@@ -7,31 +7,22 @@ package com.olmatix.ui.fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.olmatix.adapter.CustomAdapter;
-import com.olmatix.helper.OnStartDragListener;
-import com.olmatix.helper.SimpleItemTouchHelperCallback;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.utils.Connection;
 import com.olmatix.model.MyData;
 import com.olmatix.lesjaw.olmatix.R;
@@ -41,25 +32,19 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
-
 import java.util.ArrayList;
+import java.util.HashMap;
 
+public class Installed_Node extends Fragment {
 
-public class Installed_Node extends Fragment  implements OnStartDragListener {
-
-    private static CustomAdapter adapter;
+    private static RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private static RecyclerView recyclerView;
     private static ArrayList<DataModel> data;
     public static View.OnClickListener myOnClickListener;
     private static ArrayList<Integer> removedItems;
-    private String _Node_Name;
-    private Paint p = new Paint();
-    private ItemTouchHelper mItemTouchHelper;
-    private AlertDialog.Builder alertDialog;
-    private View view;
-    private TextView etTopic,version;
-    ImageView icon_node;
+    private int _Node_Id=0;
+
 
 
     public static Installed_Node newInstance() {
@@ -86,14 +71,37 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 String inputResult = m_Text.getText().toString();
+                                //Toast.makeText(getContext(), "Your Product ID -> "+ String.valueOf(inputResult), Toast.LENGTH_SHORT).show();
 
-                                String topic = "devices/" + inputResult + "/$online";
+                                dbNodeRepo repo = new dbNodeRepo(getContext());
+
+                                ArrayList<HashMap<String, String>> nodeList =  repo.getNodeList();
+                                if(nodeList.size()!=0) {
+
+                                    _Node_Id = 0;
+                                    Intent intent = getActivity().getIntent();
+                                    _Node_Id = intent.getIntExtra("node_Id", 0);
+                                    repo.getNodeById(_Node_Id);
+
+                                    Toast.makeText(getContext(), "Node DB ID -> "+ String.valueOf(_Node_Id), Toast.LENGTH_SHORT).show();
+
+
+
+                                }else{
+                                    Toast.makeText(getContext(),"No Node!",Toast.LENGTH_SHORT).show();
+                                    if (_Node_Id==0) {
+                                       // _Node_Id = repo.insert(inputResult);
+                                    }
+                                }
+
+                                String topic = "devices/"+inputResult+"/$fwname";
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
                                     subToken.setActionCallback(new IMqttActionListener() {
                                         @Override
                                         public void onSuccess(IMqttToken asyncActionToken) {
+                                            Toast.makeText(getContext(), "Sub Success", Toast.LENGTH_SHORT).show();
                                         }
 
                                         @Override
@@ -101,47 +109,13 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
                                                               Throwable exception) {
                                             // The subscription could not be performed, maybe the user was not
                                             // authorized to subscribe on the specified topic e.g. using wildcards
+                                            Toast.makeText(getContext(), "Sub fail", Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 } catch (MqttException e) {
                                     e.printStackTrace();
                                 }
 
-
-                                /*_Node_Name = "test";
-                                Intent intent = getActivity().getIntent();
-                                _Node_Name = intent.getStringExtra(_Node_Name);
-                                dbNodeRepo repo = new dbNodeRepo(getContext());
-                                dbNode node = new dbNode();
-                                repo.getNodeByNode(_Node_Name);
-                                node.node=inputResult;
-
-                                ArrayList<HashMap<String, String>> nodeList =  repo.getNodeList();
-                                if(nodeList.size()!=0) {
-
-
-                                    node.node=_Node_Name;
-                                    if (_Node_Name != inputResult){
-                                        _Node_Name = String.valueOf(repo.insert(node));
-                                        Toast.makeText(getContext(),"New Node Insert " + _Node_Name,Toast.LENGTH_SHORT).show();
-
-                                    }else{
-                                        repo.update(node);
-                                        Toast.makeText(getContext(),"You already have this Node",Toast.LENGTH_SHORT).show();
-                                    }
-                                }else {
-                                    Toast.makeText(getContext(), "No Node!", Toast.LENGTH_SHORT).show();
-                                    Toast.makeText(getContext(),"Node Name : " + _Node_Name,Toast.LENGTH_SHORT).show();
-                                    Toast.makeText(getContext(),"InputResult : " + inputResult,Toast.LENGTH_SHORT).show();
-                                    if (_Node_Name != inputResult) {
-                                        _Node_Name = String.valueOf(repo.insert(node));
-                                        Toast.makeText(getContext(), "New Node Insert " + _Node_Name, Toast.LENGTH_SHORT).show();
-
-                                    } else {
-                                        repo.update(node);
-                                        Toast.makeText(getContext(), "You already have this Node", Toast.LENGTH_SHORT).show();
-                                    }
-                                }*/
 
                             }
                         })
@@ -155,14 +129,13 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
             }
         });
 
-        initDialog();
+
         recyclerView = (RecyclerView) fragInstalledNode.findViewById(R.id.rv);
         recyclerView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(fragInstalledNode.getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
 
         data = new ArrayList<DataModel>();
         for (int i = 0; i < MyData.nameArray.length; i++) {
@@ -179,20 +152,7 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
         adapter = new CustomAdapter(data);
         recyclerView.setAdapter(adapter);
 
-        initSwipe();
-
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
-
-
-
         return fragInstalledNode;
-    }
-
-    @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        mItemTouchHelper.startDrag(viewHolder);
     }
 
 
@@ -239,83 +199,4 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
         adapter.notifyItemInserted(addItemAtListPosition);
         removedItems.remove(0);
     }
-
-    private void initDialog(){
-        alertDialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater myLayout = LayoutInflater.from(getActivity());
-        view = myLayout.inflate(R.layout.dialog_layout,null);
-        alertDialog.setView(view);
-        alertDialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                    adapter.notifyDataSetChanged();
-                    dialog.dismiss();
-
-            }
-        });
-        etTopic = (TextView) view.findViewById(R.id.et_topic);
-        version = (TextView) view.findViewById(R.id.version);
-        icon_node = (ImageView) view.findViewById(R.id.icon_node);
-    }
-
-
-
-    private void initSwipe(){
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
-
-                if (direction == ItemTouchHelper.LEFT){
-                    adapter.removeItem(position);
-                } else {
-                    //removeView();
-                    etTopic.setText(data.get(position).getName());
-                    version.setText(data.get(position).getVersion());
-                    icon_node.setImageResource(data.get(position).getImage());
-                    alertDialog.show();
-
-                }
-            }
-
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-
-                Bitmap icon;
-                if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-
-                    View itemView = viewHolder.itemView;
-                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
-                    float width = height / 3;
-
-                    if(dX > 0){
-                        p.setColor(Color.parseColor("#388E3C"));
-                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
-                        c.drawRect(background,p);
-                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_edit_white);
-                        RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);
-                    } else {
-                        p.setColor(Color.parseColor("#D32F2F"));
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(),(float) itemView.getRight(), (float) itemView.getBottom());
-                        c.drawRect(background,p);
-                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white);
-                        RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);
-                    }
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-        };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-    }
-
 }

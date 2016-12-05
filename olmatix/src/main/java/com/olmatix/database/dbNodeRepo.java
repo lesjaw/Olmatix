@@ -118,35 +118,4 @@ public class dbNodeRepo {
         return node;
     }
 
-    public dbNode getNodeByNode(String Node_Name){
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT  " +
-                dbNode.KEY_ID + "," +
-                dbNode.KEY_node + "," +
-                dbNode.KEY_fwname + "," +
-                dbNode.KEY_version +
-                " FROM " + dbNode.TABLE
-                + " WHERE " +
-                dbNode.KEY_node + "=?";// It's a good practice to use parameter ?, instead of concatenate string
-
-        int iCount =0;
-        dbNode node = new dbNode();
-
-        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(Node_Name) } );
-
-        if (cursor.moveToFirst()) {
-            do {
-                node.node_ID =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID));
-                node.node =cursor.getString(cursor.getColumnIndex(dbNode.KEY_node));
-                node.fwname  =cursor.getString(cursor.getColumnIndex(dbNode.KEY_fwname));
-                node.version =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_version));
-
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-        return node;
-    }
-
 }

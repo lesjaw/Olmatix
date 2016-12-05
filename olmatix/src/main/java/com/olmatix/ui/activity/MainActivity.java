@@ -1,29 +1,23 @@
 package com.olmatix.ui.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.service.OlmatixService;
+import android.support.v4.view.ViewPager;
+
+import com.olmatix.utils.Connection;
 import com.olmatix.ui.fragment.Favorite;
 import com.olmatix.ui.fragment.Installed_Node;
-import com.olmatix.utils.Connection;
+import com.olmatix.service.OlmatixService;
+import com.olmatix.lesjaw.olmatix.R;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -38,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     boolean serverconnected;
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private String command;
+
 
 
 
@@ -55,67 +49,11 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        Intent i = new Intent(this, OlmatixService.class);
-        startService(i);
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("custom-event-name"));
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
-        Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
-        command = "checkstatus";
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(
-                mMessageReceiver);
-    }
-
-    private void sendMessage() {
-        Log.d("sender", "MyActivity is UP = ");
-        Intent intent = new Intent("custom-event-name");
-        // You can also include some extra data.
-        intent.putExtra("MQTT State", command);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    @Override
-    protected void onPause() {
-        // Unregister since the activity is paused.
-      /*  LocalBroadcastManager.getInstance(this).unregisterReceiver(
-                mMessageReceiver);*/
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        // Register to receive messages.
-        // We are registering an observer (mMessageReceiver) to receive Intents
-        // with actions named "custom-event-name".
-        command = "checkstatus";
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("custom-event-name"));
-        super.onResume();
-    }
-
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("MQTT State");
-            Log.d("receiver", "Got message : " + message);
-            if (message == "true"){
-                serverconnected = true;
-                invalidateOptionsMenu();
-            } else
-                serverconnected = false;
-                invalidateOptionsMenu();
+        if (Connection.getClient().isConnected()) {
+            serverconnected = true;
+            invalidateOptionsMenu();
         }
-    };
+    }
 
 
 
@@ -127,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 subToken.setActionCallback(new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
+                        Toast.makeText(getApplicationContext(), "Sub Success", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -134,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                                           Throwable exception) {
                         // The subscription could not be performed, maybe the user was not
                         // authorized to subscribe on the specified topic e.g. using wildcards
+                        Toast.makeText(getApplicationContext(), "Sub fail", Toast.LENGTH_LONG).show();
                     }
                 });
             } catch (MqttException e) {
@@ -145,10 +85,13 @@ public class MainActivity extends AppCompatActivity {
     // Override this method to do what you want when the menu is recreated
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        Toast.makeText(getApplicationContext(), "Menu -> "+ String.valueOf(serverconnected), Toast.LENGTH_SHORT).show();
+
         if (serverconnected) {
             menu.findItem(R.id.state_conn).setTitle("Connected");
         } else
             menu.findItem(R.id.state_conn).setTitle("Not Connected");
+
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -170,6 +113,9 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
 
         if (id == R.id.state_conn) {
+            Intent intent = new Intent(this, OlmatixService.class);
+            startService(intent);
+
 
             return true;
         }

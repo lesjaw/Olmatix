@@ -4,24 +4,19 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.utils.Connection;
 import com.olmatix.lesjaw.olmatix.R;
 
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
@@ -33,50 +28,17 @@ public class Favorite extends Fragment {
                              Bundle savedInstanceState) {
 
         View mFavourit = inflater.inflate(R.layout.frag_favorite, container, false);
+        Button nxtact1 = (Button) mFavourit.findViewById(R.id.testBut1);
 
         FloatingActionButton fab = (FloatingActionButton) mFavourit.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                final EditText m_Text = new EditText(getContext());
 
-                new AlertDialog.Builder(getContext())
-                        .setTitle("Add Node")
-                        .setMessage("Please type Olmatix product ID!")
-                        .setView(m_Text)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                String inputResult = m_Text.getText().toString();
-
-                                String topic = "devices/"+inputResult+"/#";
-                                try {
-                                    Connection.getClient().unsubscribe(topic);
-                                    /*IMqttToken subToken = Connection.getClient().unsubscribe(topic);
-                                    subToken.setActionCallback(new IMqttActionListener() {
-                                    @Override
-                                    public void onSuccess(IMqttToken asyncActionToken) {
-                                    }
-
-                                    @Override
-                                    public void onFailure(IMqttToken asyncActionToken,
-                                                          Throwable exception) {
-                                        // The subscription could not be performed, maybe the user was not
-                                        // authorized to subscribe on the specified topic e.g. using wildcards
-                                    }
-                                });*/
-                            } catch (MqttException e) {
-                                e.printStackTrace();
-                            }
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        })
-                        .show();
+                Toast.makeText(getContext(), "Nothing to add", Toast.LENGTH_SHORT).show();
             }
         });
-        Button nxtact1 = (Button) mFavourit.findViewById(R.id.testBut1);
+
         nxtact1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

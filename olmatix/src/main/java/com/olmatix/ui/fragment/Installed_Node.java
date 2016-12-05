@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.olmatix.adapter.CustomAdapter;
 import com.olmatix.database.dbNodeRepo;
+import com.olmatix.database.dbNode;
 import com.olmatix.utils.Connection;
 import com.olmatix.model.MyData;
 import com.olmatix.lesjaw.olmatix.R;
@@ -71,26 +72,36 @@ public class Installed_Node extends Fragment {
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 String inputResult = m_Text.getText().toString();
-                                //Toast.makeText(getContext(), "Your Product ID -> "+ String.valueOf(inputResult), Toast.LENGTH_SHORT).show();
 
+
+                                _Node_Id = 0;
+                                Intent intent = getActivity().getIntent();
+                                _Node_Id = intent.getIntExtra("node_Id", 0);
                                 dbNodeRepo repo = new dbNodeRepo(getContext());
+                                dbNode node = new dbNode();
+                                repo.getNodeById(_Node_Id);
+                                node.node=inputResult;
 
                                 ArrayList<HashMap<String, String>> nodeList =  repo.getNodeList();
                                 if(nodeList.size()!=0) {
+                                    node.node_ID=_Node_Id;
+                                    if (_Node_Id==0){
+                                        _Node_Id = repo.insert(node);
+                                        Toast.makeText(getContext(),"New Node Insert " + _Node_Id,Toast.LENGTH_SHORT).show();
 
-                                    _Node_Id = 0;
-                                    Intent intent = getActivity().getIntent();
-                                    _Node_Id = intent.getIntExtra("node_Id", 0);
-                                    repo.getNodeById(_Node_Id);
-
-                                    Toast.makeText(getContext(), "Node DB ID -> "+ String.valueOf(_Node_Id), Toast.LENGTH_SHORT).show();
-
-
-
+                                    }else{
+                                        //repo.update(node);
+                                        Toast.makeText(getContext(),"You already have this Node",Toast.LENGTH_SHORT).show();
+                                    }
                                 }else{
                                     Toast.makeText(getContext(),"No Node!",Toast.LENGTH_SHORT).show();
-                                    if (_Node_Id==0) {
-                                       // _Node_Id = repo.insert(inputResult);
+                                    if (_Node_Id==0){
+                                        _Node_Id = repo.insert(node);
+                                        Toast.makeText(getContext(),"New Node Insert" + _Node_Id,Toast.LENGTH_SHORT).show();
+
+                                    }else{
+                                        //repo.update(node);
+                                        Toast.makeText(getContext(),"You already have this Node",Toast.LENGTH_SHORT).show();
                                     }
                                 }
 
@@ -101,7 +112,6 @@ public class Installed_Node extends Fragment {
                                     subToken.setActionCallback(new IMqttActionListener() {
                                         @Override
                                         public void onSuccess(IMqttToken asyncActionToken) {
-                                            Toast.makeText(getContext(), "Sub Success", Toast.LENGTH_SHORT).show();
                                         }
 
                                         @Override
@@ -109,14 +119,11 @@ public class Installed_Node extends Fragment {
                                                               Throwable exception) {
                                             // The subscription could not be performed, maybe the user was not
                                             // authorized to subscribe on the specified topic e.g. using wildcards
-                                            Toast.makeText(getContext(), "Sub fail", Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 } catch (MqttException e) {
                                     e.printStackTrace();
                                 }
-
-
                             }
                         })
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

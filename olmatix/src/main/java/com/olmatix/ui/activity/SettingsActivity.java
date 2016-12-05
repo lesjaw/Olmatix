@@ -82,9 +82,7 @@ public class SettingsActivity extends SettingsFragment {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setupActionBar();
-        stopService(new Intent(this, OlmatixService.class));
     }
 
     @Override

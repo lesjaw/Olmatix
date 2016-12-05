@@ -193,17 +193,13 @@ public class OlmatixService extends Service {
     }
 
     private void doConnect() {
-        Toast.makeText(getApplicationContext(), "Connecting to server..", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.connecting, Toast.LENGTH_SHORT).show();
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
-        Log.d("DEBUG", "Server Address 2: " + mServerURL);
         String mServerPort = sharedPref.getString("server_port", "1883");
-        Log.d("DEBUG", "Server Port 2: " + mServerPort);
         String mUserName = sharedPref.getString("user_name", "olmatix1");
-        Log.d("DEBUG", "User Name 2: " + mUserName);
         String mPassword = sharedPref.getString("password", "olmatix");
-        Log.d("DEBUG", "Password 2: " + mPassword);
 
         final MqttConnectOptions options = new MqttConnectOptions();
         options.setUserName(mUserName);
@@ -220,23 +216,21 @@ public class OlmatixService extends Service {
 
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Toast.makeText(getApplicationContext(), "Success connection", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
                     Connection.getClient().setCallback(new MqttEventCallback());
                     stateoffMqtt = 1;
-                    Toast.makeText(getApplicationContext(), "StatusConn -> "+ String.valueOf(stateoffMqtt), Toast.LENGTH_SHORT).show();
-
                     try {
-                        Connection.getClient().subscribe("devices/809ed5e0/light/0/set", 0, getApplicationContext(), new IMqttActionListener() {
+                        Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
 
                                 Log.i("sub","Subscribe success");
-                                Toast.makeText(getApplicationContext(), "Subscribe success", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), R.string.sub_success, Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                                Toast.makeText(getApplicationContext(), "Subscribe failure", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), R.string.sub_fail, Toast.LENGTH_SHORT).show();
                                 Log.e("error",exception.toString());
 
                             }
@@ -249,7 +243,7 @@ public class OlmatixService extends Service {
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Toast.makeText(getApplicationContext(), "Failure connection "+exception.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.conn_fail+exception.toString(), Toast.LENGTH_SHORT).show();
                     Log.e("mqtt",exception.toString());
                     stateoffMqtt = 2;
 
@@ -257,7 +251,6 @@ public class OlmatixService extends Service {
             });
 
         } catch (MqttSecurityException e) {
-            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         } catch (MqttException e) {
             switch (e.getReasonCode()) {
@@ -288,7 +281,7 @@ public class OlmatixService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand()");
-        Toast.makeText(getApplicationContext(), "Service starting..", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
 
         return START_STICKY;
     }
@@ -302,7 +295,7 @@ public class OlmatixService extends Service {
         // Cancel the persistent notification.
         // Tell the user we stopped.
         super.onDestroy();
-        Toast.makeText(this, "Service Stoping..", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.service_stop, Toast.LENGTH_SHORT).show();
     }
 
     @Nullable

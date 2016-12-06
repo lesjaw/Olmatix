@@ -11,6 +11,7 @@ public class Connection {
 
     public static void setClient(MqttAndroidClient cl){
         client = cl;
+
     }
     public static MqttAndroidClient getClient(){
         return client;

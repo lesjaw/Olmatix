@@ -12,6 +12,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
+import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 
@@ -43,15 +44,12 @@ public class SettingsActivity extends SettingsFragment {
             SharedPreferences sharedPref = preference.getSharedPreferences();
             boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
 
-
-            if (mSwitch_Conn) {
+           /* if (mSwitch_Conn) {
                 Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
-               // MQTTConnect mStartConnect = new MQTTConnect();
-                //mStartConnect.startConnect();
             }
-                if (!mSwitch_Conn){
-                    Log.d("DEBUG", "SwitchConnPreff: "+ mSwitch_Conn);
-                }
+            if (!mSwitch_Conn){
+                Log.d("DEBUG", "SwitchConnPreff: "+ mSwitch_Conn);
+            }*/
 
             return true;
         }
@@ -74,15 +72,14 @@ public class SettingsActivity extends SettingsFragment {
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
-
-
-
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+
+
     }
 
     @Override
@@ -118,7 +115,6 @@ public class SettingsActivity extends SettingsFragment {
     }
 
 
-
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || NetworkPreferenceFragment.class.getName().equals(fragmentName)
@@ -143,6 +139,8 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("server_port"));
             bindPreferenceSummaryToValue(findPreference("user_name"));
             bindPreferenceSummaryToValue(findPreference("password"));
+
+            SwitchPreference pref = (SwitchPreference) findPreference("switch_conn");
         }
     }
 
@@ -153,7 +151,7 @@ public class SettingsActivity extends SettingsFragment {
             super.onCreate(savedInstanceState);
 
             //Intent i = new Intent(this,AboutActivity.class);
-            //startActivity(i);
+            //startActivity(i)
         }
     }
 

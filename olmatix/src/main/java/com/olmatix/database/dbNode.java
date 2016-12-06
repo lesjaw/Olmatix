@@ -10,14 +10,29 @@ public class dbNode {
     public static final String TABLE = "Node";
 
     // Labels Table Columns names
-    public static final String KEY_ID = "id";
-    public static final String KEY_node = "node";
-    public static final String KEY_fwname = "fwname";
-    public static final String KEY_fwversion = "version";
+    public static final String KEY_ID           = "node_id";
+    public static final String KEY_NODES        = "nodes";
+    public static final String KEY_NAME         = "name";
+    public static final String KEY_LOCALIP      = "localip";
+    public static final String KEY_FWNAME       = "fwname";
+    public static final String KEY_FWVERSION    = "fwversion";
+    public static final String KEY_ONLINE       = "online";
+    public static final String KEY_SIGNAL       = "signal";
+    public static final String KEY_UPTIME       = "uptime";
+    public static final String KEY_RESET        = "reset";
+    public static final String KEY_OTA          = "ota";
 
     // property help us to keep data
-    public int node_ID;
-    public String node;
+    public int node_id;
+    public String nodes;
+    public String name;
+    public String localip;
     public String fwname;
     public int fwversion;
+    public int online;
+    public int signal;
+    public String uptime;
+    public int reset;
+    public String ota;
+
 }

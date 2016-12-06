@@ -12,10 +12,10 @@ public class dbHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     // Database Name
-    private static final String DATABASE_NAME = "crud.db";
+    private static final String DATABASE_NAME = "olmatix";
 
     public dbHelper(Context context ) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -27,9 +27,16 @@ public class dbHelper extends SQLiteOpenHelper {
 
         String CREATE_TABLE_NODE = "CREATE TABLE " + dbNode.TABLE  + "("
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_node + " TEXT, "
-                + dbNode.KEY_fwname + " TEXT, "
-                + dbNode.KEY_fwversion + " TEXT )";
+                + dbNode.KEY_NODES + " TEXT, "
+                + dbNode.KEY_NAME + " TEXT, "
+                + dbNode.KEY_LOCALIP + " TEXT, "
+                + dbNode.KEY_FWNAME + " INTEGER, "
+                + dbNode.KEY_FWVERSION + " TEXT, "
+                + dbNode.KEY_ONLINE + " BOOLEAN, "
+                + dbNode.KEY_SIGNAL + " BOOLEAN, "
+                + dbNode.KEY_UPTIME + " TEXT, "
+                + dbNode.KEY_RESET + " BOOLEAN, "
+                + dbNode.KEY_OTA + " TEXT )";
 
         db.execSQL(CREATE_TABLE_NODE);
 

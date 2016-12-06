@@ -118,7 +118,7 @@ public class dbNodeRepo {
         return node;
     }
 
-    public dbNode getNodeByNode(int Id){
+    public dbNode getNodeByNode(String Node_Name){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT  " +
                 dbNode.KEY_ID + "," +
@@ -132,7 +132,7 @@ public class dbNodeRepo {
         int iCount =0;
         dbNode node = new dbNode();
 
-        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(Id) } );
+        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(Node_Name) } );
 
         if (cursor.moveToFirst()) {
             do {

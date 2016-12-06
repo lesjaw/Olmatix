@@ -11,17 +11,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.olmatix.helper.ItemTouchHelperAdapter;
+import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DataModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
+public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder>  implements ItemTouchHelperAdapter {
 
 
 
     private ArrayList<DataModel> dataSet;
+
+
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -53,6 +58,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         return myViewHolder;
     }
 
+
+
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
@@ -68,6 +75,24 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     @Override
     public int getItemCount() {
         return dataSet.size();
+    }
+
+    public void removeItem(int position) {
+        dataSet.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, dataSet.size());
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        Collections.swap(dataSet, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+
     }
 
 }

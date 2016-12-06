@@ -64,9 +64,9 @@ public class Favorite extends Fragment {
                                         // authorized to subscribe on the specified topic e.g. using wildcards
                                     }
                                 });*/
-                            } catch (MqttException e) {
-                                e.printStackTrace();
-                            }
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         })
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

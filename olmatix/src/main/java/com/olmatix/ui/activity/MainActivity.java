@@ -113,31 +113,31 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu();
             } else
                 serverconnected = false;
-                invalidateOptionsMenu();
+            invalidateOptionsMenu();
         }
     };
 
 
 
     private void subStatus() {
-            String topic = "devices/809ed5e0/light/0/set";
-            int qos = 1;
-            try {
-                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                subToken.setActionCallback(new IMqttActionListener() {
-                    @Override
-                    public void onSuccess(IMqttToken asyncActionToken) {
-                    }
+        String topic = "devices/809ed5e0/light/0/set";
+        int qos = 1;
+        try {
+            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+            subToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                }
 
-                    @Override
-                    public void onFailure(IMqttToken asyncActionToken,
-                                          Throwable exception) {
-                        // The subscription could not be performed, maybe the user was not
-                        // authorized to subscribe on the specified topic e.g. using wildcards
-                    }
-                });
-            } catch (MqttException e) {
-                e.printStackTrace();
+                @Override
+                public void onFailure(IMqttToken asyncActionToken,
+                                      Throwable exception) {
+                    // The subscription could not be performed, maybe the user was not
+                    // authorized to subscribe on the specified topic e.g. using wildcards
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
         }
     }
 

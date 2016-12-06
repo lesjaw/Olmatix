@@ -37,8 +37,8 @@ public class SettingsActivity extends SettingsFragment {
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
 
-                // For all other preferences, set the summary to the value's
-                // simple string representation.
+            // For all other preferences, set the summary to the value's
+            // simple string representation.
             preference.setSummary(stringValue);
 
             SharedPreferences sharedPref = preference.getSharedPreferences();
@@ -134,7 +134,7 @@ public class SettingsActivity extends SettingsFragment {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-           // bindPreferenceSummaryToValue(findPreference("server_conn"));
+            // bindPreferenceSummaryToValue(findPreference("server_conn"));
             bindPreferenceSummaryToValue(findPreference("server_address"));
             bindPreferenceSummaryToValue(findPreference("server_port"));
             bindPreferenceSummaryToValue(findPreference("user_name"));

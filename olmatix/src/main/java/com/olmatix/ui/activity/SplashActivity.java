@@ -18,9 +18,6 @@ import com.olmatix.service.OlmatixService;
 
 public class SplashActivity extends AppCompatActivity {
 
-    MyReceiver myReceiver;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +32,6 @@ public class SplashActivity extends AppCompatActivity {
         Log.d("DEBUG", "User Name 1: " + mUserName);
         String mPassword = sharedPref.getString("password", "olmatix");
         Log.d("DEBUG", "Password 1: " + mPassword);
-
-        myReceiver = new MyReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(OlmatixService.MY_ACTION);
-        registerReceiver(myReceiver, intentFilter);
 
 
         Intent i = new Intent(this, OlmatixService.class);
@@ -56,22 +48,10 @@ public class SplashActivity extends AppCompatActivity {
         finish();
     }
 
-    private class MyReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context arg0, Intent arg1) {
-            // TODO Auto-generated method stub
-            int datapassed = arg1.getIntExtra("DATAPASSED",0);
-            if (datapassed == 0) {
-              //  Toast.makeText(getApplicationContext(), "StatusMain -> "+ String.valueOf(datapassed), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
 
     @Override
     protected void onStop() {
-        unregisterReceiver(myReceiver);
         super.onStop();
 
     }

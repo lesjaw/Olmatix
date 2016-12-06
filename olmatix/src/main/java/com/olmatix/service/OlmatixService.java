@@ -15,9 +15,14 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -57,7 +62,7 @@ public class OlmatixService extends Service {
     private ConnectivityManager mConnMan;
     public volatile MqttAsyncClient mqttClient;
     private String deviceId;
-    private int stateoffMqtt;
+    private String stateoffMqtt;
 
     private NotificationManager mNM;
 
@@ -91,6 +96,9 @@ public class OlmatixService extends Service {
                 String msg = getString(R.string.err_internet);
                 Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
                 toast.show();
+                stateoffMqtt = "false";
+                Log.d("DEBUG", "MQTT Status No Internet: " +stateoffMqtt);
+                sendMessage();
             }
 
             hasConnectivity = hasMmobile || hasWifi;
@@ -101,16 +109,7 @@ public class OlmatixService extends Service {
             } else if (!hasConnectivity && mqttClient != null && mqttClient.isConnected()) {
                 doDisconnect();
 
-                    }
-
-            String.valueOf(stateoffMqtt);
-            Toast.makeText(getApplicationContext(), "StatusService -> "+ String.valueOf(stateoffMqtt), Toast.LENGTH_SHORT).show();
-
-
-            Intent launchA = new Intent();
-            launchA.setAction(MY_ACTION);
-            launchA.putExtra("DATAPASSED",stateoffMqtt);
-            sendBroadcast(launchA);
+            }
         }
 
     }
@@ -121,13 +120,12 @@ public class OlmatixService extends Service {
         try {
             token = mqttClient.disconnect();
             token.waitForCompletion(1000);
+            stateoffMqtt = "false";
+            sendMessage();
         } catch (MqttException e) {
             e.printStackTrace();
             Log.d(TAG, "onReceive: " + String.valueOf(e.getMessage()));
         }
-
-
-
     }
 
     public class OlmatixBinder extends Binder {
@@ -218,7 +216,8 @@ public class OlmatixService extends Service {
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
                     Connection.getClient().setCallback(new MqttEventCallback());
-                    stateoffMqtt = 1;
+
+
                     try {
                         Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
                             @Override
@@ -226,6 +225,9 @@ public class OlmatixService extends Service {
 
                                 Log.i("sub","Subscribe success");
                                 Toast.makeText(getApplicationContext(), R.string.sub_success, Toast.LENGTH_SHORT).show();
+                                stateoffMqtt = "true";
+                                Log.d("DEBUG", "MQTT Status after sub: " +stateoffMqtt);
+                                sendMessage();
                             }
 
                             @Override
@@ -245,7 +247,9 @@ public class OlmatixService extends Service {
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     Toast.makeText(getApplicationContext(), R.string.conn_fail+exception.toString(), Toast.LENGTH_SHORT).show();
                     Log.e("mqtt",exception.toString());
-                    stateoffMqtt = 2;
+                    stateoffMqtt = "false";
+                    sendMessage();
+
 
                 }
             });
@@ -283,7 +287,17 @@ public class OlmatixService extends Service {
         Log.v(TAG, "onStartCommand()");
         Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
 
+        sendMessage();
+
         return START_STICKY;
+    }
+
+    private void sendMessage() {
+        Log.d("sender", "Broadcasting message MQTT status = " +stateoffMqtt);
+        Intent intent = new Intent("custom-event-name");
+        // You can also include some extra data.
+        intent.putExtra("MQTT State", stateoffMqtt);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public String getThread(){

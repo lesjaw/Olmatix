@@ -1,0 +1,16 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- These settings headers are only used on tablets. -->
+
+    <header
+        android:fragment="com.olmatix.ui.activity.SettingsActivity$NetworkPreferenceFragment"
+        android:icon="@drawable/ic_network_black_24dp"
+        android:title="@string/pref_network" />
+
+    <header
+        android:icon="@drawable/ic_about_black_24dp"
+        android:title="@string/pref_about"
+        android:summary="@string/about_sum"/>
+
+
+</preference-headers>

@@ -45,6 +45,7 @@ public class Installed_Node extends Fragment {
     private static RecyclerView recyclerView;
     private static ArrayList<DataModel> data;
     public static View.OnClickListener myOnClickListener;
+    public static View.OnClickListener MyOnClickButListener;
     private static ArrayList<Integer> removedItems;
     //private int _Node_Id=0;
     private String _Node_Name;
@@ -61,6 +62,8 @@ public class Installed_Node extends Fragment {
                              Bundle savedInstanceState) {
 
         View fragInstalledNode = inflater.inflate(R.layout.frag_installed_node, container, false);
+
+
 
         FloatingActionButton fab = (FloatingActionButton) fragInstalledNode.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -166,6 +169,8 @@ public class Installed_Node extends Fragment {
 
         adapter = new CustomAdapter(data);
         recyclerView.setAdapter(adapter);
+
+        myOnClickListener = new MyOnClickListener(getContext());
 
         return fragInstalledNode;
     }

@@ -13,11 +13,11 @@ public class dbNode {
     public static final String KEY_ID = "id";
     public static final String KEY_node = "node";
     public static final String KEY_fwname = "fwname";
-    public static final String KEY_version = "version";
+    public static final String KEY_fwversion = "version";
 
     // property help us to keep data
     public int node_ID;
     public String node;
     public String fwname;
-    public int version;
+    public int fwversion;
 }

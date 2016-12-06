@@ -25,7 +25,7 @@ public class dbNodeRepo {
         ContentValues values = new ContentValues();
         values.put(dbNode.KEY_node, DBNode.node);
         values.put(dbNode.KEY_fwname,DBNode.fwname);
-        values.put(dbNode.KEY_version, DBNode.version);
+        values.put(dbNode.KEY_fwversion, DBNode.fwversion);
 
         // Inserting Row
         long node_Id = db.insert(dbNode.TABLE, null, values);
@@ -48,7 +48,7 @@ public class dbNodeRepo {
 
         values.put(dbNode.KEY_node, DBNode.node);
         values.put(dbNode.KEY_fwname,DBNode.fwname);
-        values.put(dbNode.KEY_version, DBNode.version);
+        values.put(dbNode.KEY_fwversion, DBNode.fwversion);
 
         // It's a good practice to use parameter ?, instead of concatenate string
         db.update(dbNode.TABLE, values, dbNode.KEY_ID + "= ?", new String[] { String.valueOf(DBNode.node_ID) });
@@ -62,7 +62,7 @@ public class dbNodeRepo {
                 dbNode.KEY_ID + "," +
                 dbNode.KEY_node + "," +
                 dbNode.KEY_fwname + "," +
-                dbNode.KEY_version +
+                dbNode.KEY_fwversion +
                 " FROM " + dbNode.TABLE;
 
         //Student student = new Student();
@@ -93,7 +93,7 @@ public class dbNodeRepo {
                 dbNode.KEY_ID + "," +
                 dbNode.KEY_node + "," +
                 dbNode.KEY_fwname + "," +
-                dbNode.KEY_version +
+                dbNode.KEY_fwversion +
                 " FROM " + dbNode.TABLE
                 + " WHERE " +
                 dbNode.KEY_ID + "=?";// It's a good practice to use parameter ?, instead of concatenate string
@@ -108,7 +108,7 @@ public class dbNodeRepo {
                 node.node_ID =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID));
                 node.node =cursor.getString(cursor.getColumnIndex(dbNode.KEY_node));
                 node.fwname  =cursor.getString(cursor.getColumnIndex(dbNode.KEY_fwname));
-                node.version =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_version));
+                node.fwversion =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_fwversion));
 
             } while (cursor.moveToNext());
         }
@@ -124,7 +124,7 @@ public class dbNodeRepo {
                 dbNode.KEY_ID + "," +
                 dbNode.KEY_node + "," +
                 dbNode.KEY_fwname + "," +
-                dbNode.KEY_version +
+                dbNode.KEY_fwversion +
                 " FROM " + dbNode.TABLE
                 + " WHERE " +
                 dbNode.KEY_node + "=?";// It's a good practice to use parameter ?, instead of concatenate string
@@ -139,7 +139,7 @@ public class dbNodeRepo {
                 node.node_ID =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID));
                 node.node =cursor.getString(cursor.getColumnIndex(dbNode.KEY_node));
                 node.fwname  =cursor.getString(cursor.getColumnIndex(dbNode.KEY_fwname));
-                node.version =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_version));
+                node.fwversion =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_fwversion));
 
             } while (cursor.moveToNext());
         }

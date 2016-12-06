@@ -29,7 +29,7 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
                 + dbNode.KEY_node + " TEXT, "
                 + dbNode.KEY_fwname + " TEXT, "
-                + dbNode.KEY_version + " TEXT )";
+                + dbNode.KEY_fwversion + " TEXT )";
 
         db.execSQL(CREATE_TABLE_NODE);
 

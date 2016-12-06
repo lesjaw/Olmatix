@@ -32,9 +32,11 @@ import com.olmatix.model.DataModel;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.util.Strings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.jar.Attributes;
 
 public class Installed_Node extends Fragment {
 
@@ -44,7 +46,8 @@ public class Installed_Node extends Fragment {
     private static ArrayList<DataModel> data;
     public static View.OnClickListener myOnClickListener;
     private static ArrayList<Integer> removedItems;
-    private int _Node_Id=0;
+    //private int _Node_Id=0;
+    private String _Node_Name;
 
 
 
@@ -73,39 +76,7 @@ public class Installed_Node extends Fragment {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 String inputResult = m_Text.getText().toString();
 
-
-                                _Node_Id = 0;
-                                Intent intent = getActivity().getIntent();
-                                _Node_Id = intent.getIntExtra("node_Id", 0);
-                                dbNodeRepo repo = new dbNodeRepo(getContext());
-                                dbNode node = new dbNode();
-                                repo.getNodeById(_Node_Id);
-                                node.node=inputResult;
-
-                                ArrayList<HashMap<String, String>> nodeList =  repo.getNodeList();
-                                if(nodeList.size()!=0) {
-                                    node.node_ID=_Node_Id;
-                                    if (_Node_Id==0){
-                                        _Node_Id = repo.insert(node);
-                                        Toast.makeText(getContext(),"New Node Insert " + _Node_Id,Toast.LENGTH_SHORT).show();
-
-                                    }else{
-                                        //repo.update(node);
-                                        Toast.makeText(getContext(),"You already have this Node",Toast.LENGTH_SHORT).show();
-                                    }
-                                }else{
-                                    Toast.makeText(getContext(),"No Node!",Toast.LENGTH_SHORT).show();
-                                    if (_Node_Id==0){
-                                        _Node_Id = repo.insert(node);
-                                        Toast.makeText(getContext(),"New Node Insert" + _Node_Id,Toast.LENGTH_SHORT).show();
-
-                                    }else{
-                                        //repo.update(node);
-                                        Toast.makeText(getContext(),"You already have this Node",Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-
-                                String topic = "devices/"+inputResult+"/$fwname";
+                                String topic = "devices/"+inputResult+"/$online";
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
@@ -124,6 +95,43 @@ public class Installed_Node extends Fragment {
                                 } catch (MqttException e) {
                                     e.printStackTrace();
                                 }
+
+
+                                /*_Node_Name = "test";
+                                Intent intent = getActivity().getIntent();
+                                _Node_Name = intent.getStringExtra(_Node_Name);
+                                dbNodeRepo repo = new dbNodeRepo(getContext());
+                                dbNode node = new dbNode();
+                                repo.getNodeByNode(_Node_Name);
+                                node.node=inputResult;
+
+                                ArrayList<HashMap<String, String>> nodeList =  repo.getNodeList();
+                                if(nodeList.size()!=0) {
+
+
+                                    node.node=_Node_Name;
+                                    if (_Node_Name != inputResult){
+                                        _Node_Name = String.valueOf(repo.insert(node));
+                                        Toast.makeText(getContext(),"New Node Insert " + _Node_Name,Toast.LENGTH_SHORT).show();
+
+                                    }else{
+                                        repo.update(node);
+                                        Toast.makeText(getContext(),"You already have this Node",Toast.LENGTH_SHORT).show();
+                                    }
+                                }else {
+                                    Toast.makeText(getContext(), "No Node!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(),"Node Name : " + _Node_Name,Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(),"InputResult : " + inputResult,Toast.LENGTH_SHORT).show();
+                                    if (_Node_Name != inputResult) {
+                                        _Node_Name = String.valueOf(repo.insert(node));
+                                        Toast.makeText(getContext(), "New Node Insert " + _Node_Name, Toast.LENGTH_SHORT).show();
+
+                                    } else {
+                                        repo.update(node);
+                                        Toast.makeText(getContext(), "You already have this Node", Toast.LENGTH_SHORT).show();
+                                    }
+                                }*/
+
                             }
                         })
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

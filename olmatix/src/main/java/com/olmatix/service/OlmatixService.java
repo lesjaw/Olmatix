@@ -49,7 +49,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
  * ===================================================
  * Package              : com.olmatix.service.
  * Project Name         : Olmatix.
- * Copyright            : Copyright @ 2016 Indogamers.
+ * Copyright            : Copyright @ 2016 OLMATIX.
  */
 public class OlmatixService extends Service {
 
@@ -163,6 +163,7 @@ public class OlmatixService extends Service {
                 .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
                 .setContentText(text)  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
+                
                 .setOngoing(true)
                 .build();
 
@@ -196,12 +197,12 @@ public class OlmatixService extends Service {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
         String mServerPort = sharedPref.getString("server_port", "1883");
-        String mUserName = sharedPref.getString("user_name", "olmatix1");
+        String mUserName = sharedPref.getString("user_name", "olmatix");
         String mPassword = sharedPref.getString("password", "olmatix");
 
         final MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName(mUserName);
-        options.setPassword(mPassword.toCharArray());
+        options.setUserName("olmatix");
+        options.setPassword("olmatix".toCharArray());
         final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId, new MemoryPersistence());
         options.setCleanSession(false);
         Connection.setClient(client);

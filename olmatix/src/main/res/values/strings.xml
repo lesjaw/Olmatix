@@ -56,5 +56,6 @@
     <string name="sendButton">Send Config</string>
     <string name="connect_product">Connect to product WiFi</string>
     <string name="action_exit">Exit</string>
+    <string name="backbutton">Press the back button once again to close the application, otherwise just press home button</string>
 
 </resources>

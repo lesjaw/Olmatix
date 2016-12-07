@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private String command;
+    int backButtonCount;
 
 
 
@@ -234,6 +235,25 @@ public class MainActivity extends AppCompatActivity {
 
             }
             return null;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if(backButtonCount >= 1)
+        {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+            System.exit(0);
+        }
+        else
+        {
+            Toast.makeText(this, R.string.backbutton, Toast.LENGTH_SHORT).show();
+            backButtonCount++;
         }
     }
 

@@ -12,12 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.olmatix.database.dbNodeRepo;
+import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.model.NodeModel;
 import com.olmatix.lesjaw.olmatix.R;
 
+import java.util.Collections;
 import java.util.List;
 
-public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder> {
+public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter {
 
     List<NodeModel> nodeList;
     dbNodeRepo db;
@@ -70,6 +72,24 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     @Override
     public int getItemCount() {
         return nodeList.size();
+    }
+
+    public void removeItem(int position) {
+        nodeList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, nodeList.size());
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        Collections.swap(nodeList, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+
     }
 
 }

@@ -69,7 +69,8 @@ public class OlmatixService extends Service {
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
     private int NOTIFICATION = R.string.local_service_started;
-
+    private String messageMQQT;
+    private String topicMQQT;
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -198,6 +199,7 @@ public class OlmatixService extends Service {
         String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
         String mServerPort = sharedPref.getString("server_port", "1883");
         String mUserName = sharedPref.getString("user_name", "olmatix");
+        Log.d(TAG, "doConnect: " + mUserName);
         String mPassword = sharedPref.getString("password", "olmatix");
 
         final MqttConnectOptions options = new MqttConnectOptions();
@@ -301,6 +303,16 @@ public class OlmatixService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    private void sendMessageHandle() {
+        Log.d("sender", "topic message = " +topicMQQT + "\n\n"+ messageMQQT);
+        Intent intent = new Intent("info-device");
+        // You can also include some extra data.
+
+        intent.putExtra("device", topicMQQT);
+        intent.putExtra("message", messageMQQT);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
     public String getThread(){
         return Long.valueOf(thread.getId()).toString();
     }
@@ -332,7 +344,7 @@ public class OlmatixService extends Service {
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
             Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
-
+            sendMessageHandle();
         }
 
         @Override

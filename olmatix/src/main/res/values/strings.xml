@@ -44,5 +44,9 @@
     <string name="conn_fail">Connection Fail</string>
     <string name="service_start">Olmatix service starting..</string>
     <string name="service_stop">Olmatix service stop</string>
+    <string name="nodename">Node Name</string>
+    <string name="ipaddrs">IP Address</string>
+    <string name="lastupdt">Last Update</string>
+    <string name="uptime">Up Time</string>
 
 </resources>

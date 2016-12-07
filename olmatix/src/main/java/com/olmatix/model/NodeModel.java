@@ -12,10 +12,11 @@ public class NodeModel {
     private int nid;
     private String nodes;
     private String name;
+    private String niceName;
     private String localip;
     private String fwName;
     private String fwVersion;
-    private String icon;
+    private int icon;
     private String adding;
     private String online;
     private String signal;
@@ -24,6 +25,22 @@ public class NodeModel {
     private String ota;
 
     public NodeModel() {
+    }
+
+    public NodeModel(String nodes, String name, String niceName, String localip, String fwName, String fwVersion, int icon, String adding, String online, String signal, String uptime, String reset, String ota) {
+        this.nodes = nodes;
+        this.name = name;
+        this.niceName = niceName;
+        this.localip = localip;
+        this.fwName = fwName;
+        this.fwVersion = fwVersion;
+        this.icon = icon;
+        this.adding = adding;
+        this.online = online;
+        this.signal = signal;
+        this.uptime = uptime;
+        this.reset = reset;
+        this.ota = ota;
     }
 
     public int getNid() {
@@ -50,6 +67,14 @@ public class NodeModel {
         this.name = name;
     }
 
+    public String getNiceName() {
+        return niceName;
+    }
+
+    public void setNiceName(String niceName) {
+        this.niceName = niceName;
+    }
+
     public String getLocalip() {
         return localip;
     }
@@ -74,11 +99,11 @@ public class NodeModel {
         this.fwVersion = fwVersion;
     }
 
-    public String getIcon() {
+    public int getIcon() {
         return icon;
     }
 
-    public void setIcon(String icon) {
+    public void setIcon(int icon) {
         this.icon = icon;
     }
 

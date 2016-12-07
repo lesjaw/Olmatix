@@ -30,12 +30,14 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_NODES + " TEXT, "
                 + dbNode.KEY_NAME + " TEXT, "
                 + dbNode.KEY_LOCALIP + " TEXT, "
-                + dbNode.KEY_FWNAME + " INTEGER, "
+                + dbNode.KEY_FWNAME + " TEXT, "
                 + dbNode.KEY_FWVERSION + " TEXT, "
-                + dbNode.KEY_ONLINE + " BOOLEAN, "
-                + dbNode.KEY_SIGNAL + " BOOLEAN, "
+                + dbNode.KEY_ONLINE + " TEXT, "
+                + dbNode.KEY_ICON + " TEXT, "
+                + dbNode.KEY_ADDING + " TEXT, "
+                + dbNode.KEY_SIGNAL + " TEXT, "
                 + dbNode.KEY_UPTIME + " TEXT, "
-                + dbNode.KEY_RESET + " BOOLEAN, "
+                + dbNode.KEY_RESET + " TEXT, "
                 + dbNode.KEY_OTA + " TEXT )";
 
         db.execSQL(CREATE_TABLE_NODE);

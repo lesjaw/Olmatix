@@ -9,11 +9,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.olmatix.model.NodeModel;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_FWNAME;
 import static com.olmatix.database.dbNode.KEY_FWVERSION;
+import static com.olmatix.database.dbNode.KEY_ICON;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
 import static com.olmatix.database.dbNode.KEY_NAME;
 import static com.olmatix.database.dbNode.KEY_NODES;
@@ -35,20 +39,22 @@ public class dbNodeRepo {
      * SQL INSERT PROSES DATA
      * */
 
-    public int insertDb(dbNode mDbNode){
+    public int insertDb(NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODES, mDbNode.nodes);
-        values.put(KEY_NAME, mDbNode.name);
-        values.put(KEY_LOCALIP, mDbNode.localip);
-        values.put(KEY_FWNAME, mDbNode.fwname);
-        values.put(KEY_FWVERSION, mDbNode.fwversion);
-        values.put(KEY_ONLINE, mDbNode.online);
-        values.put(KEY_SIGNAL, mDbNode.signal);
-        values.put(KEY_UPTIME, mDbNode.uptime);
-        values.put(KEY_RESET, mDbNode.reset);
-        values.put(KEY_OTA, mDbNode.ota);
+        values.put(KEY_NODES, nodeModel.getNodes());
+        values.put(KEY_NAME, nodeModel.getName());
+        values.put(KEY_LOCALIP, nodeModel.getLocalip());
+        values.put(KEY_FWNAME, nodeModel.getFwName());
+        values.put(KEY_FWVERSION, nodeModel.getFwVersion());
+        values.put(KEY_ONLINE, nodeModel.getOnline());
+        values.put(KEY_ICON, nodeModel.getIcon());
+        values.put(KEY_ADDING, nodeModel.getAdding());
+        values.put(KEY_SIGNAL, nodeModel.getSignal());
+        values.put(KEY_UPTIME, nodeModel.getUptime());
+        values.put(KEY_RESET, nodeModel.getReset());
+        values.put(KEY_OTA, nodeModel.getOta());
 
         long node_Id = db.insert(TABLE, null, values);
         db.close(); // Closing database connection
@@ -71,22 +77,26 @@ public class dbNodeRepo {
      * SQL UPDATE PROSES DATA
      * */
 
-    public void update(dbNode mDbNode) {
+    public void update(NodeModel nodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODES, mDbNode.nodes);
-        values.put(KEY_NAME, mDbNode.name);
-        values.put(KEY_LOCALIP, mDbNode.localip);
-        values.put(KEY_FWNAME, mDbNode.fwname);
-        values.put(KEY_FWVERSION, mDbNode.fwversion);
-        values.put(KEY_ONLINE, mDbNode.online);
-        values.put(KEY_SIGNAL, mDbNode.signal);
-        values.put(KEY_UPTIME, mDbNode.uptime);
-        values.put(KEY_RESET, mDbNode.reset);
-        values.put(KEY_OTA, mDbNode.ota);
+        values.put(KEY_NODES, nodeModel.getNodes());
+        values.put(KEY_NAME, nodeModel.getName());
+        values.put(KEY_LOCALIP, nodeModel.getLocalip());
+        values.put(KEY_FWNAME, nodeModel.getFwName());
+        values.put(KEY_FWVERSION, nodeModel.getFwVersion());
+        values.put(KEY_ONLINE, nodeModel.getOnline());
+        values.put(KEY_ICON, nodeModel.getIcon());
+        values.put(KEY_ADDING, nodeModel.getAdding());
+        values.put(KEY_SIGNAL, nodeModel.getSignal());
+        values.put(KEY_UPTIME, nodeModel.getUptime());
+        values.put(KEY_RESET, nodeModel.getReset());
+        values.put(KEY_OTA, nodeModel.getOta());
 
-        db.update(TABLE, values, mDbNode.KEY_ID + "= ?", new String[] { String.valueOf(mDbNode.node_id) });
+        db.update(TABLE, values, dbNode.KEY_ID + "= ?", new String[] {
+                String.valueOf(dbNode.KEY_ID)
+        });
         db.close(); // Closing database connection
 
     }
@@ -113,6 +123,8 @@ public class dbNodeRepo {
                 node.put("fwname", cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
                 node.put("fwversion", cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
                 node.put("online", cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.put("icon", cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
+                node.put("adding", cursor.getString(cursor.getColumnIndex(dbNode.KEY_ADDING)));
                 node.put("signal", cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
                 node.put("uptime", cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
                 node.put("reset", cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));
@@ -145,11 +157,13 @@ public class dbNodeRepo {
                 node.name = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME));
                 node.localip = cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP));
                 node.fwname = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME));
-                node.fwversion = cursor.getInt(cursor.getColumnIndex(dbNode.KEY_FWVERSION));
-                node.online = cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ONLINE));
-                node.signal = cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SIGNAL));
+                node.fwversion = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION));
+                node.online = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE));
+                node.icon = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON));
+                node.adding = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ADDING));
+                node.signal = cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL));
                 node.uptime = cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME));
-                node.reset = cursor.getInt(cursor.getColumnIndex(dbNode.KEY_RESET));
+                node.reset = cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET));
                 node.ota = cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA));
 
             } while (cursor.moveToNext());
@@ -178,11 +192,13 @@ public class dbNodeRepo {
                 node.name = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME));
                 node.localip = cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP));
                 node.fwname = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME));
-                node.fwversion = cursor.getInt(cursor.getColumnIndex(dbNode.KEY_FWVERSION));
-                node.online = cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ONLINE));
-                node.signal = cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SIGNAL));
+                node.fwversion = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION));
+                node.online = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE));
+                node.icon = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON));
+                node.adding = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ADDING));
+                node.signal = cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL));
                 node.uptime = cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME));
-                node.reset = cursor.getInt(cursor.getColumnIndex(dbNode.KEY_RESET));
+                node.reset = cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET));
                 node.ota = cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA));
 
             } while (cursor.moveToNext());

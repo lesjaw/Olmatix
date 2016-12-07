@@ -65,6 +65,7 @@ public class OlmatixService extends Service {
     private String stateoffMqtt;
 
     private NotificationManager mNM;
+    public  static  StringBuilder payload_string = new StringBuilder();
 
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
@@ -185,7 +186,7 @@ public class OlmatixService extends Service {
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         deviceId = "OlmatixApp-" + wInfo.getMacAddress();
 
-        if (deviceId == null) {
+        if (deviceId.isEmpty()) {
             deviceId = MqttAsyncClient.generateClientId();
         }
     }
@@ -280,8 +281,6 @@ public class OlmatixService extends Service {
 
     }
 
-
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand()");
@@ -323,6 +322,7 @@ public class OlmatixService extends Service {
 
     private class MqttEventCallback implements MqttCallback  {
 
+
         @Override
         public void connectionLost(Throwable cause) {
 
@@ -330,14 +330,25 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
-            Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
+            String payload = new String(message.getPayload());
+            if(!payload.isEmpty())
+
+                payload_string.append(payload);
+                payload_string.append(",");
+
+
+                Log.v("payload",payload_string+"");
 
         }
+
 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
 
         }
 
+
     }
+
 }

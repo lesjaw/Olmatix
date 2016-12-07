@@ -43,6 +43,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created              : Rahman on 12/2/2016.
  * Date Created         : 12/2/2016 / 4:29 PM.
@@ -207,6 +209,9 @@ public class OlmatixService extends Service {
         options.setPassword("olmatix".toCharArray());
         final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId, new MemoryPersistence());
         options.setCleanSession(false);
+        String topic = "status/"+deviceId+"/$online";
+        byte[] payload = "false".getBytes();
+        options.setWill(topic, payload ,1,true);
         Connection.setClient(client);
 
 
@@ -222,6 +227,18 @@ public class OlmatixService extends Service {
 
 
                     try {
+
+                        String topic = "status/"+deviceId+"/$online";
+                        String payload = "true";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            Connection.getClient().publish(topic, message);
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+
                         Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {

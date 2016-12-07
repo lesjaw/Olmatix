@@ -32,7 +32,6 @@ import android.widget.Toast;
 import com.olmatix.adapter.CustomAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
-import com.olmatix.model.Subscription;
 import com.olmatix.utils.Connection;
 import com.olmatix.model.MyData;
 import com.olmatix.lesjaw.olmatix.R;
@@ -51,7 +50,7 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
     private static CustomAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private static RecyclerView recyclerView;
-    private static ArrayList<Subscription> data;
+    private static ArrayList<DataModel> data;
     public static View.OnClickListener myOnClickListener;
     private static ArrayList<Integer> removedItems;
     private String _Node_Name;
@@ -73,7 +72,6 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
                              Bundle savedInstanceState) {
 
         View fragInstalledNode = inflater.inflate(R.layout.frag_installed_node, container, false);
-        data = new ArrayList<Subscription>();
 
         FloatingActionButton fab = (FloatingActionButton) fragInstalledNode.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -92,22 +90,15 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
                                 String topic = "devices/" + inputResult + "/$online";
                                 int qos = 1;
                                 try {
-                                    IMqttToken subToken = Connection.getClient().subscribe(inputResult, qos);
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
                                     subToken.setActionCallback(new IMqttActionListener() {
                                         @Override
                                         public void onSuccess(IMqttToken asyncActionToken) {
-                                            Toast.makeText(getActivity(),"Subscription Successfully",Toast.LENGTH_LONG).show();
-                                            Subscription subscription = new Subscription();
-
-                                            adapter.notifyDataSetChanged();
                                         }
 
                                         @Override
                                         public void onFailure(IMqttToken asyncActionToken,
                                                               Throwable exception) {
-                                            Toast.makeText(getActivity(),"Can't add Subscription",Toast.LENGTH_LONG).show();
-
-
                                             // The subscription could not be performed, maybe the user was not
                                             // authorized to subscribe on the specified topic e.g. using wildcards
                                         }
@@ -115,6 +106,42 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
                                 } catch (MqttException e) {
                                     e.printStackTrace();
                                 }
+
+
+                                /*_Node_Name = "test";
+                                Intent intent = getActivity().getIntent();
+                                _Node_Name = intent.getStringExtra(_Node_Name);
+                                dbNodeRepo repo = new dbNodeRepo(getContext());
+                                dbNode node = new dbNode();
+                                repo.getNodeByNode(_Node_Name);
+                                node.node=inputResult;
+
+                                ArrayList<HashMap<String, String>> nodeList =  repo.getNodeList();
+                                if(nodeList.size()!=0) {
+
+
+                                    node.node=_Node_Name;
+                                    if (_Node_Name != inputResult){
+                                        _Node_Name = String.valueOf(repo.insert(node));
+                                        Toast.makeText(getContext(),"New Node Insert " + _Node_Name,Toast.LENGTH_SHORT).show();
+
+                                    }else{
+                                        repo.update(node);
+                                        Toast.makeText(getContext(),"You already have this Node",Toast.LENGTH_SHORT).show();
+                                    }
+                                }else {
+                                    Toast.makeText(getContext(), "No Node!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(),"Node Name : " + _Node_Name,Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(),"InputResult : " + inputResult,Toast.LENGTH_SHORT).show();
+                                    if (_Node_Name != inputResult) {
+                                        _Node_Name = String.valueOf(repo.insert(node));
+                                        Toast.makeText(getContext(), "New Node Insert " + _Node_Name, Toast.LENGTH_SHORT).show();
+
+                                    } else {
+                                        repo.update(node);
+                                        Toast.makeText(getContext(), "You already have this Node", Toast.LENGTH_SHORT).show();
+                                    }
+                                }*/
 
                             }
                         })
@@ -137,14 +164,15 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
-       /* for (int i = 0; i < MyData.nameArray.length; i++) {
+        data = new ArrayList<DataModel>();
+        for (int i = 0; i < MyData.nameArray.length; i++) {
             data.add(new DataModel(
                     MyData.nameArray[i],
                     MyData.versionArray[i],
                     MyData.id_[i],
                     MyData.drawableArray[i]
             ));
-        }*/
+        }
 
         removedItems = new ArrayList<Integer>();
 
@@ -200,7 +228,7 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
         }
     }
 
- /*   private void addRemovedItemToList() {
+    private void addRemovedItemToList() {
         int addItemAtListPosition = 3;
         data.add(addItemAtListPosition, new DataModel(
                 MyData.nameArray[removedItems.get(0)],
@@ -211,7 +239,7 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
         adapter.notifyItemInserted(addItemAtListPosition);
         removedItems.remove(0);
     }
-*/
+
     private void initDialog(){
         alertDialog = new AlertDialog.Builder(getActivity());
         LayoutInflater myLayout = LayoutInflater.from(getActivity());
@@ -250,8 +278,8 @@ public class Installed_Node extends Fragment  implements OnStartDragListener {
                 } else {
                     //removeView();
                     etTopic.setText(data.get(position).getName());
-                    version.setText(data.get(position).getUptime());
-                    icon_node.setImageResource(R.drawable.olmatixlogo);
+                    version.setText(data.get(position).getVersion());
+                    icon_node.setImageResource(data.get(position).getImage());
                     alertDialog.show();
 
                 }

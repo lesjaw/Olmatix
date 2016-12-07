@@ -18,6 +18,8 @@ public class dbNode {
     public static final String KEY_FWVERSION    = "fwversion";
     public static final String KEY_ONLINE       = "online";
     public static final String KEY_SIGNAL       = "signal";
+    public static final String KEY_ICON         = "icon";
+    public static final String KEY_ADDING       = "adding";
     public static final String KEY_UPTIME       = "uptime";
     public static final String KEY_RESET        = "reset";
     public static final String KEY_OTA          = "ota";
@@ -28,11 +30,13 @@ public class dbNode {
     public String name;
     public String localip;
     public String fwname;
-    public int fwversion;
-    public int online;
-    public int signal;
+    public String fwversion;
+    public String online;
+    public String icon;
+    public String adding;
+    public String signal;
     public String uptime;
-    public int reset;
+    public String reset;
     public String ota;
 
 }

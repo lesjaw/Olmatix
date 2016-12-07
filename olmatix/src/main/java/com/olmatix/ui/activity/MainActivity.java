@@ -55,11 +55,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        Intent i = new Intent(this, OlmatixService.class);
-        startService(i);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("custom-event-name"));
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
@@ -83,10 +79,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        Intent i = new Intent(this, OlmatixService.class);
+        startService(i);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("custom-event-name"));
+        super.onStart();
+    }
+
+    @Override
     protected void onPause() {
-        // Unregister since the activity is paused.
-      /*  LocalBroadcastManager.getInstance(this).unregisterReceiver(
-                mMessageReceiver);*/
         super.onPause();
     }
 
@@ -95,9 +98,9 @@ public class MainActivity extends AppCompatActivity {
         // Register to receive messages.
         // We are registering an observer (mMessageReceiver) to receive Intents
         // with actions named "custom-event-name".
-        command = "checkstatus";
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("custom-event-name"));
+        //command = "checkstatus";
+        //LocalBroadcastManager.getInstance(this).registerReceiver(
+        //        mMessageReceiver, new IntentFilter("custom-event-name"));
         super.onResume();
     }
 

@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
-import com.olmatix.model.Subscription;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DataModel;
@@ -25,7 +24,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
 
 
-    private ArrayList<Subscription> dataSet;
+    private ArrayList<DataModel> dataSet;
 
 
 
@@ -43,7 +42,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         }
     }
 
-    public CustomAdapter(ArrayList<Subscription> data) {
+    public CustomAdapter(ArrayList<DataModel> data) {
         this.dataSet = data;
     }
 
@@ -59,6 +58,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         return myViewHolder;
     }
 
+
+
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
@@ -67,8 +68,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         ImageView imageView = holder.imageViewIcon;
 
         textViewName.setText(dataSet.get(listPosition).getName());
-        textViewVersion.setText(dataSet.get(listPosition).getUptime());
-        imageView.setImageResource(R.drawable.olmatixlogo);
+        textViewVersion.setText(dataSet.get(listPosition).getVersion());
+        imageView.setImageResource(dataSet.get(listPosition).getImage());
     }
 
     @Override

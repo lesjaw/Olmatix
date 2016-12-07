@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="5dp">
+              xmlns:card_view="http://schemas.android.com/apk/res-auto"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:padding="5dp">
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
@@ -11,7 +11,6 @@
         android:id="@+id/cv"
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="2dp"
-
         card_view:cardUseCompatPadding="true">
 
 
@@ -27,19 +26,17 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="16dp"
-                android:fitsSystemWindows="true"
-                android:src="@mipmap/olmatixlogo"
-                />
+                android:src="@mipmap/olmatixlogo"/>
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/uptime"
+                android:id="@+id/icon_status"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:paddingTop="10sp"
                 android:layout_marginRight="16dp"
-                android:text="Uptime"/>
+                android:src="@drawable/ic_node_offline"
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -56,28 +53,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/status"
+                android:id="@+id/ipaddrs"
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@+id/node_name"
-                android:text="Status"
-                />
+                android:text="@string/ipaddrs"/>
 
-
-            <Button
-                android:id="@+id/testBut2"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/status"
-                android:layout_alignParentRight="true"
-                android:text="OFF" />
+                android:id="@+id/uptime"
+                android:paddingTop="10sp"
+                android:text="Uptime"
+                android:layout_below="@+id/icon_status"
+                android:layout_alignParentRight="true"/>
 
-            <Button
-                android:id="@+id/testBut1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/status"
-                android:layout_toLeftOf="@id/testBut2"
-                android:text="ON" />
 
         </RelativeLayout>
 

@@ -304,7 +304,7 @@ public class OlmatixService extends Service {
     }
 
     private void sendMessageHandle() {
-        Log.d("sender", "topic message = " +topicMQQT + "\n\n"+ messageMQQT);
+        Log.d("sender", "topic = " +topicMQQT + "message = "+ messageMQQT);
         Intent intent = new Intent("info-device");
         // You can also include some extra data.
 
@@ -344,6 +344,8 @@ public class OlmatixService extends Service {
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
             Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
+            topicMQQT = topic;
+            messageMQQT = message.toString();
             sendMessageHandle();
         }
 

@@ -90,9 +90,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        // Unregister since the activity is paused.
-      /*  LocalBroadcastManager.getInstance(this).unregisterReceiver(
-                mMessageReceiver);*/
         super.onPause();
     }
 

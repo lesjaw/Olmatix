@@ -68,9 +68,7 @@ public class Installed_Node extends Fragment{
             // Get extra data included in the Intent
             String device = intent.getStringExtra("device");
             String message = intent.getStringExtra("message");
-            Log.d("receiver", "Got message : " + device + "\n\n "+ message);
-
-
+            Log.d("receiver", "Got message : " + device + " : "+ message);
         }
     };
 

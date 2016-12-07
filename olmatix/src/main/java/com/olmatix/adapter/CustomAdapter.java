@@ -52,7 +52,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.frag_node_button, parent, false);
 
-        view.setOnClickListener(Installed_Node.myOnClickListener);
+       // view.setOnClickListener(Installed_Node.myOnClickListener);
 
         MyViewHolder myViewHolder = new MyViewHolder(view);
         return myViewHolder;

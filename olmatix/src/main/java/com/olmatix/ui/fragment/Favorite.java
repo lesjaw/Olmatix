@@ -54,7 +54,6 @@ public class Favorite extends Fragment {
                                     @Override
                                     public void onSuccess(IMqttToken asyncActionToken) {
                                     }
-
                                     @Override
                                     public void onFailure(IMqttToken asyncActionToken,
                                                           Throwable exception) {
@@ -85,6 +84,8 @@ public class Favorite extends Fragment {
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
                         MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
                         Connection.getClient().publish(topic, message);
                     } catch (UnsupportedEncodingException | MqttException e) {
                         e.printStackTrace();
@@ -106,6 +107,8 @@ public class Favorite extends Fragment {
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
                         MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
                         Connection.getClient().publish(topic, message);
                     } catch (UnsupportedEncodingException | MqttException e) {
                         e.printStackTrace();

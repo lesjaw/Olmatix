@@ -118,6 +118,7 @@ public class SettingsActivity extends SettingsFragment {
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || NetworkPreferenceFragment.class.getName().equals(fragmentName)
+                || SetupPreferenceFragment.class.getName().equals(fragmentName)
                 || AboutPreferenceFragment.class.getName().equals(fragmentName);
 
     }
@@ -141,6 +142,26 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("password"));
 
             SwitchPreference pref = (SwitchPreference) findPreference("switch_conn");
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class SetupPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_setup);
+            setHasOptionsMenu(true);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            // bindPreferenceSummaryToValue(findPreference("server_conn"));
+
+            bindPreferenceSummaryToValue(findPreference("ssid"));
+            bindPreferenceSummaryToValue(findPreference("password_wifi"));
+            
         }
     }
 

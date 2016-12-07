@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <PreferenceCategory
+        android:title="@string/pref_wifi">
+
+        <EditTextPreference
+            android:key="ssid"
+            android:title="@string/ssid"
+            android:icon="@drawable/ic_signal_wifi_3_bar_black_24dp"
+            android:dialogMessage="@string/info_ssid"
+            android:summary="Your WiFi Name" />
+
+        <EditTextPreference
+            android:key="password_wifi"
+            android:title="@string/pass_title"
+            android:icon="@drawable/ic_pass_24dp"
+            android:password="true"
+            android:dialogMessage="@string/info_pass_ssid"
+            android:summary="Your WiFi password" />
+
+    </PreferenceCategory>
+
+    <Preference
+        android:layout="@layout/sendbuttons"
+        android:key="loginButtons"/>
+
+</PreferenceScreen>

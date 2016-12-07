@@ -48,5 +48,12 @@
     <string name="ipaddrs">IP Address</string>
     <string name="lastupdt">Last Update</string>
     <string name="uptime">Up Time</string>
+    <string name="pref_setup">Setup Product</string>
+    <string name="pref_wifi">WiFi Credential</string>
+    <string name="ssid">SSID / WiFi</string>
+    <string name="info_ssid">Type your home WiFi Name/SSID</string>
+    <string name="info_pass_ssid">Type your home WiFi password</string>
+    <string name="sendButton">Send Config</string>
+    <string name="connect_product">Connect to product WiFi</string>
 
 </resources>

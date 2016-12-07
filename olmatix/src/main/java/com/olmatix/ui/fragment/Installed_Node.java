@@ -52,7 +52,7 @@ public class Installed_Node extends Fragment{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
+
         setupView();
         onClickListener();
     }
@@ -115,7 +115,10 @@ public class Installed_Node extends Fragment{
                                     e.printStackTrace();
                                 }
                             }
-                        });
+                        }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                }).show();
 
             }
         };

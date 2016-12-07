@@ -212,6 +212,7 @@ public class OlmatixService extends Service {
         String topic = "status/"+deviceId+"/$online";
         byte[] payload = "false".getBytes();
         options.setWill(topic, payload ,1,true);
+        options.setKeepAliveInterval(30);
         Connection.setClient(client);
 
 

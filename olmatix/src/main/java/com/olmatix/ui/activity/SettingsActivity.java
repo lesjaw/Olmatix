@@ -161,7 +161,7 @@ public class SettingsActivity extends SettingsFragment {
 
             bindPreferenceSummaryToValue(findPreference("ssid"));
             bindPreferenceSummaryToValue(findPreference("password_wifi"));
-            
+
         }
     }
 

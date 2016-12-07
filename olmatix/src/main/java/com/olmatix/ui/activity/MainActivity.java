@@ -182,6 +182,12 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        if (id == R.id.action_exit) {
+            finish();
+            System.exit(0);
+            return true;
+        }
+
         if (id == R.id.action_about) {
             Intent i = new Intent(this,AboutActivity.class);
             startActivity(i);

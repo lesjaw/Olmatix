@@ -55,5 +55,6 @@
     <string name="info_pass_ssid">Type your home WiFi password</string>
     <string name="sendButton">Send Config</string>
     <string name="connect_product">Connect to product WiFi</string>
+    <string name="action_exit">Exit</string>
 
 </resources>

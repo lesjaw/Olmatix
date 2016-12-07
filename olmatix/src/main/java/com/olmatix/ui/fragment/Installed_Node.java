@@ -96,7 +96,6 @@ public class Installed_Node extends Fragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String inputResult =mEditText.getText().toString();
-
                                 String topic = "devices/" + inputResult + "/$online";
                                 int qos = 1;
                                 try {

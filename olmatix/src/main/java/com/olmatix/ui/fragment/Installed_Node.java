@@ -109,7 +109,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             String device = intent.getStringExtra("MQTT devices");
             String message = intent.getStringExtra("MQTT message");
             Log.d("receiver", "Got message : " + device + " : "+ message);
-            NodeSplit = message.toString();
+            NodeSplit = device;
             String[] outputDevices = NodeSplit.split("/");
             NodeID= outputDevices[2];
             mMessage = message;

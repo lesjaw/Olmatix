@@ -361,11 +361,7 @@ public class OlmatixService extends Service {
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
             Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
-          /*String device = topic;
-            nodeMsg = message.toString();
-            String[] outputDevices = device.split("/");
-            nodeId= outputDevices[1];
-            nodeKey = outputDevices[2];*/
+
             nodeTopic = topic;
             nodeMsg = message.toString();
             Log.d("sender", "Broadcasting message = " +nodeTopic +" message = " + nodeMsg);

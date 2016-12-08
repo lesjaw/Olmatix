@@ -48,6 +48,7 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.util.Strings;
+import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,6 +76,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private String inputResult;
     private String NodeID;
     private  String mMessage;
+    private String NodeSplit;
 
     @Nullable
     @Override
@@ -107,8 +109,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             String device = intent.getStringExtra("MQTT devices");
             String message = intent.getStringExtra("MQTT message");
             Log.d("receiver", "Got message : " + device + " : "+ message);
-            device = message.toString();
-            String[] outputDevices = device.split("/");
+            NodeSplit = message.toString();
+            String[] outputDevices = NodeSplit.split("/");
             NodeID= outputDevices[2];
             mMessage = message;
             device = device.substring(device.indexOf("$")+1,device.length());

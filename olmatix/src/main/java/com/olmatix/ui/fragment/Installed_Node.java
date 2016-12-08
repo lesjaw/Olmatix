@@ -70,12 +70,12 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private Paint p = new Paint();
     private ItemTouchHelper mItemTouchHelper;
     HashMap<String,String> messageReceive = new HashMap<>();
-    private dbNodeRepo dbNodeRepo;
+    public static dbNodeRepo dbNodeRepo;
     private  NodeModel nodeModel;
     private String inputResult;
     private String NodeID;
     private  String mMessage;
-
+    private String NodeSplit;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -107,10 +107,11 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             String device = intent.getStringExtra("MQTT devices");
             String message = intent.getStringExtra("MQTT message");
             Log.d("receiver", "Got message : " + device + " : "+ message);
-            device = message.toString();
-            String[] outputDevices = device.split("/");
-            NodeID= outputDevices[2];
-            mMessage = message;
+            NodeSplit = device.toString();
+            String[] outputDevices = NodeSplit.split("/");
+            NodeID = outputDevices[1];
+
+            mMessage = "true";
             device = device.substring(device.indexOf("$")+1,device.length());
             messageReceive.put(device,message);
 
@@ -127,26 +128,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 if (mMessage.equals("true")){
                     Log.d("addCheckValid 3", "Passed");
 
-                    /*String topic = "devices/" + inputResult + "/#";
-                    int qos = 1;
-                    try {
-                        IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                        subToken.setActionCallback(new IMqttActionListener() {
-                            @Override
-                            public void onSuccess(IMqttToken asyncActionToken) {
-                                messageReceive.put("NodeId",inputResult);
-
-                            }
-
-                            @Override
-                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-
-                            }
-                        });
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }*/
-                    //saveandpersist();
+                    saveandpersist();
                 }
             }
 
@@ -162,33 +144,38 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
                 && messageReceive.containsKey("ota"))
         {
-                nodeModel.setNid(messageReceive.get("NodeId"));
-                nodeModel.setOnline(messageReceive.get("online"));
-                nodeModel.setNodes(messageReceive.get("nodes"));
-                nodeModel.setName(messageReceive.get("name"));
-                nodeModel.setLocalip(messageReceive.get("localip"));
-                nodeModel.setFwName(messageReceive.get("fwname"));
-                nodeModel.setFwVersion(messageReceive.get("fwversion"));
-                nodeModel.setSignal(messageReceive.get("signal"));
-                nodeModel.setUptime(messageReceive.get("uptime"));
-                nodeModel.setReset(messageReceive.get("reset"));
-                nodeModel.setOta(messageReceive.get("ota"));
+            Toast.makeText(getActivity(),"Subscribe Successfull",Toast.LENGTH_LONG).show();
 
-                dbNodeRepo.insertDb(nodeModel);
-                messageReceive.clear();
-                Toast.makeText(getActivity(),dbNodeRepo.getNodeList().size(),Toast.LENGTH_LONG).show();
+            nodeModel.setNid(messageReceive.get("NodeId"));
+            nodeModel.setOnline(messageReceive.get("online"));
+            nodeModel.setNodes(messageReceive.get("nodes"));
+            nodeModel.setName(messageReceive.get("name"));
+            nodeModel.setLocalip(messageReceive.get("localip"));
+            nodeModel.setFwName(messageReceive.get("fwname"));
+            nodeModel.setFwVersion(messageReceive.get("fwversion"));
+            nodeModel.setSignal(messageReceive.get("signal"));
+            nodeModel.setUptime(messageReceive.get("uptime"));
+            nodeModel.setReset(messageReceive.get("reset"));
+            nodeModel.setOta(messageReceive.get("ota"));
+
+            dbNodeRepo.insertDb(nodeModel);
+            adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
+            mRecycleView.setAdapter(adapter);
+            data.clear();
+            data.addAll(dbNodeRepo.getNodeList());
+
+            messageReceive.clear();
 
         }
+
     }
-
-
     @Override
     public void onStart() {
         Intent i = new Intent(getActivity(), OlmatixService.class);
         getActivity().startService(i);
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                mMessageReceiver, new IntentFilter("info-device"));
+                mMessageReceiver, new IntentFilter("messageMQTT"));
         super.onStart();
     }
 
@@ -206,7 +193,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 inputResult =mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/$online";
+                                String topic = "devices/" + inputResult + "/#";
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
@@ -243,7 +230,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
 
-        adapter = new OlmatixAdapter(data);
+        data.addAll(dbNodeRepo.getNodeList());
+
+        adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
         mRecycleView.setAdapter(adapter);
 
         initSwipe();

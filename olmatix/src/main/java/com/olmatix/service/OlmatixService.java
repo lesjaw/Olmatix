@@ -306,9 +306,7 @@ public class OlmatixService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand()");
         Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
-
         sendMessage();
-
         return START_STICKY;
     }
 

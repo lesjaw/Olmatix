@@ -48,7 +48,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     @Override
     public OlmatixHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.nodeitemlist, parent, false);
+                .inflate(R.layout.frag_nodeitemlist, parent, false);
 
         return new OlmatixHolder(itemView);
     }
@@ -58,12 +58,11 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
         final NodeModel mNodeModel = nodeList.get(position);
         if(mNodeModel.getOnline().equals("1")){
-            holder.imgNode.setImageResource(R.drawable.ic_node_online);
+            holder.imgStatus.setImageResource(R.drawable.ic_node_online);
         } else {
             holder.imgStatus.setImageResource(R.drawable.ic_node_offline);
         }
-
-
+        holder.imgNode.setImageResource(R.drawable.olmatixlogo);
         holder.nodeName.setText(mNodeModel.getNiceName());
         holder.ipAddrs.setText(mNodeModel.getLocalip());
         holder.upTime.setText(mNodeModel.getUptime());

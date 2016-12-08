@@ -122,4 +122,5 @@ public class Favorite extends Fragment {
 
         ((TextView)mFavourit.findViewById(R.id.text)).setText("Lampu Kamar");
         return mFavourit;
-    }}
+    }
+}

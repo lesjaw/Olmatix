@@ -56,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-
-
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
@@ -96,12 +94,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        // Register to receive messages.
-        // We are registering an observer (mMessageReceiver) to receive Intents
-        // with actions named "custom-event-name".
-        //command = "checkstatus";
-        //LocalBroadcastManager.getInstance(this).registerReceiver(
-        //        mMessageReceiver, new IntentFilter("custom-event-name"));
         super.onResume();
     }
 
@@ -117,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu();
             } else
                 serverconnected = false;
-            invalidateOptionsMenu();
+                invalidateOptionsMenu();
         }
     };
 

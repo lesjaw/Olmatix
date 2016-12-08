@@ -65,9 +65,9 @@ public class OlmatixService extends Service {
     public volatile MqttAsyncClient mqttClient;
     private String deviceId;
     private String stateoffMqtt;
-    private String nodeId;
+    private String nodeTopic;
     private String nodeMsg;
-    private String nodeKey;
+
     private NotificationManager mNM;
 
     // Unique Identification Number for the Notification.
@@ -314,11 +314,17 @@ public class OlmatixService extends Service {
 
     private void sendMessage() {
         Log.d("sender", "Broadcasting message MQTT status = " +stateoffMqtt);
-        Intent intent = new Intent("custom-event-name");
+        Intent intent = new Intent("MQTT Status");
         // You can also include some extra data.
         intent.putExtra("MQTT State", stateoffMqtt);
-        intent.putExtra("device", nodeKey);
-        intent.putExtra("message", nodeMsg);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendMessageMQTT() {
+        Intent intent = new Intent("messageMQTT");
+        // You can also include some extra data.
+        intent.putExtra("MQTT devices", nodeTopic);
+        intent.putExtra("MQTT message", nodeMsg);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -354,17 +360,16 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
-           // Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
-           // Log.d("sender", "Broadcasting message devices status = " +message.toString());
-            String device = topic;
+            Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
+          /*String device = topic;
             nodeMsg = message.toString();
             String[] outputDevices = device.split("/");
             nodeId= outputDevices[1];
-            nodeKey = topic;
-           // Log.d("sender", "Broadcasting message \ndevices id = " +nodeId +" \nand = " + nodeKey +"\nnode msq =" + nodeMsg);
-            if(nodeMsg != null) {
-                sendMessage1();
-            }
+            nodeKey = outputDevices[2];*/
+            nodeTopic = topic;
+            nodeMsg = message.toString();
+            Log.d("sender", "Broadcasting message = " +nodeTopic +" message = " + nodeMsg);
+            sendMessageMQTT();
 
         }
 
@@ -374,15 +379,6 @@ public class OlmatixService extends Service {
         }
 
     }
-
-    private void sendMessage1() {
-        Intent intent = new Intent("custom-event1");
-        intent.putExtra("device", nodeKey);
-        intent.putExtra("message", nodeMsg);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-
 
 
 }

@@ -132,14 +132,15 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 nodeModel.setOta(messageReceive.get("ota"));
 
                 dbNodeRepo.insertDb(nodeModel);
-                adapter.notifyDataSetChanged();
-                messageReceive.clear();
+                adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
+                mRecycleView.setAdapter(adapter);
+                data.clear();
+                data.addAll(dbNodeRepo.getNodeList());
+
+            messageReceive.clear();
 
         }
-       /* if(messageReceive.containsKey("uptime") && ! messageReceive.containsKey("name"))
-        {
-            messageReceive.clear();
-        }*/
+
     }
 
 
@@ -177,6 +178,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                                     subToken.setActionCallback(new IMqttActionListener() {
                                         @Override
                                         public void onSuccess(IMqttToken asyncActionToken) {
+                                            Toast.makeText(getActivity(),"Successfully Subscribe",Toast.LENGTH_LONG).show();
                                             messageReceive.put("NodeId",inputResult);
 
                                         }

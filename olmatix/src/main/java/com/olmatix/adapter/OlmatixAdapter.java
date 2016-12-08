@@ -4,17 +4,17 @@ package com.olmatix.adapter;
  * Created by Lesjaw on 04/12/2016.
  */
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.model.NodeModel;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.ui.fragment.Installed_Node;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
 public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter {
 
     List<NodeModel> nodeList;
-    dbNodeRepo db;
+
 
 
     public class OlmatixHolder extends RecyclerView.ViewHolder {
@@ -63,7 +63,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             holder.imgStatus.setImageResource(R.drawable.ic_node_offline);
         }
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-        holder.nodeName.setText(mNodeModel.getNiceName());
+        holder.nodeName.setText(mNodeModel.getName());
         holder.ipAddrs.setText(mNodeModel.getLocalip());
         holder.upTime.setText(mNodeModel.getUptime());
     }
@@ -75,6 +75,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
     public void removeItem(int position) {
         nodeList.remove(position);
+        Installed_Node.dbNodeRepo.delete(Integer.parseInt(nodeList.get(position).getNid()));
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, nodeList.size());
     }

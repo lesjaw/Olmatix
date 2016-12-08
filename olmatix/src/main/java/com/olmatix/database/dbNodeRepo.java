@@ -11,6 +11,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.olmatix.model.NodeModel;
 
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -105,7 +107,7 @@ public class dbNodeRepo {
      * SQL GET LIST DATA
      * */
 
-    public ArrayList<HashMap<String, String>> getNodeList() {
+   /* public ArrayList<HashMap<String, String>> getNodeList() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM " + TABLE;
@@ -137,6 +139,43 @@ public class dbNodeRepo {
         db.close();
         return nodeList;
     }
+*/
+
+
+    public ArrayList<NodeModel> getNodeList() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT * FROM " + TABLE;
+
+        ArrayList<NodeModel> nodeList = new ArrayList<NodeModel>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                NodeModel node = new NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNid( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setNodes( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
+                node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setLocalip( cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
+                node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
+                node.setFwVersion( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
+                node.setOnline( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.setIcon( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
+                node.setAdding( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ADDING)));
+                node.setSignal( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
+                node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setReset( cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));
+                node.setOta( cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
 
 
     public dbNode getNodeById(int Id){

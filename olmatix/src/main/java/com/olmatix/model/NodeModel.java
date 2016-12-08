@@ -16,7 +16,7 @@ public class NodeModel {
     private String localip;
     private String fwName;
     private String fwVersion;
-    private int icon;
+    private String icon;
     private String adding;
     private String online;
     private String signal;
@@ -27,7 +27,7 @@ public class NodeModel {
     public NodeModel() {
     }
 
-    public NodeModel(String nodes, String name, String niceName, String localip, String fwName, String fwVersion, int icon, String adding, String online, String signal, String uptime, String reset, String ota) {
+    public NodeModel(String nodes, String name, String niceName, String localip, String fwName, String fwVersion, String icon, String adding, String online, String signal, String uptime, String reset, String ota) {
         this.nodes = nodes;
         this.name = name;
         this.niceName = niceName;
@@ -99,11 +99,11 @@ public class NodeModel {
         this.fwVersion = fwVersion;
     }
 
-    public int getIcon() {
+    public String getIcon() {
         return icon;
     }
 
-    public void setIcon(int icon) {
+    public void setIcon(String icon) {
         this.icon = icon;
     }
 

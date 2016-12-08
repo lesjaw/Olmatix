@@ -56,7 +56,6 @@ import java.util.List;
 public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private View mView;
-    private List<NodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
     private AlertDialog.Builder alertDialog;
@@ -69,8 +68,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private Paint p = new Paint();
     private ItemTouchHelper mItemTouchHelper;
     HashMap<String,String> messageReceive = new HashMap<>();
-    private dbNodeRepo dbNodeRepo;
+    public static dbNodeRepo dbNodeRepo;
     private  NodeModel nodeModel;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -101,7 +101,6 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             // Get extra data included in the Intent
             String device = intent.getStringExtra("device");
             String message = intent.getStringExtra("message");
-            Log.d("receiver", "Got message : " + device + " : "+ message);
 
             device = device.substring(device.indexOf("$")+1,device.length());
             messageReceive.put(device,message);
@@ -119,6 +118,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
                 && messageReceive.containsKey("ota"))
         {
+
                 nodeModel.setNid(messageReceive.get("NodeId"));
                 nodeModel.setOnline(messageReceive.get("online"));
                 nodeModel.setNodes(messageReceive.get("nodes"));
@@ -133,8 +133,11 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
                 dbNodeRepo.insertDb(nodeModel);
                 messageReceive.clear();
-                Toast.makeText(getActivity(),dbNodeRepo.getNodeList().size(),Toast.LENGTH_LONG).show();
 
+        }
+        if(messageReceive.containsKey("uptime") && ! messageReceive.containsKey("name"))
+        {
+            messageReceive.clear();
         }
     }
 
@@ -145,7 +148,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         getActivity().startService(i);
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                mMessageReceiver, new IntentFilter("info-device"));
+                mMessageReceiver, new IntentFilter("custom-event1"));
         super.onStart();
     }
 
@@ -205,8 +208,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
+        data.addAll(dbNodeRepo.getNodeList());
 
-        adapter = new OlmatixAdapter(data);
+        adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
         mRecycleView.setAdapter(adapter);
 
         initSwipe();

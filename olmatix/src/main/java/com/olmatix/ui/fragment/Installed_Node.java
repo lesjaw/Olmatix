@@ -107,11 +107,11 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             String device = intent.getStringExtra("MQTT devices");
             String message = intent.getStringExtra("MQTT message");
             Log.d("receiver", "Got message : " + device + " : "+ message);
-            NodeSplit = device.toString();
+            NodeSplit = device;
             String[] outputDevices = NodeSplit.split("/");
             NodeID = outputDevices[1];
 
-            mMessage = "true";
+            mMessage = message;
             device = device.substring(device.indexOf("$")+1,device.length());
             messageReceive.put(device,message);
 
@@ -123,10 +123,10 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private void addCheckValidation(){
         if(messageReceive.containsKey("online")){
             Log.d("addCheckValid 1", "Passed");
-            if (inputResult.equals(NodeID)){
+            if (mMessage.equals("true")){
                 Log.d("addCheckValid 2", "Passed");
-                if (mMessage.equals("true")){
-                    Log.d("addCheckValid 3", "Passed");
+                if (inputResult.equals(NodeID)) {
+                    Log.d("addCheckValid 3", "Passed" +NodeID +" : " +inputResult +" : "+mMessage);
 
                     saveandpersist();
                 }
@@ -139,16 +139,16 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private void saveandpersist() {
 
 
-        if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes") && messageReceive.containsKey("name")
+        if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes")/* && messageReceive.containsKey("name")
                 && messageReceive.containsKey("localip") && messageReceive.containsKey("fwname") && messageReceive.containsKey("fwversion")
                 && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
-                && messageReceive.containsKey("ota"))
+                && messageReceive.containsKey("ota")*/)
         {
             Toast.makeText(getActivity(),"Subscribe Successfull",Toast.LENGTH_LONG).show();
 
             nodeModel.setNid(messageReceive.get("NodeId"));
             nodeModel.setOnline(messageReceive.get("online"));
-            nodeModel.setNodes(messageReceive.get("nodes"));
+            /*nodeModel.setNodes(messageReceive.get("nodes"));
             nodeModel.setName(messageReceive.get("name"));
             nodeModel.setLocalip(messageReceive.get("localip"));
             nodeModel.setFwName(messageReceive.get("fwname"));
@@ -156,7 +156,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             nodeModel.setSignal(messageReceive.get("signal"));
             nodeModel.setUptime(messageReceive.get("uptime"));
             nodeModel.setReset(messageReceive.get("reset"));
-            nodeModel.setOta(messageReceive.get("ota"));
+            nodeModel.setOta(messageReceive.get("ota"));*/
 
             dbNodeRepo.insertDb(nodeModel);
             adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
@@ -193,7 +193,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 inputResult =mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/#";
+                                String topic = "devices/" + inputResult + "/$online";
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);

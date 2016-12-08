@@ -49,18 +49,6 @@ public class Favorite extends Fragment {
                                 String topic = "devices/"+inputResult+"/#";
                                 try {
                                     Connection.getClient().unsubscribe(topic);
-                                    /*IMqttToken subToken = Connection.getClient().unsubscribe(topic);
-                                    subToken.setActionCallback(new IMqttActionListener() {
-                                    @Override
-                                    public void onSuccess(IMqttToken asyncActionToken) {
-                                    }
-                                    @Override
-                                    public void onFailure(IMqttToken asyncActionToken,
-                                                          Throwable exception) {
-                                        // The subscription could not be performed, maybe the user was not
-                                        // authorized to subscribe on the specified topic e.g. using wildcards
-                                    }
-                                });*/
                                 } catch (MqttException e) {
                                     e.printStackTrace();
                                 }

@@ -27,6 +27,7 @@ public class dbHelper extends SQLiteOpenHelper {
 
         String CREATE_TABLE_NODE = "CREATE TABLE " + dbNode.TABLE  + "("
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_NODE_ID + " TEXT, "
                 + dbNode.KEY_NODES + " TEXT, "
                 + dbNode.KEY_NAME + " TEXT, "
                 + dbNode.KEY_LOCALIP + " TEXT, "

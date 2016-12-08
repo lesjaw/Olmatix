@@ -76,6 +76,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private String NodeID;
     private  String mMessage;
     private String NodeSplit;
+    int flag =0;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -144,27 +146,38 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
                 && messageReceive.containsKey("ota"))
         {
-            Toast.makeText(getActivity(),"Subscribe Successfull",Toast.LENGTH_LONG).show();
 
-            nodeModel.setNid(messageReceive.get("NodeId"));
-            nodeModel.setOnline(messageReceive.get("online"));
-            nodeModel.setNodes(messageReceive.get("nodes"));
-            nodeModel.setName(messageReceive.get("name"));
-            nodeModel.setLocalip(messageReceive.get("localip"));
-            nodeModel.setFwName(messageReceive.get("fwname"));
-            nodeModel.setFwVersion(messageReceive.get("fwversion"));
-            nodeModel.setSignal(messageReceive.get("signal"));
-            nodeModel.setUptime(messageReceive.get("uptime"));
-            nodeModel.setReset(messageReceive.get("reset"));
-            nodeModel.setOta(messageReceive.get("ota"));
+            for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
+                if (data.get(i).getNid().equals(NodeID)) {
+                    Toast.makeText(getActivity(), "Already Subscribed,Please try with another id", Toast.LENGTH_LONG).show();
+                    flag =1;
+                }
+            }
 
-            dbNodeRepo.insertDb(nodeModel);
-            adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
-            mRecycleView.setAdapter(adapter);
-            data.clear();
-            data.addAll(dbNodeRepo.getNodeList());
+                if(flag == 0)
+                {
+                    Toast.makeText(getActivity(),"Subscribe Successfully",Toast.LENGTH_LONG).show();
 
-            messageReceive.clear();
+                    nodeModel.setNid(NodeID);
+                    nodeModel.setOnline(messageReceive.get("online"));
+                    nodeModel.setNodes(messageReceive.get("nodes"));
+                    nodeModel.setName(messageReceive.get("name"));
+                    nodeModel.setLocalip(messageReceive.get("localip"));
+                    nodeModel.setFwName(messageReceive.get("fwname"));
+                    nodeModel.setFwVersion(messageReceive.get("fwversion"));
+                    nodeModel.setSignal(messageReceive.get("signal"));
+                    nodeModel.setUptime(messageReceive.get("uptime"));
+                    nodeModel.setReset(messageReceive.get("reset"));
+                    nodeModel.setOta(messageReceive.get("ota"));
+
+                    dbNodeRepo.insertDb(nodeModel);
+                    adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
+                    mRecycleView.setAdapter(adapter);
+                    data.clear();
+                    data.addAll(dbNodeRepo.getNodeList());
+
+                    messageReceive.clear();
+                }
 
         }
 
@@ -200,6 +213,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                                     subToken.setActionCallback(new IMqttActionListener() {
                                         @Override
                                         public void onSuccess(IMqttToken asyncActionToken) {
+                                            messageReceive.put("NodeId",inputResult);
                                         }
 
                                         @Override

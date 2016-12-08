@@ -23,6 +23,7 @@ import static com.olmatix.database.dbNode.KEY_ICON;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
 import static com.olmatix.database.dbNode.KEY_NAME;
 import static com.olmatix.database.dbNode.KEY_NODES;
+import static com.olmatix.database.dbNode.KEY_NODE_ID;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
 import static com.olmatix.database.dbNode.KEY_OTA;
 import static com.olmatix.database.dbNode.KEY_RESET;
@@ -44,7 +45,7 @@ public class dbNodeRepo {
     public int insertDb(NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-
+        values.put(KEY_NODE_ID,nodeModel.getNid());
         values.put(KEY_NODES, nodeModel.getNodes());
         values.put(KEY_NAME, nodeModel.getName());
         values.put(KEY_LOCALIP, nodeModel.getLocalip());
@@ -154,7 +155,7 @@ public class dbNodeRepo {
             do {
                 NodeModel node = new NodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setNid( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setNid( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNodes( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
                 node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
                 node.setLocalip( cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
@@ -192,7 +193,7 @@ public class dbNodeRepo {
         if (cursor.moveToFirst()) {
             do {
                 node.node_id =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID));
-                node.nodes = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES));
+                node.nodes = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID));
                 node.name = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME));
                 node.localip = cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP));
                 node.fwname = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME));

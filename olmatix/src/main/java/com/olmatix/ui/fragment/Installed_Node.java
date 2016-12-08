@@ -76,6 +76,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private String NodeID;
     private  String mMessage;
     private String NodeSplit;
+    int flag =0;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -107,11 +109,11 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             String device = intent.getStringExtra("MQTT devices");
             String message = intent.getStringExtra("MQTT message");
             Log.d("receiver", "Got message : " + device + " : "+ message);
-            NodeSplit = device;
+            NodeSplit = device.toString();
             String[] outputDevices = NodeSplit.split("/");
             NodeID = outputDevices[1];
 
-            mMessage = message;
+            mMessage = "true";
             device = device.substring(device.indexOf("$")+1,device.length());
             messageReceive.put(device,message);
 
@@ -123,10 +125,10 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private void addCheckValidation(){
         if(messageReceive.containsKey("online")){
             Log.d("addCheckValid 1", "Passed");
-            if (mMessage.equals("true")){
+            if (inputResult.equals(NodeID)){
                 Log.d("addCheckValid 2", "Passed");
-                if (inputResult.equals(NodeID)) {
-                    Log.d("addCheckValid 3", "Passed" +NodeID +" : " +inputResult +" : "+mMessage);
+                if (mMessage.equals("true")){
+                    Log.d("addCheckValid 3", "Passed");
 
                     saveandpersist();
                 }
@@ -139,32 +141,43 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private void saveandpersist() {
 
 
-        if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes")/* && messageReceive.containsKey("name")
+        if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes") && messageReceive.containsKey("name")
                 && messageReceive.containsKey("localip") && messageReceive.containsKey("fwname") && messageReceive.containsKey("fwversion")
                 && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
-                && messageReceive.containsKey("ota")*/)
+                && messageReceive.containsKey("ota"))
         {
-            Toast.makeText(getActivity(),"Subscribe Successfull",Toast.LENGTH_LONG).show();
 
-            nodeModel.setNid(messageReceive.get("NodeId"));
-            nodeModel.setOnline(messageReceive.get("online"));
-            /*nodeModel.setNodes(messageReceive.get("nodes"));
-            nodeModel.setName(messageReceive.get("name"));
-            nodeModel.setLocalip(messageReceive.get("localip"));
-            nodeModel.setFwName(messageReceive.get("fwname"));
-            nodeModel.setFwVersion(messageReceive.get("fwversion"));
-            nodeModel.setSignal(messageReceive.get("signal"));
-            nodeModel.setUptime(messageReceive.get("uptime"));
-            nodeModel.setReset(messageReceive.get("reset"));
-            nodeModel.setOta(messageReceive.get("ota"));*/
+            for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
+                if (data.get(i).getNid().equals(NodeID)) {
+                    Toast.makeText(getActivity(), "Already Subscribed,Please try with another id", Toast.LENGTH_LONG).show();
+                    flag =1;
+                }
+            }
 
-            dbNodeRepo.insertDb(nodeModel);
-            adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
-            mRecycleView.setAdapter(adapter);
-            data.clear();
-            data.addAll(dbNodeRepo.getNodeList());
+                if(flag == 0)
+                {
+                    Toast.makeText(getActivity(),"Subscribe Successfully",Toast.LENGTH_LONG).show();
 
-            messageReceive.clear();
+                    nodeModel.setNid(NodeID);
+                    nodeModel.setOnline(messageReceive.get("online"));
+                    nodeModel.setNodes(messageReceive.get("nodes"));
+                    nodeModel.setName(messageReceive.get("name"));
+                    nodeModel.setLocalip(messageReceive.get("localip"));
+                    nodeModel.setFwName(messageReceive.get("fwname"));
+                    nodeModel.setFwVersion(messageReceive.get("fwversion"));
+                    nodeModel.setSignal(messageReceive.get("signal"));
+                    nodeModel.setUptime(messageReceive.get("uptime"));
+                    nodeModel.setReset(messageReceive.get("reset"));
+                    nodeModel.setOta(messageReceive.get("ota"));
+
+                    dbNodeRepo.insertDb(nodeModel);
+                    adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
+                    mRecycleView.setAdapter(adapter);
+                    data.clear();
+                    data.addAll(dbNodeRepo.getNodeList());
+
+                    messageReceive.clear();
+                }
 
         }
 
@@ -193,13 +206,14 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 inputResult =mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/$online";
+                                String topic = "devices/" + inputResult + "/#";
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
                                     subToken.setActionCallback(new IMqttActionListener() {
                                         @Override
                                         public void onSuccess(IMqttToken asyncActionToken) {
+                                            messageReceive.put("NodeId",inputResult);
                                         }
 
                                         @Override

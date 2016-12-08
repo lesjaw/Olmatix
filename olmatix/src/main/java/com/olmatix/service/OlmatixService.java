@@ -360,7 +360,7 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
-           // Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
           /*String device = topic;
             nodeMsg = message.toString();
             String[] outputDevices = device.split("/");

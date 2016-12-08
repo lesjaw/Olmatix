@@ -124,12 +124,12 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private void addCheckValidation(){
         if(messageReceive.containsKey("online")){
             Log.d("addCheckValid 1", "Passed");
-            if (inputResult.equals(NodeID)){
+            if (mMessage.equals("true")) {
                 Log.d("addCheckValid 2", "Passed");
-                if (mMessage.equals("true")){
+                if(inputResult.equals(NodeID)){
                     Log.d("addCheckValid 3", "Passed");
 
-                    /*String topic = "devices/" + inputResult + "/#";
+                    String topic = "devices/" + inputResult + "/#";
                     int qos = 1;
                     try {
                         IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
@@ -147,8 +147,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                         });
                     } catch (MqttException e) {
                         e.printStackTrace();
-                    }*/
-                    //saveandpersist();
+                    }
+                    saveandpersist();
                 }
             }
 

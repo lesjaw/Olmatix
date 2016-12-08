@@ -9,7 +9,7 @@ package com.olmatix.model;
  * Copyright            : Copyright @ 2016 Indogamers.
  */
 public class NodeModel {
-    private int nid;
+    private String nid;
     private String nodes;
     private String name;
     private String niceName;
@@ -43,11 +43,11 @@ public class NodeModel {
         this.ota = ota;
     }
 
-    public int getNid() {
+    public String getNid() {
         return nid;
     }
 
-    public void setNid(int nid) {
+    public void setNid(String nid) {
         this.nid = nid;
     }
 

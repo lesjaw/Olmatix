@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu();
             } else
                 serverconnected = false;
-                invalidateOptionsMenu();
+            invalidateOptionsMenu();
         }
     };
 

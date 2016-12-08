@@ -4,6 +4,7 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,8 +33,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixAdapter;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
@@ -46,6 +49,7 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -64,7 +68,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private static ArrayList<NodeModel> data;
     private Paint p = new Paint();
     private ItemTouchHelper mItemTouchHelper;
-
+    HashMap<String,String> messageReceive = new HashMap<>();
+    private dbNodeRepo dbNodeRepo;
+    private  NodeModel nodeModel;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,6 +83,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         super.onViewCreated(view, savedInstanceState);
 
         data = new ArrayList<>();
+        dbNodeRepo = new dbNodeRepo(getActivity());
+        nodeModel = new NodeModel();
         initDialog();
         setupView();
         onClickListener();
@@ -94,8 +102,42 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             String device = intent.getStringExtra("device");
             String message = intent.getStringExtra("message");
             Log.d("receiver", "Got message : " + device + " : "+ message);
+
+            device = device.substring(device.indexOf("$")+1,device.length());
+            messageReceive.put(device,message);
+
+            saveandpersist();
         }
+
     };
+
+    private void saveandpersist() {
+
+
+        if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes") && messageReceive.containsKey("name")
+                && messageReceive.containsKey("localip") && messageReceive.containsKey("fwname") && messageReceive.containsKey("fwversion")
+                && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
+                && messageReceive.containsKey("ota"))
+        {
+                nodeModel.setNid(messageReceive.get("NodeId"));
+                nodeModel.setOnline(messageReceive.get("online"));
+                nodeModel.setNodes(messageReceive.get("nodes"));
+                nodeModel.setName(messageReceive.get("name"));
+                nodeModel.setLocalip(messageReceive.get("localip"));
+                nodeModel.setFwName(messageReceive.get("fwname"));
+                nodeModel.setFwVersion(messageReceive.get("fwversion"));
+                nodeModel.setSignal(messageReceive.get("signal"));
+                nodeModel.setUptime(messageReceive.get("uptime"));
+                nodeModel.setReset(messageReceive.get("reset"));
+                nodeModel.setOta(messageReceive.get("ota"));
+
+                dbNodeRepo.insertDb(nodeModel);
+                messageReceive.clear();
+                Toast.makeText(getActivity(),dbNodeRepo.getNodeList().size(),Toast.LENGTH_LONG).show();
+
+        }
+    }
+
 
     @Override
     public void onStart() {
@@ -120,14 +162,18 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String inputResult =mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/$online";
+                                final String inputResult =mEditText.getText().toString();
+                                String topic = "devices/" + inputResult + "/#";
+                               // String topic = "devices/" + inputResult + "/$online";
+
+
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
                                     subToken.setActionCallback(new IMqttActionListener() {
                                         @Override
                                         public void onSuccess(IMqttToken asyncActionToken) {
+                                            messageReceive.put("NodeId",inputResult);
 
                                         }
 

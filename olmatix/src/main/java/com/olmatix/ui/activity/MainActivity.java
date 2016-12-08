@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     boolean serverconnected;
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private String command;
     int backButtonCount;
 
 
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
-        command = "checkstatus";
     }
 
     @Override
@@ -69,21 +67,13 @@ public class MainActivity extends AppCompatActivity {
                 mMessageReceiver);
     }
 
-    private void sendMessage() {
-        Log.d("sender", "MyActivity is UP = ");
-        Intent intent = new Intent("custom-event-name");
-        // You can also include some extra data.
-        intent.putExtra("MQTT State", command);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
     @Override
     protected void onStart() {
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("custom-event-name"));
+                mMessageReceiver, new IntentFilter("MQTT Status"));
         super.onStart();
     }
 
@@ -103,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             // TODO Auto-generated method stub
             // Get extra data included in the Intent
             String message = intent.getStringExtra("MQTT State");
-            Log.d("receiver", "Got message : " + message);
+            Log.d("receiver", "Status MQTT : " + message);
             if (message == "true"){
                 serverconnected = true;
                 invalidateOptionsMenu();

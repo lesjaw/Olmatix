@@ -132,13 +132,14 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 nodeModel.setOta(messageReceive.get("ota"));
 
                 dbNodeRepo.insertDb(nodeModel);
+                adapter.notifyDataSetChanged();
                 messageReceive.clear();
 
         }
-        if(messageReceive.containsKey("uptime") && ! messageReceive.containsKey("name"))
+       /* if(messageReceive.containsKey("uptime") && ! messageReceive.containsKey("name"))
         {
             messageReceive.clear();
-        }
+        }*/
     }
 
 

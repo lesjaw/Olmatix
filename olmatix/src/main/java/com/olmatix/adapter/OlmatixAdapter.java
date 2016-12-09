@@ -18,6 +18,9 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.model.NodeModel;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.ui.fragment.Installed_Node;
+import com.olmatix.utils.Connection;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.Collections;
 import java.util.List;
@@ -85,6 +88,12 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     public void removeItem(int position) {
         //Installed_Node.dbNodeRepo.delete("809ed5e0");
         Installed_Node.dbNodeRepo.delete(nodeList.get(position).getNodesID());
+        String topic = "devices/"+nodeList.get(position).getNodesID()+"/#";
+        try {
+            Connection.getClient().unsubscribe(topic);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
         nodeList.remove(position);
 
         notifyItemRemoved(position);

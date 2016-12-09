@@ -137,9 +137,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             if (flagNodeAdd==1) {
                 addCheckValidation();
             }
-            if(flagNodeAdd == 0) {
-                saveandpersist();
-            }
+
+            saveandpersist();
+
         }
 
     };

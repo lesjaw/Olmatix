@@ -4,11 +4,14 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -35,6 +38,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixAdapter;
+import com.olmatix.database.dbHelper;
+import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
@@ -46,10 +51,26 @@ import com.olmatix.utils.Connection;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.util.Strings;
+import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.olmatix.database.dbNode.KEY_ADDING;
+import static com.olmatix.database.dbNode.KEY_FWNAME;
+import static com.olmatix.database.dbNode.KEY_FWVERSION;
+import static com.olmatix.database.dbNode.KEY_ICON;
+import static com.olmatix.database.dbNode.KEY_LOCALIP;
+import static com.olmatix.database.dbNode.KEY_NAME;
+import static com.olmatix.database.dbNode.KEY_NODES;
+import static com.olmatix.database.dbNode.KEY_ONLINE;
+import static com.olmatix.database.dbNode.KEY_OTA;
+import static com.olmatix.database.dbNode.KEY_RESET;
+import static com.olmatix.database.dbNode.KEY_SIGNAL;
+import static com.olmatix.database.dbNode.KEY_UPTIME;
+import static com.olmatix.database.dbNode.TABLE;
 
 
 public class Installed_Node extends Fragment implements OnStartDragListener {
@@ -191,7 +212,12 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private void saveandpersist() {
 
+           /* for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
+                if (data.get(i).getNodesID().equals(NodeID)) {
+                    String gNID = data.get(i).getNodesID();
+                    Log.d("DB", "NodeID = " + NodeID + " + " + gNID);*/
 
+                    nodeModel.setNodesID(NodeID);
                     if (messageReceive.get("online") != null) {
                         nodeModel.setOnline(messageReceive.get("online"));
                         String mOnline = messageReceive.get("online");
@@ -250,7 +276,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                     data.addAll(dbNodeRepo.getNodeList());
 
                     messageReceive.clear();
-
+           /*     }
+            }*/
 
     }
 

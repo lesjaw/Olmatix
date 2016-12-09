@@ -357,7 +357,7 @@ public class OlmatixService extends Service {
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
             nodeTopic = topic;
             nodeMsg = message.toString();
-            //Log.d("sender", "Broadcasting message = " +nodeTopic +" message = " + nodeMsg);
+            Log.d("sender", "Broadcasting message = " +nodeTopic +" message = " + nodeMsg);
             sendMessageMQTT();
 
         }

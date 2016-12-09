@@ -6,11 +6,14 @@ package com.olmatix.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.model.NodeModel;
 import com.olmatix.lesjaw.olmatix.R;
@@ -59,10 +62,12 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     public void onBindViewHolder(OlmatixHolder holder, int position) {
 
         final NodeModel mNodeModel = nodeList.get(position);
-        if(mNodeModel.getOnline().equals("true")){
-            holder.imgStatus.setImageResource(R.drawable.ic_node_online);
-        } else {
-            holder.imgStatus.setImageResource(R.drawable.ic_node_offline);
+        if(mNodeModel.getOnline() != null) {
+            if (mNodeModel.getOnline().equals("true")) {
+                holder.imgStatus.setImageResource(R.drawable.ic_node_online);
+            } else {
+                holder.imgStatus.setImageResource(R.drawable.ic_node_offline);
+            }
         }
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
         holder.fwName.setText(mNodeModel.getFwName());
@@ -78,8 +83,10 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     }
 
     public void removeItem(int position) {
+        //Installed_Node.dbNodeRepo.delete("809ed5e0");
+        Installed_Node.dbNodeRepo.delete(nodeList.get(position).getNodesID());
         nodeList.remove(position);
-        Installed_Node.dbNodeRepo.delete(nodeList.get(position).getNid());
+
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, nodeList.size());
     }

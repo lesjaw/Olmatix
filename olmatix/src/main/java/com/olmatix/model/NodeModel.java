@@ -23,11 +23,12 @@ public class NodeModel {
     private String uptime;
     private String reset;
     private String ota;
+    private String knid;
 
     public NodeModel() {
     }
 
-    public NodeModel(String nodes, String name, String niceName, String localip, String fwName, String fwVersion, String icon, String adding, String online, String signal, String uptime, String reset, String ota) {
+    public NodeModel(String key_node_id, String nodes, String name, String niceName, String localip, String fwName, String fwVersion, String icon, String adding, String online, String signal, String uptime, String reset, String ota) {
         this.nodes = nodes;
         this.name = name;
         this.niceName = niceName;
@@ -41,6 +42,15 @@ public class NodeModel {
         this.uptime = uptime;
         this.reset = reset;
         this.ota = ota;
+        this.knid = key_node_id;
+    }
+
+    public String getKey_node_id() {
+        return knid;
+    }
+
+    public void setKnid(String knid) {
+        this.knid = knid;
     }
 
     public String getNid() {

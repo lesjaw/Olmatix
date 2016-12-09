@@ -26,14 +26,14 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
 
     public class OlmatixHolder extends RecyclerView.ViewHolder {
-        public TextView nodeName, ipAddrs, upTime;
+        public TextView fwName, ipAddrs, upTime;
         public ImageView imgNode, imgStatus;
 
         public OlmatixHolder(View view) {
             super(view);
             imgNode     = (ImageView) view.findViewById(R.id.icon_node);
             imgStatus   = (ImageView) view.findViewById(R.id.icon_status);
-            nodeName    = (TextView) view.findViewById(R.id.node_name);
+            fwName    = (TextView) view.findViewById(R.id.fw_name);
             ipAddrs     = (TextView) view.findViewById(R.id.ipaddrs);
             upTime      = (TextView) view.findViewById(R.id.uptime);
         }
@@ -57,13 +57,13 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     public void onBindViewHolder(OlmatixHolder holder, int position) {
 
         final NodeModel mNodeModel = nodeList.get(position);
-        if(mNodeModel.getOnline().equals("1")){
+        if(mNodeModel.getOnline().equals("true")){
             holder.imgStatus.setImageResource(R.drawable.ic_node_online);
         } else {
             holder.imgStatus.setImageResource(R.drawable.ic_node_offline);
         }
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-        holder.nodeName.setText(mNodeModel.getName());
+        holder.fwName.setText(mNodeModel.getFwName());
         holder.ipAddrs.setText(mNodeModel.getLocalip());
         holder.upTime.setText(mNodeModel.getUptime());
     }

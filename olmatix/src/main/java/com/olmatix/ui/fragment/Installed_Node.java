@@ -6,10 +6,12 @@ package com.olmatix.ui.fragment;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -36,6 +38,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixAdapter;
+import com.olmatix.database.dbHelper;
+import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
@@ -48,10 +52,25 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.util.Strings;
+import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.olmatix.database.dbNode.KEY_ADDING;
+import static com.olmatix.database.dbNode.KEY_FWNAME;
+import static com.olmatix.database.dbNode.KEY_FWVERSION;
+import static com.olmatix.database.dbNode.KEY_ICON;
+import static com.olmatix.database.dbNode.KEY_LOCALIP;
+import static com.olmatix.database.dbNode.KEY_NAME;
+import static com.olmatix.database.dbNode.KEY_NODES;
+import static com.olmatix.database.dbNode.KEY_ONLINE;
+import static com.olmatix.database.dbNode.KEY_OTA;
+import static com.olmatix.database.dbNode.KEY_RESET;
+import static com.olmatix.database.dbNode.KEY_SIGNAL;
+import static com.olmatix.database.dbNode.KEY_UPTIME;
+import static com.olmatix.database.dbNode.TABLE;
 
 
 public class Installed_Node extends Fragment implements OnStartDragListener {
@@ -77,6 +96,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private  String mMessage;
     private String NodeSplit;
     int flag =0;
+    int flagNodeAdd =0;
 
     @Nullable
     @Override
@@ -104,20 +124,21 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
-            // Get extra data included in the Intent
+
             String device = intent.getStringExtra("MQTT devices");
             String message = intent.getStringExtra("MQTT message");
             Log.d("receiver", "Got message : " + device + " : "+ message);
-            NodeSplit = device.toString();
+            NodeSplit = device;
             String[] outputDevices = NodeSplit.split("/");
             NodeID = outputDevices[1];
-
-            mMessage = "true";
+            mMessage = message;
             device = device.substring(device.indexOf("$")+1,device.length());
             messageReceive.put(device,message);
+            if (flagNodeAdd==1) {
+                addCheckValidation();
+            }
+            saveandpersist();
 
-            addCheckValidation();
         }
 
     };
@@ -130,58 +151,102 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 if (mMessage.equals("true")){
                     Log.d("addCheckValid 3", "Passed");
 
-                    saveandpersist();
+                    saveIfOnline();
                 }
             }
 
+        }
+
+    }
+
+    private void saveIfOnline() {
+
+
+        if(messageReceive.containsKey("online"))
+        {
+
+            for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
+                if (data.get(i).getNid().equals(NodeID)) {
+                    Toast.makeText(getActivity(), "You already have this Node ID", Toast.LENGTH_LONG).show();
+                    flag =1;
+                }
+            }
+
+            if(flag == 0)
+            {
+                Toast.makeText(getActivity(),"Add Node Successfully",Toast.LENGTH_LONG).show();
+
+                nodeModel.setNid(NodeID);
+                nodeModel.setOnline(messageReceive.get("online"));
+
+                dbNodeRepo.insertDb(nodeModel);
+                messageReceive.clear();
+                flagNodeAdd=0;
+
+                doSubcribeIfOnline();
+            }
+
+        }
+
+    }
+
+    private void doSubcribeIfOnline(){
+        String topic = "devices/" + inputResult + "/#";
+        int qos = 1;
+        try {
+            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+            subToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    messageReceive.put("NodeId",inputResult);
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
         }
 
     }
 
     private void saveandpersist() {
 
+        Log.d("SaveandPersist", "Executed");
 
-        if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes") && messageReceive.containsKey("name")
+        /*if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes") && messageReceive.containsKey("name")
                 && messageReceive.containsKey("localip") && messageReceive.containsKey("fwname") && messageReceive.containsKey("fwversion")
                 && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
                 && messageReceive.containsKey("ota"))
-        {
 
-            for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
-                if (data.get(i).getNid().equals(NodeID)) {
-                    Toast.makeText(getActivity(), "Already Subscribed,Please try with another id", Toast.LENGTH_LONG).show();
-                    flag =1;
-                }
-            }
+            {*/
+              //  Toast.makeText(getActivity(),"Update Node Successfull",Toast.LENGTH_LONG).show();
 
-                if(flag == 0)
-                {
-                    Toast.makeText(getActivity(),"Subscribe Successfully",Toast.LENGTH_LONG).show();
+                nodeModel.setNid(NodeID);
+                nodeModel.setOnline(messageReceive.get("online"));
+                nodeModel.setNodes(messageReceive.get("nodes"));
+                nodeModel.setName(messageReceive.get("name"));
+                nodeModel.setLocalip(messageReceive.get("localip"));
+                nodeModel.setFwName(messageReceive.get("fwname"));
+                nodeModel.setFwVersion(messageReceive.get("fwversion"));
+                nodeModel.setSignal(messageReceive.get("signal"));
+                nodeModel.setUptime(messageReceive.get("uptime"));
+                nodeModel.setReset(messageReceive.get("reset"));
+                nodeModel.setOta(messageReceive.get("ota"));
 
-                    nodeModel.setNid(NodeID);
-                    nodeModel.setOnline(messageReceive.get("online"));
-                    nodeModel.setNodes(messageReceive.get("nodes"));
-                    nodeModel.setName(messageReceive.get("name"));
-                    nodeModel.setLocalip(messageReceive.get("localip"));
-                    nodeModel.setFwName(messageReceive.get("fwname"));
-                    nodeModel.setFwVersion(messageReceive.get("fwversion"));
-                    nodeModel.setSignal(messageReceive.get("signal"));
-                    nodeModel.setUptime(messageReceive.get("uptime"));
-                    nodeModel.setReset(messageReceive.get("reset"));
-                    nodeModel.setOta(messageReceive.get("ota"));
+                dbNodeRepo.update(nodeModel);
+                adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
+                mRecycleView.setAdapter(adapter);
+                data.clear();
+                data.addAll(dbNodeRepo.getNodeList());
 
-                    dbNodeRepo.insertDb(nodeModel);
-                    adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
-                    mRecycleView.setAdapter(adapter);
-                    data.clear();
-                    data.addAll(dbNodeRepo.getNodeList());
-
-                    messageReceive.clear();
-                }
-
-        }
+                messageReceive.clear();
+            //}
 
     }
+
+
     @Override
     public void onStart() {
         Intent i = new Intent(getActivity(), OlmatixService.class);
@@ -206,7 +271,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 inputResult =mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/#";
+                                String topic = "devices/" + inputResult + "/$online";
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
@@ -214,6 +279,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                                         @Override
                                         public void onSuccess(IMqttToken asyncActionToken) {
                                             messageReceive.put("NodeId",inputResult);
+                                            flagNodeAdd = 1;
                                         }
 
                                         @Override

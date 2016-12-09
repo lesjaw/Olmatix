@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         startService(i);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("MQTT Status"));
+                mMessageReceiver, new IntentFilter("MQTTStatus"));
         super.onStart();
     }
 

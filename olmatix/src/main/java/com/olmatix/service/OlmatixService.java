@@ -225,7 +225,6 @@ public class OlmatixService extends Service {
                     Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
                     Connection.getClient().setCallback(new MqttEventCallback());
 
-
                     try {
 
                         String topic = "status/"+deviceId+"/$online";
@@ -244,7 +243,6 @@ public class OlmatixService extends Service {
                         Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
-
                                 Log.i("sub","Subscribe success");
                                 Toast.makeText(getApplicationContext(), R.string.sub_success, Toast.LENGTH_SHORT).show();
                                 stateoffMqtt = "true";
@@ -271,8 +269,6 @@ public class OlmatixService extends Service {
                     Log.e("mqtt",exception.toString());
                     stateoffMqtt = "false";
                     sendMessage();
-
-
                 }
             });
 
@@ -308,13 +304,13 @@ public class OlmatixService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand()");
         Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
-        sendMessage();
+        //sendMessage();
         return START_STICKY;
     }
 
     private void sendMessage() {
         Log.d("sender", "Broadcasting message MQTT status = " +stateoffMqtt);
-        Intent intent = new Intent("MQTT Status");
+        Intent intent = new Intent("MQTTStatus");
         // You can also include some extra data.
         intent.putExtra("MQTT State", stateoffMqtt);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -360,12 +356,6 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
-            //Toast.makeText(getApplicationContext(), "Message arrived -> "+topic+" : "+message.toString(), Toast.LENGTH_SHORT).show();
-          /*String device = topic;
-            nodeMsg = message.toString();
-            String[] outputDevices = device.split("/");
-            nodeId= outputDevices[1];
-            nodeKey = outputDevices[2];*/
             nodeTopic = topic;
             nodeMsg = message.toString();
             Log.d("sender", "Broadcasting message = " +nodeTopic +" message = " + nodeMsg);

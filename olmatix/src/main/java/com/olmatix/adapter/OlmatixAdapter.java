@@ -75,7 +75,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
     public void removeItem(int position) {
         nodeList.remove(position);
-        Installed_Node.dbNodeRepo.delete(Integer.parseInt(nodeList.get(position).getNid()));
+        Installed_Node.dbNodeRepo.delete(nodeList.get(position).getNid());
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, nodeList.size());
     }

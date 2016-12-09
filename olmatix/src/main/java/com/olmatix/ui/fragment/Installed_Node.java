@@ -181,7 +181,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 nodeModel.setOnline(messageReceive.get("online"));
 
                 dbNodeRepo.insertDb(nodeModel);
-                //messageReceive.clear();
+                messageReceive.clear();
                 flagNodeAdd=0;
                 doSubcribeIfOnline();
             }

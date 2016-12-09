@@ -42,9 +42,10 @@ public class dbNodeRepo {
     public int insertDb(NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_NODE_ID,nodeModel.getNid());
+        values.put(KEY_NODE_ID,nodeModel.getNodesID());
         values.put(KEY_NODES, nodeModel.getNodes());
         values.put(KEY_NAME, nodeModel.getName());
+        values.put(KEY_NICE_NAME, nodeModel.getNiceName());
         values.put(KEY_LOCALIP, nodeModel.getLocalip());
         values.put(KEY_FWNAME, nodeModel.getFwName());
         values.put(KEY_FWVERSION, nodeModel.getFwVersion());
@@ -69,7 +70,8 @@ public class dbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
-        db.delete(TABLE, dbNode.KEY_NODE_ID + "= ?", new String[] { String.valueOf(node_Id) });
+        db.delete(TABLE, dbNode.KEY_NODE_ID + "= ?", new String[] {
+                String.valueOf(dbNode.KEY_NODE_ID) });
         db.close(); // Closing database connection
     }
 
@@ -81,7 +83,7 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODE_ID,nodeModel.getNid());
+        values.put(KEY_NODE_ID,nodeModel.getNodesID());
         values.put(KEY_NODES, nodeModel.getNodes());
         values.put(KEY_NAME, nodeModel.getName());
         values.put(KEY_NICE_NAME, nodeModel.getNiceName());

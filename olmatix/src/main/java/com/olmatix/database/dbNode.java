@@ -36,9 +36,9 @@ public class dbNode {
     public String fwname;
     public String fwversion;
     public String online;
+    public String signal;
     public String icon;
     public String adding;
-    public String signal;
     public String uptime;
     public String reset;
     public String ota;

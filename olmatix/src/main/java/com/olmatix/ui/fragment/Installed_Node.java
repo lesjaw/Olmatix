@@ -212,8 +212,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private void saveandpersist() {
 
-        for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
-            if (data.get(i) != null) {
+            for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
                 if (data.get(i).getNid().equals(NodeID)) {
                     String gNID = data.get(i).getNid();
                     Log.d("DB", "NodeID = " + NodeID + " + " + gNID);
@@ -279,7 +278,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                     messageReceive.clear();
                 }
             }
-        }
+
     }
 
 

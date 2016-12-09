@@ -22,6 +22,7 @@ import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
 import static com.olmatix.database.dbNode.KEY_NAME;
+import static com.olmatix.database.dbNode.KEY_NICE_NAME;
 import static com.olmatix.database.dbNode.KEY_NODES;
 import static com.olmatix.database.dbNode.KEY_NODE_ID;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
@@ -37,10 +38,6 @@ public class dbNodeRepo {
     public dbNodeRepo(Context context) {
         dbHelper = new dbHelper(context);
     }
-
-    /**
-     * SQL INSERT PROSES DATA
-     * */
 
     public int insertDb(NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -72,7 +69,7 @@ public class dbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
-        db.delete(TABLE, dbNode.KEY_ID + "= ?", new String[] { String.valueOf(node_Id) });
+        db.delete(TABLE, dbNode.KEY_NODE_ID + "= ?", new String[] { String.valueOf(node_Id) });
         db.close(); // Closing database connection
     }
 
@@ -87,6 +84,7 @@ public class dbNodeRepo {
         values.put(KEY_NODE_ID,nodeModel.getNid());
         values.put(KEY_NODES, nodeModel.getNodes());
         values.put(KEY_NAME, nodeModel.getName());
+        values.put(KEY_NICE_NAME, nodeModel.getNiceName());
         values.put(KEY_LOCALIP, nodeModel.getLocalip());
         values.put(KEY_FWNAME, nodeModel.getFwName());
         values.put(KEY_FWVERSION, nodeModel.getFwVersion());
@@ -104,44 +102,6 @@ public class dbNodeRepo {
         db.close(); // Closing database connection
 
     }
-
-    /**
-     * SQL GET LIST DATA
-     * */
-
-   /* public ArrayList<HashMap<String, String>> getNodeList() {
-
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT * FROM " + TABLE;
-
-        ArrayList<HashMap<String, String>> nodeList = new ArrayList<HashMap<String, String>>();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                HashMap<String, String> node = new HashMap<String, String>();
-                node.put("id", cursor.getString(cursor.getColumnIndex(dbNode.KEY_ID)));
-                node.put("nodes", cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
-                node.put("name", cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
-                node.put("localip", cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
-                node.put("fwname", cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
-                node.put("fwversion", cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
-                node.put("online", cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
-                node.put("icon", cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
-                node.put("adding", cursor.getString(cursor.getColumnIndex(dbNode.KEY_ADDING)));
-                node.put("signal", cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
-                node.put("uptime", cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
-                node.put("reset", cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));
-                node.put("ota", cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA)));
-                nodeList.add(node);
-
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
-        return nodeList;
-    }
-*/
 
 
     public ArrayList<NodeModel> getNodeList() {
@@ -179,42 +139,6 @@ public class dbNodeRepo {
     }
 
 
-
-    public dbNode getNodeById(int Id){
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT  * FROM " + dbNode.TABLE
-                + " WHERE " +
-                dbNode.KEY_ID + "=?";// It's a good practice to use parameter ?, instead of concatenate string
-
-        int iCount =0;
-        dbNode node = new dbNode();
-
-        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(Id) } );
-
-        if (cursor.moveToFirst()) {
-            do {
-                node.node_id =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID));
-                node.nodes = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID));
-                node.name = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME));
-                node.localip = cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP));
-                node.fwname = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME));
-                node.fwversion = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION));
-                node.online = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE));
-                node.icon = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON));
-                node.adding = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ADDING));
-                node.signal = cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL));
-                node.uptime = cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME));
-                node.reset = cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET));
-                node.ota = cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA));
-
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-        return node;
-    }
-
     public dbNode getNodeByNode(String nodeName){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM " + dbNode.TABLE
@@ -228,7 +152,7 @@ public class dbNodeRepo {
 
         if (cursor.moveToFirst()) {
             do {
-                node.node_id =cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID));
+                node.node_id =cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID));
                 node.nodes = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES));
                 node.name = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME));
                 node.localip = cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP));

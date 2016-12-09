@@ -12,7 +12,7 @@ public class NodeModel {
     private String nid;
     private String nodes;
     private String name;
-    private String niceName;
+    private String nice_name;
     private String localip;
     private String fwName;
     private String fwVersion;
@@ -23,15 +23,16 @@ public class NodeModel {
     private String uptime;
     private String reset;
     private String ota;
-    private String knid;
 
     public NodeModel() {
     }
 
-    public NodeModel(String key_node_id, String nodes, String name, String niceName, String localip, String fwName, String fwVersion, String icon, String adding, String online, String signal, String uptime, String reset, String ota) {
+    public NodeModel(String nodes, String name, String nice_name, String localip, String fwName, String fwVersion,
+                     String icon, String adding, String online, String signal, String uptime, String reset, String ota) {
+
         this.nodes = nodes;
         this.name = name;
-        this.niceName = niceName;
+        this.nice_name = nice_name;
         this.localip = localip;
         this.fwName = fwName;
         this.fwVersion = fwVersion;
@@ -42,16 +43,9 @@ public class NodeModel {
         this.uptime = uptime;
         this.reset = reset;
         this.ota = ota;
-        this.knid = key_node_id;
+
     }
 
-    public String getKey_node_id() {
-        return knid;
-    }
-
-    public void setKnid(String knid) {
-        this.knid = knid;
-    }
 
     public String getNid() {
         return nid;
@@ -78,11 +72,11 @@ public class NodeModel {
     }
 
     public String getNiceName() {
-        return niceName;
+        return nice_name;
     }
 
     public void setNiceName(String niceName) {
-        this.niceName = niceName;
+        this.nice_name = niceName;
     }
 
     public String getLocalip() {

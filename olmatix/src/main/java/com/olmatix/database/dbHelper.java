@@ -12,7 +12,7 @@ public class dbHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 2;
 
     // Database Name
     private static final String DATABASE_NAME = "olmatix";
@@ -30,12 +30,13 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_NODE_ID + " TEXT, "
                 + dbNode.KEY_NODES + " TEXT, "
                 + dbNode.KEY_NAME + " TEXT, "
+                + dbNode.KEY_NICE_NAME + " TEXT, " //this name will be from user input
                 + dbNode.KEY_LOCALIP + " TEXT, "
                 + dbNode.KEY_FWNAME + " TEXT, "
                 + dbNode.KEY_FWVERSION + " TEXT, "
                 + dbNode.KEY_ONLINE + " TEXT, "
                 + dbNode.KEY_ICON + " TEXT, "
-                + dbNode.KEY_ADDING + " TEXT, "
+                + dbNode.KEY_ADDING + " TEXT, " //this is the timestamps when the node added
                 + dbNode.KEY_SIGNAL + " TEXT, "
                 + dbNode.KEY_UPTIME + " TEXT, "
                 + dbNode.KEY_RESET + " TEXT, "

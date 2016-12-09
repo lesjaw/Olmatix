@@ -46,6 +46,7 @@ import com.olmatix.utils.Connection;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,7 +96,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         setupView();
 
     onClickListener();
-}
+    }
+
+
     private void onClickListener() {
         mFab.setOnClickListener(mFabClickListener());
     }
@@ -106,7 +109,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
             String device = intent.getStringExtra("MQTT devices");
             String message = intent.getStringExtra("MQTT message");
-            Log.d("receiver", "Got message : " + device + " : "+ message);
+            Log.d("receiver", " = " + device + " : "+ message);
             NodeSplit = device;
             String[] outputDevices = NodeSplit.split("/");
             NodeID = outputDevices[1];
@@ -141,35 +144,27 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private void saveIfOnline() {
 
-        if(messageReceive.containsKey("online"))
-        {
-            for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
+        if (messageReceive.containsKey("online")) {
+
+            for (int i = 0; i < dbNodeRepo.getNodeList().size(); i++) {
                 if (data.get(i).getNodesID().equals(NodeID)) {
                     Toast.makeText(getActivity(), "You already have this Node ID", Toast.LENGTH_LONG).show();
-                    flag =1;
-                    Log.d("saveIfOnline", "You already have this Node, DB = " +i +" flag = " +flag);
+                    flag = 1;
+                    Log.d("saveIfOnline", "You already have this Node, DB = " + i + " flag = " + flag);
                 }
             }
 
-            if(flag != 1)
-            {
+            if (flag != 1) {
                 installedNodeModel.setNodesID(NodeID);
                 installedNodeModel.setOnline(messageReceive.get("online"));
-                /*installedNodeModel.setNodes(messageReceive.get("nodes"));
-                installedNodeModel.setName(messageReceive.get("name"));
-                installedNodeModel.setLocalip(messageReceive.get("localip"));
-                installedNodeModel.setFwName(messageReceive.get("fwname"));
-                installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
-                installedNodeModel.setReset(messageReceive.get("reset"));
-                installedNodeModel.setOta(messageReceive.get("ota"));*/
+
 
                 dbNodeRepo.insertDb(installedNodeModel);
-                //messageReceive.clear();
-                flagNodeAdd=0;
-                //doSubcribeIfOnline();
-
-                Toast.makeText(getActivity(),"Add Node Successfully",Toast.LENGTH_LONG).show();
-                Log.d("saveIfOnline", "Add Node success, " +" flag = " +flag);
+                flagNodeAdd = 0;
+                Toast.makeText(getActivity(), "Add Node Successfully", Toast.LENGTH_LONG).show();
+                Log.d("saveIfOnline", "Add Node success, " + " flag = " + flag);
+                messageReceive.clear();
+                doSubcribeIfOnline();
 
             }
 
@@ -200,54 +195,51 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private void saveandpersist() {
 
-           /* for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
-                if (data.get(i).getNodesID().equals(NodeID)) {
-                    String gNID = data.get(i).getNodesID();
-                    Log.d("DB", "NodeID = " + NodeID + " + " + gNID);*/
 
-                    if (messageReceive.get("online") != null) {
-                        installedNodeModel.setOnline(messageReceive.get("online"));
-                        String mOnline = messageReceive.get("online");
-                        Log.d("online = ", "" + mOnline + " updated");
-                    }
-                    if (messageReceive.get("fwname") != null) {
-                        installedNodeModel.setName(messageReceive.get("fwname"));
-                        String mfwName = messageReceive.get("fwname");
-                        Log.d("name = ", "" + mfwName + " updated");
-                    }
+        installedNodeModel.setNodesID(NodeID);
 
-                    if (messageReceive.get("name") != null) {
-                        installedNodeModel.setName(messageReceive.get("name"));
-                        String mName = messageReceive.get("name");
-                        Log.d("name = ", "" + mName + " updated");
-                    }
-                    if (messageReceive.get("localip") != null) {
-                        installedNodeModel.setLocalip(messageReceive.get("localip"));
-                        String mlocalIP = messageReceive.get("localip");
-                        Log.d("localip = ", "" + mlocalIP + " updated");
-                    }
+        if (messageReceive.get("nodes") != null) {
+            installedNodeModel.setNodes(messageReceive.get("nodes"));
+        }
+        if (messageReceive.get("name") != null) {
+            installedNodeModel.setName(messageReceive.get("name"));
+        }
+        if (messageReceive.get("localip") != null) {
+            installedNodeModel.setLocalip(messageReceive.get("localip"));
+        }
+        if (messageReceive.get("fwname") != null) {
+            installedNodeModel.setName(messageReceive.get("fwname"));
+            String mFwName =  messageReceive.get("fwname");
+            Log.d("SaveAndPersist", "Executed by = " +mFwName);
+        }
+        if (messageReceive.get("fwversion") != null) {
+            installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
+        }
+        if (messageReceive.get("online") != null) {
+            installedNodeModel.setOnline(messageReceive.get("online"));
+        }
+        if (messageReceive.get("signal") != null) {
+            installedNodeModel.setSignal(messageReceive.get("signal"));
+        }
+        if (messageReceive.get("uptime") != null) {
+            installedNodeModel.setUptime(messageReceive.get("uptime"));
+        }
+        if (messageReceive.get("reset") != null) {
+            installedNodeModel.setReset(messageReceive.get("reset"));
+        }
+        if (messageReceive.get("ota") != null) {
+            installedNodeModel.setOta(messageReceive.get("ota"));
+        }
 
-                    if (messageReceive.get("signal") != null) {
-                        installedNodeModel.setSignal(messageReceive.get("signal"));
-                        String mSignal = messageReceive.get("signal");
-                        Log.d("signal = ", "" + mSignal + " updated");
-                    }
-                    if (messageReceive.get("uptime") != null) {
-                        installedNodeModel.setUptime(messageReceive.get("uptime"));
-                        String mUptime1 = messageReceive.get("uptime");
-                        Log.d("uptime = ", "" + mUptime1 + " updated");
-                    }
+        String mNodeid = installedNodeModel.getNodesID();
+        Log.d("SaveAndPersist", "Executed by = " +mNodeid);
 
-
-                    dbNodeRepo.update(installedNodeModel);
-                    adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
-                    mRecycleView.setAdapter(adapter);
-                    data.clear();
-                    data.addAll(dbNodeRepo.getNodeList());
-
-                    messageReceive.clear();
-           /*     }
-            }*/
+        dbNodeRepo.update(installedNodeModel);
+        adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
+        mRecycleView.setAdapter(adapter);
+        data.clear();
+        data.addAll(dbNodeRepo.getNodeList());
+        messageReceive.clear();
 
     }
 
@@ -257,12 +249,28 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         Intent i = new Intent(getActivity(), OlmatixService.class);
         getActivity().startService(i);
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                mMessageReceiver, new IntentFilter("messageMQTT"));
+        /*LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mMessageReceiver, new IntentFilter("messageMQTT"));*/
         super.onStart();
     }
 
-    private View.OnClickListener mFabClickListener() {
+    @Override
+    public void onPause() {
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
+
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mMessageReceiver, new IntentFilter("messageMQTT"));
+        super.onResume();
+    }
+
+
+
+        private View.OnClickListener mFabClickListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,7 +284,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 inputResult =mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/#";
+                                String topic = "devices/" + inputResult + "/$online";
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);

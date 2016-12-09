@@ -302,7 +302,7 @@ public class OlmatixService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand()");
-        Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
         sendMessage();
         return START_STICKY;
     }
@@ -357,7 +357,7 @@ public class OlmatixService extends Service {
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
             nodeTopic = topic;
             nodeMsg = message.toString();
-            Log.d("sender", "Broadcasting message = " +nodeTopic +" message = " + nodeMsg);
+            Log.d("sender", " = " +nodeTopic +" message = " + nodeMsg);
             sendMessageMQTT();
 
         }

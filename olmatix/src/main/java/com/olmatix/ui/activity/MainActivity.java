@@ -72,18 +72,21 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("MQTTStatus"));
+        /*LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("MQTTStatus"));*/
         super.onStart();
     }
 
     @Override
     protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("MQTTStatus"));
         super.onResume();
     }
 

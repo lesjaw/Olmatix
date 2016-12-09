@@ -114,9 +114,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         nodeModel = new NodeModel();
         initDialog();
         setupView();
-        onClickListener();
-    }
 
+    onClickListener();
+}
     private void onClickListener() {
         mFab.setOnClickListener(mFabClickListener());
     }
@@ -150,39 +150,39 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 Log.d("addCheckValid 2", "Passed");
                 if (mMessage.equals("true")){
                     Log.d("addCheckValid 3", "Passed");
-
+                    Log.d("Running = ", "saveIfOnline");
                     saveIfOnline();
+
                 }
             }
-
         }
 
     }
 
     private void saveIfOnline() {
 
-
         if(messageReceive.containsKey("online"))
         {
-
             for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
                 if (data.get(i).getNid().equals(NodeID)) {
                     Toast.makeText(getActivity(), "You already have this Node ID", Toast.LENGTH_LONG).show();
                     flag =1;
+                    Log.d("saveIfOnline", "You already have this Node, DB = " +i +" flag = " +flag);
                 }
             }
 
-            if(flag == 0)
+            if(flag != 1)
             {
                 Toast.makeText(getActivity(),"Add Node Successfully",Toast.LENGTH_LONG).show();
+                Log.d("saveIfOnline", "Add Node success, " +" flag = " +flag);
+
 
                 nodeModel.setNid(NodeID);
                 nodeModel.setOnline(messageReceive.get("online"));
 
                 dbNodeRepo.insertDb(nodeModel);
-                messageReceive.clear();
+                //messageReceive.clear();
                 flagNodeAdd=0;
-
                 doSubcribeIfOnline();
             }
 
@@ -213,15 +213,12 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private void saveandpersist() {
 
-        Log.d("SaveandPersist", "Executed");
-
-        /*if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes") && messageReceive.containsKey("name")
-                && messageReceive.containsKey("localip") && messageReceive.containsKey("fwname") && messageReceive.containsKey("fwversion")
-                && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
-                && messageReceive.containsKey("ota"))
-
-            {*/
-                Toast.makeText(getActivity(),"Update Node Successful",Toast.LENGTH_SHORT).show();
+        for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
+            if (data.get(i).getNid().equals(NodeID)) {
+                String gNID = data.get(i).getNid();
+                Log.d("DB", "NodeID = " + NodeID + " + " + gNID);
+                Log.d("DB", "index = " + i);
+                Log.d("SaveandPersist", "Executed");
 
                 nodeModel.setNid(NodeID);
                 nodeModel.setOnline(messageReceive.get("online"));
@@ -242,7 +239,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 data.addAll(dbNodeRepo.getNodeList());
 
                 messageReceive.clear();
-            //}
+            }
+        }
 
     }
 

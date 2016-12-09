@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="5dp">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/cv"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
+
+        card_view:cardUseCompatPadding="true">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/icon_node"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="16dp"
+                android:fitsSystemWindows="true"
+                android:src="@mipmap/olmatixlogo"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/uptime"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:paddingTop="10sp"
+                android:layout_marginRight="16dp"
+                android:text="Uptime"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/node_name"
+                android:layout_toRightOf="@+id/icon_node"
+                android:layout_below="@id/uptime"
+                android:layout_alignParentTop="true"
+                android:textSize="20sp"
+                android:text="Node Name"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/status"
+                android:layout_toRightOf="@+id/icon_node"
+                android:layout_below="@id/node_version"
+                android:text="Status"
+                />
+
+
+            <Button
+                android:id="@+id/testBut2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/status"
+                android:layout_alignParentRight="true"
+                android:text="OFF" />
+
+            <Button
+                android:id="@+id/testBut1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/status"
+                android:layout_toLeftOf="@id/testBut2"
+                android:text="ON" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/node_version"
+                android:textSize="16sp"
+                android:text="Node Version"
+                android:layout_alignBottom="@+id/icon_node"
+                android:layout_toRightOf="@+id/icon_node"
+                android:layout_toEndOf="@+id/icon_node" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

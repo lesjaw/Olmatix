@@ -164,7 +164,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         if(messageReceive.containsKey("online"))
         {
             for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
-                if (data.get(i).getNid().equals(NodeID)) {
+                if (data.get(i).getNodesID().equals(NodeID)) {
                     Toast.makeText(getActivity(), "You already have this Node ID", Toast.LENGTH_LONG).show();
                     flag =1;
                     Log.d("saveIfOnline", "You already have this Node, DB = " +i +" flag = " +flag);
@@ -176,7 +176,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 Toast.makeText(getActivity(),"Add Node Successfully",Toast.LENGTH_LONG).show();
                 Log.d("saveIfOnline", "Add Node success, " +" flag = " +flag);
 
-                nodeModel.setNid(NodeID);
+                nodeModel.setNodesID(NodeID);
                 nodeModel.setOnline(messageReceive.get("online"));
 
                 dbNodeRepo.insertDb(nodeModel);
@@ -213,11 +213,11 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private void saveandpersist() {
 
             for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
-                if (data.get(i).getNid().equals(NodeID)) {
-                    String gNID = data.get(i).getNid();
+                if (data.get(i).getNodesID().equals(NodeID)) {
+                    String gNID = data.get(i).getNodesID();
                     Log.d("DB", "NodeID = " + NodeID + " + " + gNID);
 
-                    nodeModel.setNid(NodeID);
+                    nodeModel.setNodesID(NodeID);
                     if (messageReceive.get("online") != null) {
                         nodeModel.setOnline(messageReceive.get("online"));
                         String mOnline = messageReceive.get("online");

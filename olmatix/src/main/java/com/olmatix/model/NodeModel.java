@@ -28,9 +28,10 @@ public class NodeModel {
     public NodeModel() {
     }
 
-    public NodeModel(String nodes, String name, String nice_name, String localip, String fwName, String fwVersion,
+    public NodeModel(String node_id, String nodes, String name, String nice_name, String localip, String fwName, String fwVersion,
                      String icon, String adding, String online, String signal, String uptime, String reset, String ota) {
 
+        this.node_id = node_id;
         this.nodes = nodes;
         this.name = name;
         this.nice_name = nice_name;
@@ -54,6 +55,14 @@ public class NodeModel {
 
     public void setNid(int id) {
         this.id = id;
+    }
+
+    public String getNodesID() {
+        return node_id;
+    }
+
+    public void setNodesID(String node_id) {
+        this.node_id = node_id;
     }
 
     public String getNodes() {

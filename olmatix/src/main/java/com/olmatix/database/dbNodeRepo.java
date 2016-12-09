@@ -116,7 +116,7 @@ public class dbNodeRepo {
             do {
                 NodeModel node = new NodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setNid( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNodesID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNodes( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
                 node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
                 node.setLocalip( cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));

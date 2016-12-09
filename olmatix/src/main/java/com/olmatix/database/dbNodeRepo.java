@@ -68,7 +68,7 @@ public class dbNodeRepo {
      * SQL DELETE PROSES DATA BY ID
      * */
 
-    public void delete(int node_Id) {
+    public void delete(String node_Id) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string

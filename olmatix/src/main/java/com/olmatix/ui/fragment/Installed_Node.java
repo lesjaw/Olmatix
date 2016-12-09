@@ -137,9 +137,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             if (flagNodeAdd==1) {
                 addCheckValidation();
             }
-            if(flagNodeAdd == 0 ) {
-                saveandpersist();
-            }
+
+            saveandpersist();
+
         }
 
     };
@@ -188,7 +188,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 nodeModel.setOta(messageReceive.get("ota"));
 
                 dbNodeRepo.insertDb(nodeModel);
-                messageReceive.clear();
+                //messageReceive.clear();
                 flagNodeAdd=0;
                 //doSubcribeIfOnline();
             }

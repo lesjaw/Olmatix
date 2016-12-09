@@ -73,7 +73,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             }
         }
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-        holder.fwName.setText(mNodeModel.getFwName());
+        holder.fwName.setText(mNodeModel.getName());
         holder.ipAddrs.setText(mNodeModel.getLocalip());
         holder.siGnal.setText(mNodeModel.getSignal());
         holder.upTime.setText(mNodeModel.getUptime());

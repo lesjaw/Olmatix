@@ -4,18 +4,15 @@ package com.olmatix.adapter;
  * Created by Lesjaw on 04/12/2016.
  */
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
-import com.olmatix.model.NodeModel;
+import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.utils.Connection;
@@ -27,7 +24,7 @@ import java.util.List;
 
 public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter {
 
-    List<NodeModel> nodeList;
+    List<Installed_NodeModel> nodeList;
 
 
 
@@ -47,7 +44,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         }
     }
 
-    public OlmatixAdapter(List<NodeModel> nodeList) {
+    public OlmatixAdapter(List<Installed_NodeModel> nodeList) {
         this.nodeList = nodeList;
     }
 
@@ -64,20 +61,20 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     @Override
     public void onBindViewHolder(OlmatixHolder holder, int position) {
 
-        final NodeModel mNodeModel = nodeList.get(position);
-        if(mNodeModel.getOnline() != null) {
-            if (mNodeModel.getOnline().equals("true")) {
+        final Installed_NodeModel mInstalledNodeModel = nodeList.get(position);
+        if(mInstalledNodeModel.getOnline() != null) {
+            if (mInstalledNodeModel.getOnline().equals("true")) {
                 holder.imgStatus.setImageResource(R.drawable.ic_node_online);
             } else {
                 holder.imgStatus.setImageResource(R.drawable.ic_node_offline);
             }
         }
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-        holder.fwName.setText(mNodeModel.getName());
-        holder.ipAddrs.setText(mNodeModel.getLocalip());
-        holder.siGnal.setText(mNodeModel.getSignal());
-        holder.upTime.setText(mNodeModel.getUptime());
-        holder.nodeid.setText(mNodeModel.getNodesID());
+        holder.fwName.setText(mInstalledNodeModel.getName());
+        holder.ipAddrs.setText(mInstalledNodeModel.getLocalip());
+        holder.siGnal.setText(mInstalledNodeModel.getSignal());
+        holder.upTime.setText(mInstalledNodeModel.getUptime());
+        holder.nodeid.setText(mInstalledNodeModel.getNodesID());
     }
 
     @Override

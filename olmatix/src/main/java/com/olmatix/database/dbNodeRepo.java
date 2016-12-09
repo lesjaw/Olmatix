@@ -9,14 +9,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
-import com.olmatix.model.NodeModel;
-import com.olmatix.ui.fragment.Installed_Node;
-
-import org.w3c.dom.Node;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_CHANNEL;
@@ -43,23 +39,23 @@ public class dbNodeRepo {
         dbHelper = new dbHelper(context);
     }
 
-    public int insertDb(NodeModel nodeModel){
+    public int insertDb(Installed_NodeModel installedNodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_NODE_ID,nodeModel.getNodesID());
-        values.put(KEY_NODES, nodeModel.getNodes());
-        values.put(KEY_NAME, nodeModel.getName());
-        values.put(KEY_NICE_NAME, nodeModel.getNiceName());
-        values.put(KEY_LOCALIP, nodeModel.getLocalip());
-        values.put(KEY_FWNAME, nodeModel.getFwName());
-        values.put(KEY_FWVERSION, nodeModel.getFwVersion());
-        values.put(KEY_ONLINE, nodeModel.getOnline());
-        values.put(KEY_ICON, nodeModel.getIcon());
-        values.put(KEY_ADDING, nodeModel.getAdding());
-        values.put(KEY_SIGNAL, nodeModel.getSignal());
-        values.put(KEY_UPTIME, nodeModel.getUptime());
-        values.put(KEY_RESET, nodeModel.getReset());
-        values.put(KEY_OTA, nodeModel.getOta());
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        values.put(KEY_NODES, installedNodeModel.getNodes());
+        values.put(KEY_NAME, installedNodeModel.getName());
+        values.put(KEY_NICE_NAME, installedNodeModel.getNiceName());
+        values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
+        values.put(KEY_FWNAME, installedNodeModel.getFwName());
+        values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
+        values.put(KEY_ONLINE, installedNodeModel.getOnline());
+        values.put(KEY_ICON, installedNodeModel.getIcon());
+        values.put(KEY_ADDING, installedNodeModel.getAdding());
+        values.put(KEY_SIGNAL, installedNodeModel.getSignal());
+        values.put(KEY_UPTIME, installedNodeModel.getUptime());
+        values.put(KEY_RESET, installedNodeModel.getReset());
+        values.put(KEY_OTA, installedNodeModel.getOta());
 
         long node_Id = db.insert(TABLE, null, values);
         db.close(); // Closing database connection
@@ -67,7 +63,7 @@ public class dbNodeRepo {
     }
 
 
-    public int insertInstalledNode(Installed_NodeModel nodeModel){
+    public int insertInstalledNode(Detail_NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         
         ContentValues values = new ContentValues();
@@ -98,44 +94,44 @@ public class dbNodeRepo {
      * SQL UPDATE PROSES DATA
      * */
 
-    public void update(NodeModel nodeModel) {
+    public void update(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODE_ID,nodeModel.getNodesID());
-        values.put(KEY_NODES, nodeModel.getNodes());
-        values.put(KEY_NAME, nodeModel.getName());
-        values.put(KEY_NICE_NAME, nodeModel.getNiceName());
-        values.put(KEY_LOCALIP, nodeModel.getLocalip());
-        values.put(KEY_FWNAME, nodeModel.getFwName());
-        values.put(KEY_FWVERSION, nodeModel.getFwVersion());
-        values.put(KEY_ONLINE, nodeModel.getOnline());
-        values.put(KEY_ICON, nodeModel.getIcon());
-        values.put(KEY_ADDING, nodeModel.getAdding());
-        values.put(KEY_SIGNAL, nodeModel.getSignal());
-        values.put(KEY_UPTIME, nodeModel.getUptime());
-        values.put(KEY_RESET, nodeModel.getReset());
-        values.put(KEY_OTA, nodeModel.getOta());
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        values.put(KEY_NODES, installedNodeModel.getNodes());
+        values.put(KEY_NAME, installedNodeModel.getName());
+        values.put(KEY_NICE_NAME, installedNodeModel.getNiceName());
+        values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
+        values.put(KEY_FWNAME, installedNodeModel.getFwName());
+        values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
+        values.put(KEY_ONLINE, installedNodeModel.getOnline());
+        values.put(KEY_ICON, installedNodeModel.getIcon());
+        values.put(KEY_ADDING, installedNodeModel.getAdding());
+        values.put(KEY_SIGNAL, installedNodeModel.getSignal());
+        values.put(KEY_UPTIME, installedNodeModel.getUptime());
+        values.put(KEY_RESET, installedNodeModel.getReset());
+        values.put(KEY_OTA, installedNodeModel.getOta());
 
         db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[] {
-                String.valueOf(nodeModel.getNodesID())
+                String.valueOf(installedNodeModel.getNodesID())
         });
         db.close(); // Closing database connection
 
     }
 
 
-    public ArrayList<NodeModel> getNodeList() {
+    public ArrayList<Installed_NodeModel> getNodeList() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM " + TABLE;
 
-        ArrayList<NodeModel> nodeList = new ArrayList<NodeModel>();
+        ArrayList<Installed_NodeModel> nodeList = new ArrayList<Installed_NodeModel>();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                NodeModel node = new NodeModel();
+                Installed_NodeModel node = new Installed_NodeModel();
                 //ArrayList<String> node = new ArrayList<>();
                 node.setNodesID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNodes( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));

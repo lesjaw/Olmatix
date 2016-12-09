@@ -4,14 +4,11 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -38,45 +35,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixAdapter;
-import com.olmatix.database.dbHelper;
-import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.NodeModel;
+import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.service.OlmatixService;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.util.Strings;
-import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.olmatix.database.dbNode.KEY_ADDING;
-import static com.olmatix.database.dbNode.KEY_FWNAME;
-import static com.olmatix.database.dbNode.KEY_FWVERSION;
-import static com.olmatix.database.dbNode.KEY_ICON;
-import static com.olmatix.database.dbNode.KEY_LOCALIP;
-import static com.olmatix.database.dbNode.KEY_NAME;
-import static com.olmatix.database.dbNode.KEY_NODES;
-import static com.olmatix.database.dbNode.KEY_ONLINE;
-import static com.olmatix.database.dbNode.KEY_OTA;
-import static com.olmatix.database.dbNode.KEY_RESET;
-import static com.olmatix.database.dbNode.KEY_SIGNAL;
-import static com.olmatix.database.dbNode.KEY_UPTIME;
-import static com.olmatix.database.dbNode.TABLE;
-
 
 public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private View mView;
-    private List<NodeModel> nodeList = new ArrayList<>();
+    private List<Installed_NodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
     private AlertDialog.Builder alertDialog;
@@ -85,12 +64,12 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private TextView etTopic,version;
     ImageView icon_node;
     private RecyclerView.LayoutManager layoutManager;
-    private static ArrayList<NodeModel> data;
+    private static ArrayList<Installed_NodeModel> data;
     private Paint p = new Paint();
     private ItemTouchHelper mItemTouchHelper;
     HashMap<String,String> messageReceive = new HashMap<>();
     public static dbNodeRepo dbNodeRepo;
-    private  NodeModel nodeModel;
+    private Installed_NodeModel installedNodeModel;
     private String inputResult;
     private String NodeID;
     private  String mMessage;
@@ -111,7 +90,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
-        nodeModel = new NodeModel();
+        installedNodeModel = new Installed_NodeModel();
         initDialog();
         setupView();
 
@@ -137,9 +116,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             if (flagNodeAdd==1) {
                 addCheckValidation();
             }
-
-            saveandpersist();
-
+            if(flagNodeAdd == 0 ) {
+                //saveandpersist();
+            }
         }
 
     };
@@ -174,23 +153,23 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
             if(flag != 1)
             {
+                installedNodeModel.setNodesID(NodeID);
+                installedNodeModel.setOnline(messageReceive.get("online"));
+                installedNodeModel.setNodes(messageReceive.get("nodes"));
+                installedNodeModel.setName(messageReceive.get("name"));
+                installedNodeModel.setLocalip(messageReceive.get("localip"));
+                installedNodeModel.setFwName(messageReceive.get("fwname"));
+                installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
+                installedNodeModel.setReset(messageReceive.get("reset"));
+                installedNodeModel.setOta(messageReceive.get("ota"));
+
+                dbNodeRepo.insertDb(installedNodeModel);
+                messageReceive.clear();
+                flagNodeAdd=0;
+                //doSubcribeIfOnline();
                 Toast.makeText(getActivity(),"Add Node Successfully",Toast.LENGTH_LONG).show();
                 Log.d("saveIfOnline", "Add Node success, " +" flag = " +flag);
 
-                nodeModel.setNodesID(NodeID);
-                nodeModel.setOnline(messageReceive.get("online"));
-                nodeModel.setNodes(messageReceive.get("nodes"));
-                nodeModel.setName(messageReceive.get("name"));
-                nodeModel.setLocalip(messageReceive.get("localip"));
-                nodeModel.setFwName(messageReceive.get("fwname"));
-                nodeModel.setFwVersion(messageReceive.get("fwversion"));
-                nodeModel.setReset(messageReceive.get("reset"));
-                nodeModel.setOta(messageReceive.get("ota"));
-
-                dbNodeRepo.insertDb(nodeModel);
-                //messageReceive.clear();
-                flagNodeAdd=0;
-                //doSubcribeIfOnline();
             }
 
         }
@@ -226,40 +205,40 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                     Log.d("DB", "NodeID = " + NodeID + " + " + gNID);*/
 
                     if (messageReceive.get("online") != null) {
-                        nodeModel.setOnline(messageReceive.get("online"));
+                        installedNodeModel.setOnline(messageReceive.get("online"));
                         String mOnline = messageReceive.get("online");
                         Log.d("online = ", "" + mOnline + " updated");
                     }
                     if (messageReceive.get("fwname") != null) {
-                        nodeModel.setName(messageReceive.get("fwname"));
+                        installedNodeModel.setName(messageReceive.get("fwname"));
                         String mfwName = messageReceive.get("fwname");
                         Log.d("name = ", "" + mfwName + " updated");
                     }
 
                     if (messageReceive.get("name") != null) {
-                        nodeModel.setName(messageReceive.get("name"));
+                        installedNodeModel.setName(messageReceive.get("name"));
                         String mName = messageReceive.get("name");
                         Log.d("name = ", "" + mName + " updated");
                     }
                     if (messageReceive.get("localip") != null) {
-                        nodeModel.setLocalip(messageReceive.get("localip"));
+                        installedNodeModel.setLocalip(messageReceive.get("localip"));
                         String mlocalIP = messageReceive.get("localip");
                         Log.d("localip = ", "" + mlocalIP + " updated");
                     }
 
                     if (messageReceive.get("signal") != null) {
-                        nodeModel.setSignal(messageReceive.get("signal"));
+                        installedNodeModel.setSignal(messageReceive.get("signal"));
                         String mSignal = messageReceive.get("signal");
                         Log.d("signal = ", "" + mSignal + " updated");
                     }
                     if (messageReceive.get("uptime") != null) {
-                        nodeModel.setUptime(messageReceive.get("uptime"));
+                        installedNodeModel.setUptime(messageReceive.get("uptime"));
                         String mUptime1 = messageReceive.get("uptime");
                         Log.d("uptime = ", "" + mUptime1 + " updated");
                     }
 
 
-                    dbNodeRepo.update(nodeModel);
+                    dbNodeRepo.update(installedNodeModel);
                     adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
                     mRecycleView.setAdapter(adapter);
                     data.clear();

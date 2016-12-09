@@ -9,17 +9,17 @@ package com.olmatix.model;
  * Copyright            : Copyright @ 2016 Indogamers.
  */
 public class NodeModel {
-    private String nid;
+    private String node_id;
     private String nodes;
     private String name;
     private String nice_name;
     private String localip;
     private String fwName;
     private String fwVersion;
-    private String icon;
-    private String adding;
     private String online;
     private String signal;
+    private String icon;
+    private String adding;
     private String uptime;
     private String reset;
     private String ota;
@@ -48,11 +48,11 @@ public class NodeModel {
 
 
     public String getNid() {
-        return nid;
+        return node_id;
     }
 
     public void setNid(String nid) {
-        this.nid = nid;
+        this.node_id = node_id;
     }
 
     public String getNodes() {

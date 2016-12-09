@@ -26,7 +26,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
 
     public class OlmatixHolder extends RecyclerView.ViewHolder {
-        public TextView fwName, ipAddrs, upTime;
+        public TextView fwName, ipAddrs, upTime, siGnal;
         public ImageView imgNode, imgStatus;
 
         public OlmatixHolder(View view) {
@@ -35,6 +35,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             imgStatus   = (ImageView) view.findViewById(R.id.icon_status);
             fwName    = (TextView) view.findViewById(R.id.fw_name);
             ipAddrs     = (TextView) view.findViewById(R.id.ipaddrs);
+            siGnal      = (TextView) view.findViewById(R.id.signal);
             upTime      = (TextView) view.findViewById(R.id.uptime);
         }
     }
@@ -65,6 +66,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
         holder.fwName.setText(mNodeModel.getFwName());
         holder.ipAddrs.setText(mNodeModel.getLocalip());
+        holder.siGnal.setText(mNodeModel.getSignal());
         holder.upTime.setText(mNodeModel.getUptime());
     }
 

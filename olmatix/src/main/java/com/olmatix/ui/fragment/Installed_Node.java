@@ -212,10 +212,10 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private void saveandpersist() {
 
-            for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
+           /* for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
                 if (data.get(i).getNodesID().equals(NodeID)) {
                     String gNID = data.get(i).getNodesID();
-                    Log.d("DB", "NodeID = " + NodeID + " + " + gNID);
+                    Log.d("DB", "NodeID = " + NodeID + " + " + gNID);*/
 
                     nodeModel.setNodesID(NodeID);
                     if (messageReceive.get("online") != null) {
@@ -276,8 +276,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                     data.addAll(dbNodeRepo.getNodeList());
 
                     messageReceive.clear();
-                }
-            }
+           /*     }
+            }*/
 
     }
 

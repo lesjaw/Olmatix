@@ -77,6 +77,15 @@
                 android:layout_below="@+id/icon_status"
                 android:layout_alignParentRight="true"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/nodeid"
+                android:paddingTop="10sp"
+                android:text="nodeID"
+                android:layout_below="@+id/uptime"
+                android:layout_alignParentRight="true"/>
+
 
         </RelativeLayout>
 

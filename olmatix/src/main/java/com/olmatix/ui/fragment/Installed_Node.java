@@ -117,7 +117,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 addCheckValidation();
             }
             if(flagNodeAdd == 0 ) {
-                //saveandpersist();
+                saveandpersist();
             }
         }
 
@@ -155,18 +155,19 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             {
                 installedNodeModel.setNodesID(NodeID);
                 installedNodeModel.setOnline(messageReceive.get("online"));
-                installedNodeModel.setNodes(messageReceive.get("nodes"));
+                /*installedNodeModel.setNodes(messageReceive.get("nodes"));
                 installedNodeModel.setName(messageReceive.get("name"));
                 installedNodeModel.setLocalip(messageReceive.get("localip"));
                 installedNodeModel.setFwName(messageReceive.get("fwname"));
                 installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
                 installedNodeModel.setReset(messageReceive.get("reset"));
-                installedNodeModel.setOta(messageReceive.get("ota"));
+                installedNodeModel.setOta(messageReceive.get("ota"));*/
 
                 dbNodeRepo.insertDb(installedNodeModel);
-                messageReceive.clear();
+                //messageReceive.clear();
                 flagNodeAdd=0;
                 //doSubcribeIfOnline();
+
                 Toast.makeText(getActivity(),"Add Node Successfully",Toast.LENGTH_LONG).show();
                 Log.d("saveIfOnline", "Add Node success, " +" flag = " +flag);
 

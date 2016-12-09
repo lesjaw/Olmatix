@@ -176,7 +176,6 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 Toast.makeText(getActivity(),"Add Node Successfully",Toast.LENGTH_LONG).show();
                 Log.d("saveIfOnline", "Add Node success, " +" flag = " +flag);
 
-
                 nodeModel.setNid(NodeID);
                 nodeModel.setOnline(messageReceive.get("online"));
 
@@ -214,34 +213,73 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private void saveandpersist() {
 
         for(int i=0; i<dbNodeRepo.getNodeList().size(); i++) {
-            if (data.get(i).getNid().equals(NodeID)) {
-                String gNID = data.get(i).getNid();
-                Log.d("DB", "NodeID = " + NodeID + " + " + gNID);
-                Log.d("DB", "index = " + i);
-                Log.d("SaveandPersist", "Executed");
+            if (data.get(i) != null) {
+                if (data.get(i).getNid().equals(NodeID)) {
+                    String gNID = data.get(i).getNid();
+                    Log.d("DB", "NodeID = " + NodeID + " + " + gNID);
 
-                nodeModel.setNid(NodeID);
-                nodeModel.setOnline(messageReceive.get("online"));
-                nodeModel.setNodes(messageReceive.get("nodes"));
-                nodeModel.setName(messageReceive.get("name"));
-                nodeModel.setLocalip(messageReceive.get("localip"));
-                nodeModel.setFwName(messageReceive.get("fwname"));
-                nodeModel.setFwVersion(messageReceive.get("fwversion"));
-                nodeModel.setSignal(messageReceive.get("signal"));
-                nodeModel.setUptime(messageReceive.get("uptime"));
-                nodeModel.setReset(messageReceive.get("reset"));
-                nodeModel.setOta(messageReceive.get("ota"));
+                    nodeModel.setNid(NodeID);
+                    if (messageReceive.get("online") != null) {
+                        nodeModel.setOnline(messageReceive.get("online"));
+                        String mOnline = messageReceive.get("online");
+                        Log.d("online = ", "" + mOnline + " updated");
+                    }
+                    if (messageReceive.get("nodes") != null) {
+                        nodeModel.setNodes(messageReceive.get("nodes"));
+                        String mNodes = messageReceive.get("nodes");
+                        Log.d("nodes = ", "" + mNodes + " updated");
+                    }
+                    if (messageReceive.get("name") != null) {
+                        nodeModel.setName(messageReceive.get("name"));
+                        String mName = messageReceive.get("name");
+                        Log.d("name = ", "" + mName + " updated");
+                    }
+                    if (messageReceive.get("localip") != null) {
+                        nodeModel.setLocalip(messageReceive.get("localip"));
+                        String mlocalIP = messageReceive.get("localip");
+                        Log.d("localip = ", "" + mlocalIP + " updated");
+                    }
+                    if (messageReceive.get("fwname") != null) {
+                        nodeModel.setFwName(messageReceive.get("fwname"));
+                        String mFwname = messageReceive.get("fwname");
+                        Log.d("fwname = ", "" + mFwname + " updated");
+                    }
+                    if (messageReceive.get("fwversion") != null) {
+                        nodeModel.setFwVersion(messageReceive.get("fwversion"));
+                        String mFwversion = messageReceive.get("fwversion");
+                        Log.d("fwversion = ", "" + mFwversion + " updated");
+                    }
+                    if (messageReceive.get("signal") != null) {
+                        nodeModel.setSignal(messageReceive.get("signal"));
+                        String mSignal = messageReceive.get("signal");
+                        Log.d("signal = ", "" + mSignal + " updated");
+                    }
+                    if (messageReceive.get("uptime") != null) {
+                        nodeModel.setUptime(messageReceive.get("uptime"));
+                        String mUptime1 = messageReceive.get("uptime");
+                        Log.d("uptime = ", "" + mUptime1 + " updated");
+                    }
+                    if (messageReceive.get("reset") != null) {
+                        nodeModel.setReset(messageReceive.get("reset"));
+                        String mReset = messageReceive.get("reset");
+                        Log.d("reset = ", "" + mReset + " updated");
+                    }
+                    if (messageReceive.get("ota") != null) {
+                        nodeModel.setOta(messageReceive.get("ota"));
+                        String mOta = messageReceive.get("ota");
+                        Log.d("ota = ", "" + mOta + " updated");
+                    }
 
-                dbNodeRepo.update(nodeModel);
-                adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
-                mRecycleView.setAdapter(adapter);
-                data.clear();
-                data.addAll(dbNodeRepo.getNodeList());
+                    dbNodeRepo.update(nodeModel);
+                    adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
+                    mRecycleView.setAdapter(adapter);
+                    data.clear();
+                    data.addAll(dbNodeRepo.getNodeList());
 
-                messageReceive.clear();
+                    messageReceive.clear();
+                }
             }
         }
-
     }
 
 

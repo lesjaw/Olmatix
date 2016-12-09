@@ -84,7 +84,7 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODE_ID, nodeModel.getNodes());
+        values.put(KEY_NODE_ID,nodeModel.getNid());
         values.put(KEY_NODES, nodeModel.getNodes());
         values.put(KEY_NAME, nodeModel.getName());
         values.put(KEY_LOCALIP, nodeModel.getLocalip());

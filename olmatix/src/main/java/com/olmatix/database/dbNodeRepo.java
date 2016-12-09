@@ -20,6 +20,7 @@ import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_FWNAME;
 import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
+import static com.olmatix.database.dbNode.KEY_ID;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
 import static com.olmatix.database.dbNode.KEY_NAME;
 import static com.olmatix.database.dbNode.KEY_NICE_NAME;
@@ -98,8 +99,8 @@ public class dbNodeRepo {
         values.put(KEY_RESET, nodeModel.getReset());
         values.put(KEY_OTA, nodeModel.getOta());
 
-        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[] {
-                String.valueOf(dbNode.KEY_NODE_ID)
+        db.update(TABLE, values, dbNode.KEY_ID + "= ?", new String[] {
+                String.valueOf(dbNode.KEY_ID)
         });
         db.close(); // Closing database connection
 
@@ -141,16 +142,16 @@ public class dbNodeRepo {
     }
 
 
-    public dbNode getNodeByNode(String nodeName){
+    public dbNode getNodeByNode(String nodeID){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM " + dbNode.TABLE
                 + " WHERE " +
-                dbNode.KEY_NODES + "=?";// It's a good practice to use parameter ?, instead of concatenate string
+                dbNode.KEY_NODE_ID + "=?";// It's a good practice to use parameter ?, instead of concatenate string
 
         int iCount =0;
         dbNode node = new dbNode();
 
-        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(nodeName) } );
+        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(KEY_NODE_ID) } );
 
         if (cursor.moveToFirst()) {
             do {

@@ -55,6 +55,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/node_version"
+                android:textSize="16sp"
+                android:text="Node Version"
+                android:layout_alignBottom="@+id/icon_node"
+                android:layout_toRightOf="@+id/icon_node"
+                android:layout_toEndOf="@+id/icon_node" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/status"
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@id/node_version"
@@ -78,15 +88,7 @@
                 android:layout_toLeftOf="@id/testBut2"
                 android:text="ON" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/node_version"
-                android:textSize="16sp"
-                android:text="Node Version"
-                android:layout_alignBottom="@+id/icon_node"
-                android:layout_toRightOf="@+id/icon_node"
-                android:layout_toEndOf="@+id/icon_node" />
+
 
         </RelativeLayout>
 

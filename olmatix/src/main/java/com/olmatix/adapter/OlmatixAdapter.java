@@ -87,6 +87,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
     public void removeItem(int position) {
         //Installed_Node.dbNodeRepo.delete("809ed5e0");
+        String inputResult;
         Installed_Node.dbNodeRepo.delete(nodeList.get(position).getNodesID());
         String topic = "devices/"+nodeList.get(position).getNodesID()+"/#";
         try {
@@ -98,6 +99,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, nodeList.size());
+
     }
 
     @Override

@@ -46,7 +46,7 @@ public class Favorite extends Fragment {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 String inputResult = m_Text.getText().toString();
 
-                                String topic = "devices/"+inputResult+"/#";
+                                String topic = "devices/"+inputResult+"/$online";
                                 try {
                                     Connection.getClient().unsubscribe(topic);
                                 } catch (MqttException e) {

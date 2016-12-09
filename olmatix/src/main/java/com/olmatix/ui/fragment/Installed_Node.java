@@ -179,11 +179,18 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
                 nodeModel.setNodesID(NodeID);
                 nodeModel.setOnline(messageReceive.get("online"));
+                nodeModel.setNodes(messageReceive.get("nodes"));
+                nodeModel.setName(messageReceive.get("name"));
+                nodeModel.setLocalip(messageReceive.get("localip"));
+                nodeModel.setFwName(messageReceive.get("fwname"));
+                nodeModel.setFwVersion(messageReceive.get("fwversion"));
+                nodeModel.setReset(messageReceive.get("reset"));
+                nodeModel.setOta(messageReceive.get("ota"));
 
                 dbNodeRepo.insertDb(nodeModel);
                 messageReceive.clear();
                 flagNodeAdd=0;
-                doSubcribeIfOnline();
+                //doSubcribeIfOnline();
             }
 
         }
@@ -218,17 +225,17 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                     String gNID = data.get(i).getNodesID();
                     Log.d("DB", "NodeID = " + NodeID + " + " + gNID);*/
 
-                    nodeModel.setNodesID(NodeID);
                     if (messageReceive.get("online") != null) {
                         nodeModel.setOnline(messageReceive.get("online"));
                         String mOnline = messageReceive.get("online");
                         Log.d("online = ", "" + mOnline + " updated");
                     }
-                    if (messageReceive.get("nodes") != null) {
-                        nodeModel.setNodes(messageReceive.get("nodes"));
-                        String mNodes = messageReceive.get("nodes");
-                        Log.d("nodes = ", "" + mNodes + " updated");
+                    if (messageReceive.get("fwname") != null) {
+                        nodeModel.setName(messageReceive.get("fwname"));
+                        String mfwName = messageReceive.get("fwname");
+                        Log.d("name = ", "" + mfwName + " updated");
                     }
+
                     if (messageReceive.get("name") != null) {
                         nodeModel.setName(messageReceive.get("name"));
                         String mName = messageReceive.get("name");
@@ -239,16 +246,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                         String mlocalIP = messageReceive.get("localip");
                         Log.d("localip = ", "" + mlocalIP + " updated");
                     }
-                    if (messageReceive.get("fwname") != null) {
-                        nodeModel.setFwName(messageReceive.get("fwname"));
-                        String mFwname = messageReceive.get("fwname");
-                        Log.d("fwname = ", "" + mFwname + " updated");
-                    }
-                    if (messageReceive.get("fwversion") != null) {
-                        nodeModel.setFwVersion(messageReceive.get("fwversion"));
-                        String mFwversion = messageReceive.get("fwversion");
-                        Log.d("fwversion = ", "" + mFwversion + " updated");
-                    }
+
                     if (messageReceive.get("signal") != null) {
                         nodeModel.setSignal(messageReceive.get("signal"));
                         String mSignal = messageReceive.get("signal");
@@ -259,16 +257,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                         String mUptime1 = messageReceive.get("uptime");
                         Log.d("uptime = ", "" + mUptime1 + " updated");
                     }
-                    if (messageReceive.get("reset") != null) {
-                        nodeModel.setReset(messageReceive.get("reset"));
-                        String mReset = messageReceive.get("reset");
-                        Log.d("reset = ", "" + mReset + " updated");
-                    }
-                    if (messageReceive.get("ota") != null) {
-                        nodeModel.setOta(messageReceive.get("ota"));
-                        String mOta = messageReceive.get("ota");
-                        Log.d("ota = ", "" + mOta + " updated");
-                    }
+
 
                     dbNodeRepo.update(nodeModel);
                     adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
@@ -307,7 +296,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 inputResult =mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/$online";
+                                String topic = "devices/" + inputResult + "/#";
                                 int qos = 1;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);

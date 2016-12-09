@@ -9,7 +9,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.model.NodeModel;
+import com.olmatix.ui.fragment.Installed_Node;
 
 import org.w3c.dom.Node;
 
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.olmatix.database.dbNode.KEY_ADDING;
+import static com.olmatix.database.dbNode.KEY_CHANNEL;
 import static com.olmatix.database.dbNode.KEY_FWNAME;
 import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
@@ -29,6 +32,7 @@ import static com.olmatix.database.dbNode.KEY_ONLINE;
 import static com.olmatix.database.dbNode.KEY_OTA;
 import static com.olmatix.database.dbNode.KEY_RESET;
 import static com.olmatix.database.dbNode.KEY_SIGNAL;
+import static com.olmatix.database.dbNode.KEY_STATUS;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
 import static com.olmatix.database.dbNode.TABLE;
 
@@ -56,6 +60,21 @@ public class dbNodeRepo {
         values.put(KEY_UPTIME, nodeModel.getUptime());
         values.put(KEY_RESET, nodeModel.getReset());
         values.put(KEY_OTA, nodeModel.getOta());
+
+        long node_Id = db.insert(TABLE, null, values);
+        db.close(); // Closing database connection
+        return (int) node_Id;
+    }
+
+
+    public int insertInstalledNode(Installed_NodeModel nodeModel){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        
+        ContentValues values = new ContentValues();
+        values.put(KEY_NODE_ID,nodeModel.getNode_id());
+        values.put(KEY_CHANNEL, nodeModel.getChannel());
+        values.put(KEY_STATUS, nodeModel.getStatus());
+
 
         long node_Id = db.insert(TABLE, null, values);
         db.close(); // Closing database connection

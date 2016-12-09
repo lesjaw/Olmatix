@@ -42,7 +42,16 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_RESET + " TEXT, "
                 + dbNode.KEY_OTA + " TEXT )";
 
+
+        String CREATE_TABLE_NODE_INSTALLED = "CREATE TABLE " + dbNode.TABLE_NODE  + "("
+                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_NODE_ID + " TEXT, "
+                + dbNode.KEY_CHANNEL + " TEXT, "
+                + dbNode.KEY_STATUS + " TEXT )";
+
+
         db.execSQL(CREATE_TABLE_NODE);
+        db.execSQL(CREATE_TABLE_NODE_INSTALLED);
 
     }
 
@@ -50,6 +59,7 @@ public class dbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed, all data will be gone!!!
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_NODE);
 
         // Create tables again
         onCreate(db);

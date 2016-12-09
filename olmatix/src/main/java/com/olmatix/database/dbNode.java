@@ -8,6 +8,7 @@ public class dbNode {
 
     // Labels table name
     public static final String TABLE = "Node";
+    public static final String TABLE_NODE = "Node_Installed";
 
     // Labels Table Columns names
     public static final String KEY_ID           = "id";
@@ -25,6 +26,8 @@ public class dbNode {
     public static final String KEY_UPTIME       = "uptime";
     public static final String KEY_RESET        = "reset";
     public static final String KEY_OTA          = "ota";
+    public static final String KEY_STATUS      =  "status";
+    public static final String KEY_CHANNEL    = "channel";
 
     // property help us to keep data
     public int id;

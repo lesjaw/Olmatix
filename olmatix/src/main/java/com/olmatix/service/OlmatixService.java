@@ -112,7 +112,6 @@ public class OlmatixService extends Service {
 
             } else if (!hasConnectivity && mqttClient != null && mqttClient.isConnected()) {
                 doDisconnect();
-
             }
         }
 
@@ -243,8 +242,8 @@ public class OlmatixService extends Service {
                         Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
-                                Log.i("sub","Subscribe success");
-                                Toast.makeText(getApplicationContext(), R.string.sub_success, Toast.LENGTH_SHORT).show();
+                                //Log.i("sub","Subscribe success");
+                                //Toast.makeText(getApplicationContext(), R.string.sub_success, Toast.LENGTH_SHORT).show();
                                 stateoffMqtt = "true";
                                 Log.d("DEBUG", "MQTT Status after sub: " +stateoffMqtt);
                                 sendMessage();
@@ -304,12 +303,12 @@ public class OlmatixService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand()");
         Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
-        //sendMessage();
+        sendMessage();
         return START_STICKY;
     }
 
     private void sendMessage() {
-        Log.d("sender", "Broadcasting message MQTT status = " +stateoffMqtt);
+        //Log.d("sender", "Broadcasting message MQTT status = " +stateoffMqtt);
         Intent intent = new Intent("MQTTStatus");
         // You can also include some extra data.
         intent.putExtra("MQTT State", stateoffMqtt);
@@ -358,7 +357,7 @@ public class OlmatixService extends Service {
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
             nodeTopic = topic;
             nodeMsg = message.toString();
-            Log.d("sender", "Broadcasting message = " +nodeTopic +" message = " + nodeMsg);
+            //Log.d("sender", "Broadcasting message = " +nodeTopic +" message = " + nodeMsg);
             sendMessageMQTT();
 
         }

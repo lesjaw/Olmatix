@@ -12,7 +12,6 @@ public class dbNode {
     // Labels Table Columns names
     public static final String KEY_ID           = "node_id";
     public static final String KEY_NODE_ID      = "key_node_id";
-
     public static final String KEY_NODES        = "nodes";
     public static final String KEY_NAME         = "name";
     public static final String KEY_LOCALIP      = "localip";

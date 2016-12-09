@@ -174,11 +174,13 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
             if(flag == 0)
             {
+                Toast.makeText(getActivity(),"Add Node Successfully",Toast.LENGTH_LONG).show();
 
                 nodeModel.setNid(NodeID);
                 nodeModel.setOnline(messageReceive.get("online"));
 
                 dbNodeRepo.insertDb(nodeModel);
+                messageReceive.clear();
                 flagNodeAdd=0;
 
                 doSubcribeIfOnline();
@@ -213,15 +215,15 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
         Log.d("SaveandPersist", "Executed");
 
-        if(messageReceive.containsKey("nodes") && messageReceive.containsKey("name")
+        /*if(messageReceive.containsKey("online") && messageReceive.containsKey("nodes") && messageReceive.containsKey("name")
                 && messageReceive.containsKey("localip") && messageReceive.containsKey("fwname") && messageReceive.containsKey("fwversion")
                 && messageReceive.containsKey("signal") && messageReceive.containsKey("uptime") && messageReceive.containsKey("reset")
-                && messageReceive.containsKey("ota") && flagNodeAdd == 0)
+                && messageReceive.containsKey("ota"))
 
-            {
-                Toast.makeText(getActivity(),"Update Node Successfully",Toast.LENGTH_SHORT).show();
+            {*/
+                Toast.makeText(getActivity(),"Update Node Successful",Toast.LENGTH_SHORT).show();
 
-                messageReceive.put("NodeId",inputResult);
+                nodeModel.setNid(NodeID);
                 nodeModel.setOnline(messageReceive.get("online"));
                 nodeModel.setNodes(messageReceive.get("nodes"));
                 nodeModel.setName(messageReceive.get("name"));
@@ -240,7 +242,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 data.addAll(dbNodeRepo.getNodeList());
 
                 messageReceive.clear();
-            }
+            //}
 
     }
 

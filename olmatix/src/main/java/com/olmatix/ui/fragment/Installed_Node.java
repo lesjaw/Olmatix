@@ -221,7 +221,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                 && messageReceive.containsKey("ota"))
 
             {*/
-              //  Toast.makeText(getActivity(),"Update Node Successfull",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"Update Node Successful",Toast.LENGTH_SHORT).show();
 
                 nodeModel.setNid(NodeID);
                 nodeModel.setOnline(messageReceive.get("online"));

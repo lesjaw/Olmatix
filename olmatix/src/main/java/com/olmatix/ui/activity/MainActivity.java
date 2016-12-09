@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             // Get extra data included in the Intent
             String message = intent.getStringExtra("MQTT State");
             Log.d("receiver", "Status MQTT : " + message);
-            if (message == "true"){
+            if (message.equals("true")){
                 serverconnected = true;
                 invalidateOptionsMenu();
             } else

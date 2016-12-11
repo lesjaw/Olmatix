@@ -15,21 +15,18 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-
-import com.olmatix.utils.Connection;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.MainActivity;
+import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -44,6 +41,9 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 /**
  * Created              : Rahman on 12/2/2016.
@@ -65,14 +65,15 @@ public class OlmatixService extends Service {
     public volatile MqttAsyncClient mqttClient;
     private String deviceId;
     private String stateoffMqtt;
-    private String nodeTopic;
-    private String nodeMsg;
-
+    public static dbNodeRepo dbNodeRepo;
+    private Installed_NodeModel installedNodeModel;
+    private static ArrayList<Installed_NodeModel> data;
+    private String NodeID;
+    private String mMessage;
+    int flagExist =0;
     private NotificationManager mNM;
-
-    // Unique Identification Number for the Notification.
-    // We use it on Notification start, and to cancel it.
     private int NOTIFICATION = R.string.local_service_started;
+    HashMap<String,String>  messageReceive = new HashMap<>();
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -101,7 +102,7 @@ public class OlmatixService extends Service {
                 Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
                 toast.show();
                 stateoffMqtt = "false";
-                Log.d("DEBUG", "MQTT Status No Internet: " +stateoffMqtt);
+                Log.d("Sender", "MQTT Status No Internet: " +stateoffMqtt);
                 sendMessage();
             }
 
@@ -147,6 +148,9 @@ public class OlmatixService extends Service {
         mConnMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
+        data = new ArrayList<>();
+        dbNodeRepo = new dbNodeRepo(getApplicationContext());
+        installedNodeModel = new Installed_NodeModel();
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
     }
@@ -245,7 +249,7 @@ public class OlmatixService extends Service {
                                 //Log.i("sub","Subscribe success");
                                 //Toast.makeText(getApplicationContext(), R.string.sub_success, Toast.LENGTH_SHORT).show();
                                 stateoffMqtt = "true";
-                                Log.d("DEBUG", "MQTT Status after sub: " +stateoffMqtt);
+                                Log.d("Sender", "MQTT Status after sub: " +stateoffMqtt);
                                 sendMessage();
                             }
 
@@ -302,7 +306,9 @@ public class OlmatixService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "onStartCommand()");
-        //Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
+        Log.d("Service = ", "Starting..");
+
         sendMessage();
         return START_STICKY;
     }
@@ -314,16 +320,6 @@ public class OlmatixService extends Service {
         intent.putExtra("MQTT State", stateoffMqtt);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
-
-    private void sendMessageMQTT() {
-        Intent intent = new Intent("messageMQTT");
-        // You can also include some extra data.
-        intent.putExtra("MQTT devices", nodeTopic);
-        intent.putExtra("MQTT message", nodeMsg);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-
 
     public String getThread(){
         return Long.valueOf(thread.getId()).toString();
@@ -355,10 +351,18 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
-            nodeTopic = topic;
-            nodeMsg = message.toString();
-            Log.d("sender", " = " +nodeTopic +" message = " + nodeMsg);
-            sendMessageMQTT();
+            Log.d("MQTTMessage", " = " +topic +" message = " + message.toString());
+
+            NodeID = topic;
+            mMessage = message.toString();
+            String[] outputDevices = NodeID.split("/");
+            NodeID = outputDevices[1];
+            String  mNodeId = topic;
+            mNodeId = mNodeId.substring(mNodeId.indexOf("$")+1,mNodeId.length());
+            messageReceive.put(mNodeId,mMessage);
+
+            checkValidation();
+
 
         }
 
@@ -369,5 +373,157 @@ public class OlmatixService extends Service {
 
     }
 
+    private void checkValidation() {
+        Log.d("messageReceive ", "= " + messageReceive);
+        if (messageReceive.containsKey("online")) {
+            Log.d("CheckValid online", "Passed");
+            if (mMessage.equals("true")){
+                Log.d("CheckValid online", " true Passed");
+                saveFirst();
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.deviceoffline, Toast.LENGTH_LONG).show();
+                installedNodeModel.setNodesID(NodeID);
+                if (dbNodeRepo.hasObject(installedNodeModel)) {
 
+                    Toast.makeText(getApplicationContext(), "Updating status device : " + NodeID, Toast.LENGTH_LONG).show();
+                    Log.d("Updating", "status device = " + NodeID);
+                    statusDevices();
+
+                } else {
+                    doUnsubscribe();
+                }
+            }
+        }
+        saveDatabase();
+    }
+
+    private void saveFirst() {
+
+            if (dbNodeRepo.getNodeList().isEmpty()) {
+                installedNodeModel.setNodesID(NodeID);
+                installedNodeModel.setNodes(messageReceive.get("online"));
+
+                dbNodeRepo.insertDb(installedNodeModel);
+                Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
+                Log.d("saveFirst", "Add Node success, ");
+                messageReceive.clear();
+                doSubscribeIfOnline();
+
+            } else {
+                installedNodeModel.setNodesID(NodeID);
+                if (dbNodeRepo.hasObject(installedNodeModel)) {
+
+                    Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID, Toast.LENGTH_LONG).show();
+                    //flagExist = 1;
+                    Log.d("saveFirst", "You already have this Node, DB = " + NodeID);
+                    saveDatabase();
+
+                } else {
+                    installedNodeModel.setNodesID(NodeID);
+                    installedNodeModel.setNodes(messageReceive.get("online"));
+
+                    dbNodeRepo.insertDb(installedNodeModel);
+                    Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
+                    Log.d("saveFirst", "Add Node success, ");
+                    messageReceive.clear();
+                    doSubscribeIfOnline();
+                }
+            }
+
+            //flagExist = 0;
+    }
+
+    private void statusDevices(){
+        installedNodeModel.setNodesID(NodeID);
+        if (dbNodeRepo.hasObject(installedNodeModel)) {
+            if (messageReceive.get("online") != null) {
+                installedNodeModel.setOnline(messageReceive.get("online"));
+            }
+
+            dbNodeRepo.update(installedNodeModel);
+        }
+
+
+    }
+
+    private void saveDatabase(){
+
+        Log.d("saveDatabase", "Executed");
+
+
+                if (messageReceive.get("nodes") != null) {
+                    installedNodeModel.setNodes(messageReceive.get("nodes"));
+                }
+                if (messageReceive.get("name") != null) {
+                    installedNodeModel.setName(messageReceive.get("name"));
+                }
+                if (messageReceive.get("localip") != null) {
+                    installedNodeModel.setLocalip(messageReceive.get("localip"));
+                }
+                if (messageReceive.get("fwname") != null) {
+                    installedNodeModel.setName(messageReceive.get("fwname"));
+                    String mFwName =  messageReceive.get("fwname");
+                    //Log.d("SaveAndPersist", "Executed by = " +mFwName);
+                }
+                if (messageReceive.get("fwversion") != null) {
+                    installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
+                }
+                if (messageReceive.get("online") != null) {
+                    installedNodeModel.setOnline(messageReceive.get("online"));
+                }
+                if (messageReceive.get("signal") != null) {
+                    installedNodeModel.setSignal(messageReceive.get("signal"));
+                }
+                if (messageReceive.get("uptime") != null) {
+                    installedNodeModel.setUptime(messageReceive.get("uptime"));
+                }
+                if (messageReceive.get("reset") != null) {
+
+                    installedNodeModel.setReset(messageReceive.get("reset"));
+                }
+                if (messageReceive.get("ota") != null) {
+                    installedNodeModel.setOta(messageReceive.get("ota"));
+                }
+
+                dbNodeRepo.update(installedNodeModel);
+                //flagExist = 0;
+                messageReceive.clear();
+
+    }
+    private void doSubscribeIfOnline(){
+        String topic = "devices/" + NodeID + "/#";
+        int qos = 1;
+        try {
+            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+            subToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.d("Subscribe", " device = " + NodeID);
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void doUnsubscribe(){
+        String topic = "devices/"+NodeID+"/$online";
+        try {
+            Connection.getClient().unsubscribe(topic);
+            Log.d("Unsubscribe", " device = " + NodeID);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
+
+
+
+
+

@@ -60,5 +60,6 @@
     <string name="fav_label">Favorite</string>
     <string name="installed_label">Installed Node</string>
     <string name="signal">100</string>
+    <string name="deviceoffline">Your devices OFFLINE!</string>
 
 </resources>

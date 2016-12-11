@@ -3,4 +3,5 @@
     <string name="pref_setup">Setup Product</string>
     <string name="pref_wifi">WiFi Credential</string>
     <string name="info_pass_ssid">Type your home WiFi password</string>
+    <string name="deviceoffline">Your devices OFFLINE!</string>
 </resources>

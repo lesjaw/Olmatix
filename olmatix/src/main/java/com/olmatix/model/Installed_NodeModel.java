@@ -9,7 +9,7 @@ package com.olmatix.model;
  * Copyright            : Copyright @ 2016 Indogamers.
  */
 public class Installed_NodeModel {
-    private  int id;
+    private int id;
     private String node_id;
     private String nodes;
     private String name;
@@ -25,11 +25,14 @@ public class Installed_NodeModel {
     private String reset;
     private String ota;
 
+    private String addNode;
+
     public Installed_NodeModel() {
     }
 
-    public Installed_NodeModel(String node_id, String nodes, String name, String nice_name, String localip, String fwName, String fwVersion,
-                               String icon, String adding, String online, String signal, String uptime, String reset, String ota) {
+    public Installed_NodeModel(String node_id, String nodes, String name, String nice_name, String localip, String fwName,
+                               String fwVersion, String icon, String adding, String online, String signal, String uptime,
+                               String reset, String ota, String addNode) {
 
         this.node_id = node_id;
         this.nodes = nodes;
@@ -45,9 +48,18 @@ public class Installed_NodeModel {
         this.uptime = uptime;
         this.reset = reset;
         this.ota = ota;
+        this.addNode = addNode;
 
     }
 
+
+    public  String getAddNode(){
+        return addNode;
+    }
+
+    public void setAddNode(String addNode){
+        this.addNode = addNode;
+    }
 
     public int getNid() {
         return id;

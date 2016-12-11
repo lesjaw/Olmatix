@@ -70,10 +70,10 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             }
         }
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-        holder.fwName.setText(mInstalledNodeModel.getName());
-        holder.ipAddrs.setText(mInstalledNodeModel.getLocalip());
-        holder.siGnal.setText(mInstalledNodeModel.getSignal());
-        holder.upTime.setText(mInstalledNodeModel.getUptime());
+        holder.fwName.setText(mInstalledNodeModel.getFwName());
+        holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
+        holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");
+        holder.upTime.setText("Uptime : "+mInstalledNodeModel.getUptime());
         holder.nodeid.setText(mInstalledNodeModel.getNodesID());
     }
 

@@ -24,11 +24,6 @@ import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.Favorite;
 import com.olmatix.ui.fragment.Installed_Node;
-import com.olmatix.utils.Connection;
-
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttException;
 
 /**
  * Created by Lesjaw on 02/12/2016.
@@ -131,30 +126,6 @@ public class MainActivity extends AppCompatActivity {
             invalidateOptionsMenu();
         }
     };
-
-
-
-    private void subStatus() {
-        String topic = "devices/809ed5e0/light/0/set";
-        int qos = 1;
-        try {
-            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-            subToken.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken,
-                                      Throwable exception) {
-                    // The subscription could not be performed, maybe the user was not
-                    // authorized to subscribe on the specified topic e.g. using wildcards
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
 
 
     // Override this method to do what you want when the menu is recreated

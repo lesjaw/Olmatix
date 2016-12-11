@@ -116,6 +116,7 @@ public class dbNodeRepo {
                 String.valueOf(installedNodeModel.getNodesID())
         });
         db.close(); // Closing database connection
+        Log.d("DEBUG", "updateDb: " + String.valueOf(installedNodeModel.getNodesID()));
 
     }
 

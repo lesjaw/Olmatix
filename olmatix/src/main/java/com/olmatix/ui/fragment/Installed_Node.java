@@ -4,7 +4,11 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,11 +19,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +69,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     public static dbNodeRepo dbNodeRepo;
     private Installed_NodeModel installedNodeModel;
     private String inputResult;
+    int flagReceiver=0;
 
 
 
@@ -94,17 +101,37 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     @Override
     public void onStart() {
 
-       /* if (flagReceiver==0) {
-            *//*Intent i = new Intent(getActivity(), OlmatixService.class);
-            getActivity().startService(i);*//*
+        if (flagReceiver==0) {
+            /*Intent i = new Intent(getActivity(), OlmatixService.class);
+            getActivity().startService(i);*/
 
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                    mMessageReceiver, new IntentFilter("messageMQTT"));
+                    mMessageReceiver, new IntentFilter("MQTTStatus"));
             Log.d("Receiver ", "Installed_Node = Starting..");
             flagReceiver = 1;
-        }*/
+        }
         super.onStart();
     }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("NotifyChange");
+            Log.d("receiver", "NotifyChange : " + message);
+            if (message==null){
+                message = "false";
+
+            }
+            if (message.equals("true")){
+                adapter.notifyDataSetChanged();
+                adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
+                mRecycleView.setAdapter(adapter);
+
+            }
+        }
+    };
 
     @Override
     public void onPause() {
@@ -115,6 +142,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     @Override
     public void onResume() {
+        adapter.notifyDataSetChanged();
+
         adapter = new OlmatixAdapter(dbNodeRepo.getNodeList());
         mRecycleView.setAdapter(adapter);
         super.onResume();

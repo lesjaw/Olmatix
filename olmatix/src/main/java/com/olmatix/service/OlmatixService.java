@@ -318,6 +318,7 @@ public class OlmatixService extends Service {
         Intent intent = new Intent("MQTTStatus");
         // You can also include some extra data.
         intent.putExtra("MQTT State", stateoffMqtt);
+        intent.putExtra("NotifyChange", "true");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -446,48 +447,58 @@ public class OlmatixService extends Service {
 
     }
 
-    private void saveDatabase(){
+    private void saveDatabase() {
 
         Log.d("saveDatabase", "Executed");
 
+        installedNodeModel.setNodesID(NodeID);
 
                 if (messageReceive.get("nodes") != null) {
+                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setNodes(messageReceive.get("nodes"));
                 }
+
                 if (messageReceive.get("name") != null) {
+                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setName(messageReceive.get("name"));
                 }
+
                 if (messageReceive.get("localip") != null) {
+                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setLocalip(messageReceive.get("localip"));
                 }
+
                 if (messageReceive.get("fwname") != null) {
-                    installedNodeModel.setName(messageReceive.get("fwname"));
-                    String mFwName =  messageReceive.get("fwname");
-                    //Log.d("SaveAndPersist", "Executed by = " +mFwName);
+                    installedNodeModel.setNodesID(NodeID);
+                    installedNodeModel.setFwName(messageReceive.get("fwname"));
+                    Log.d("FWNAME", " = : " + installedNodeModel.getFwName());
                 }
+
+
                 if (messageReceive.get("fwversion") != null) {
+                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
                 }
+
                 if (messageReceive.get("online") != null) {
+                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setOnline(messageReceive.get("online"));
                 }
+
                 if (messageReceive.get("signal") != null) {
+                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setSignal(messageReceive.get("signal"));
                 }
-                if (messageReceive.get("uptime") != null) {
-                    installedNodeModel.setUptime(messageReceive.get("uptime"));
-                }
-                if (messageReceive.get("reset") != null) {
 
-                    installedNodeModel.setReset(messageReceive.get("reset"));
-                }
-                if (messageReceive.get("ota") != null) {
-                    installedNodeModel.setOta(messageReceive.get("ota"));
+                if (messageReceive.get("uptime") != null) {
+                    installedNodeModel.setNodesID(NodeID);
+                    installedNodeModel.setUptime(messageReceive.get("uptime"));
                 }
 
                 dbNodeRepo.update(installedNodeModel);
                 //flagExist = 0;
                 messageReceive.clear();
+                sendMessage();
 
     }
     private void doSubscribeIfOnline(){

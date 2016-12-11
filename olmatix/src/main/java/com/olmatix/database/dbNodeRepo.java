@@ -175,7 +175,7 @@ public class dbNodeRepo {
 
             } while (cursor.moveToNext());
         }
-        Log.d("getlist", "getNodeList: " +cursor.getCount());
+        //Log.d("getlist", "getNodeList: " +cursor.getCount());
         cursor.close();
         db.close();
         return nodeList;

@@ -449,7 +449,7 @@ public class OlmatixService extends Service {
 
     private void saveDatabase() {
 
-        Log.d("saveDatabase", "Executed");
+        //Log.d("saveDatabase", "Executed");
 
         installedNodeModel.setNodesID(NodeID);
 

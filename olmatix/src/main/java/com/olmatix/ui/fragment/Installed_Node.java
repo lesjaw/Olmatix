@@ -119,7 +119,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
             // TODO Auto-generated method stub
             // Get extra data included in the Intent
             String message = intent.getStringExtra("NotifyChange");
-            Log.d("receiver", "NotifyChange : " + message);
+            //Log.d("receiver", "NotifyChange : " + message);
             if (message==null){
                 message = "false";
 

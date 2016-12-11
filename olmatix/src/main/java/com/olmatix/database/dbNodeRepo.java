@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
@@ -57,9 +58,10 @@ public class dbNodeRepo {
         values.put(KEY_RESET, installedNodeModel.getReset());
         values.put(KEY_OTA, installedNodeModel.getOta());
 
-        long node_Id = db.insert(TABLE, null, values);
+        long Id = db.insert(TABLE, null, values);
         db.close(); // Closing database connection
-        return (int) node_Id;
+        Log.d("DEBUG", "insertDb: " + String.valueOf(KEY_NODE_ID));
+        return (int) Id;
     }
 
 
@@ -90,9 +92,6 @@ public class dbNodeRepo {
         db.close(); // Closing database connection
     }
 
-    /**
-     * SQL UPDATE PROSES DATA
-     * */
 
     public void update(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -150,13 +149,44 @@ public class dbNodeRepo {
 
             } while (cursor.moveToNext());
         }
+        Log.d("getlist", "getNodeList: " +cursor.getCount());
         cursor.close();
         db.close();
         return nodeList;
     }
 
+    public boolean hasObject(Installed_NodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String selectString = "SELECT * FROM " + dbNode.TABLE + " WHERE " + KEY_NODE_ID + " =?";
 
-    public dbNode getNodeByNode(String nodeName){
+        // Add the String you are searching by here.
+        // Put it in an array to avoid an unrecognized token error
+        Cursor cursor = db.rawQuery(selectString, new String[] {String.valueOf(installedNodeModel.getNodesID())});
+
+        boolean hasObject = false;
+        if(cursor.moveToFirst()){
+            hasObject = true;
+
+            //region if you had multiple records to check for, use this region.
+
+            int count = 0;
+            while(cursor.moveToNext()){
+                count++;
+            }
+            //here, count is records found
+            Log.d("hasObject", String.format("%d records found", count));
+
+            //endregion
+
+        }
+
+        cursor.close();          // Dont forget to close your cursor
+        db.close();              //AND your Database!
+        return hasObject;
+    }
+
+
+    public dbNode getNodeByNode(Installed_NodeModel installedNodeModel){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM " + dbNode.TABLE
                 + " WHERE " +
@@ -165,7 +195,7 @@ public class dbNodeRepo {
         int iCount =0;
         dbNode node = new dbNode();
 
-        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(nodeName) } );
+        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(installedNodeModel.getNodesID()) } );
 
         if (cursor.moveToFirst()) {
             do {

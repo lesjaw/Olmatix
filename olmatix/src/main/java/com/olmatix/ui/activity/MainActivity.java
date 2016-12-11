@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     int backButtonCount;
-
+    int flagReceiver=0;
 
 
     @Override
@@ -49,11 +50,32 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.addTab(tabLayout.newTab().setText("Dashboard"));
+        tabLayout.addTab(tabLayout.newTab().setText("Nodes"));
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                mViewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
@@ -63,30 +85,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(
-                mMessageReceiver);
+
     }
 
     @Override
     protected void onStart() {
-        Intent i = new Intent(this, OlmatixService.class);
-        startService(i);
 
-        /*LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("MQTTStatus"));*/
-        super.onStart();
+        if (flagReceiver == 0) {
+            Intent i = new Intent(this, OlmatixService.class);
+            startService(i);
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                    mMessageReceiver, new IntentFilter("MQTTStatus"));
+            flagReceiver = 1;
+            Log.d("MainAcitivity = ", "Starting OlmatixService");
+        }
+            super.onStart();
     }
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("MQTTStatus"));
         super.onResume();
     }
 
@@ -199,10 +221,10 @@ public class MainActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    //Fragement for Android Tab
+                    //Fragement for Fav Tab
                     return new Favorite();
                 case 1:
-                    //Fragment for Ios Tab
+                    //Fragment for Nodes Tab
                     return new Installed_Node();
             }
             return null;

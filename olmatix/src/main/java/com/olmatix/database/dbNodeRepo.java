@@ -98,20 +98,45 @@ public class dbNodeRepo {
         ContentValues values = new ContentValues();
 
         values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
-        values.put(KEY_NODES, installedNodeModel.getNodes());
-        values.put(KEY_NAME, installedNodeModel.getName());
-        values.put(KEY_NICE_NAME, installedNodeModel.getNiceName());
-        values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
-        values.put(KEY_FWNAME, installedNodeModel.getFwName());
-        values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
-        values.put(KEY_ONLINE, installedNodeModel.getOnline());
-        values.put(KEY_ICON, installedNodeModel.getIcon());
-        values.put(KEY_ADDING, installedNodeModel.getAdding());
-        values.put(KEY_SIGNAL, installedNodeModel.getSignal());
-        values.put(KEY_UPTIME, installedNodeModel.getUptime());
-        values.put(KEY_RESET, installedNodeModel.getReset());
-        values.put(KEY_OTA, installedNodeModel.getOta());
-
+        if (installedNodeModel.getNodes()!=null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
+        if (installedNodeModel.getName()!=null) {
+            values.put(KEY_NAME, installedNodeModel.getName());
+        }
+        if (installedNodeModel.getNiceName()!=null) {
+            values.put(KEY_NICE_NAME, installedNodeModel.getNiceName());
+        }
+        if (installedNodeModel.getLocalip()!=null) {
+            values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
+        }
+        if (installedNodeModel.getFwName()!=null) {
+            values.put(KEY_FWNAME, installedNodeModel.getFwName());
+        }
+        if (installedNodeModel.getFwVersion()!=null) {
+            values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
+        }
+        if (installedNodeModel.getOnline()!=null) {
+            values.put(KEY_ONLINE, installedNodeModel.getOnline());
+        }
+        if (installedNodeModel.getNodesID()!=null) {
+            values.put(KEY_ICON, installedNodeModel.getIcon());
+        }
+        if (installedNodeModel.getAdding()!=null) {
+            values.put(KEY_ADDING, installedNodeModel.getAdding());
+        }
+        if (installedNodeModel.getSignal()!=null) {
+            values.put(KEY_SIGNAL, installedNodeModel.getSignal());
+        }
+        if (installedNodeModel.getUptime()!=null) {
+            values.put(KEY_UPTIME, installedNodeModel.getUptime());
+        }
+        if (installedNodeModel.getReset()!=null) {
+            values.put(KEY_RESET, installedNodeModel.getReset());
+        }
+        if (installedNodeModel.getOta()!=null) {
+            values.put(KEY_OTA, installedNodeModel.getOta());
+        }
         db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[] {
                 String.valueOf(installedNodeModel.getNodesID())
         });

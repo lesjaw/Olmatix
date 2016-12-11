@@ -413,7 +413,7 @@ public class OlmatixService extends Service {
                 installedNodeModel.setNodesID(NodeID);
                 if (dbNodeRepo.hasObject(installedNodeModel)) {
 
-                    Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID +", updating Node status", Toast.LENGTH_LONG).show();
                     //flagExist = 1;
                     Log.d("saveFirst", "You already have this Node, DB = " + NodeID);
                     saveDatabase();

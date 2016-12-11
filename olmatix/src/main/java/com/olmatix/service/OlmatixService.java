@@ -442,6 +442,8 @@ public class OlmatixService extends Service {
             }
 
             dbNodeRepo.update(installedNodeModel);
+            messageReceive.clear();
+
         }
 
 

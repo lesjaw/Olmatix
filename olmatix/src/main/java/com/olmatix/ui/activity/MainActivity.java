@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Dashboard"));
-        tabLayout.addTab(tabLayout.newTab().setText("Nodes"));
+        tabLayout.addTab(tabLayout.newTab().setText("Dashboard").setIcon(R.drawable.ic_fav));
+        tabLayout.addTab(tabLayout.newTab().setText("Nodes").setIcon(R.drawable.ic_node));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());

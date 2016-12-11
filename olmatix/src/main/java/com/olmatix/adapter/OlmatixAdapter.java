@@ -92,6 +92,12 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         } catch (MqttException e) {
             e.printStackTrace();
         }
+        String topic1 = "devices/"+nodeList.get(position).getNodesID()+"/$online";
+        try {
+            Connection.getClient().unsubscribe(topic1);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
         nodeList.remove(position);
 
         notifyItemRemoved(position);

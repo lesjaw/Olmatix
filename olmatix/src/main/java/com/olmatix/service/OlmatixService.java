@@ -416,7 +416,7 @@ public class OlmatixService extends Service {
 
                     Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID +", updating Node status", Toast.LENGTH_LONG).show();
                     //flagExist = 1;
-                    Log.d("saveFirst", "You already have this Node, DB = " + NodeID);
+                    Log.d("saveFirst", "You already have this Node, DB = " + NodeID+", updating Node status");
                     saveDatabase();
 
                 } else {

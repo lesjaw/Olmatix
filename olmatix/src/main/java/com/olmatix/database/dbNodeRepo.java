@@ -75,7 +75,7 @@ public class dbNodeRepo {
         values.put(KEY_STATUS, nodeModel.getStatus());
 
 
-        long node_Id = db.insert(TABLE, null, values);
+        long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
         return (int) node_Id;
     }

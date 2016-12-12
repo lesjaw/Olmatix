@@ -26,8 +26,8 @@ public class dbNode {
     public static final String KEY_UPTIME       = "uptime";
     public static final String KEY_RESET        = "reset";
     public static final String KEY_OTA          = "ota";
-    public static final String KEY_STATUS      =  "status";
-    public static final String KEY_CHANNEL    = "channel";
+    public static final String KEY_STATUS       =  "status";
+    public static final String KEY_CHANNEL      =   "channel";
 
     // property help us to keep data
     public int id;

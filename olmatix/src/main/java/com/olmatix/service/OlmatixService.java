@@ -373,6 +373,7 @@ public class OlmatixService extends Service {
             if(!Channel.isEmpty()) {
                 message_topic.put("channel", mMessage);
                 InsertChannel();
+
             }
 
             checkValidation();
@@ -448,7 +449,7 @@ public class OlmatixService extends Service {
     }
     private  void InsertChannel()
     {
-        if (dbNodeRepo.getNodeDetail().isEmpty() && !Channel.isEmpty()) {
+        if (dbNodeRepo.getNodeDetail().isEmpty()) {
             detailNodeModel.setNode_id(NodeID);
             detailNodeModel.setChannel(Channel);
             detailNodeModel.setStatus(message_topic.get("channel"));
@@ -457,7 +458,6 @@ public class OlmatixService extends Service {
             Toast.makeText(getApplicationContext(), "Status Add Successfully", Toast.LENGTH_LONG).show();
             message_topic.clear();
             Channel = "";
-            doSubscribeStatusIfOnline();
 
         }
         else {
@@ -476,7 +476,6 @@ public class OlmatixService extends Service {
                 Toast.makeText(getApplicationContext(), "Add Status Successfully", Toast.LENGTH_LONG).show();
                 message_topic.clear();
                 Channel = "";
-                doSubscribeStatusIfOnline();
 
             }
         }

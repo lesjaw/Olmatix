@@ -70,6 +70,7 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+
         values.put(KEY_NODE_ID,nodeModel.getNode_id());
         values.put(KEY_CHANNEL, nodeModel.getChannel());
         values.put(KEY_STATUS, nodeModel.getStatus());
@@ -77,6 +78,8 @@ public class dbNodeRepo {
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
+        Log.d("DEBUG", "insertDb: " + String.valueOf(KEY_NODE_ID));
+
         return (int) node_Id;
     }
 
@@ -159,7 +162,7 @@ public class dbNodeRepo {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
         }
 
-        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[] {
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "= ?", new String[] {
                 String.valueOf(detailNodeModel.getNode_id())
         });
         db.close(); // Closing database connection

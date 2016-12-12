@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.utils.Connection;
@@ -55,6 +56,7 @@ import java.util.HashMap;
  */
 public class OlmatixService extends Service {
 
+
     private static String TAG = OlmatixService.class.getSimpleName();
     public final static String MY_ACTION = "MY_ACTION";
 
@@ -67,13 +69,14 @@ public class OlmatixService extends Service {
     private String stateoffMqtt;
     public static dbNodeRepo dbNodeRepo;
     private Installed_NodeModel installedNodeModel;
+    private Detail_NodeModel detailNodeModel;
     private static ArrayList<Installed_NodeModel> data;
-    private String NodeID;
+    private String NodeID,Channel;
     private String mMessage;
-    int flagExist =0;
     private NotificationManager mNM;
     private int NOTIFICATION = R.string.local_service_started;
     HashMap<String,String>  messageReceive = new HashMap<>();
+    HashMap<String,String> message_topic = new HashMap<>();
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -151,6 +154,7 @@ public class OlmatixService extends Service {
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new Installed_NodeModel();
+        detailNodeModel = new Detail_NodeModel();
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
     }
@@ -216,8 +220,6 @@ public class OlmatixService extends Service {
         options.setWill(topic, payload ,1,true);
         options.setKeepAliveInterval(300);
         Connection.setClient(client);
-
-
         try {
 
             IMqttToken token = client.connect(options);
@@ -239,7 +241,9 @@ public class OlmatixService extends Service {
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                        } catch (UnsupportedEncodingException | MqttException e) {
+                        }
+                        catch (UnsupportedEncodingException | MqttException e)
+                        {
                             e.printStackTrace();
                         }
 
@@ -358,9 +362,18 @@ public class OlmatixService extends Service {
             mMessage = message.toString();
             String[] outputDevices = NodeID.split("/");
             NodeID = outputDevices[1];
+            Channel = outputDevices[3];
             String  mNodeId = topic;
             mNodeId = mNodeId.substring(mNodeId.indexOf("$")+1,mNodeId.length());
+
+           /* String NodeStatus = topic;
+            NodeStatus = NodeStatus.substring(NodeStatus.indexOf("=")+1,NodeStatus.length());
+*/
             messageReceive.put(mNodeId,mMessage);
+            if(!Channel.isEmpty()) {
+                message_topic.put("channel", mMessage);
+                InsertChannel();
+            }
 
             checkValidation();
 
@@ -433,6 +446,39 @@ public class OlmatixService extends Service {
 
             //flagExist = 0;
     }
+    private  void InsertChannel()
+    {
+        if (dbNodeRepo.getNodeDetail().isEmpty() && !Channel.isEmpty()) {
+            detailNodeModel.setNode_id(NodeID);
+            detailNodeModel.setChannel(Channel);
+            detailNodeModel.setStatus(message_topic.get("channel"));
+
+            dbNodeRepo.insertInstalledNode(detailNodeModel);
+            Toast.makeText(getApplicationContext(), "Status Add Successfully", Toast.LENGTH_LONG).show();
+            message_topic.clear();
+            Channel = "";
+        }
+        else {
+            detailNodeModel.setNode_id(NodeID);
+            if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
+
+                Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID + ", updating Node status", Toast.LENGTH_LONG).show();
+                //flagExist = 1;
+                Log.d("saveFirst", "You already have this Node, DB = " + NodeID + ", updating Node status");
+                saveDatabase_Detail();
+
+            } else {
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel(Channel);
+                detailNodeModel.setStatus(message_topic.get("channel"));
+
+                dbNodeRepo.insertInstalledNode(detailNodeModel);
+                Toast.makeText(getApplicationContext(), "Add Status Successfully", Toast.LENGTH_LONG).show();
+                messageReceive.clear();
+                doSubscribeIfOnline();
+            }
+        }
+    }
 
     private void statusDevices(){
         installedNodeModel.setNodesID(NodeID);
@@ -468,6 +514,21 @@ public class OlmatixService extends Service {
                 //flagExist = 0;
                 messageReceive.clear();
                 sendMessage();
+
+    }
+
+    private void saveDatabase_Detail() {
+
+        //Log.d("saveDatabase", "Executed");
+
+        detailNodeModel.setNode_id(NodeID);
+        detailNodeModel.setChannel(Channel);
+        detailNodeModel.setStatus(messageReceive.get("channel"));
+
+        dbNodeRepo.update_detail(detailNodeModel);
+        //flagExist = 0;
+        message_topic.clear();
+        sendMessage();
 
     }
     private void doSubscribeIfOnline(){

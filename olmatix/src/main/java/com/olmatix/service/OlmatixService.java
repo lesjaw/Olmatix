@@ -463,8 +463,6 @@ public class OlmatixService extends Service {
             if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
 
                 Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID + ", updating Node status", Toast.LENGTH_LONG).show();
-                //flagExist = 1;
-                Log.d("saveFirst", "You already have this Node, DB = " + NodeID + ", updating Node status");
                 saveDatabase_Detail();
 
             } else {
@@ -474,8 +472,8 @@ public class OlmatixService extends Service {
 
                 dbNodeRepo.insertInstalledNode(detailNodeModel);
                 Toast.makeText(getApplicationContext(), "Add Status Successfully", Toast.LENGTH_LONG).show();
-                messageReceive.clear();
-                doSubscribeIfOnline();
+                message_topic.clear();
+                Channel = "";
             }
         }
     }
@@ -499,8 +497,7 @@ public class OlmatixService extends Service {
 
         //Log.d("saveDatabase", "Executed");
 
-        installedNodeModel.setNodesID(NodeID);
-
+                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setNodes(messageReceive.get("nodes"));
                     installedNodeModel.setName(messageReceive.get("name"));
                     installedNodeModel.setLocalip(messageReceive.get("localip"));
@@ -528,6 +525,7 @@ public class OlmatixService extends Service {
         dbNodeRepo.update_detail(detailNodeModel);
         //flagExist = 0;
         message_topic.clear();
+        Channel = "";
         sendMessage();
 
     }

@@ -70,6 +70,13 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             }
         }
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
+        if(mInstalledNodeModel.getFwName() != null) {
+            if (mInstalledNodeModel.getFwName().equals("smartfitting")) {
+                holder.imgNode.setImageResource(R.mipmap.ic_light);
+            } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")){
+                holder.imgNode.setImageResource(R.mipmap.ic_adapter);
+            }
+        }
         holder.fwName.setText(mInstalledNodeModel.getFwName());
         holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
         holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");

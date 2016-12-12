@@ -465,7 +465,6 @@ public class OlmatixService extends Service {
                     installedNodeModel.setUptime(messageReceive.get("uptime"));
 
                 dbNodeRepo.update(installedNodeModel);
-                //flagExist = 0;
                 messageReceive.clear();
                 sendMessage();
 

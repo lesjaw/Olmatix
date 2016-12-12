@@ -71,8 +71,6 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private String inputResult;
     int flagReceiver=0;
 
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

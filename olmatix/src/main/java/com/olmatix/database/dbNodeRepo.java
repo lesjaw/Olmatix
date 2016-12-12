@@ -32,6 +32,7 @@ import static com.olmatix.database.dbNode.KEY_SIGNAL;
 import static com.olmatix.database.dbNode.KEY_STATUS;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
 import static com.olmatix.database.dbNode.TABLE;
+import static com.olmatix.database.dbNode.TABLE_NODE;
 
 public class dbNodeRepo {
     private dbHelper dbHelper;
@@ -67,7 +68,7 @@ public class dbNodeRepo {
 
     public int insertInstalledNode(Detail_NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        
+
         ContentValues values = new ContentValues();
         values.put(KEY_NODE_ID,nodeModel.getNode_id());
         values.put(KEY_CHANNEL, nodeModel.getChannel());
@@ -145,6 +146,27 @@ public class dbNodeRepo {
 
     }
 
+    public void update_detail(Detail_NodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
+
+        if (detailNodeModel.getChannel()!=null) {
+            values.put(KEY_CHANNEL, detailNodeModel.getChannel());
+        }
+        if (detailNodeModel.getStatus()!=null) {
+            values.put(KEY_STATUS, detailNodeModel.getStatus());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[] {
+                String.valueOf(detailNodeModel.getNode_id())
+        });
+        db.close(); // Closing database connection
+        Log.d("DEBUG", "updateDb: " + String.valueOf(detailNodeModel.getNode_id()));
+
+    }
+
 
     public ArrayList<Installed_NodeModel> getNodeList() {
 
@@ -181,6 +203,31 @@ public class dbNodeRepo {
         return nodeList;
     }
 
+    public ArrayList<Detail_NodeModel> getNodeDetail() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT * FROM " + TABLE_NODE;
+
+        ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Detail_NodeModel node = new Detail_NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        //Log.d("getlist", "getNodeList: " +cursor.getCount());
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
     public boolean hasObject(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selectString = "SELECT * FROM " + dbNode.TABLE + " WHERE " + KEY_NODE_ID + " =?";
@@ -188,6 +235,36 @@ public class dbNodeRepo {
         // Add the String you are searching by here.
         // Put it in an array to avoid an unrecognized token error
         Cursor cursor = db.rawQuery(selectString, new String[] {String.valueOf(installedNodeModel.getNodesID())});
+
+        boolean hasObject = false;
+        if(cursor.moveToFirst()){
+            hasObject = true;
+
+            //region if you had multiple records to check for, use this region.
+
+            int count = 0;
+            while(cursor.moveToNext()){
+                count++;
+            }
+            //here, count is records found
+            Log.d("hasObject", String.format("%d records found", count));
+
+            //endregion
+
+        }
+
+        cursor.close();          // Dont forget to close your cursor
+        db.close();              //AND your Database!
+        return hasObject;
+    }
+
+    public boolean hasDetailObject(Detail_NodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =?";
+
+        // Add the String you are searching by here.
+        // Put it in an array to avoid an unrecognized token error
+        Cursor cursor = db.rawQuery(selectString, new String[] {String.valueOf(detailNodeModel.getNode_id())});
 
         boolean hasObject = false;
         if(cursor.moveToFirst()){

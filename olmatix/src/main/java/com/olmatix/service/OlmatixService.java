@@ -214,7 +214,7 @@ public class OlmatixService extends Service {
         String topic = "status/"+deviceId+"/$online";
         byte[] payload = "false".getBytes();
         options.setWill(topic, payload ,1,true);
-        options.setKeepAliveInterval(30);
+        options.setKeepAliveInterval(300);
         Connection.setClient(client);
 
 
@@ -455,47 +455,14 @@ public class OlmatixService extends Service {
 
         installedNodeModel.setNodesID(NodeID);
 
-                if (messageReceive.get("nodes") != null) {
-                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setNodes(messageReceive.get("nodes"));
-                }
-
-                if (messageReceive.get("name") != null) {
-                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setName(messageReceive.get("name"));
-                }
-
-                if (messageReceive.get("localip") != null) {
-                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setLocalip(messageReceive.get("localip"));
-                }
-
-                if (messageReceive.get("fwname") != null) {
-                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setFwName(messageReceive.get("fwname"));
-                    Log.d("FWNAME", " = : " + installedNodeModel.getFwName());
-                }
-
-
-                if (messageReceive.get("fwversion") != null) {
-                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
-                }
-
-                if (messageReceive.get("online") != null) {
-                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setOnline(messageReceive.get("online"));
-                }
-
-                if (messageReceive.get("signal") != null) {
-                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setSignal(messageReceive.get("signal"));
-                }
-
-                if (messageReceive.get("uptime") != null) {
-                    installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setUptime(messageReceive.get("uptime"));
-                }
 
                 dbNodeRepo.update(installedNodeModel);
                 //flagExist = 0;

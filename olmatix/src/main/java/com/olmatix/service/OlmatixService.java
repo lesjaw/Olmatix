@@ -75,8 +75,11 @@ public class OlmatixService extends Service {
     private String mMessage;
     private NotificationManager mNM;
     private int NOTIFICATION = R.string.local_service_started;
+    HashMap<String,String>  checkDollar = new HashMap<>();
     HashMap<String,String>  messageReceive = new HashMap<>();
     HashMap<String,String> message_topic = new HashMap<>();
+    private String mNodeID;
+    private String TopicID;
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -356,35 +359,39 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
-            Log.d("MQTTMessage", " = " +topic +" message = " + message.toString());
-
-            NodeID = topic;
+            Log.d("MQTTMessage", " = " + topic + " message = " + message.toString());
+            TopicID = topic;
+            mNodeID = topic;
             mMessage = message.toString();
-            String[] outputDevices = NodeID.split("/");
-            NodeID = outputDevices[1];
-            Channel = outputDevices[3];
-            String  mNodeId = topic;
-            mNodeId = mNodeId.substring(mNodeId.indexOf("$")+1,mNodeId.length());
 
-           /* String NodeStatus = topic;
-            NodeStatus = NodeStatus.substring(NodeStatus.indexOf("=")+1,NodeStatus.length());
-*/
-            messageReceive.put(mNodeId,mMessage);
-            if(!Channel.isEmpty()) {
-                message_topic.put("channel", mMessage);
-                InsertChannel();
-
+            if (mNodeID.contains("$")) {
+                addNode();
+            } else {
+                addDetail();
             }
-
-            checkValidation();
-
-
         }
-
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
 
         }
+
+    }
+
+    private void addNode (){
+        String[] outputDevices = TopicID.split("/");
+        NodeID = outputDevices[1];
+        String  mNodeIdSplit = mNodeID;
+        mNodeIdSplit = mNodeIdSplit.substring(mNodeIdSplit.indexOf("$")+1,mNodeIdSplit.length());
+        messageReceive.put(mNodeIdSplit,mMessage);
+        checkValidation();
+    }
+
+    private void addDetail(){
+        String[] outputDevices = TopicID.split("/");
+        Channel = outputDevices[3];
+        message_topic.put("channel", mMessage);
+        InsertChannel();
+
 
     }
 

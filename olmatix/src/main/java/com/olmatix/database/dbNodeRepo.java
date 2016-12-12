@@ -61,7 +61,7 @@ public class dbNodeRepo {
 
         long Id = db.insert(TABLE, null, values);
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDb: " + String.valueOf(KEY_NODE_ID));
+        Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
     }
 
@@ -78,7 +78,7 @@ public class dbNodeRepo {
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDb: " + String.valueOf(KEY_NODE_ID));
+        Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
 
         return (int) node_Id;
     }
@@ -145,7 +145,7 @@ public class dbNodeRepo {
                 String.valueOf(installedNodeModel.getNodesID())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateDb: " + String.valueOf(installedNodeModel.getNodesID()));
+        Log.d("DEBUG", "updateNode: " + String.valueOf(installedNodeModel.getNodesID()));
 
     }
 
@@ -166,7 +166,7 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getNode_id())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateDb: " + String.valueOf(detailNodeModel.getNode_id()));
+        Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()));
 
     }
 

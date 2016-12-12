@@ -457,6 +457,8 @@ public class OlmatixService extends Service {
             Toast.makeText(getApplicationContext(), "Status Add Successfully", Toast.LENGTH_LONG).show();
             message_topic.clear();
             Channel = "";
+            doSubscribeStatusIfOnline();
+
         }
         else {
             detailNodeModel.setNode_id(NodeID);
@@ -474,6 +476,8 @@ public class OlmatixService extends Service {
                 Toast.makeText(getApplicationContext(), "Add Status Successfully", Toast.LENGTH_LONG).show();
                 message_topic.clear();
                 Channel = "";
+                doSubscribeStatusIfOnline();
+
             }
         }
     }
@@ -537,6 +541,27 @@ public class OlmatixService extends Service {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.d("Subscribe", " device = " + NodeID);
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void doSubscribeStatusIfOnline(){
+        String topic = "devices/" + NodeID + "/light/"+Channel+"/set";
+        int qos = 1;
+        try {
+            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+            subToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.d("Subscribe", " status device = " + NodeID);
                 }
 
                 @Override

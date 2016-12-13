@@ -137,8 +137,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     @Override
     public void onPause() {
-        /*LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
-*/
+        /*LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);*/
         super.onPause();
     }
 

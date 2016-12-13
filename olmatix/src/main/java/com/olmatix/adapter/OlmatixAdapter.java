@@ -108,7 +108,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
             holder.upTime.setText("Uptime : " + calculateTime(seconds));
             holder.nodeid.setText(mInstalledNodeModel.getNodesID());
-            holder.lastAdd.setText(dateTimeAgo);
+            holder.lastAdd.setText("Updated : "+dateTimeAgo);
         }
     }
 

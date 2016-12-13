@@ -389,6 +389,8 @@ public class OlmatixService extends Service {
 
     private void addDetail(){
         String[] outputDevices = TopicID.split("/");
+        NodeID = outputDevices[1];
+
         Channel = outputDevices[3];
         message_topic.put("channel", mMessage);
         InsertChannel();
@@ -537,7 +539,7 @@ public class OlmatixService extends Service {
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
-        detailNodeModel.setStatus(messageReceive.get("channel"));
+        detailNodeModel.setStatus(message_topic.get("channel"));
 
         dbNodeRepo.update_detail(detailNodeModel);
         message_topic.clear();

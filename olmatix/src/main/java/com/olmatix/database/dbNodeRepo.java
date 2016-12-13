@@ -320,7 +320,7 @@ public class dbNodeRepo {
                 count++;
             }
             //here, count is records found
-            Log.d("hasObject", String.format("%d records found", count));
+            Log.d("hasObjectDetail", String.format("%d records found", count));
 
             //endregion
 

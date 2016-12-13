@@ -123,14 +123,17 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
             }
             if (message.equals("true")){
-                adapter.notifyDataSetChanged();
-                //adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
-                mRecycleView.setAdapter(adapter);
-
+                updatelist();
 
             }
         }
     };
+
+    private void updatelist (){
+        adapter.notifyDataSetChanged();
+        adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
+        mRecycleView.setAdapter(adapter);
+    }
 
     @Override
     public void onPause() {

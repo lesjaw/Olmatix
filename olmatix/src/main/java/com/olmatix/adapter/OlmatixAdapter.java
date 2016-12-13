@@ -23,6 +23,7 @@ import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
 
     public class OlmatixHolder extends RecyclerView.ViewHolder {
-        public TextView fwName, ipAddrs, upTime, siGnal, nodeid;
+        public TextView fwName, ipAddrs, upTime, siGnal, nodeid,lastAdd;
         public ImageView imgNode, imgStatus;
 
         public OlmatixHolder(View view) {
@@ -46,6 +47,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             siGnal      = (TextView) view.findViewById(R.id.signal);
             upTime      = (TextView) view.findViewById(R.id.uptime);
             nodeid      = (TextView) view.findViewById(R.id.nodeid);
+            lastAdd     = (TextView) view.findViewById(R.id.latestAdd);
         }
     }
 
@@ -102,8 +104,75 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         calculateTime(seconds);
         //Log.d("DEBUG", "onBindViewHolder: " + calculateTime(updSec));
 
+        String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
         holder.upTime.setText("Uptime : "+calculateTime(seconds));
         holder.nodeid.setText(mInstalledNodeModel.getNodesID());
+        holder.lastAdd.setText(dateTimeAgo);
+    }
+
+    private String timeAgo(long time_ago) {
+        long cur_time = (Calendar.getInstance().getTimeInMillis()) / 1000;
+        long time_elapsed = cur_time - time_ago;
+        long seconds = time_elapsed;
+        int minutes = Math.round(time_elapsed / 60);
+        int hours = Math.round(time_elapsed / 3600);
+        int days = Math.round(time_elapsed / 86400);
+        int weeks = Math.round(time_elapsed / 604800);
+        int months = Math.round(time_elapsed / 2600640);
+        int years = Math.round(time_elapsed / 31207680);
+
+        // Seconds
+        if (seconds <= 60) {
+            return "just now";
+        }
+        //Minutes
+        else if (minutes <= 60) {
+            if (minutes == 1) {
+                return "one minute ago";
+            } else {
+                return minutes + " minutes ago";
+            }
+        }
+        //Hours
+        else if (hours <= 24) {
+            if (hours == 1) {
+                return "an hour ago";
+            } else {
+                return hours + " hrs ago";
+            }
+        }
+        //Days
+        else if (days <= 7) {
+            if (days == 1) {
+                return "yesterday";
+            } else {
+                return days + " days ago";
+            }
+        }
+        //Weeks
+        else if (weeks <= 4.3) {
+            if (weeks == 1) {
+                return "a week ago";
+            } else {
+                return weeks + " weeks ago";
+            }
+        }
+        //Months
+        else if (months <= 12) {
+            if (months == 1) {
+                return "a month ago";
+            } else {
+                return months + " months ago";
+            }
+        }
+        //Years
+        else {
+            if (years == 1) {
+                return "one year ago";
+            } else {
+                return years + " years ago";
+            }
+        }
     }
 
     public static String calculateTime(long seconds) {

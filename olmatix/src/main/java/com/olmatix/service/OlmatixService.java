@@ -42,7 +42,10 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -513,6 +516,9 @@ public class OlmatixService extends Service {
                     installedNodeModel.setLocalip(messageReceive.get("localip"));
                     installedNodeModel.setFwName(messageReceive.get("fwname"));
                     installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
+                    Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
+
+                    installedNodeModel.setAdding(String.valueOf(currentDateTimeString));
                     installedNodeModel.setOnline(messageReceive.get("online"));
                     installedNodeModel.setSignal(messageReceive.get("signal"));
                     installedNodeModel.setUptime(messageReceive.get("uptime"));

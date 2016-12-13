@@ -5,6 +5,7 @@ package com.olmatix.adapter;
  */
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,8 +81,34 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         holder.fwName.setText(mInstalledNodeModel.getFwName());
         holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
         holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");
-        holder.upTime.setText("Uptime : "+mInstalledNodeModel.getUptime());
+        long seconds = Long.parseLong(mInstalledNodeModel.getUptime());
+        calculateTime(seconds);
+        //Log.d("DEBUG", "onBindViewHolder: " + calculateTime(updSec));
+
+        holder.upTime.setText("Uptime : "+calculateTime(seconds));
         holder.nodeid.setText(mInstalledNodeModel.getNodesID());
+    }
+
+    public static String calculateTime(long seconds) {
+        Log.d("DEBUG", "calculateTime: " + seconds);
+        long sec = seconds % 60;
+        long minutes = seconds % 3600 / 60;
+        long hours = seconds % 86400 / 3600;
+        long days = seconds / 86400;
+        String uptimeUpd;
+        if(days!= 0){
+            uptimeUpd = days + " D " + hours + " H";
+        } else if (hours != 0){
+            uptimeUpd = hours + " H " + minutes + " M";
+        } else if (minutes != 0){
+            uptimeUpd = minutes + " M " + sec + " s";
+        } else {
+            uptimeUpd = sec + " s" ;
+        }
+
+
+               // System.out.println(uptimeUpd);
+        return uptimeUpd;
     }
 
     @Override

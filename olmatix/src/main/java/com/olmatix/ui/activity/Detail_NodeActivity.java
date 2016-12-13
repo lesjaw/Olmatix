@@ -3,6 +3,7 @@ package com.olmatix.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.olmatix.adapter.NodeDetailAdapter;
+import com.olmatix.adapter.OlmatixAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 
@@ -25,7 +27,7 @@ public class Detail_NodeActivity extends AppCompatActivity {
     private RecyclerView mRecycleView;
     private RecyclerView.LayoutManager layoutManager;
     NodeDetailAdapter adapter;
-
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,7 +50,7 @@ public class Detail_NodeActivity extends AppCompatActivity {
 
     private void setupView() {
         mRecycleView    = (RecyclerView) findViewById(R.id.rv);
-
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         mRecycleView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -58,9 +60,23 @@ public class Detail_NodeActivity extends AppCompatActivity {
         adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id));
         mRecycleView.setAdapter(adapter);
 
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mSwipeRefreshLayout.setRefreshing(true);
+                setRefresh();
 
 
 
+            }
+        });
+
+    }
+    private void setRefresh() {
+
+        adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id));
+        mRecycleView.setAdapter(adapter);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override

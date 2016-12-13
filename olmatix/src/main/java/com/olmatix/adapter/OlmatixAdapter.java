@@ -104,10 +104,12 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         calculateTime(seconds);
         //Log.d("DEBUG", "onBindViewHolder: " + calculateTime(updSec));
 
-        String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
-        holder.upTime.setText("Uptime : "+calculateTime(seconds));
-        holder.nodeid.setText(mInstalledNodeModel.getNodesID());
-        holder.lastAdd.setText(dateTimeAgo);
+        if(mInstalledNodeModel.getAdding() != null) {
+            String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
+            holder.upTime.setText("Uptime : " + calculateTime(seconds));
+            holder.nodeid.setText(mInstalledNodeModel.getNodesID());
+            holder.lastAdd.setText(dateTimeAgo);
+        }
     }
 
     private String timeAgo(long time_ago) {

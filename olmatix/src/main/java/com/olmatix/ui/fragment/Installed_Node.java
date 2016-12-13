@@ -141,7 +141,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     @Override
     public void onResume() {
-      
+
         super.onResume();
     }
 

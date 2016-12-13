@@ -61,5 +61,6 @@
     <string name="installed_label">Installed Node</string>
     <string name="signal">100</string>
     <string name="deviceoffline">Your devices OFFLINE!</string>
+    <string name="latestAdding">Adding</string>
 
 </resources>

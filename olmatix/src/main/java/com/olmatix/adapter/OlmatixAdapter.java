@@ -4,15 +4,18 @@ package com.olmatix.adapter;
  * Created by Lesjaw on 04/12/2016.
  */
 
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
+import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.ui.fragment.Installed_Node;
@@ -26,6 +29,7 @@ import java.util.List;
 public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter {
 
     List<Installed_NodeModel> nodeList;
+    private final OnStartDragListener mDragStartListener;
 
 
 
@@ -45,8 +49,11 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         }
     }
 
-    public OlmatixAdapter(List<Installed_NodeModel> nodeList) {
+    public OlmatixAdapter(List<Installed_NodeModel> nodeList,OnStartDragListener dragStartListener) {
+
         this.nodeList = nodeList;
+        mDragStartListener = dragStartListener;
+
     }
 
 
@@ -60,7 +67,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     }
 
     @Override
-    public void onBindViewHolder(OlmatixHolder holder, int position) {
+    public void onBindViewHolder(final OlmatixHolder holder, int position) {
 
         final Installed_NodeModel mInstalledNodeModel = nodeList.get(position);
         if(mInstalledNodeModel.getOnline() != null) {
@@ -78,6 +85,16 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
                 holder.imgNode.setImageResource(R.mipmap.ic_adapter);
             }
         }
+
+        holder.imgStatus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                    mDragStartListener.onStartDrag(holder);
+                }
+                return false;
+            }
+        });
         holder.fwName.setText(mInstalledNodeModel.getFwName());
         holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
         holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");

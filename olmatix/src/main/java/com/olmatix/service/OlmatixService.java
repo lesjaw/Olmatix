@@ -457,7 +457,7 @@ public class OlmatixService extends Service {
     }
     private  void InsertChannel()
     {
-        if (dbNodeRepo.getNodeDetail().isEmpty()) {
+        if (dbNodeRepo.getNodeDetail().isEmpty() && !Channel.isEmpty()) {
             detailNodeModel.setNode_id(NodeID);
             detailNodeModel.setChannel(Channel);
             detailNodeModel.setStatus(message_topic.get("channel"));
@@ -536,7 +536,6 @@ public class OlmatixService extends Service {
         detailNodeModel.setStatus(messageReceive.get("channel"));
 
         dbNodeRepo.update_detail(detailNodeModel);
-        //flagExist = 0;
         message_topic.clear();
         Channel = "";
         sendMessage();

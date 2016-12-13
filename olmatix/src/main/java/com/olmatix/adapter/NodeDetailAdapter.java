@@ -81,7 +81,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
             @Override
             public void onClick(View view) {
                 if (Connection.getClient().isConnected()) {
-                    String topic = "devices/809ed5e0/light/0/set";
+                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/0/set";
                     String payload = "ON";
                     byte[] encodedPayload = new byte[0];
                     try {
@@ -103,7 +103,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
             @Override
             public void onClick(View view) {
                 if (Connection.getClient().isConnected()) {
-                    String topic = "devices/809ed5e0/light/0/set";
+                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/0/set";
                     String payload = "OFF";
                     byte[] encodedPayload = new byte[0];
                     try {

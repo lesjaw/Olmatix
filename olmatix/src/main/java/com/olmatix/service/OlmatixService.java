@@ -463,25 +463,28 @@ public class OlmatixService extends Service {
             detailNodeModel.setStatus(message_topic.get("channel"));
 
             dbNodeRepo.insertInstalledNode(detailNodeModel);
-            Toast.makeText(getApplicationContext(), "Status Add Successfully", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Status Add Successfully", Toast.LENGTH_SHORT).show();
             message_topic.clear();
             Channel = "";
 
         }
         else {
             detailNodeModel.setNode_id(NodeID);
-            if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
 
-                Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID + ", updating Node status", Toast.LENGTH_LONG).show();
+            if (dbNodeRepo.hasDetailObject(detailNodeModel) && !Channel.isEmpty()) {
+
+                Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID + ", updating Node status", Toast.LENGTH_SHORT).show();
                 saveDatabase_Detail();
+                Channel = "";
 
-            } else {
+            } else if(!Channel.isEmpty()){
+
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel(Channel);
                 detailNodeModel.setStatus(message_topic.get("channel"));
 
                 dbNodeRepo.insertInstalledNode(detailNodeModel);
-                Toast.makeText(getApplicationContext(), "Add Status Successfully", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Add Status Successfully", Toast.LENGTH_SHORT).show();
                 message_topic.clear();
                 Channel = "";
 

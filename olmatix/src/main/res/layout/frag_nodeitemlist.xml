@@ -68,6 +68,13 @@
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@+id/ipaddrs"
                 android:text="@string/signal"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/latestAdd"
+                android:layout_toRightOf="@+id/icon_node"
+                android:layout_below="@+id/signal"
+                android:text="@string/latestAdding"/>
 
             <TextView
                 android:layout_width="wrap_content"

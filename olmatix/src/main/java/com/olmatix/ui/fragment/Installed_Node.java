@@ -39,6 +39,7 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.ui.activity.Detail_NodeActivity;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -255,11 +256,16 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                     adapter.removeItem(position);
                 } else {
                     //removeView();
-                    etTopic.setText(data.get(position).getName());
+                    adapter.notifyDataSetChanged();
+
+                    Intent i= new Intent(getActivity(), Detail_NodeActivity.class);
+                    i.putExtra("node_id",data.get(position).getNodesID());
+                    startActivity(i);
+                   /* etTopic.setText(data.get(position).getName());
                     version.setText(data.get(position).getFwVersion());
                     icon_node.setImageResource(R.drawable.olmatixlogo);
                     alertDialog.show();
-
+*/
                 }
             }
 

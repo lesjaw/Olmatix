@@ -5,6 +5,8 @@
     android:layout_height="wrap_content"
     android:padding="5dp">
 
+
+
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,8 +23,8 @@
             android:padding="10dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:id="@+id/icon_node"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
@@ -64,7 +66,7 @@
 
 
             <Button
-                android:id="@+id/testBut2"
+                android:id="@+id/btn_off"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/status"
@@ -72,11 +74,11 @@
                 android:text="OFF" />
 
             <Button
-                android:id="@+id/testBut1"
+                android:id="@+id/btn_on"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/status"
-                android:layout_toLeftOf="@id/testBut2"
+                android:layout_toLeftOf="@id/btn_off"
                 android:text="ON" />
 
         </RelativeLayout>

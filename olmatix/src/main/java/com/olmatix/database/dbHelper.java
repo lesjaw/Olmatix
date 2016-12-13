@@ -47,6 +47,7 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
                 + dbNode.KEY_NODE_ID + " TEXT, "
                 + dbNode.KEY_CHANNEL + " TEXT, "
+                + dbNode.KEY_NICE_NAME + " TEXT, "
                 + dbNode.KEY_STATUS + " TEXT )";
 
 

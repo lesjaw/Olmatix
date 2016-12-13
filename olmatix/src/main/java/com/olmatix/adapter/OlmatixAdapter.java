@@ -58,8 +58,6 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
 
     }
 
-
-
     @Override
     public OlmatixHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())

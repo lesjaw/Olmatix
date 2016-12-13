@@ -303,11 +303,11 @@ public class dbNodeRepo {
 
     public boolean hasDetailObject(Detail_NodeModel detailNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =?";
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =? AND "+KEY_CHANNEL +" =?";
 
         // Add the String you are searching by here.
         // Put it in an array to avoid an unrecognized token error
-        Cursor cursor = db.rawQuery(selectString, new String[] {String.valueOf(detailNodeModel.getNode_id())});
+        Cursor cursor = db.rawQuery(selectString, new String[] {String.valueOf(detailNodeModel.getNode_id()),String.valueOf(detailNodeModel.getChannel()) });
 
         boolean hasObject = false;
         if(cursor.moveToFirst()){

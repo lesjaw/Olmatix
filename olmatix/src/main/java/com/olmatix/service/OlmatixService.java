@@ -470,8 +470,9 @@ public class OlmatixService extends Service {
         }
         else {
             detailNodeModel.setNode_id(NodeID);
+            detailNodeModel.setChannel(Channel);
 
-            if (dbNodeRepo.hasDetailObject(detailNodeModel) && !Channel.isEmpty()) {
+            if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
 
                 Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID + ", updating Node status", Toast.LENGTH_SHORT).show();
                 saveDatabase_Detail();

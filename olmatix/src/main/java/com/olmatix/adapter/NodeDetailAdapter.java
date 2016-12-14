@@ -91,7 +91,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
                         message.setQos(1);
                         message.setRetained(true);
                         Connection.getClient().publish(topic, message);
-                        holder.status.setText("true");
 
                     } catch (UnsupportedEncodingException | MqttException e) {
                         e.printStackTrace();
@@ -115,7 +114,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
                         message.setQos(1);
                         message.setRetained(true);
                         Connection.getClient().publish(topic, message);
-                        holder.status.setText("false");
 
                     } catch (UnsupportedEncodingException | MqttException e) {
                         e.printStackTrace();

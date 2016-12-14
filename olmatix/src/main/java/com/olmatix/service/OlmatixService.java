@@ -350,7 +350,6 @@ public class OlmatixService extends Service {
         return null;
     }
 
-
     private class MqttEventCallback implements MqttCallback  {
 
         @Override
@@ -468,6 +467,7 @@ public class OlmatixService extends Service {
             Toast.makeText(getApplicationContext(), "Status Add Successfully", Toast.LENGTH_SHORT).show();
             message_topic.clear();
             Channel = "";
+           // sendMessage();
 
         }
         else {
@@ -490,6 +490,7 @@ public class OlmatixService extends Service {
                 Toast.makeText(getApplicationContext(), "Add Status Successfully", Toast.LENGTH_SHORT).show();
                 message_topic.clear();
                 Channel = "";
+               // sendMessage();
 
             }
         }

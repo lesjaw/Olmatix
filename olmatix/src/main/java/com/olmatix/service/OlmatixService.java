@@ -463,6 +463,7 @@ public class OlmatixService extends Service {
 
             if (installedNodeModel.getFwName().equals("smartfitting")) {
                 detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel(Channel);
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();
                 } else {

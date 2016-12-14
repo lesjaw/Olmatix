@@ -483,10 +483,7 @@ public class OlmatixService extends Service {
                 }
             }
         }
-        for(int i=0; i<=dbNodeRepo.getNodeDetailID("80e149e0").size(); i++)
-        {
-            Toast.makeText(getApplicationContext(),detailNodeModel.getChannel(),Toast.LENGTH_LONG).show();
-        }
+      
     }
 
     private void statusDevices(){

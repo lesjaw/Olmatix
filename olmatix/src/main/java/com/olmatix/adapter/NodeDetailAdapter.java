@@ -70,11 +70,14 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
 
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
         if (mInstalledNodeModel.getName() != null) {
-
             holder.node_name.setText(mInstalledNodeModel.getName());
         }
         holder.upTime.setText(mInstalledNodeModel.getUptime());
-        holder.status.setText(mInstalledNodeModel.getStatus());
+        holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
+        if (mInstalledNodeModel.getStatus().equals("ON")){
+            holder.imgNode.setImageResource(R.mipmap.onlamp);
+
+        }else holder.imgNode.setImageResource(R.mipmap.offlamp);
 
         holder.btn_on.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,7 +102,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
 
             }
         });
-        Log.e("status",mInstalledNodeModel.getStatus());
+        //Log.e("status",mInstalledNodeModel.getStatus());
 
         holder.btn_off.setOnClickListener(new View.OnClickListener() {
             @Override

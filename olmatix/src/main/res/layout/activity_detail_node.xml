@@ -4,9 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-  >
-
-
+    >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -26,7 +24,8 @@
         android:id="@+id/rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:layout_marginTop="5sp"/>
+        android:layout_marginTop="5sp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

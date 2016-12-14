@@ -12,18 +12,12 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-
-import java.io.UnsupportedEncodingException;
 
 public class Favorite extends Fragment {
     @Override
@@ -68,54 +62,8 @@ public class Favorite extends Fragment {
                         .show();
             }
         });
-        Button nxtact1 = (Button) mFavourit.findViewById(R.id.testBut1);
-        nxtact1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Connection.getClient().isConnected()) {
-                    String topic = "devices/809ed5e0/light/0/set";
-                    String payload = "ON";
-                    byte[] encodedPayload = new byte[0];
-                    try {
-                        encodedPayload = payload.getBytes("UTF-8");
-                        MqttMessage message = new MqttMessage(encodedPayload);
-                        message.setQos(1);
-                        message.setRetained(true);
-                        Connection.getClient().publish(topic, message);
-                    } catch (UnsupportedEncodingException | MqttException e) {
-                        e.printStackTrace();
-                    }
-                } else
-                    Toast.makeText(getContext(), "Not connected to server", Toast.LENGTH_LONG).show();
-
-            }
-        });
-
-        Button  nxtact2 = (Button) mFavourit.findViewById(R.id.testBut2);
-        nxtact2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Connection.getClient().isConnected()) {
-                    String topic = "devices/809ed5e0/light/0/set";
-                    String payload = "OFF";
-                    byte[] encodedPayload = new byte[0];
-                    try {
-                        encodedPayload = payload.getBytes("UTF-8");
-                        MqttMessage message = new MqttMessage(encodedPayload);
-                        message.setQos(1);
-                        message.setRetained(true);
-                        Connection.getClient().publish(topic, message);
-                    } catch (UnsupportedEncodingException | MqttException e) {
-                        e.printStackTrace();
-                    }
-                } else
-                    Toast.makeText(getContext(), "Not connected to server", Toast.LENGTH_LONG).show();
-            }
-
-        });
 
 
-        ((TextView)mFavourit.findViewById(R.id.text)).setText("Lampu Kamar");
         return mFavourit;
     }
 }

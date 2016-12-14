@@ -390,7 +390,6 @@ public class OlmatixService extends Service {
     private void updateDetail(){
         String[] outputDevices = TopicID.split("/");
         NodeID = outputDevices[1];
-
         Channel = outputDevices[3];
         message_topic.put("channel", mMessage);
         saveDatabase_Detail();

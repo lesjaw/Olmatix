@@ -497,7 +497,7 @@ public class OlmatixService extends Service {
                 }
             }else if (installedNodeModel.getFwName().equals("smartsensordoor")) {
                 detailNodeModel.setNode_id(NodeID);
-                detailNodeModel.setChannel(Channel);
+                detailNodeModel.setChannel("0");
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();
                 } else {

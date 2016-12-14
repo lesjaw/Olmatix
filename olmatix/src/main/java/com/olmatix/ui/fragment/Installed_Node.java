@@ -133,6 +133,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private void updatelist (){
         adapter.notifyDataSetChanged();
+        data.clear();
+        data.addAll(dbNodeRepo.getNodeList());
+
         adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
     }
@@ -205,7 +208,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-
+        data.clear();
         data.addAll(dbNodeRepo.getNodeList());
         adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
@@ -232,6 +235,9 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     }
 
     private void setRefresh() {
+
+        data.clear();
+        data.addAll(dbNodeRepo.getNodeList());
 
         adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);

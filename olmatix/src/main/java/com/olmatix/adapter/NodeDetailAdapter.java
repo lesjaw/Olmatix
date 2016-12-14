@@ -99,6 +99,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
 
             }
         });
+        Log.e("status",mInstalledNodeModel.getStatus());
 
         holder.btn_off.setOnClickListener(new View.OnClickListener() {
             @Override

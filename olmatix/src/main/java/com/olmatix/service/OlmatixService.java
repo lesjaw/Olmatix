@@ -472,6 +472,7 @@ public class OlmatixService extends Service {
                     detailNodeModel.setStatus("false");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
+
                 }
 
             } else if (installedNodeModel.getFwName().equals("smartadapter4ch")){
@@ -491,6 +492,7 @@ public class OlmatixService extends Service {
                 }
             }
         }
+      
     }
 
     private void statusDevices(){

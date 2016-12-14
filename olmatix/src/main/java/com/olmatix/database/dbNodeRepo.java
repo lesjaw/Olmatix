@@ -76,8 +76,6 @@ public class dbNodeRepo {
         values.put(KEY_STATUS, nodeModel.getStatus());
         values.put(KEY_NICE_NAME, nodeModel.getNice_name());
 
-
-
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
         Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
@@ -89,15 +87,18 @@ public class dbNodeRepo {
      * SQL DELETE PROSES DATA BY ID
      * */
 
-    public void delete(String node_Id) {
+    public void deleteNode(String node_Id) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
         db.delete(TABLE, dbNode.KEY_NODE_ID + "= ?", new String[] {
                 String.valueOf(node_Id) });
+
+        db.delete(TABLE_NODE, dbNode.KEY_NODE_ID + "= ?", new String[] {
+                String.valueOf(node_Id) });
+
         db.close(); // Closing database connection
     }
-
 
     public void update(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

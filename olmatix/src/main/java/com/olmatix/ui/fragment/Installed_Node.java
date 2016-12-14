@@ -20,6 +20,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -71,7 +72,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     private Installed_NodeModel installedNodeModel;
     private String inputResult;
     int flagReceiver=0;
-
+    SwipeRefreshLayout mSwipeRefreshLayout;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -194,6 +195,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
+        mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
+
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
 
         mRecycleView.setHasFixedSize(true);
@@ -204,9 +207,19 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
 
         data.addAll(dbNodeRepo.getNodeList());
-
         adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mSwipeRefreshLayout.setRefreshing(true);
+                setRefresh();
+
+
+
+            }
+        });
+
 
         initSwipe();
 
@@ -216,6 +229,13 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
 
 
+    }
+
+    private void setRefresh() {
+
+        adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
+        mRecycleView.setAdapter(adapter);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     private void initDialog(){

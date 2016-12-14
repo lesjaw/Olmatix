@@ -43,7 +43,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/fw_name"
-                android:textAllCaps="true"
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@id/uptime"
                 android:layout_alignParentTop="true"

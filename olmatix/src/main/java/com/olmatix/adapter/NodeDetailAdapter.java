@@ -1,7 +1,6 @@
 package com.olmatix.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,8 +78,13 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
         if (mInstalledNodeModel.getName() != null) {
             holder.node_name.setText(mInstalledNodeModel.getName());
+            if (mInstalledNodeModel.getNice_name_d()!= null){
+                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+            }
         }
+
         holder.upTime.setText(mInstalledNodeModel.getUptime());
+
         holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
         if (mInstalledNodeModel.getStatus().equals("ON")){
             holder.imgNode.setImageResource(R.mipmap.onlamp);

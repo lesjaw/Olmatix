@@ -531,12 +531,17 @@ public class OlmatixService extends Service {
     }
 
     private void saveDatabase_Detail() {
+        String mStatus;
         Log.d("messageReceive ", "= " + mMessage);
         Log.d("messageReceive ", "= " + message_topic);
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
-        detailNodeModel.setStatus(mMessage);
+        if (mMessage.equals("true")) {
+            mStatus = "ON";
+        } else mStatus = "OFF";
+
+        detailNodeModel.setStatus(mStatus);
 
         dbNodeRepo.update_detail(detailNodeModel);
         message_topic.clear();

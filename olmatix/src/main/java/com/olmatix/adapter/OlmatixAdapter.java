@@ -231,7 +231,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     public void removeItem(int position) {
         //Installed_Node.dbNodeRepo.delete("809ed5e0");
         String inputResult;
-        Installed_Node.dbNodeRepo.delete(nodeList.get(position).getNodesID());
+        Installed_Node.dbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
         String topic = "devices/"+nodeList.get(position).getNodesID()+"/#";
         try {
             Connection.getClient().unsubscribe(topic);

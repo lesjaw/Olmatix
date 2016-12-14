@@ -463,21 +463,32 @@ public class OlmatixService extends Service {
             Log.d("addNodeDetail", "fw name, "+installedNodeModel.getFwName());
 
             if (installedNodeModel.getFwName().equals("smartfitting")) {
+
                 detailNodeModel.setNode_id(NodeID);
-                detailNodeModel.setChannel("0");
-                detailNodeModel.setStatus("false");
-
-                dbNodeRepo.insertInstalledNode(detailNodeModel);
-            } else if (installedNodeModel.getFwName().equals("smartadapter4ch")){
-
-                for (int i=0;i<4;i++){
-                    String a = String.valueOf(i);
-
+                if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
+                    saveDatabase_Detail();
+                } else {
                     detailNodeModel.setNode_id(NodeID);
-                    detailNodeModel.setChannel(a);
+                    detailNodeModel.setChannel("0");
                     detailNodeModel.setStatus("false");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
+                }
+
+            } else if (installedNodeModel.getFwName().equals("smartadapter4ch")){
+                detailNodeModel.setNode_id(NodeID);
+                if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
+                    saveDatabase_Detail();
+                    }else {
+                    for (int i = 0; i < 4; i++) {
+                        String a = String.valueOf(i);
+
+                        detailNodeModel.setNode_id(NodeID);
+                        detailNodeModel.setChannel(a);
+                        detailNodeModel.setStatus("false");
+
+                        dbNodeRepo.insertInstalledNode(detailNodeModel);
+                    }
                 }
             }
         }
@@ -511,7 +522,6 @@ public class OlmatixService extends Service {
                     if(installedNodeModel.getFwName() != null) {
                         addNodeDetail();
                     }
-
                     installedNodeModel.setOnline(messageReceive.get("online"));
                     installedNodeModel.setSignal(messageReceive.get("signal"));
                     installedNodeModel.setUptime(messageReceive.get("uptime"));

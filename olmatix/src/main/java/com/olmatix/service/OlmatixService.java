@@ -531,8 +531,6 @@ public class OlmatixService extends Service {
 
     private void saveDatabase_Detail() {
         String mStatus;
-        Log.d("messageReceive ", "= " + mMessage);
-        Log.d("messageReceive ", "= " + message_topic);
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);

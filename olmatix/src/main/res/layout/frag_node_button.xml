@@ -49,8 +49,10 @@
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@id/uptime"
                 android:layout_alignParentTop="true"
-                android:textSize="20sp"
+                android:textSize="19sp"
                 android:text="Node Name"
+                android:textStyle="bold|italic"
+
                 />
 
 

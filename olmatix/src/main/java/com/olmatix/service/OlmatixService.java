@@ -393,8 +393,7 @@ public class OlmatixService extends Service {
 
         Channel = outputDevices[3];
         message_topic.put("channel", mMessage);
-        statusDevices();
-
+        saveDatabase_Detail();
 
     }
 
@@ -429,8 +428,6 @@ public class OlmatixService extends Service {
                 installedNodeModel.setNodes(messageReceive.get("online"));
                 Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
                 installedNodeModel.setAdding(String.valueOf(currentDateTimeString));
-                installedNodeModel.setFwName(messageReceive.get("fwname"));
-
 
                 dbNodeRepo.insertDb(installedNodeModel);
                 Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
@@ -452,8 +449,6 @@ public class OlmatixService extends Service {
                     installedNodeModel.setNodes(messageReceive.get("online"));
                     Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
                     installedNodeModel.setAdding(String.valueOf(currentDateTimeString));
-                    installedNodeModel.setFwName(messageReceive.get("fwname"));
-
 
                     dbNodeRepo.insertDb(installedNodeModel);
                     Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
@@ -464,26 +459,27 @@ public class OlmatixService extends Service {
             }
     }
     private  void addNodeDetail() {
-        Log.d("addNodeDetail", "Add Node success, "+installedNodeModel.getFwName());
-
         if(installedNodeModel.getFwName() != null) {
+            Log.d("addNodeDetail", "fw name, "+installedNodeModel.getFwName());
 
             if (installedNodeModel.getFwName().equals("smartfitting")) {
                 detailNodeModel.setNode_id(NodeID);
-                detailNodeModel.setChannel(Channel);
-                detailNodeModel.setStatus(message_topic.get("channel"));
+                detailNodeModel.setChannel("0");
+                detailNodeModel.setStatus("false");
 
                 dbNodeRepo.insertInstalledNode(detailNodeModel);
             } else if (installedNodeModel.getFwName().equals("smartadapter4ch")){
-                for (int i=0;i>3;i++){
+                Log.d("executed", "4 time: ");
+
+                for (int i=0;i<4;i++){
                     String a = String.valueOf(i);
                     Log.d("A", "addNodeDetail: "+a);
 
-                    /*detailNodeModel.setNode_id(NodeID);
-                    detailNodeModel.setChannel(Channel);
-                    detailNodeModel.setStatus(message_topic.get("channel"));
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel(a);
+                    detailNodeModel.setStatus("false");
 
-                    dbNodeRepo.insertInstalledNode(detailNodeModel);*/
+                    dbNodeRepo.insertInstalledNode(detailNodeModel);
                 }
             }
         }
@@ -514,6 +510,10 @@ public class OlmatixService extends Service {
                     installedNodeModel.setLocalip(messageReceive.get("localip"));
                     installedNodeModel.setFwName(messageReceive.get("fwname"));
                     installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
+                    if(installedNodeModel.getFwName() != null) {
+                        addNodeDetail();
+                    }
+
                     installedNodeModel.setOnline(messageReceive.get("online"));
                     installedNodeModel.setSignal(messageReceive.get("signal"));
                     installedNodeModel.setUptime(messageReceive.get("uptime"));
@@ -524,7 +524,6 @@ public class OlmatixService extends Service {
                 dbNodeRepo.update(installedNodeModel);
                 messageReceive.clear();
                 sendMessage();
-                addNodeDetail();
 
 
     }

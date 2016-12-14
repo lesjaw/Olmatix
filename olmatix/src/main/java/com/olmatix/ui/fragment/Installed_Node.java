@@ -284,7 +284,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
+                final int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT){
                     adapter.removeItem(position);
@@ -304,6 +304,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String nice_name = input.getText().toString();
+                            installedNodeModel.setNodesID(data.get(position).getNodesID());
                             installedNodeModel.setNiceName(nice_name);
                             dbNodeRepo.update(installedNodeModel);
                             Toast.makeText(getActivity(),"Successfully Inserted",Toast.LENGTH_LONG).show();

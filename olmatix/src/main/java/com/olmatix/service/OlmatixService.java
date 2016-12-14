@@ -469,11 +469,9 @@ public class OlmatixService extends Service {
 
                 dbNodeRepo.insertInstalledNode(detailNodeModel);
             } else if (installedNodeModel.getFwName().equals("smartadapter4ch")){
-                Log.d("executed", "4 time: ");
 
                 for (int i=0;i<4;i++){
                     String a = String.valueOf(i);
-                    Log.d("A", "addNodeDetail: "+a);
 
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel(a);

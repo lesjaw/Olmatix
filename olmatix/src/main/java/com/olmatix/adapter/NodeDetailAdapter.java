@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Detail_NodeModel;
@@ -66,7 +65,9 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
     }
 
     @Override
-    public void onBindViewHolder(final OlmatixHolder holder, int position) {
+    public void onBindViewHolder(final OlmatixHolder holder, final int position) {
+        final int pos = position;
+        Log.d("pos", "onBindViewHolder: "+pos);
 
         final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
 
@@ -82,7 +83,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
             @Override
             public void onClick(View view) {
                 if (Connection.getClient().isConnected()) {
-                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+mInstalledNodeModel.getChannel()+"/set";
+                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+String.valueOf(pos)+"/set";
                     String payload = "ON";
                     byte[] encodedPayload = new byte[0];
                     try {
@@ -91,7 +92,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
                         message.setQos(1);
                         message.setRetained(true);
                         Connection.getClient().publish(topic, message);
-                        holder.status.setText("true");
+                        holder.status.setText("ON");
 
                     } catch (UnsupportedEncodingException | MqttException e) {
                         e.printStackTrace();
@@ -106,7 +107,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
             @Override
             public void onClick(View view) {
                 if (Connection.getClient().isConnected()) {
-                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+mInstalledNodeModel.getChannel()+"/set";
+                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+String.valueOf(pos)+"/set";
                     String payload = "OFF";
                     byte[] encodedPayload = new byte[0];
                     try {
@@ -115,7 +116,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
                         message.setQos(1);
                         message.setRetained(true);
                         Connection.getClient().publish(topic, message);
-                        holder.status.setText("false");
+                        holder.status.setText("OFF");
 
                     } catch (UnsupportedEncodingException | MqttException e) {
                         e.printStackTrace();

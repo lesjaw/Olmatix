@@ -306,9 +306,11 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
                         public void onClick(DialogInterface dialog, int which) {
                             String nice_name = input.getText().toString();
                             installedNodeModel.setNodesID(data.get(position).getNodesID());
-                            installedNodeModel.setNiceName(nice_name);
+                            installedNodeModel.setNice_name_n(nice_name);
                             dbNodeRepo.update(installedNodeModel);
                             Toast.makeText(getActivity(),"Successfully Inserted",Toast.LENGTH_LONG).show();
+                            setRefresh();
+
                         }
                     });
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

@@ -15,7 +15,7 @@ public class dbNode {
     public static final String KEY_NODE_ID      = "node_id";
     public static final String KEY_NODES        = "nodes";
     public static final String KEY_NAME         = "name";
-    public static final String KEY_NICE_NAME    = "nice_name"; //this name will be from user input
+    public static final String KEY_NICE_NAME_N    = "nice_name_n"; //this name will be from user input
     public static final String KEY_LOCALIP      = "localip";
     public static final String KEY_FWNAME       = "fwname";
     public static final String KEY_FWVERSION    = "fwversion";
@@ -26,15 +26,18 @@ public class dbNode {
     public static final String KEY_UPTIME       = "uptime";
     public static final String KEY_RESET        = "reset";
     public static final String KEY_OTA          = "ota";
-    public static final String KEY_STATUS       =  "status";
-    public static final String KEY_CHANNEL      =   "channel";
+    public static final String KEY_STATUS       = "status";
+    public static final String KEY_CHANNEL      = "channel";
+    public static final String KEY_NICE_NAME_D    = "nice_name_d"; //this name will be from user input
+
 
     // property help us to keep data
     public int id;
     public String node_id;
     public String nodes;
     public String name;
-    public String nice_name;
+    public String nice_name_n;
+    public String nice_name_d;
     public String localip;
     public String fwname;
     public String fwversion;

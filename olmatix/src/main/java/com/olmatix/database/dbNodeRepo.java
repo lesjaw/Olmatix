@@ -22,7 +22,8 @@ import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
 import static com.olmatix.database.dbNode.KEY_NAME;
-import static com.olmatix.database.dbNode.KEY_NICE_NAME;
+import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
+import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
 import static com.olmatix.database.dbNode.KEY_NODES;
 import static com.olmatix.database.dbNode.KEY_NODE_ID;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
@@ -47,7 +48,7 @@ public class dbNodeRepo {
         values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
         values.put(KEY_NODES, installedNodeModel.getNodes());
         values.put(KEY_NAME, installedNodeModel.getName());
-        values.put(KEY_NICE_NAME, installedNodeModel.getNiceName());
+        values.put(KEY_NICE_NAME_N, installedNodeModel.getNice_name_n());
         values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
         values.put(KEY_FWNAME, installedNodeModel.getFwName());
         values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
@@ -74,7 +75,7 @@ public class dbNodeRepo {
         values.put(KEY_NODE_ID,nodeModel.getNode_id());
         values.put(KEY_CHANNEL, nodeModel.getChannel());
         values.put(KEY_STATUS, nodeModel.getStatus());
-        values.put(KEY_NICE_NAME, nodeModel.getNice_name());
+        values.put(KEY_NICE_NAME_D, nodeModel.getNice_name_d());
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
@@ -111,8 +112,8 @@ public class dbNodeRepo {
         if (installedNodeModel.getName()!=null) {
             values.put(KEY_NAME, installedNodeModel.getName());
         }
-        if (installedNodeModel.getNiceName()!=null) {
-            values.put(KEY_NICE_NAME, installedNodeModel.getNiceName());
+        if (installedNodeModel.getNice_name_n()!=null) {
+            values.put(KEY_NICE_NAME_N, installedNodeModel.getNice_name_n());
         }
         if (installedNodeModel.getLocalip()!=null) {
             values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
@@ -164,8 +165,8 @@ public class dbNodeRepo {
         if (detailNodeModel.getStatus()!=null) {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
         }
-        if (detailNodeModel.getNice_name()!=null) {
-            values.put(KEY_NICE_NAME, detailNodeModel.getNice_name());
+        if (detailNodeModel.getNice_name_d()!=null) {
+            values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
@@ -193,6 +194,7 @@ public class dbNodeRepo {
                 node.setNodesID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNodes( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
                 node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setNice_name_n( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_N)));
                 node.setLocalip( cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
                 node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
                 node.setFwVersion( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
@@ -228,7 +230,7 @@ public class dbNodeRepo {
                 node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
-                node.setNice_name( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME)));
+                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
 
                 nodeList.add(node);
 
@@ -257,7 +259,7 @@ public class dbNodeRepo {
                 node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
-                node.setNice_name( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME)));
+                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
                 node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
 

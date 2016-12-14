@@ -4,8 +4,6 @@ package com.olmatix.adapter;
  * Created by Lesjaw on 04/12/2016.
  */
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,7 +18,6 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Installed_NodeModel;
-import com.olmatix.ui.activity.Detail_NodeActivity;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
@@ -114,7 +111,14 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
                 return false;
             }
         });
-        holder.fwName.setText(mInstalledNodeModel.getFwName());
+
+        Log.d("Nice Name", "onBindViewHolder: "+mInstalledNodeModel.getNice_name_n()+" : " +mInstalledNodeModel.getFwName());
+
+
+        if(mInstalledNodeModel.getNice_name_n() != null) {
+            holder.fwName.setText(mInstalledNodeModel.getNice_name_n());
+        } else holder.fwName.setText(mInstalledNodeModel.getFwName());
+
         holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
         holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");
         if (mInstalledNodeModel.getUptime()!=null) {
@@ -123,7 +127,6 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             holder.upTime.setText("Uptime : " + calculateTime(seconds));
 
         }
-
 
         if(mInstalledNodeModel.getAdding() != null) {
             //String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
@@ -202,7 +205,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     }
 
     public static String calculateTime(long seconds) {
-        Log.d("DEBUG", "calculateTime: " + seconds);
+        //Log.d("DEBUG", "calculateTime: " + seconds);
         long sec = seconds % 60;
         long minutes = seconds % 3600 / 60;
         long hours = seconds % 86400 / 3600;

@@ -462,7 +462,6 @@ public class OlmatixService extends Service {
             Log.d("addNodeDetail", "fwname, "+installedNodeModel.getFwName());
 
             if (installedNodeModel.getFwName().equals("smartfitting")) {
-
                 detailNodeModel.setNode_id(NodeID);
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();

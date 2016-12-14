@@ -10,7 +10,7 @@ public class Detail_NodeModel {
     private String node_id;
     private String channel;
     private String status;
-    private String nice_name;
+    private String nice_name_d;
     private String uptime;
     private String name;
 
@@ -47,12 +47,12 @@ public class Detail_NodeModel {
         this.status = status;
     }
 
-    public String getNice_name() {
-        return nice_name;
+    public String getNice_name_d() {
+        return nice_name_d;
     }
 
-    public void setNice_name(String nice_name) {
-        this.nice_name = nice_name;
+    public void setNice_name_d(String nice_name_d) {
+        this.nice_name_d = nice_name_d;
     }
 
     public String getUptime() {

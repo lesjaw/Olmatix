@@ -13,7 +13,7 @@ public class Installed_NodeModel {
     private String node_id;
     private String nodes;
     private String name;
-    private String nice_name;
+    private String nice_name_n;
     private String localip;
     private String fwName;
     private String fwVersion;
@@ -28,14 +28,14 @@ public class Installed_NodeModel {
     public Installed_NodeModel() {
     }
 
-    public Installed_NodeModel(String node_id, String nodes, String name, String nice_name, String localip, String fwName,
+    public Installed_NodeModel(String node_id, String nodes, String name, String nice_name_n, String localip, String fwName,
                                String fwVersion, String icon, String adding, String online, String signal, String uptime,
                                String reset, String ota) {
 
         this.node_id = node_id;
         this.nodes = nodes;
         this.name = name;
-        this.nice_name = nice_name;
+        this.nice_name_n = nice_name_n;
         this.localip = localip;
         this.fwName = fwName;
         this.fwVersion = fwVersion;
@@ -82,12 +82,12 @@ public class Installed_NodeModel {
         this.name = name;
     }
 
-    public String getNiceName() {
-        return nice_name;
+    public String getNice_name_n() {
+        return nice_name_n;
     }
 
-    public void setNiceName(String niceName) {
-        this.nice_name = niceName;
+    public void setNice_name_n(String nice_name_n) {
+        this.nice_name_n = nice_name_n;
     }
 
     public String getLocalip() {

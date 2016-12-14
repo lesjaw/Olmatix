@@ -292,13 +292,13 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
                     //removeView();
                     adapter.notifyDataSetChanged();
 
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setTitle("Create Nice Name");
+                    builder.setTitle("Rename Node");
 
                     final EditText input = new EditText(getActivity());
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
+                    input.setText(installedNodeModel.getNice_name_n());
 
                     builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override

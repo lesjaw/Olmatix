@@ -192,7 +192,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
 
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(Detail_NodeActivity.this);
-                    builder.setTitle("Create Nice Name");
+                    builder.setTitle("Rename Node detail");
 
                     final EditText input = new EditText(Detail_NodeActivity.this);
                     input.setInputType(InputType.TYPE_CLASS_TEXT);

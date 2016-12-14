@@ -72,7 +72,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
 
     @Override
     public void onBindViewHolder(final OlmatixHolder holder, final int position) {
-        final int pos = position;
+        //final int pos = position;
         final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
 
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
@@ -86,11 +86,14 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
         holder.upTime.setText(mInstalledNodeModel.getUptime());
 
         holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
-        if (mInstalledNodeModel.getStatus().equals("ON")){
+        if (mInstalledNodeModel.getStatus().equals("true")){
             holder.imgNode.setImageResource(R.mipmap.onlamp);
+            holder.status.setText("Status : "+"ON");
 
-        }else holder.imgNode.setImageResource(R.mipmap.offlamp);
-
+        }else {
+            holder.imgNode.setImageResource(R.mipmap.offlamp);
+            holder.status.setText("Status : " + "OFF");
+        }
         holder.btn_on.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

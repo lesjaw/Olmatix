@@ -501,13 +501,19 @@ public class OlmatixService extends Service {
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();
                 } else {
-                    for (int i = 0; i < 3; i++) {
-                        String a = String.valueOf(i);
-                        detailNodeModel.setNode_id(NodeID);
-                        detailNodeModel.setChannel("0");
-                        detailNodeModel.setStatus("false");
+                    for (int i = 0; i < 2; i++) {
+                        String a = "";
+                        if (i==0) {
+                            a = "0";
+                        }else if (i==1){
+                            a = "door";
+                        }
+                            detailNodeModel.setNode_id(NodeID);
+                            detailNodeModel.setChannel(a);
+                            detailNodeModel.setStatus("false");
 
-                        dbNodeRepo.insertInstalledNode(detailNodeModel);
+                            dbNodeRepo.insertInstalledNode(detailNodeModel);
+
                     }
                 }
             }
@@ -555,11 +561,13 @@ public class OlmatixService extends Service {
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
+/*
         if (mMessage.equals("true")) {
             mStatus = "ON";
         } else mStatus = "OFF";
+*/
 
-        detailNodeModel.setStatus(mStatus);
+        detailNodeModel.setStatus(mMessage);
 
         dbNodeRepo.update_detail(detailNodeModel);
         message_topic.clear();

@@ -49,10 +49,8 @@
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@id/uptime"
                 android:layout_alignParentTop="true"
-                android:textSize="19sp"
+                android:textSize="20sp"
                 android:text="Node Name"
-                android:textStyle="bold|italic"
-
                 />
 
 
@@ -64,7 +62,23 @@
                 android:layout_below="@+id/node_name"
                 android:text="Status"
                 />
-            
+
+
+            <Button
+                android:id="@+id/btn_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/status"
+                android:layout_alignParentRight="true"
+                android:text="OFF" />
+
+            <Button
+                android:id="@+id/btn_on"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/status"
+                android:layout_toLeftOf="@id/btn_off"
+                android:text="ON" />
 
         </RelativeLayout>
 

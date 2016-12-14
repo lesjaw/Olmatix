@@ -21,14 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/label_detail"
-        android:text="Node Detail of "
-        android:textSize="20sp"
-        android:paddingBottom="10sp"
-        android:paddingLeft="5sp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -36,9 +28,10 @@
         android:id="@+id/label_node"
         android:text="Node Detail"
         android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingTop="10sp"
         android:paddingBottom="10sp"
-        android:paddingLeft="5sp"
-        android:layout_toRightOf="@+id/label_detail"/>
+        android:paddingLeft="5sp"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -50,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="5sp"
-        android:paddingTop="30sp"
+        android:paddingTop="40sp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         />

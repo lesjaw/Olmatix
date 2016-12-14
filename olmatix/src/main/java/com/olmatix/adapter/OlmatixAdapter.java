@@ -6,7 +6,6 @@ package com.olmatix.adapter;
 
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -97,11 +96,12 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         if(mInstalledNodeModel.getFwName() != null) {
             if (mInstalledNodeModel.getFwName().equals("smartfitting")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_light);
-            } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")){
+            } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_adapter);
+            } else if (mInstalledNodeModel.getFwName().equals("smartsensordoor")) {
+                holder.imgNode.setImageResource(R.mipmap.door);
             }
         }
-
         holder.imgStatus.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -111,8 +111,6 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
                 return false;
             }
         });
-
-        Log.d("Nice Name", "onBindViewHolder: "+mInstalledNodeModel.getNice_name_n()+" : " +mInstalledNodeModel.getFwName());
 
 
         if(mInstalledNodeModel.getNice_name_n() != null) {

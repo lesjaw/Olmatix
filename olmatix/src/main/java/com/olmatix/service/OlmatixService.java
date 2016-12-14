@@ -215,8 +215,8 @@ public class OlmatixService extends Service {
         String mPassword = sharedPref.getString("password", "olmatix");
 
         final MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName("olmatix");
-        options.setPassword("olmatix".toCharArray());
+        options.setUserName(mUserName);
+        options.setPassword(mPassword.toCharArray());
         final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId, new MemoryPersistence());
         options.setCleanSession(false);
         String topic = "status/"+deviceId+"/$online";
@@ -458,12 +458,16 @@ public class OlmatixService extends Service {
             }
     }
     private  void addNodeDetail() {
+        Log.d("messageReceiveDetail ", "= " + message_topic);
+
         if(installedNodeModel.getFwName() != null) {
             Log.d("addNodeDetail", "fwname, "+installedNodeModel.getFwName());
 
             if (installedNodeModel.getFwName().equals("smartfitting")) {
                 detailNodeModel.setNode_id(NodeID);
-                detailNodeModel.setChannel(Channel);
+                detailNodeModel.setChannel("0");
+                Log.d("addNodeDetail", "NodeID, "+NodeID + ", channel, "+Channel);
+
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();
                 } else {
@@ -477,6 +481,7 @@ public class OlmatixService extends Service {
 
             } else if (installedNodeModel.getFwName().equals("smartadapter4ch")){
                 detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel("0");
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();
                     }else {
@@ -490,9 +495,24 @@ public class OlmatixService extends Service {
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
                     }
                 }
+            }else if (installedNodeModel.getFwName().equals("smartsensordoor")) {
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel(Channel);
+                if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
+                    saveDatabase_Detail();
+                } else {
+                    for (int i = 0; i < 3; i++) {
+                        String a = String.valueOf(i);
+                        detailNodeModel.setNode_id(NodeID);
+                        detailNodeModel.setChannel("0");
+                        detailNodeModel.setStatus("false");
+
+                        dbNodeRepo.insertInstalledNode(detailNodeModel);
+                    }
+                }
             }
         }
-      
+
     }
 
     private void statusDevices(){

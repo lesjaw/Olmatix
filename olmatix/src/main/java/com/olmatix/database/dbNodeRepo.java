@@ -174,7 +174,7 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getChannel())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) + String.valueOf(detailNodeModel.getNice_name_d()));
+        Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+ String.valueOf(detailNodeModel.getChannel()));
 
     }
 
@@ -311,7 +311,9 @@ public class dbNodeRepo {
 
         // Add the String you are searching by here.
         // Put it in an array to avoid an unrecognized token error
-        Cursor cursor = db.rawQuery(selectString, new String[] {String.valueOf(detailNodeModel.getNode_id()),String.valueOf(detailNodeModel.getChannel()) });
+        Cursor cursor = db.rawQuery(selectString, new String[] {
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel()) });
 
         boolean hasObject = false;
         if(cursor.moveToFirst()){

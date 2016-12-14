@@ -197,8 +197,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
                         public void onClick(DialogInterface dialog, int which) {
                             String nice_name = input.getText().toString();
                             detailNodeModel.setNode_id(data.get(position).getNode_id());
-                            detailNodeModel.setNode_id(data.get(position).getChannel());
-
+                            detailNodeModel.setChannel(data.get(position).getChannel());
                             detailNodeModel.setNice_name_d(nice_name);
                             dbNodeRepo.update_detail(detailNodeModel);
                             Toast.makeText(getApplicationContext(),"Successfully Inserted",Toast.LENGTH_LONG).show();

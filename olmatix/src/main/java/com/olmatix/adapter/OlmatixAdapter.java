@@ -16,15 +16,17 @@ import android.widget.TextView;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
-import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter {
@@ -98,15 +100,21 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         holder.fwName.setText(mInstalledNodeModel.getFwName());
         holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
         holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");
-        long seconds = Long.parseLong(mInstalledNodeModel.getUptime());
-        calculateTime(seconds);
-        //Log.d("DEBUG", "onBindViewHolder: " + calculateTime(updSec));
+        if (mInstalledNodeModel.getUptime()!=null) {
+            long seconds = Long.parseLong(mInstalledNodeModel.getUptime());
+            calculateTime(seconds);
+            holder.upTime.setText("Uptime : " + calculateTime(seconds));
+
+        }
+
 
         if(mInstalledNodeModel.getAdding() != null) {
-            String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
-            holder.upTime.setText("Uptime : " + calculateTime(seconds));
+            //String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
+            long yourmilliseconds = Long.parseLong(mInstalledNodeModel.getAdding());
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+            Date resultdate = new Date(yourmilliseconds);
             holder.nodeid.setText(mInstalledNodeModel.getNodesID());
-            holder.lastAdd.setText("Updated : "+dateTimeAgo);
+            holder.lastAdd.setText(sdf.format(resultdate));
         }
     }
 
@@ -183,13 +191,13 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
         long days = seconds / 86400;
         String uptimeUpd;
         if(days!= 0){
-            uptimeUpd = days + " D " + hours + " H";
+            uptimeUpd = days + "d " + hours + "h";
         } else if (hours != 0){
-            uptimeUpd = hours + " H " + minutes + " M";
+            uptimeUpd = hours + "h " + minutes + "m";
         } else if (minutes != 0){
-            uptimeUpd = minutes + " M " + sec + " s";
+            uptimeUpd = minutes + "m " + sec + "s";
         } else {
-            uptimeUpd = sec + " s" ;
+            uptimeUpd = sec + "s" ;
         }
 
 

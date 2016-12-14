@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.NodeDetailAdapter;
@@ -45,7 +46,7 @@ import java.util.ArrayList;
 public class Detail_NodeActivity extends AppCompatActivity implements OnStartDragListener {
 
     dbNodeRepo dbNodeRepo;
-    String node_id;
+    String node_id,node_name;
     private RecyclerView mRecycleView;
     private RecyclerView.LayoutManager layoutManager;
     NodeDetailAdapter adapter;
@@ -53,6 +54,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     private ItemTouchHelper mItemTouchHelper;
     private Detail_NodeModel detailNodeModel;
     private Paint p = new Paint();
+    private TextView label_node;
 
     private static ArrayList<Detail_NodeModel> data;
 
@@ -65,6 +67,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
 
         Intent i = getIntent();
         node_id = i.getStringExtra("node_id");
+        node_name = i.getStringExtra("node_name");
         data = new ArrayList<>();
         dbNodeRepo =new dbNodeRepo(getApplicationContext());
         detailNodeModel = new Detail_NodeModel();
@@ -79,6 +82,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     }
 
     private void setupView() {
+        label_node = (TextView) findViewById(R.id.label_node);
         mRecycleView    = (RecyclerView) findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         mRecycleView.setHasFixedSize(true);
@@ -106,6 +110,8 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
+
+        label_node.setText(node_name);
 
     }
     private void setRefresh() {

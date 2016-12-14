@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.olmatix.helper.ItemTouchHelperAdapter;
+import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.utils.Connection;
@@ -17,16 +19,19 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by android on 12/13/2016.
  */
 
-public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.OlmatixHolder>
+public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.OlmatixHolder> implements ItemTouchHelperAdapter
 {
 
     List<Detail_NodeModel> nodeList;
+    private final OnStartDragListener mDragStartListener;
+
 
 
     public class OlmatixHolder extends RecyclerView.ViewHolder {
@@ -46,9 +51,11 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
         }
     }
 
-    public NodeDetailAdapter(List<Detail_NodeModel> nodeList) {
+    public NodeDetailAdapter(List<Detail_NodeModel> nodeList,OnStartDragListener dragStartListener) {
 
         this.nodeList = nodeList;
+        mDragStartListener = dragStartListener;
+
 
     }
     @Override
@@ -132,5 +139,17 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
 
 
     }
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        Collections.swap(nodeList, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+        @Override
+    public void onItemDismiss(int position) {
+
+    }
+
 
 }

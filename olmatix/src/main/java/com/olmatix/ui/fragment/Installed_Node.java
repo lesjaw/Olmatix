@@ -76,6 +76,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
     private String inputResult;
     int flagReceiver=0;
     SwipeRefreshLayout mSwipeRefreshLayout;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

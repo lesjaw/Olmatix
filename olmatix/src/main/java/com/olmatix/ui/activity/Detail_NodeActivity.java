@@ -1,14 +1,19 @@
 package com.olmatix.ui.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.olmatix.adapter.NodeDetailAdapter;
@@ -28,6 +33,7 @@ public class Detail_NodeActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     NodeDetailAdapter adapter;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    int flagReceiver=0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,6 +84,46 @@ public class Detail_NodeActivity extends AppCompatActivity {
         mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }
+
+    @Override
+    public void onStart() {
+
+        if (flagReceiver==0) {
+            /*Intent i = new Intent(getActivity(), OlmatixService.class);
+            getActivity().startService(i);*/
+
+            LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
+                    mMessageReceiver, new IntentFilter("MQTTStatus"));
+            Log.d("Receiver ", "Installed_Node = Starting..");
+            flagReceiver = 1;
+        }
+        super.onStart();
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("NotifyChange");
+            //Log.d("receiver", "NotifyChange : " + message);
+            if (message==null){
+                message = "false";
+
+            }
+            if (message.equals("true")){
+                updatelist();
+
+            }
+        }
+    };
+
+    private void updatelist (){
+        adapter.notifyDataSetChanged();
+        adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id));
+        mRecycleView.setAdapter(adapter);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

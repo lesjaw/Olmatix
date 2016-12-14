@@ -479,8 +479,13 @@ public class OlmatixService extends Service {
                     detailNodeModel.setStatus("false");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
+
                 }
             }
+        }
+        for(int i=0; i<=dbNodeRepo.getNodeDetailID("80e149e0").size(); i++)
+        {
+            Toast.makeText(getApplicationContext(),detailNodeModel.getChannel(),Toast.LENGTH_LONG).show();
         }
     }
 

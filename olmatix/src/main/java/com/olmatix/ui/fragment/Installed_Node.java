@@ -26,6 +26,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -41,6 +43,7 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.Detail_NodeActivity;
+import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -52,7 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class Installed_Node extends Fragment implements OnStartDragListener {
+public class Installed_Node extends Fragment implements OnStartDragListener, ClickListener {
 
     private View mView;
     private List<Installed_NodeModel> nodeList = new ArrayList<>();
@@ -138,6 +141,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
         adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
+        adapter.setClickListener(this);
+
     }
 
     @Override
@@ -212,6 +217,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         data.addAll(dbNodeRepo.getNodeList());
         adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
+
+
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -230,7 +237,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
-
+        adapter.setClickListener(this);
 
     }
 
@@ -241,6 +248,8 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
 
         adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
+        adapter.setClickListener(this);
+
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
@@ -283,14 +292,33 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
                     //removeView();
                     adapter.notifyDataSetChanged();
 
-                    Intent i= new Intent(getActivity(), Detail_NodeActivity.class);
-                    i.putExtra("node_id",data.get(position).getNodesID());
-                    startActivity(i);
-                   /* etTopic.setText(data.get(position).getName());
-                    version.setText(data.get(position).getFwVersion());
-                    icon_node.setImageResource(R.drawable.olmatixlogo);
-                    alertDialog.show();
-*/
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Create Nice Name");
+
+                    final EditText input = new EditText(getActivity());
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(input);
+
+                    builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String nice_name = input.getText().toString();
+                            installedNodeModel.setNiceName(nice_name);
+                            dbNodeRepo.update(installedNodeModel);
+                            Toast.makeText(getActivity(),"Successfully Inserted",Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+
+
                 }
             }
 
@@ -331,5 +359,13 @@ public class Installed_Node extends Fragment implements OnStartDragListener {
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
     }
+
+    @Override
+    public void itemClicked(View view, int position) {
+        Intent i= new Intent(getActivity(), Detail_NodeActivity.class);
+        i.putExtra("node_id",data.get(position).getNodesID());
+        startActivity(i);
+    }
+
 
 }

@@ -4,6 +4,8 @@ package com.olmatix.adapter;
  * Created by Lesjaw on 04/12/2016.
  */
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,7 +20,9 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.ui.activity.Detail_NodeActivity;
 import com.olmatix.ui.fragment.Installed_Node;
+import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -29,14 +33,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter {
+public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter
+{
 
     List<Installed_NodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
+    private ClickListener clicklistener = null;
 
-
-
-    public class OlmatixHolder extends RecyclerView.ViewHolder {
+    public class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView fwName, ipAddrs, upTime, siGnal, nodeid,lastAdd;
         public ImageView imgNode, imgStatus;
 
@@ -50,8 +54,21 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             upTime      = (TextView) view.findViewById(R.id.uptime);
             nodeid      = (TextView) view.findViewById(R.id.nodeid);
             lastAdd     = (TextView) view.findViewById(R.id.latestAdd);
+
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (clicklistener != null) {
+                clicklistener.itemClicked(v, getAdapterPosition());
+            }
         }
     }
+    public void setClickListener(ClickListener clicklistener) {
+        this.clicklistener = clicklistener;
+    }
+
 
     public OlmatixAdapter(List<Installed_NodeModel> nodeList,OnStartDragListener dragStartListener) {
 
@@ -116,6 +133,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
             holder.nodeid.setText(mInstalledNodeModel.getNodesID());
             holder.lastAdd.setText(sdf.format(resultdate));
         }
+
     }
 
     private String timeAgo(long time_ago) {
@@ -244,5 +262,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     public void onItemDismiss(int position) {
 
     }
+
+
 
 }

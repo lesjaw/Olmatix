@@ -227,8 +227,6 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
                 mSwipeRefreshLayout.setRefreshing(true);
                 setRefresh();
 
-
-
             }
         });
 

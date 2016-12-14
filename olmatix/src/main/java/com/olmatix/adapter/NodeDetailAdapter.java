@@ -1,7 +1,6 @@
 package com.olmatix.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,8 +66,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
     @Override
     public void onBindViewHolder(final OlmatixHolder holder, final int position) {
         final int pos = position;
-        Log.d("pos", "onBindViewHolder: "+pos);
-
         final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
 
         holder.imgNode.setImageResource(R.drawable.olmatixlogo);
@@ -83,7 +80,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
             @Override
             public void onClick(View view) {
                 if (Connection.getClient().isConnected()) {
-                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+String.valueOf(pos)+"/set";
+                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+mInstalledNodeModel.getChannel()+"/set";
                     String payload = "ON";
                     byte[] encodedPayload = new byte[0];
                     try {
@@ -107,7 +104,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.O
             @Override
             public void onClick(View view) {
                 if (Connection.getClient().isConnected()) {
-                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+String.valueOf(pos)+"/set";
+                    String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+mInstalledNodeModel.getChannel()+"/set";
                     String payload = "OFF";
                     byte[] encodedPayload = new byte[0];
                     try {

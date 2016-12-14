@@ -391,7 +391,7 @@ public class OlmatixService extends Service {
         String[] outputDevices = TopicID.split("/");
         NodeID = outputDevices[1];
         Channel = outputDevices[3];
-        message_topic.put("channel", mMessage);
+        message_topic.put(Channel, mMessage);
         saveDatabase_Detail();
 
     }
@@ -459,7 +459,7 @@ public class OlmatixService extends Service {
     }
     private  void addNodeDetail() {
         if(installedNodeModel.getFwName() != null) {
-            Log.d("addNodeDetail", "fw name, "+installedNodeModel.getFwName());
+            Log.d("addNodeDetail", "fwname, "+installedNodeModel.getFwName());
 
             if (installedNodeModel.getFwName().equals("smartfitting")) {
 
@@ -483,7 +483,7 @@ public class OlmatixService extends Service {
                         String a = String.valueOf(i);
 
                         detailNodeModel.setNode_id(NodeID);
-                        detailNodeModel.setChannel(a);
+                        detailNodeModel.setChannel(String.valueOf(i));
                         detailNodeModel.setStatus("false");
 
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
@@ -499,18 +499,13 @@ public class OlmatixService extends Service {
             if (messageReceive.get("online") != null) {
                 installedNodeModel.setOnline(messageReceive.get("online"));
             }
-
             dbNodeRepo.update(installedNodeModel);
             messageReceive.clear();
-
         }
-
 
     }
 
     private void saveDatabase() {
-
-        //Log.d("saveDatabase", "Executed");
 
                     installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setNodes(messageReceive.get("nodes"));
@@ -527,21 +522,19 @@ public class OlmatixService extends Service {
                     Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
                     installedNodeModel.setAdding(String.valueOf(currentDateTimeString));
 
-
                 dbNodeRepo.update(installedNodeModel);
                 messageReceive.clear();
                 sendMessage();
 
-
     }
 
     private void saveDatabase_Detail() {
-
-        //Log.d("saveDatabase", "Executed");
+        Log.d("messageReceive ", "= " + mMessage);
+        Log.d("messageReceive ", "= " + message_topic);
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
-        detailNodeModel.setStatus(message_topic.get("channel"));
+        detailNodeModel.setStatus(mMessage);
 
         dbNodeRepo.update_detail(detailNodeModel);
         message_topic.clear();

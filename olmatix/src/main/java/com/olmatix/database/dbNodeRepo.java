@@ -167,8 +167,9 @@ public class dbNodeRepo {
             values.put(KEY_NICE_NAME, detailNodeModel.getNice_name());
         }
 
-        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "= ?", new String[] {
-                String.valueOf(detailNodeModel.getNode_id())
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel())
         });
         db.close(); // Closing database connection
         Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()));

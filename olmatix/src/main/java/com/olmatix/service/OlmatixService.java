@@ -501,20 +501,13 @@ public class OlmatixService extends Service {
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();
                 } else {
-                    for (int i = 0; i < 2; i++) {
-                        String a = "";
-                        if (i==0) {
-                            a = "0";
-                        }else if (i==1){
-                            a = "door";
-                        }
-                            detailNodeModel.setNode_id(NodeID);
-                            detailNodeModel.setChannel(a);
-                            detailNodeModel.setStatus("false");
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel("door");
+                    detailNodeModel.setStatus("false");
+                    detailNodeModel.setSensor("false");
 
-                            dbNodeRepo.insertInstalledNode(detailNodeModel);
+                    dbNodeRepo.insertInstalledNode(detailNodeModel);
 
-                    }
                 }
             }
         }
@@ -547,6 +540,11 @@ public class OlmatixService extends Service {
                     installedNodeModel.setOnline(messageReceive.get("online"));
                     installedNodeModel.setSignal(messageReceive.get("signal"));
                     installedNodeModel.setUptime(messageReceive.get("uptime"));
+                    if(messageReceive.containsKey("uptime")) {
+                        if (mMessage != null) {
+                            installedNodeModel.setOnline("true");
+                        }
+                    }
                     Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
                     installedNodeModel.setAdding(String.valueOf(currentDateTimeString));
 
@@ -561,13 +559,10 @@ public class OlmatixService extends Service {
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
-/*
-        if (mMessage.equals("true")) {
-            mStatus = "ON";
-        } else mStatus = "OFF";
-*/
-
         detailNodeModel.setStatus(mMessage);
+        if (Channel.equals("door")){
+            detailNodeModel.setSensor(mMessage);
+        }
 
         dbNodeRepo.update_detail(detailNodeModel);
         message_topic.clear();

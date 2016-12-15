@@ -55,16 +55,19 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
     }
 
     public class OlmatixSensorHolder extends ViewHolder {
-        public TextView node_name, upTime, status,node_version;
+        public TextView node_name, upTime, status,sensorStatus;
         public ImageView imgNode;
+        Button btn_off, btn_on;
 
         public OlmatixSensorHolder(View view) {
             super(view);
             imgNode = (ImageView) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
-            node_version = (TextView) view.findViewById(R.id.node_version);
+            sensorStatus = (TextView) view.findViewById(R.id.sensorstatus);
             status = (TextView) view.findViewById(R.id.status);
             upTime = (TextView) view.findViewById(R.id.uptime);
+            btn_off = (Button) view.findViewById(R.id.btn_off);
+            btn_on = (Button) view.findViewById(R.id.btn_on);
 
         }
     }
@@ -195,18 +198,65 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             }
 
             holder.upTime.setText(mInstalledNodeModel.getUptime());
-            holder.node_version.setText(mInstalledNodeModel.getVersion());
-
             holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
-            if (mInstalledNodeModel.getChannel().equals("0")){
+            holder.sensorStatus.setText(mInstalledNodeModel.getSensor());
+            if (mInstalledNodeModel.getStatus().equals("true")){
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
-                holder.status.setText("Status : "+"0");
+                holder.status.setText("Status : "+"ARMED");
 
             }else {
                 holder.imgNode.setImageResource(R.mipmap.offlamp);
-                holder.status.setText("Status : " + "door");
+                holder.status.setText("Status : " + "NOT ARMED");
             }
 
+            holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (Connection.getClient().isConnected()) {
+                        String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/0/set";
+                        String payload = "ON";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.status.setText("ARMED");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else
+                    {}
+
+                }
+            });
+
+            holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (Connection.getClient().isConnected()) {
+                        String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/0/set";
+                        String payload = "OFF";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.status.setText("NOT ARMED");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else
+                    {}
+
+                }
+
+            });
         }
 
 

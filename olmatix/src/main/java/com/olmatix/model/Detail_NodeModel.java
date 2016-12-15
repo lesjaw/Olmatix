@@ -13,7 +13,7 @@ public class Detail_NodeModel {
     private String nice_name_d;
     private String uptime;
     private String name;
-    private String version;
+    private String sensor;
 
 
     public int getId() {
@@ -72,11 +72,11 @@ public class Detail_NodeModel {
         this.name = name;
     }
 
-    public String getVersion() {
-        return version;
+    public String getSensor() {
+        return sensor;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    public void setSensor(String sensor) {
+        this.sensor = sensor;
     }
 }

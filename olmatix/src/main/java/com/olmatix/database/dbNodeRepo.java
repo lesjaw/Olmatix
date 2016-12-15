@@ -177,11 +177,7 @@ public class dbNodeRepo {
         }
 
         if (detailNodeModel.getStatus_sensor()!=null) {
-            if (detailNodeModel.getStatus_sensor().equals("false")) {
-                values.put(KEY_STATUS_SENSOR, "false");
-            }else{
-                values.put(KEY_STATUS_SENSOR, "true");
-            }
+            values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
             Log.d("DEBUG", "update_detail: " +detailNodeModel.getStatus_sensor());
         }
 
@@ -274,7 +270,7 @@ public class dbNodeRepo {
             do {
                 Detail_NodeModel node = new Detail_NodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
+                node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));

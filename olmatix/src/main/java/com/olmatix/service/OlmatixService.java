@@ -573,8 +573,9 @@ public class OlmatixService extends Service {
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
         detailNodeModel.setStatus(mMessage);
-        detailNodeModel.setStatus_sensor(mMessage);
-
+        if (message_topic.containsKey("close")) {
+            detailNodeModel.setStatus_sensor(mMessage);
+        }
         dbNodeRepo.update_detail(detailNodeModel);
         message_topic.clear();
         Channel = "";

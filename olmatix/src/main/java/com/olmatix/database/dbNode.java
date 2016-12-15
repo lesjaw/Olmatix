@@ -51,4 +51,6 @@ public class dbNode {
     public String reset;
     public String ota;
 
+
+
 }

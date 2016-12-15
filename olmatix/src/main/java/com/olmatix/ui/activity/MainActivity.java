@@ -15,6 +15,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
 import android.view.Surface;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     int backButtonCount;
     int flagReceiver=0;
     OrientationEventListener mOrientationListener;
-
+    TabLayout tabLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,9 +59,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Dashboard").setIcon(R.drawable.ic_fav));
-        tabLayout.addTab(tabLayout.newTab().setText("Nodes").setIcon(R.drawable.ic_node));
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+
+                               tabLayout.addTab(tabLayout.newTab().setText("Dashboard").setIcon(R.drawable.ic_fav));
+                               tabLayout.addTab(tabLayout.newTab().setText("Nodes").setIcon(R.drawable.ic_node));
+
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -84,18 +88,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if(savedInstanceState != null) {
-            mViewPager.setCurrentItem(savedInstanceState.getInt("item"));
-        }
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
     }
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("item", mViewPager.getCurrentItem());
-    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -199,7 +196,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter  {
+
+        private Favorite m1stFragment;
+        private Installed_Node m2ndFragment;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -209,6 +209,8 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+
+
             switch (position) {
                 case 0:
                     //Fragement for Fav Tab
@@ -218,6 +220,21 @@ public class MainActivity extends AppCompatActivity {
                     return new Installed_Node();
             }
             return null;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
+            // save the appropriate reference depending on position
+            switch (position) {
+                case 0:
+                    m1stFragment = (Favorite) createdFragment;
+                    break;
+                case 1:
+                    m2ndFragment = (Installed_Node) createdFragment;
+                    break;
+            }
+            return createdFragment;
         }
 
         @Override

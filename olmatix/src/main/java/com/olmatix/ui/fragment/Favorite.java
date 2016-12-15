@@ -32,6 +32,8 @@ public class Favorite extends Fragment {
         // retain this fragment
         setRetainInstance(true);
     }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

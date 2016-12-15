@@ -84,6 +84,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
         // retain this fragment
         setRetainInstance(true);
     }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -375,12 +376,10 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
 
     @Override
     public void itemClicked(View view, int position) {
-        nice_name = data.get(position).getNice_name_n();
-        if(nice_name == null)
-        {
-            nice_name = data.get(position).getFwName();
 
-        }
+        nice_name = data.get(position).getFwName();
+
+
         Intent i= new Intent(getActivity(), Detail_NodeActivity.class);
         i.putExtra("node_id",data.get(position).getNodesID());
         i.putExtra("node_name",nice_name);

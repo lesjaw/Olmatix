@@ -15,6 +15,7 @@ public class Detail_NodeModel {
     private String name;
     private String sensor;
     private String status_sensor;
+    private String fwName;
 
 
     public int getId() {
@@ -77,6 +78,10 @@ public class Detail_NodeModel {
         return sensor;
     }
 
+    public void setSensor(String sensor) {
+        this.sensor = sensor;
+    }
+
     public String getStatus_sensor() {
         return status_sensor;
     }
@@ -85,7 +90,11 @@ public class Detail_NodeModel {
         this.status_sensor = status_sensor;
     }
 
-    public void setSensor(String sensor) {
-        this.sensor = sensor;
+    public String getFwName() {
+        return fwName;
+    }
+
+    public void setFwName(String fwName) {
+        this.fwName = fwName;
     }
 }

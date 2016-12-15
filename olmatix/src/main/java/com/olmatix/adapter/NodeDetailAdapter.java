@@ -1,6 +1,7 @@
 package com.olmatix.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
     List<Detail_NodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
     String node_name;
+    String fw_name;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View v) {
@@ -38,7 +40,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
         }
     }
     public class OlmatixHolder extends ViewHolder {
-        public TextView node_name, upTime, status;
+        public TextView node_name, upTime, status, fwName;
         public ImageView imgNode;
         Button btn_off, btn_on;
 
@@ -46,6 +48,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             super(view);
             imgNode = (ImageView) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
+            fwName = (TextView) view.findViewById(R.id.fw_name);
             status = (TextView) view.findViewById(R.id.status);
             upTime = (TextView) view.findViewById(R.id.uptime);
             btn_off = (Button) view.findViewById(R.id.btn_off);
@@ -55,7 +58,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
     }
 
     public class OlmatixSensorHolder extends ViewHolder {
-        public TextView node_name, upTime, status,sensorStatus;
+        public TextView node_name, upTime, status,sensorStatus, fwName;
         public ImageView imgNode;
         Button btn_off, btn_on;
 
@@ -63,6 +66,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             super(view);
             imgNode = (ImageView) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
+            fwName = (TextView) view.findViewById(R.id.fw_name);
             sensorStatus = (TextView) view.findViewById(R.id.sensorstatus);
             status = (TextView) view.findViewById(R.id.status);
             upTime = (TextView) view.findViewById(R.id.uptime);
@@ -72,10 +76,10 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
         }
     }
 
-    public NodeDetailAdapter(List<Detail_NodeModel> nodeList,String node_name,OnStartDragListener dragStartListener) {
+    public NodeDetailAdapter(List<Detail_NodeModel> nodeList,String fw_name,OnStartDragListener dragStartListener) {
 
         this.nodeList = nodeList;
-        this.node_name = node_name;
+        this.fw_name = fw_name;
         mDragStartListener = dragStartListener;
 
 
@@ -88,14 +92,15 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView;
-        if (node_name.equals("smartfitting") || node_name.equals("smartadapter4ch")) {
+
+        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_button, parent, false);
 
               return new OlmatixHolder(itemView);
 
         }
-        else if(node_name.equals("smartsensordoor"))
+        else if(fw_name.equals("smartsensordoor"))
         {
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_sensor, parent, false);
@@ -111,10 +116,10 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
         //final int pos = position;
         final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
 
-        if(node_name.equals("smartfitting") || node_name.equals("smartadapter4ch"))
+        if(fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch"))
         {
             final OlmatixHolder holder = (OlmatixHolder) viewHolder;
-
+            holder.fwName.setText(mInstalledNodeModel.getFwName());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
             if (mInstalledNodeModel.getName() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getName());
@@ -185,7 +190,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             });
 
 
-        }else if(node_name.equals("smartsensordoor"))
+        }else if(fw_name.equals("smartsensordoor"))
         {
             final OlmatixSensorHolder holder = (OlmatixSensorHolder) viewHolder;
 
@@ -196,10 +201,14 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
                     holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
                 }
             }
-
+            holder.fwName.setText(mInstalledNodeModel.getFwName());
             holder.upTime.setText(mInstalledNodeModel.getUptime());
             holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
-            holder.sensorStatus.setText(mInstalledNodeModel.getStatus_sensor());
+
+                holder.sensorStatus.setText(mInstalledNodeModel.getStatus_sensor());
+                Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_sensor());
+
+
             if (mInstalledNodeModel.getStatus().equals("true")){
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
                 holder.status.setText("Status : "+"ARMED");

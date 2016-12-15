@@ -367,6 +367,8 @@ public class OlmatixService extends Service {
 
             if (mNodeID.contains("$")) {
                 addNode();
+            } else if (mNodeID.contains("door")) {
+                updateSensor();
             } else {
                 updateDetail();
             }
@@ -376,6 +378,17 @@ public class OlmatixService extends Service {
 
         }
 
+    }
+
+    private void updateSensor(){
+
+        detailNodeModel.setNode_id(NodeID);
+        detailNodeModel.setChannel("0");
+        detailNodeModel.setStatus_sensor(mMessage);
+        dbNodeRepo.update_detail(detailNodeModel);
+        message_topic.clear();
+        Channel = "";
+        sendMessage();
     }
 
     private void addNode (){
@@ -560,15 +573,7 @@ public class OlmatixService extends Service {
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
         detailNodeModel.setStatus(mMessage);
-        detailNodeModel.setStatus_sensor("false");
-        if (Channel.equals("close")){
-            detailNodeModel.setStatus_sensor(mMessage);
-        }
-
-
-        if (Channel.equals("close")){
-            detailNodeModel.setStatus_sensor(mMessage);
-        }
+        detailNodeModel.setStatus_sensor(mMessage);
 
         dbNodeRepo.update_detail(detailNodeModel);
         message_topic.clear();

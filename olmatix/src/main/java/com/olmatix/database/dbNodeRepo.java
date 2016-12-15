@@ -177,7 +177,11 @@ public class dbNodeRepo {
         }
 
         if (detailNodeModel.getStatus_sensor()!=null) {
-            values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
+            if (detailNodeModel.getStatus_sensor().equals("false")) {
+                values.put(KEY_STATUS_SENSOR, "false");
+            }else{
+                values.put(KEY_STATUS_SENSOR, "true");
+            }
             Log.d("DEBUG", "update_detail: " +detailNodeModel.getStatus_sensor());
         }
 

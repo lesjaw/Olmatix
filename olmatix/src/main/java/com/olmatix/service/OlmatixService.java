@@ -560,6 +560,11 @@ public class OlmatixService extends Service {
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
         detailNodeModel.setStatus(mMessage);
+        detailNodeModel.setStatus_sensor("false");
+        if (Channel.equals("close")){
+            detailNodeModel.setStatus_sensor(mMessage);
+        }
+
 
         if (Channel.equals("close")){
             detailNodeModel.setStatus_sensor(mMessage);

@@ -78,9 +78,16 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
     SwipeRefreshLayout mSwipeRefreshLayout;
     String nice_name;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // retain this fragment
+        setRetainInstance(true);
+    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         mView = inflater.inflate(R.layout.frag_installed_node, container, false);
         return mView;
     }

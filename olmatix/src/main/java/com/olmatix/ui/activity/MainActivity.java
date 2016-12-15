@@ -84,11 +84,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        if(savedInstanceState != null) {
+            mViewPager.setCurrentItem(savedInstanceState.getInt("item"));
+        }
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
     }
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("item", mViewPager.getCurrentItem());
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

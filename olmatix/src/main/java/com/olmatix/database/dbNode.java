@@ -30,6 +30,7 @@ public class dbNode {
     public static final String KEY_NICE_NAME_D  = "nice_name_d" ;
     public static final String KEY_NICE_NAME_N  = "nice_name_n" ;
     public static final String KEY_SENSOR       = "sensor" ;
+    public static final String KEY_STATUS_SENSOR  = "status_sensor" ;
 
 
     // property help us to keep data
@@ -38,6 +39,7 @@ public class dbNode {
     public String nodes;
     public String name;
     public String sensor;
+    public String status_sensor;
     public String localip;
     public String fwname;
     public String fwversion;

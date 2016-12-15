@@ -14,6 +14,7 @@ public class Detail_NodeModel {
     private String uptime;
     private String name;
     private String sensor;
+    private String status_sensor;
 
 
     public int getId() {
@@ -74,6 +75,14 @@ public class Detail_NodeModel {
 
     public String getSensor() {
         return sensor;
+    }
+
+    public String getStatus_sensor() {
+        return status_sensor;
+    }
+
+    public void setStatus_sensor(String status_sensor) {
+        this.status_sensor = status_sensor;
     }
 
     public void setSensor(String sensor) {

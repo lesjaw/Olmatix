@@ -502,9 +502,10 @@ public class OlmatixService extends Service {
                     saveDatabase_Detail();
                 } else {
                     detailNodeModel.setNode_id(NodeID);
-                    detailNodeModel.setChannel("door");
+                    detailNodeModel.setChannel("0");
+                    detailNodeModel.setSensor("close");
                     detailNodeModel.setStatus("false");
-                    detailNodeModel.setSensor("false");
+                    detailNodeModel.setStatus_sensor("false");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
 
@@ -555,13 +556,13 @@ public class OlmatixService extends Service {
     }
 
     private void saveDatabase_Detail() {
-        String mStatus;
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
         detailNodeModel.setStatus(mMessage);
-        if (Channel.equals("door")){
-            detailNodeModel.setSensor(mMessage);
+
+        if (Channel.equals("close")){
+            detailNodeModel.setStatus_sensor(mMessage);
         }
 
         dbNodeRepo.update_detail(detailNodeModel);

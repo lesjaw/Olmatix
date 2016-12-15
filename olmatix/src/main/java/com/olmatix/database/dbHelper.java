@@ -49,6 +49,7 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_CHANNEL + " TEXT, "
                 + dbNode.KEY_NICE_NAME_D + " TEXT, "
                 + dbNode.KEY_STATUS + " TEXT, "
+                + dbNode.KEY_STATUS_SENSOR + " TEXT, "
                 + dbNode.KEY_SENSOR + " TEXT )";
 
         db.execSQL(CREATE_TABLE_NODE);

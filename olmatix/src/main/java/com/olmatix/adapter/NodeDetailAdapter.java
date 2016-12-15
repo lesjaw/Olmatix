@@ -199,7 +199,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
 
             holder.upTime.setText(mInstalledNodeModel.getUptime());
             holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
-            holder.sensorStatus.setText(mInstalledNodeModel.getSensor());
+            holder.sensorStatus.setText(mInstalledNodeModel.getStatus_sensor());
             if (mInstalledNodeModel.getStatus().equals("true")){
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
                 holder.status.setText("Status : "+"ARMED");

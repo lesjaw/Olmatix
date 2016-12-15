@@ -13,6 +13,7 @@ public class Detail_NodeModel {
     private String nice_name_d;
     private String uptime;
     private String name;
+    private String version;
 
 
     public int getId() {
@@ -69,5 +70,13 @@ public class Detail_NodeModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

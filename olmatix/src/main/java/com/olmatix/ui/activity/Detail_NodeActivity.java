@@ -92,7 +92,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailID(node_id));
-        adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id),this);
+        adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id),node_name,this);
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -117,7 +117,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     private void setRefresh() {
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailID(node_id));
-        adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id),this);
+        adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id),node_name,this);
         mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }
@@ -159,7 +159,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
         adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailID(node_id));
-        adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id),this);
+        adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id),node_name,this);
         mRecycleView.setAdapter(adapter);
     }
 

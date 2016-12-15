@@ -262,6 +262,7 @@ public class dbNodeRepo {
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
                 node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setVersion( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
 
 
                 nodeList.add(node);

@@ -1,5 +1,6 @@
 package com.olmatix.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -32,6 +34,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
     List<Detail_NodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
     String node_name;
+    Context context;
     String fw_name;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -76,11 +79,12 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
         }
     }
 
-    public NodeDetailAdapter(List<Detail_NodeModel> nodeList,String fw_name,OnStartDragListener dragStartListener) {
+    public NodeDetailAdapter(List<Detail_NodeModel> nodeList,String fw_name,Context context,OnStartDragListener dragStartListener) {
 
         this.nodeList = nodeList;
         this.fw_name = fw_name;
         mDragStartListener = dragStartListener;
+        this.context = context;
 
 
     }
@@ -118,6 +122,8 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
 
         if(fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch"))
         {
+
+            Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
             final OlmatixHolder holder = (OlmatixHolder) viewHolder;
             holder.fwName.setText(mInstalledNodeModel.getFwName());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);

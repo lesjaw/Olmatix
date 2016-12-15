@@ -573,7 +573,7 @@ public class OlmatixService extends Service {
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
         detailNodeModel.setStatus(mMessage);
-       
+
         dbNodeRepo.update_detail(detailNodeModel);
         message_topic.clear();
         Channel = "";

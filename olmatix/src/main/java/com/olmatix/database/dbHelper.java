@@ -12,7 +12,7 @@ public class dbHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     // Database Name
     private static final String DATABASE_NAME = "olmatix";
@@ -48,8 +48,8 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_NODE_ID + " TEXT, "
                 + dbNode.KEY_CHANNEL + " TEXT, "
                 + dbNode.KEY_NICE_NAME_D + " TEXT, "
-                + dbNode.KEY_STATUS + " TEXT )";
-
+                + dbNode.KEY_STATUS + " TEXT, "
+                + dbNode.KEY_SENSOR + " TEXT )";
 
         db.execSQL(CREATE_TABLE_NODE);
         db.execSQL(CREATE_TABLE_NODE_INSTALLED);

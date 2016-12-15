@@ -149,7 +149,6 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
 
     @Override
     public void onPause() {
-        /*LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);*/
         super.onPause();
     }
 
@@ -166,7 +165,6 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
             @Override
             public void onClick(View v) {
                 final EditText mEditText = new EditText(getContext());
-                final boolean addnode = true;
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")
                         .setMessage("Please type Olmatix product ID!")
@@ -201,6 +199,11 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
 
             }
         };
+    }
+
+    private void doSubWhenStart(){
+        /*final int position = viewHolder.getAdapterPosition();
+        String NodeID = data.get(position).getNodesID();*/
     }
 
     private void setupView() {

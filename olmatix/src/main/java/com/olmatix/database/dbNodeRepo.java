@@ -29,6 +29,7 @@ import static com.olmatix.database.dbNode.KEY_NODE_ID;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
 import static com.olmatix.database.dbNode.KEY_OTA;
 import static com.olmatix.database.dbNode.KEY_RESET;
+import static com.olmatix.database.dbNode.KEY_SENSOR;
 import static com.olmatix.database.dbNode.KEY_SIGNAL;
 import static com.olmatix.database.dbNode.KEY_STATUS;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
@@ -168,6 +169,9 @@ public class dbNodeRepo {
         if (detailNodeModel.getNice_name_d()!=null) {
             values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
         }
+        if (detailNodeModel.getSensor()!=null) {
+            values.put(KEY_SENSOR, detailNodeModel.getSensor());
+        }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
                 String.valueOf(detailNodeModel.getNode_id()),
@@ -231,6 +235,7 @@ public class dbNodeRepo {
                 node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
 
                 nodeList.add(node);
 
@@ -262,7 +267,7 @@ public class dbNodeRepo {
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
                 node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
-                node.setVersion( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
+                node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
 
 
                 nodeList.add(node);

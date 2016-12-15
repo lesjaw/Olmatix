@@ -77,6 +77,7 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
     int flagReceiver=0;
     SwipeRefreshLayout mSwipeRefreshLayout;
     String nice_name;
+    String fwName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -382,12 +383,14 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
     @Override
     public void itemClicked(View view, int position) {
 
-        nice_name = data.get(position).getFwName();
+        fwName = data.get(position).getFwName();
+        nice_name = data.get(position).getNice_name_n();
 
 
         Intent i= new Intent(getActivity(), Detail_NodeActivity.class);
         i.putExtra("node_id",data.get(position).getNodesID());
-        i.putExtra("node_name",nice_name);
+        i.putExtra("node_name",fwName);
+        i.putExtra("nice_name",nice_name);
 
         startActivity(i);
     }

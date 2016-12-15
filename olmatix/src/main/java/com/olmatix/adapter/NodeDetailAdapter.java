@@ -198,13 +198,13 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             holder.node_version.setText(mInstalledNodeModel.getVersion());
 
             holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
-            if (mInstalledNodeModel.getStatus().equals("true")){
+            if (mInstalledNodeModel.getChannel().equals("0")){
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
-                holder.status.setText("Status : "+"ON");
+                holder.status.setText("Status : "+"0");
 
             }else {
                 holder.imgNode.setImageResource(R.mipmap.offlamp);
-                holder.status.setText("Status : " + "OFF");
+                holder.status.setText("Status : " + "door");
             }
 
         }

@@ -203,7 +203,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             else    if (mInstalledNodeModel.getNice_name_d()!= null){
                     holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
                 }
-            
+
             holder.fwName.setText(mInstalledNodeModel.getFwName());
             holder.upTime.setText(mInstalledNodeModel.getUptime());
             holder.status.setText("Status : "+mInstalledNodeModel.getStatus());

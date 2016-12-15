@@ -55,7 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class Installed_Node extends Fragment implements OnStartDragListener, ClickListener {
+public class Installed_Node extends Fragment implements  OnStartDragListener, ClickListener {
 
     private View mView;
     private List<Installed_NodeModel> nodeList = new ArrayList<>();
@@ -78,17 +78,6 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
     SwipeRefreshLayout mSwipeRefreshLayout;
     String nice_name;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // retain this fragment
-        setRetainInstance(true);
-    }
-    public Installed_Node()
-    {
-        setRetainInstance(true);
-
-    }
 
     @Nullable
     @Override

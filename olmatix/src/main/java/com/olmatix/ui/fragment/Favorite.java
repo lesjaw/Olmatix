@@ -25,26 +25,20 @@ import com.olmatix.utils.Connection;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 public class Favorite extends Fragment {
+    View mFavourit;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // retain this fragment
-        setRetainInstance(true);
-    }
 
-    public Favorite()
-    {
-        setRetainInstance(true);
 
-    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
 
-        View mFavourit = inflater.inflate(R.layout.frag_favorite, container, false);
+        if(savedInstanceState == null) {
+            mFavourit = inflater.inflate(R.layout.frag_favorite, container, false);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) mFavourit.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

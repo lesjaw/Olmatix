@@ -512,7 +512,7 @@ public class OlmatixService extends Service {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
-                    saveDatabase_Detail();
+                    saveDatabase_sensor();
                 } else {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel("0");
@@ -569,6 +569,18 @@ public class OlmatixService extends Service {
     }
 
     private void saveDatabase_Detail() {
+
+        detailNodeModel.setNode_id(NodeID);
+        detailNodeModel.setChannel(Channel);
+        detailNodeModel.setStatus(mMessage);
+       
+        dbNodeRepo.update_detail(detailNodeModel);
+        message_topic.clear();
+        Channel = "";
+        sendMessage();
+
+    }
+    private void saveDatabase_sensor() {
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);

@@ -49,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
     OrientationEventListener mOrientationListener;
     TabLayout tabLayout;
     @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        // super.onSaveInstanceState(outState);
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -198,8 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter  {
 
-        private Favorite m1stFragment;
-        private Installed_Node m2ndFragment;
+
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -222,20 +225,7 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
-            // save the appropriate reference depending on position
-            switch (position) {
-                case 0:
-                    m1stFragment = (Favorite) createdFragment;
-                    break;
-                case 1:
-                    m2ndFragment = (Installed_Node) createdFragment;
-                    break;
-            }
-            return createdFragment;
-        }
+
 
         @Override
         public int getCount() {
@@ -274,5 +264,13 @@ public class MainActivity extends AppCompatActivity {
             backButtonCount++;
         }
     }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setContentView(R.layout.activity_main);
+        InitializeUI();
+    }
 
+    private void InitializeUI() {
+    }
 }

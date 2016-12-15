@@ -84,6 +84,11 @@ public class Installed_Node extends Fragment implements OnStartDragListener, Cli
         // retain this fragment
         setRetainInstance(true);
     }
+    public Installed_Node()
+    {
+        setRetainInstance(true);
+
+    }
 
     @Nullable
     @Override

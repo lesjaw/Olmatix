@@ -33,6 +33,11 @@ public class Favorite extends Fragment {
         setRetainInstance(true);
     }
 
+    public Favorite()
+    {
+        setRetainInstance(true);
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

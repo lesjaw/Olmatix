@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="fill_parent"
+    android:weightSum="10"
+    android:baselineAligned="false" android:orientation="horizontal">
+
+    <Button
+        android:text="@string/sendButton"
+        android:layout_width="wrap_content"
+        android:textAllCaps="false"
+        android:layout_weight="5"
+        android:layout_height="wrap_content"
+        android:id="@+id/sendButton"
+        android:layout_gravity="left" />
+
+    <Button
+        android:text="@string/connect_product"
+        android:textAllCaps="false"
+        android:layout_width="wrap_content"
+        android:layout_weight="5"
+        android:layout_height="wrap_content"
+        android:id="@+id/connectButton"
+        android:layout_gravity="left" />
+
+</LinearLayout>

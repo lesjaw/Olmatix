@@ -186,7 +186,8 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getChannel())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+ String.valueOf(detailNodeModel.getChannel()));
+        Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
+                String.valueOf(detailNodeModel.getChannel()));
 
     }
 

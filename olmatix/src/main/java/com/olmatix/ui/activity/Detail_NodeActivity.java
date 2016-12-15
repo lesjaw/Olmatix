@@ -55,6 +55,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     private Detail_NodeModel detailNodeModel;
     private Paint p = new Paint();
     private TextView label_node;
+    private String nicename;
 
     private static ArrayList<Detail_NodeModel> data;
 
@@ -68,6 +69,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
         Intent i = getIntent();
         node_id = i.getStringExtra("node_id");
         node_name = i.getStringExtra("node_name");
+        nicename = i.getStringExtra("nice_name");
         data = new ArrayList<>();
         dbNodeRepo =new dbNodeRepo(getApplicationContext());
         detailNodeModel = new Detail_NodeModel();
@@ -111,8 +113,11 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
-        label_node.setText(node_name);
-
+        if (nicename!=null) {
+            label_node.setText(nicename);
+        }else{
+            label_node.setText(node_name);
+        }
     }
     private void setRefresh() {
         data.clear();

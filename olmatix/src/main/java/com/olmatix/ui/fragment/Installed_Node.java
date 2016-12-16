@@ -45,20 +45,16 @@ import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.Detail_NodeActivity;
 import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
-import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Handler;
 
 
 public class Installed_Node extends Fragment implements  OnStartDragListener, ClickListener {
@@ -334,7 +330,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
                             String nice_name = input.getText().toString();
                             installedNodeModel.setNodesID(data.get(position).getNodesID());
                             installedNodeModel.setNice_name_n(nice_name);
-                            dbNodeRepo.update(installedNodeModel);
+                            dbNodeRepo.updateNameNice(installedNodeModel);
                             Toast.makeText(getActivity(),"Successfully Inserted",Toast.LENGTH_LONG).show();
                             setRefresh();
 

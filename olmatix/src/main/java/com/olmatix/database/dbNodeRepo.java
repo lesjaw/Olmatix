@@ -14,8 +14,6 @@ import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_CHANNEL;
@@ -24,8 +22,8 @@ import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
 import static com.olmatix.database.dbNode.KEY_NAME;
-import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
 import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
+import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
 import static com.olmatix.database.dbNode.KEY_NODES;
 import static com.olmatix.database.dbNode.KEY_NODE_ID;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
@@ -162,6 +160,25 @@ public class dbNodeRepo {
         Log.d("DEBUG", "updateNode: " + String.valueOf(installedNodeModel.getNodesID()));
 
     }
+
+    public void updateNameNice(Installed_NodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+
+        if (installedNodeModel.getNice_name_n()!=null) {
+            values.put(KEY_NICE_NAME_N, installedNodeModel.getNice_name_n());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[] {
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close(); // Closing database connection
+        Log.d("DEBUG", "updateNiceName: " + String.valueOf(installedNodeModel.getNodesID()));
+
+    }
+
 
     public void update_detail(Detail_NodeModel detailNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

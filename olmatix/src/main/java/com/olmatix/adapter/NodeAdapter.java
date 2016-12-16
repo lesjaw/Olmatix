@@ -6,7 +6,6 @@ package com.olmatix.adapter;
 
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
-import android.telecom.Call;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,7 +24,6 @@ import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -101,7 +99,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_adapter);
             } else if (mInstalledNodeModel.getFwName().equals("smartsensordoor")) {
-                //holder.imgNode.setImageResource(R.mipmap.door);
+                holder.imgNode.setImageResource(R.mipmap.door);
             }
         }
         holder.imgStatus.setOnTouchListener(new View.OnTouchListener() {

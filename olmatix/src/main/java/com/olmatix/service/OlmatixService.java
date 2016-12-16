@@ -382,8 +382,10 @@ public class OlmatixService extends Service {
 
             if (mNodeID.contains("$")) {
                 addNode();
-            } else if (mNodeID.contains("door")) {
-                updateSensor();
+            } else if (mNodeID.contains("close")) {
+                updateSensorDoor();
+            } else if (mNodeID.contains("theft")) {
+                updateSensorTheft();
             } else {
                 updateDetail();
             }
@@ -422,19 +424,36 @@ public class OlmatixService extends Service {
         Log.d("DEBUG", "toastAndNotif: 5");
 
         Toast.makeText(getApplicationContext(), nameNice + state, Toast.LENGTH_LONG).show();
+        messageReceive.clear();
         message_topic.clear();
         Channel = "";
 
     }
 
-    private void updateSensor(){
+    private void updateSensorDoor(){
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel("0");
         detailNodeModel.setStatus_sensor(mMessage);
+        Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
+        detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
+
         dbNodeRepo.update_detail(detailNodeModel);
         sendMessage();
     }
+
+    private void updateSensorTheft(){
+
+        detailNodeModel.setNode_id(NodeID);
+        detailNodeModel.setChannel("0");
+        detailNodeModel.setStatus_theft(mMessage);
+        Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
+        detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
+
+        dbNodeRepo.update_detail(detailNodeModel);
+        sendMessage();
+    }
+
 
     private void addNode (){
         String[] outputDevices = TopicID.split("/");
@@ -560,13 +579,15 @@ public class OlmatixService extends Service {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
-                    saveDatabase_sensor();
+                   // saveDatabase_sensor();
                 } else {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel("0");
                     detailNodeModel.setSensor("close");
                     detailNodeModel.setStatus("false");
                     detailNodeModel.setStatus_sensor("false");
+                    detailNodeModel.setStatus_theft("false");
+
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
 
@@ -622,6 +643,8 @@ public class OlmatixService extends Service {
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
         detailNodeModel.setStatus(mMessage);
+        Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
+        detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 
         dbNodeRepo.update_detail(detailNodeModel);
         sendMessage();

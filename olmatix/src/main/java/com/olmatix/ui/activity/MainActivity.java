@@ -1,37 +1,28 @@
 package com.olmatix.ui.activity;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
-import android.view.Surface;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.Favorite;
 import com.olmatix.ui.fragment.Installed_Node;
 
@@ -107,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
 
         if (flagReceiver == 0) {
-            Intent i = new Intent(this, OlmatixService.class);
-            startService(i);
+            /*Intent i = new Intent(this, OlmatixService.class);
+            startService(i);*/
             LocalBroadcastManager.getInstance(this).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
             flagReceiver = 1;

@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -62,7 +61,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
 
     public class OlmatixSensorHolder extends ViewHolder {
         public TextView node_name, upTime, status,sensorStatus, fwName;
-        public ImageView imgNode;
+        public ImageView imgNode, imgSensor;
         Button btn_off, btn_on;
 
         public OlmatixSensorHolder(View view) {
@@ -75,6 +74,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             upTime = (TextView) view.findViewById(R.id.uptime);
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);
+            imgSensor = (ImageView) view.findViewById(R.id.door);
 
         }
     }
@@ -119,25 +119,25 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         //final int pos = position;
         final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
-
         if(fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch"))
         {
 
-            Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
+            //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
             final OlmatixHolder holder = (OlmatixHolder) viewHolder;
-            holder.fwName.setText(mInstalledNodeModel.getFwName());
+            holder.fwName.setText(mInstalledNodeModel.getNode_id());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-            if (mInstalledNodeModel.getName() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getName());
+
+            if (mInstalledNodeModel.getNice_name_d() != null) {
+                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
             }
-             else   if (mInstalledNodeModel.getNice_name_d()!= null){
-                    holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-                }
+             else holder.node_name.setText(mInstalledNodeModel.getName());
+
 
 
             holder.upTime.setText(mInstalledNodeModel.getUptime());
 
             holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
+
             if (mInstalledNodeModel.getStatus().equals("true")){
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
                 holder.status.setText("Status : "+"ON");
@@ -210,20 +210,27 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
                     holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
                 }
 
-            holder.fwName.setText(mInstalledNodeModel.getFwName());
+            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+
             holder.upTime.setText(mInstalledNodeModel.getUptime());
             holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
 
-                holder.sensorStatus.setText(mInstalledNodeModel.getStatus_sensor());
+                if(mInstalledNodeModel.getStatus_sensor().equals("true")) {
+                    holder.sensorStatus.setText("Door Close!");
+                    holder.imgSensor.setImageResource(R.drawable.door_close);
+                }else {
+                    holder.sensorStatus.setText("Door Open!");
+                    holder.imgSensor.setImageResource(R.drawable.door_open);
+                }
                 Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_sensor());
 
 
             if (mInstalledNodeModel.getStatus().equals("true")){
-                holder.imgNode.setImageResource(R.mipmap.onlamp);
+                holder.imgNode.setImageResource(R.mipmap.armed);
                 holder.status.setText("Status : "+"ARMED");
 
             }else {
-                holder.imgNode.setImageResource(R.mipmap.offlamp);
+                holder.imgNode.setImageResource(R.mipmap.not_armed);
                 holder.status.setText("Status : " + "NOT ARMED");
             }
 

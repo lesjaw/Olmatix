@@ -76,11 +76,11 @@ public class OlmatixService extends Service {
     private String mMessage;
     private NotificationManager mNM;
     private int NOTIFICATION = R.string.local_service_started;
-    HashMap<String,String>  checkDollar = new HashMap<>();
     HashMap<String,String>  messageReceive = new HashMap<>();
     HashMap<String,String> message_topic = new HashMap<>();
     private String mNodeID;
     private String TopicID;
+    boolean flagAct=true;
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -306,18 +306,33 @@ public class OlmatixService extends Service {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
-
+        if (flagAct) {
+/*
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            flagAct = false;
+*/
+        }
     }
 
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
         Log.v(TAG, "onStartCommand()");
-        Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
-        Log.d("Service = ", "Starting..");
+        if (flagAct) {
+            Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
+            Log.d("Service = ", "Starting..");
+            flagAct = false;
+        }
 
         sendMessage();
+        boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
+        Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
+
         return START_STICKY;
     }
 
@@ -380,14 +395,44 @@ public class OlmatixService extends Service {
 
     }
 
+    private void toastAndNotif(){
+
+        String nameNice = "";
+        String state="";
+        detailNodeModel.setNode_id(NodeID);
+        detailNodeModel.setChannel(Channel);
+        Log.d("DEBUG", "toastAndNotif: 5 "+NodeID+" / "+Channel+" / " +detailNodeModel.getNice_name_d());
+
+        if (detailNodeModel.getNice_name_d().equals("")){
+            nameNice = detailNodeModel.getName();
+            Log.d("DEBUG", "toastAndNotif : 1");
+        } else
+            nameNice = detailNodeModel.getNice_name_d();
+            Log.d("DEBUG", "toastAndNotif: 2");
+
+        if (mNodeID.contains("light")) {
+            if (mMessage.equals("true")){
+                state = "ON";
+                Log.d("DEBUG", "toastAndNotif: 3");
+            }else
+                state = "OFF";
+            Log.d("DEBUG", "toastAndNotif: 4");
+        }
+
+        Log.d("DEBUG", "toastAndNotif: 5");
+
+        Toast.makeText(getApplicationContext(), nameNice + state, Toast.LENGTH_LONG).show();
+        message_topic.clear();
+        Channel = "";
+
+    }
+
     private void updateSensor(){
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel("0");
         detailNodeModel.setStatus_sensor(mMessage);
         dbNodeRepo.update_detail(detailNodeModel);
-        message_topic.clear();
-        Channel = "";
         sendMessage();
     }
 
@@ -406,6 +451,7 @@ public class OlmatixService extends Service {
         Channel = outputDevices[3];
         message_topic.put(Channel, mMessage);
         saveDatabase_Detail();
+        toastAndNotif();
 
     }
 
@@ -445,6 +491,7 @@ public class OlmatixService extends Service {
                 Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
                 Log.d("saveFirst", "Add Node success, ");
                 messageReceive.clear();
+                data.clear();
                 doSubscribeIfOnline();
 
             } else {
@@ -466,6 +513,7 @@ public class OlmatixService extends Service {
                     Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
                     Log.d("saveFirst", "Add Node success, ");
                     messageReceive.clear();
+                    data.clear();
                     doSubscribeIfOnline();
                 }
             }
@@ -564,6 +612,7 @@ public class OlmatixService extends Service {
 
                 dbNodeRepo.update(installedNodeModel);
                 messageReceive.clear();
+                data.clear();
                 sendMessage();
 
     }
@@ -575,8 +624,6 @@ public class OlmatixService extends Service {
         detailNodeModel.setStatus(mMessage);
 
         dbNodeRepo.update_detail(detailNodeModel);
-        message_topic.clear();
-        Channel = "";
         sendMessage();
 
     }
@@ -589,8 +636,6 @@ public class OlmatixService extends Service {
             detailNodeModel.setStatus_sensor(mMessage);
         }
         dbNodeRepo.update_detail(detailNodeModel);
-        message_topic.clear();
-        Channel = "";
         sendMessage();
 
     }

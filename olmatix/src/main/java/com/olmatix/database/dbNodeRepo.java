@@ -130,6 +130,8 @@ public class dbNodeRepo {
         }
         if (installedNodeModel.getOnline()!=null) {
             values.put(KEY_ONLINE, installedNodeModel.getOnline());
+            Log.d("DEBUG", "updateNode Online: " +installedNodeModel.getOnline());
+
         }
         if (installedNodeModel.getNodesID()!=null) {
             values.put(KEY_ICON, installedNodeModel.getIcon());
@@ -168,6 +170,8 @@ public class dbNodeRepo {
         }
         if (detailNodeModel.getStatus()!=null) {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
+            Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
+
         }
         if (detailNodeModel.getNice_name_d()!=null) {
             values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
@@ -178,7 +182,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_sensor()!=null) {
             values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
-            Log.d("DEBUG", "update_detail: " +detailNodeModel.getStatus_sensor());
+            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {

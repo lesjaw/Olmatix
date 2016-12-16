@@ -32,7 +32,7 @@ public class dbNode {
     public static final String KEY_SENSOR       = "sensor" ;
     public static final String KEY_STATUS_SENSOR  = "status_sensor" ;
     public static final String KEY_STATUS_THEFT  = "status_theft" ;
-    public static final String KEY_TIMESTAMPS  = "status_theft" ;
+    public static final String KEY_TIMESTAMPS  = "timestamps" ;
 
 
 

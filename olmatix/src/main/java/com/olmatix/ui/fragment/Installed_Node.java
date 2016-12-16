@@ -36,7 +36,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.olmatix.adapter.OlmatixAdapter;
+import com.olmatix.adapter.NodeAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
@@ -63,7 +63,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
     private FloatingActionButton mFab;
     private AlertDialog.Builder alertDialog;
     private View view;
-    private static OlmatixAdapter adapter;
+    private static NodeAdapter adapter;
     private TextView etTopic,version;
     ImageView icon_node;
     private RecyclerView.LayoutManager layoutManager;
@@ -144,7 +144,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
 
-        adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
+        adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
         adapter.setClickListener(this);
 
@@ -223,7 +223,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
-        adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
+        adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
 
 
@@ -252,7 +252,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
 
-        adapter = new OlmatixAdapter(dbNodeRepo.getNodeList(),this);
+        adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
         mRecycleView.setAdapter(adapter);
         adapter.setClickListener(this);
 

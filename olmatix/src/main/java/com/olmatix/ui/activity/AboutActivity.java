@@ -26,7 +26,7 @@ public class AboutActivity extends AppCompatActivity {
 
         View aboutPage = new AboutPage(this)
                 .isRTL(false)
-                .setImage(R.mipmap.olmatixlogo)
+                .setImage(R.drawable.olmatixsmall)
                 .addItem(descriptionOlmatixElement())
                 .setDescription("We connect everything")
                 .addItem(new Element().setTitle("Version 2.0"))

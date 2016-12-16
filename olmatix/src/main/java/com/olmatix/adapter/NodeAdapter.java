@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter
+public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter
 {
 
     List<Installed_NodeModel> nodeList;
@@ -68,7 +68,7 @@ public class OlmatixAdapter extends RecyclerView.Adapter<OlmatixAdapter.OlmatixH
     }
 
 
-    public OlmatixAdapter(List<Installed_NodeModel> nodeList,OnStartDragListener dragStartListener) {
+    public NodeAdapter(List<Installed_NodeModel> nodeList, OnStartDragListener dragStartListener) {
 
         this.nodeList = nodeList;
         mDragStartListener = dragStartListener;

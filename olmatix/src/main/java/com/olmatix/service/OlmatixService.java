@@ -189,7 +189,7 @@ public class OlmatixService extends Service {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         Log.d(TAG, "onConfigurationChanged()");
-        android.os.Debug.waitForDebugger();
+        //android.os.Debug.waitForDebugger();
         super.onConfigurationChanged(newConfig);
 
     }
@@ -218,7 +218,7 @@ public class OlmatixService extends Service {
         options.setUserName(mUserName);
         options.setPassword(mPassword.toCharArray());
         final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId, new MemoryPersistence());
-        options.setCleanSession(false);
+        options.setCleanSession(true);
         String topic = "status/"+deviceId+"/$online";
         byte[] payload = "false".getBytes();
         options.setWill(topic, payload ,1,true);
@@ -332,7 +332,7 @@ public class OlmatixService extends Service {
         boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private void sendMessage() {

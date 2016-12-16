@@ -2,7 +2,6 @@ package com.olmatix.ui.activity;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -11,12 +10,9 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 
-import com.olmatix.service.OlmatixService;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.ui.fragment.SettingsFragment;
 
@@ -170,9 +166,9 @@ public class SettingsActivity extends SettingsFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
-            //Intent i = new Intent(this,AboutActivity.class);
-            //startActivity(i)
+/*
+            Intent i = new Intent(getActivity(),AboutActivity.class);
+            startActivity(i);*/
         }
     }
 

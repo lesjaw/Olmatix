@@ -33,9 +33,12 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(intent);
 
         } else {
-            Intent i = new Intent(this, OlmatixService.class);
-            startService(i);
-            flagReceiver =1;
+            if (flagReceiver == 0);
+            {
+                Intent i = new Intent(this, OlmatixService.class);
+                startService(i);
+                flagReceiver = 1;
+            }
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }

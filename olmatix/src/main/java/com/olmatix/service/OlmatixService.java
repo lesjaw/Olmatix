@@ -353,8 +353,8 @@ public class OlmatixService extends Service {
     public void onDestroy() {
         // Cancel the persistent notification.
         // Tell the user we stopped.
-        super.onDestroy();
         Toast.makeText(this, R.string.service_stop, Toast.LENGTH_SHORT).show();
+        super.onDestroy();
     }
 
     @Nullable

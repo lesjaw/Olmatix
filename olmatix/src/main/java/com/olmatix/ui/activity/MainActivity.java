@@ -23,6 +23,7 @@ import android.view.OrientationEventListener;
 import android.widget.Toast;
 
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.Favorite;
 import com.olmatix.ui.fragment.Installed_Node;
 
@@ -47,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         //Get current screen orientation
 
@@ -98,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
 
         if (flagReceiver == 0) {
-            /*Intent i = new Intent(this, OlmatixService.class);
-            startService(i);*/
+            Intent i = new Intent(this, OlmatixService.class);
+            startService(i);
             LocalBroadcastManager.getInstance(this).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
             flagReceiver = 1;

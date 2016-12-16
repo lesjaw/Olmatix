@@ -281,4 +281,9 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

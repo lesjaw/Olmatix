@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -202,6 +203,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
         {
             final OlmatixSensorHolder holder = (OlmatixSensorHolder) viewHolder;
 
+
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
@@ -239,7 +241,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
                 holder.status.setTypeface(null, Typeface.BOLD);
 
             }
-            //Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_theft());
+            Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_sensor());
 
 
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
@@ -294,6 +296,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
 
 
     }
+
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
         Collections.swap(nodeList, fromPosition, toPosition);

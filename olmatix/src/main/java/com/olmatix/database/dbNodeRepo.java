@@ -161,6 +161,8 @@ public class dbNodeRepo {
 
     }
 
+
+
     public void updateNameNice(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -223,7 +225,30 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getChannel()));
 
     }
+    public void update_detailSensor(Detail_NodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
 
+        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
+
+        if (detailNodeModel.getStatus_sensor()!=null) {
+            values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
+            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+        }
+        if (detailNodeModel.getStatus_theft()!=null) {
+            values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
+            Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
+        }
+
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel())
+        });
+        db.close(); // Closing database connection
+        Log.d("DEBUG", "updateDetailSensor: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
+                String.valueOf(detailNodeModel.getChannel()));
+
+    }
 
     public ArrayList<Installed_NodeModel> getNodeList() {
 

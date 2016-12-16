@@ -17,7 +17,6 @@ import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -236,7 +235,6 @@ public class OlmatixService extends Service {
                     Connection.getClient().setCallback(new MqttEventCallback());
 
                     try {
-
                         String topic = "status/"+deviceId+"/$online";
                         String payload = "true";
                         byte[] encodedPayload = new byte[0];
@@ -350,15 +348,19 @@ public class OlmatixService extends Service {
         return Long.valueOf(thread.getId()).toString();
     }
 
+
+
     @Override
     public void onDestroy() {
         // Cancel the persistent notification.
         // Tell the user we stopped.
         Toast.makeText(this, R.string.service_stop, Toast.LENGTH_SHORT).show();
+        messageReceive.clear();
+        message_topic.clear();
+        data.clear();
         super.onDestroy();
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(TAG, "onBind called");
@@ -376,7 +378,7 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
-            Log.d("MQTTMessage", " = " + topic + " message = " + message.toString());
+            Log.d("Receive MQTTMessage", " = " + topic + " message = " + message.toString());
             TopicID = topic;
             mNodeID = topic;
             mMessage = message.toString();
@@ -427,6 +429,7 @@ public class OlmatixService extends Service {
         Toast.makeText(getApplicationContext(), nameNice + state, Toast.LENGTH_LONG).show();
         messageReceive.clear();
         message_topic.clear();
+        data.clear();
         Channel = "";
 
     }
@@ -439,7 +442,7 @@ public class OlmatixService extends Service {
         Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
         detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 
-        dbNodeRepo.update_detail(detailNodeModel);
+        dbNodeRepo.update_detailSensor(detailNodeModel);
         sendMessage();
     }
 
@@ -451,7 +454,7 @@ public class OlmatixService extends Service {
         Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
         detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 
-        dbNodeRepo.update_detail(detailNodeModel);
+        dbNodeRepo.update_detailSensor(detailNodeModel);
         sendMessage();
     }
 
@@ -593,7 +596,6 @@ public class OlmatixService extends Service {
                     detailNodeModel.setStatus_sensor("false");
                     detailNodeModel.setStatus_theft("false");
 
-
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
 
                 }
@@ -610,6 +612,7 @@ public class OlmatixService extends Service {
             }
             dbNodeRepo.update(installedNodeModel);
             messageReceive.clear();
+            data.clear();
         }
 
     }
@@ -638,7 +641,7 @@ public class OlmatixService extends Service {
                     Calendar now = Calendar.getInstance();
                     now.setTime(new Date());
                     now.getTimeInMillis();
-                    System.out.println("data " + now.getTimeInMillis());
+                    //System.out.println("data " + now.getTimeInMillis());
                     installedNodeModel.setAdding(now.getTimeInMillis());
 
                 dbNodeRepo.update(installedNodeModel);

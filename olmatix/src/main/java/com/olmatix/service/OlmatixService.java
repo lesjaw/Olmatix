@@ -44,6 +44,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -503,8 +504,10 @@ public class OlmatixService extends Service {
             if (dbNodeRepo.getNodeList().isEmpty()) {
                 installedNodeModel.setNodesID(NodeID);
                 installedNodeModel.setNodes(messageReceive.get("online"));
-                Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-                installedNodeModel.setAdding(String.valueOf(currentDateTimeString));
+                Calendar now = Calendar.getInstance();
+                now.setTime(new Date());
+                now.getTimeInMillis();
+                installedNodeModel.setAdding(now.getTimeInMillis());
 
                 dbNodeRepo.insertDb(installedNodeModel);
                 Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
@@ -525,8 +528,10 @@ public class OlmatixService extends Service {
                 } else {
                     installedNodeModel.setNodesID(NodeID);
                     installedNodeModel.setNodes(messageReceive.get("online"));
-                    Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-                    installedNodeModel.setAdding(String.valueOf(currentDateTimeString));
+                    Calendar now = Calendar.getInstance();
+                    now.setTime(new Date());
+                    now.getTimeInMillis();
+                    installedNodeModel.setAdding(now.getTimeInMillis());
 
                     dbNodeRepo.insertDb(installedNodeModel);
                     Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
@@ -628,8 +633,13 @@ public class OlmatixService extends Service {
                             installedNodeModel.setOnline("true");
                         }
                     }
-                    Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-                    installedNodeModel.setAdding(String.valueOf(currentDateTimeString));
+
+
+                    Calendar now = Calendar.getInstance();
+                    now.setTime(new Date());
+                    now.getTimeInMillis();
+                    System.out.println("data " + now.getTimeInMillis());
+                    installedNodeModel.setAdding(now.getTimeInMillis());
 
                 dbNodeRepo.update(installedNodeModel);
                 messageReceive.clear();

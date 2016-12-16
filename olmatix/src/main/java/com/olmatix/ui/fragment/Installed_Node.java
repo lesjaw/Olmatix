@@ -45,14 +45,20 @@ import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.Detail_NodeActivity;
 import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
+import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Handler;
 
 
 public class Installed_Node extends Fragment implements  OnStartDragListener, ClickListener {
@@ -63,6 +69,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
     private FloatingActionButton mFab;
     private AlertDialog.Builder alertDialog;
     private View view;
+    private Timer autoUpdate;
     private static NodeAdapter adapter;
     private TextView etTopic,version;
     ImageView icon_node;
@@ -97,8 +104,23 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         installedNodeModel = new Installed_NodeModel();
         initDialog();
         setupView();
+        onClickListener();
+        refreshHeader();
+    }
 
-    onClickListener();
+    private void refreshHeader() {
+        autoUpdate = new Timer();
+        autoUpdate.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (adapter != null)
+                            adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }, 100, 5000); // updates GUI each 40 secs
     }
 
 

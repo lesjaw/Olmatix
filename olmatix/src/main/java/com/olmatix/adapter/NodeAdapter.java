@@ -6,6 +6,7 @@ package com.olmatix.adapter;
 
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
+import android.telecom.Call;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
+import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -99,7 +101,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_adapter);
             } else if (mInstalledNodeModel.getFwName().equals("smartsensordoor")) {
-                holder.imgNode.setImageResource(R.mipmap.door);
+                //holder.imgNode.setImageResource(R.mipmap.door);
             }
         }
         holder.imgStatus.setOnTouchListener(new View.OnTouchListener() {
@@ -128,11 +130,12 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
 
         if(mInstalledNodeModel.getAdding() != null) {
             //String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
-            long yourmilliseconds = Long.parseLong(mInstalledNodeModel.getAdding());
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
-            Date resultdate = new Date(yourmilliseconds);
             holder.nodeid.setText(mInstalledNodeModel.getNodesID());
-            holder.lastAdd.setText(sdf.format(resultdate));
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date(mInstalledNodeModel.getAdding()));
+            cal.getTimeInMillis();
+            holder.lastAdd.setText(OlmatixUtils.getTimeAgo(cal));
+            System.out.println("data tanggal " + OlmatixUtils.getTimeAgo(cal));
         }
 
     }

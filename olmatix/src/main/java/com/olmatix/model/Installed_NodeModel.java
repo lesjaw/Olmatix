@@ -129,7 +129,7 @@ public class Installed_NodeModel {
         return adding;
     }
 
-    public void setAdding(long adding) {
+    public void setAdding(Long adding) {
         this.adding = adding;
     }
 

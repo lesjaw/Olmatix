@@ -140,8 +140,8 @@ public class dbNodeRepo {
         if (installedNodeModel.getNodesID()!=null) {
             values.put(KEY_ICON, installedNodeModel.getIcon());
         }
-        if (installedNodeModel.getAdding()!=null) {
-            values.put(KEY_ADDING, String.valueOf(installedNodeModel.getAdding()));
+        if (Long.valueOf(installedNodeModel.getAdding())!=null) {
+            values.put(KEY_ADDING, Long.valueOf(installedNodeModel.getAdding()));
         }
         if (installedNodeModel.getSignal()!=null) {
             values.put(KEY_SIGNAL, installedNodeModel.getSignal());

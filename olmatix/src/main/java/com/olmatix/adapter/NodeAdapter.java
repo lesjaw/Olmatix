@@ -131,12 +131,11 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         if(mInstalledNodeModel.getAdding() != null) {
             //String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
             holder.nodeid.setText(mInstalledNodeModel.getNodesID());
-            Long dateTimeAgo =  mInstalledNodeModel.getAdding();
             Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date(dateTimeAgo));
+            cal.setTime(new Date(mInstalledNodeModel.getAdding()));
             cal.getTimeInMillis();
             holder.lastAdd.setText(OlmatixUtils.getTimeAgo(cal));
-            System.out.println(OlmatixUtils.getTimeAgo(cal));
+            System.out.println("data tanggal " + OlmatixUtils.getTimeAgo(cal));
         }
 
     }

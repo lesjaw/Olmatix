@@ -507,7 +507,7 @@ public class OlmatixService extends Service {
                 Calendar now = Calendar.getInstance();
                 now.setTime(new Date());
                 now.getTimeInMillis();
-                installedNodeModel.setAdding(Long.valueOf(now.getTimeInMillis()));
+                installedNodeModel.setAdding(now.getTimeInMillis());
 
                 dbNodeRepo.insertDb(installedNodeModel);
                 Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
@@ -531,7 +531,7 @@ public class OlmatixService extends Service {
                     Calendar now = Calendar.getInstance();
                     now.setTime(new Date());
                     now.getTimeInMillis();
-                    installedNodeModel.setAdding(Long.valueOf(now.getTimeInMillis()));
+                    installedNodeModel.setAdding(now.getTimeInMillis());
 
                     dbNodeRepo.insertDb(installedNodeModel);
                     Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
@@ -633,11 +633,13 @@ public class OlmatixService extends Service {
                             installedNodeModel.setOnline("true");
                         }
                     }
+
+
                     Calendar now = Calendar.getInstance();
                     now.setTime(new Date());
                     now.getTimeInMillis();
                     System.out.println("data " + now.getTimeInMillis());
-                    installedNodeModel.setAdding(Long.valueOf(now.getTimeInMillis()));
+                    installedNodeModel.setAdding(now.getTimeInMillis());
 
                 dbNodeRepo.update(installedNodeModel);
                 messageReceive.clear();

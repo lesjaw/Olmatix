@@ -1,25 +1,6 @@
 package com.olmatix.utils;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.location.Criteria;
-import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.util.Log;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.util.Calendar;
-import java.util.Map;
 
 /**
  * Created              : Rahman on 12/16/2016.
@@ -39,7 +20,7 @@ public class OlmatixUtils {
         long diff = milliseconds2 - milliseconds1;
 
         long diffSeconds = diff / 1000;
-        Log.d("DEBUG", "getTimeAgo: " + diffSeconds);
+        //Log.d("DEBUG", "getTimeAgo: " + diffSeconds);
         return getScaledTime(diffSeconds) + " Ago";
     }
 

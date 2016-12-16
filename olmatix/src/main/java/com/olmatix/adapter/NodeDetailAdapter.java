@@ -222,7 +222,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
                     holder.sensorStatus.setText("Door Open!");
                     //holder.imgSensor.setImageResource(R.drawable.door_open);
                 }
-                Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_sensor());
 
 
             if (mInstalledNodeModel.getStatus().equals("true")){
@@ -232,7 +231,14 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             }else {
                 holder.imgNode.setImageResource(R.mipmap.not_armed);
                 holder.status.setText("Status : " + "NOT ARMED");
+                //if (mInstalledNodeModel.getStatus_theft().equals("true")){
+                  //  holder.status.setText("Status : " + "ALARM!!");
+                    //holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+
+                //}
             }
+            Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_theft());
+
 
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override

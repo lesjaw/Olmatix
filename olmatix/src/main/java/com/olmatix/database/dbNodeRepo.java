@@ -35,6 +35,8 @@ import static com.olmatix.database.dbNode.KEY_SENSOR;
 import static com.olmatix.database.dbNode.KEY_SIGNAL;
 import static com.olmatix.database.dbNode.KEY_STATUS;
 import static com.olmatix.database.dbNode.KEY_STATUS_SENSOR;
+import static com.olmatix.database.dbNode.KEY_STATUS_THEFT;
+import static com.olmatix.database.dbNode.KEY_TIMESTAMPS;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
 import static com.olmatix.database.dbNode.TABLE;
 import static com.olmatix.database.dbNode.TABLE_NODE;
@@ -186,6 +188,14 @@ public class dbNodeRepo {
             values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
             Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
         }
+        if (detailNodeModel.getStatus_theft()!=null) {
+            values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
+            Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
+        }
+        if (detailNodeModel.getTimestamps()!=null) {
+            values.put(KEY_TIMESTAMPS, detailNodeModel.getTimestamps());
+            Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
+        }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
                 String.valueOf(detailNodeModel.getNode_id()),
@@ -252,6 +262,8 @@ public class dbNodeRepo {
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus_sensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
+                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
 
                 nodeList.add(node);
 
@@ -286,6 +298,10 @@ public class dbNodeRepo {
                 node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
+                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
+
+
 
 
                 nodeList.add(node);

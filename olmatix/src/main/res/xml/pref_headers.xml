@@ -4,16 +4,16 @@
 
     <header
         android:fragment="com.olmatix.ui.activity.SettingsActivity$NetworkPreferenceFragment"
-        android:icon="@drawable/ic_network_black_24dp"
+        android:icon="@drawable/ic_network_black"
         android:title="@string/pref_network" />
 
     <header
         android:fragment="com.olmatix.ui.activity.SettingsActivity$SetupPreferenceFragment"
-        android:icon="@drawable/ic_setup_24dp"
+        android:icon="@drawable/ic_setup_black"
         android:title="@string/pref_setup" />
 
     <header
-        android:icon="@drawable/ic_about_black_24dp"
+        android:icon="@drawable/ic_about_black"
         android:title="@string/pref_about"
         android:summary="@string/about_sum"/>
 

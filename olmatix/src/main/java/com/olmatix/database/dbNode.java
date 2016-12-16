@@ -31,6 +31,9 @@ public class dbNode {
     public static final String KEY_NICE_NAME_N  = "nice_name_n" ;
     public static final String KEY_SENSOR       = "sensor" ;
     public static final String KEY_STATUS_SENSOR  = "status_sensor" ;
+    public static final String KEY_STATUS_THEFT  = "status_theft" ;
+    public static final String KEY_TIMESTAMPS  = "status_theft" ;
+
 
 
     // property help us to keep data
@@ -40,6 +43,8 @@ public class dbNode {
     public String name;
     public String sensor;
     public String status_sensor;
+    public String status_theft;
+    public String timestamps;
     public String localip;
     public String fwname;
     public String fwversion;

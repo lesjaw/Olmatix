@@ -16,6 +16,9 @@ public class Detail_NodeModel {
     private String sensor;
     private String status_sensor;
     private String fwName;
+    private String status_theft;
+    private String timestamps;
+
 
 
     public int getId() {
@@ -88,6 +91,22 @@ public class Detail_NodeModel {
 
     public void setStatus_sensor(String status_sensor) {
         this.status_sensor = status_sensor;
+    }
+
+    public String getStatus_theft() {
+        return status_theft;
+    }
+
+    public void setStatus_theft(String status_theft) {
+        this.status_theft = status_theft;
+    }
+
+    public String getTimestamps() {
+        return timestamps;
+    }
+
+    public void setTimestamps(String timestamps) {
+        this.timestamps = timestamps;
     }
 
     public String getFwName() {

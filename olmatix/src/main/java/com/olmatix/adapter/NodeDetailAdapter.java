@@ -34,7 +34,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
 
     List<Detail_NodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
-    String node_name;
     Context context;
     String fw_name;
 
@@ -126,6 +125,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
 
             //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
             final OlmatixHolder holder = (OlmatixHolder) viewHolder;
+
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
 
@@ -133,8 +133,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
             }
              else holder.node_name.setText(mInstalledNodeModel.getName());
-
-
 
             holder.upTime.setText(mInstalledNodeModel.getUptime());
 
@@ -171,7 +169,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
 
                 }
             });
-            //Log.e("status",mInstalledNodeModel.getStatus());
 
             holder.btn_off.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -202,7 +199,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
         }else if(fw_name.equals("smartsensordoor"))
         {
             final OlmatixSensorHolder holder = (OlmatixSensorHolder) viewHolder;
-
 
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
             if (mInstalledNodeModel.getNice_name_d() != null) {

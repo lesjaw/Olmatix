@@ -218,7 +218,7 @@ public class OlmatixService extends Service {
         options.setUserName(mUserName);
         options.setPassword(mPassword.toCharArray());
         final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId, new MemoryPersistence());
-        options.setCleanSession(true);
+        options.setCleanSession(false);
         String topic = "status/"+deviceId+"/$online";
         byte[] payload = "false".getBytes();
         options.setWill(topic, payload ,1,true);

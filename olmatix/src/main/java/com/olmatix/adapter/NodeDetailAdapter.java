@@ -1,8 +1,9 @@
 package com.olmatix.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -202,13 +203,12 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             final OlmatixSensorHolder holder = (OlmatixSensorHolder) viewHolder;
 
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-            if (mInstalledNodeModel.getName() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getName());
+            if (mInstalledNodeModel.getNice_name_d() != null) {
+                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
             }
 
-            else    if (mInstalledNodeModel.getNice_name_d()!= null){
-                    holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-                }
+            else holder.node_name.setText(mInstalledNodeModel.getName());
+
 
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
 
@@ -231,13 +231,15 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             }else {
                 holder.imgNode.setImageResource(R.mipmap.not_armed);
                 holder.status.setText("Status : " + "NOT ARMED");
-                //if (mInstalledNodeModel.getStatus_theft().equals("true")){
-                  //  holder.status.setText("Status : " + "ALARM!!");
-                    //holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-
-                //}
             }
-            Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_theft());
+
+            if (mInstalledNodeModel.getStatus_theft().equals("true")){
+                holder.status.setText("Status : " + "ALARM!!");
+                holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                holder.status.setTypeface(null, Typeface.BOLD);
+
+            }
+            //Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_theft());
 
 
             holder.btn_on.setOnClickListener(new View.OnClickListener() {

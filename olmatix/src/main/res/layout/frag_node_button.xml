@@ -51,6 +51,7 @@
                 android:layout_alignParentTop="true"
                 android:textSize="20sp"
                 android:text="Node Name"
+                android:textStyle="bold"
                 />
 
 

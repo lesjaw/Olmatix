@@ -47,7 +47,7 @@
                 android:layout_below="@id/uptime"
                 android:layout_alignParentTop="true"
                 android:textSize="19sp"
-                android:textStyle="bold|italic"
+                android:textStyle="bold"
                 android:text="Node Name"
                 />
 

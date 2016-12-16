@@ -38,7 +38,7 @@
                 android:id="@+id/uptime"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:paddingTop="10sp"
+                android:paddingTop="25sp"
                 android:layout_marginRight="16dp"
                 android:text="Uptime"/>
 

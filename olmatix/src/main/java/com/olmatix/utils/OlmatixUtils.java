@@ -21,7 +21,7 @@ public class OlmatixUtils {
 
         long diffSeconds = diff / 1000;
         //Log.d("DEBUG", "getTimeAgo: " + diffSeconds);
-        return getScaledTime(diffSeconds) + " Ago";
+        return getScaledTime(diffSeconds) + " ago";
     }
 
     public static String getScaledTime(long diffSeconds) {

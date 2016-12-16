@@ -204,6 +204,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
                     final EditText input = new EditText(Detail_NodeActivity.this);
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
+                    input.setText(data.get(position).getNice_name_d());
 
                     builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override
@@ -212,7 +213,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
                             detailNodeModel.setNode_id(data.get(position).getNode_id());
                             detailNodeModel.setChannel(data.get(position).getChannel());
                             detailNodeModel.setNice_name_d(nice_name);
-                            dbNodeRepo.update_detail(detailNodeModel);
+                            dbNodeRepo.update_detail_NiceName(detailNodeModel);
                             Toast.makeText(getApplicationContext(),"Successfully Inserted",Toast.LENGTH_LONG).show();
                             setRefresh();
 

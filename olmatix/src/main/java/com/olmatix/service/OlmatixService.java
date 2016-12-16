@@ -38,7 +38,6 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -217,8 +216,8 @@ public class OlmatixService extends Service {
         final MqttConnectOptions options = new MqttConnectOptions();
         options.setUserName(mUserName);
         options.setPassword(mPassword.toCharArray());
-        final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId, new MemoryPersistence());
-        options.setCleanSession(false);
+        final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId);
+        options.setCleanSession(true);
         String topic = "status/"+deviceId+"/$online";
         byte[] payload = "false".getBytes();
         options.setWill(topic, payload ,1,true);
@@ -253,8 +252,10 @@ public class OlmatixService extends Service {
                         Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
-                                //Log.i("sub","Subscribe success");
-                                //Toast.makeText(getApplicationContext(), R.string.sub_success, Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getApplication(), MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+
                                 stateoffMqtt = "true";
                                 Log.d("Sender", "MQTT Status after sub: " +stateoffMqtt);
                                 sendMessage();
@@ -305,14 +306,6 @@ public class OlmatixService extends Service {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
-        if (flagAct) {
-/*
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            flagAct = false;
-*/
-        }
     }
 
 
@@ -341,6 +334,7 @@ public class OlmatixService extends Service {
         // You can also include some extra data.
         intent.putExtra("MQTT State", stateoffMqtt);
         intent.putExtra("NotifyChange", "true");
+        intent.putExtra("StartMain","true");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -354,6 +348,7 @@ public class OlmatixService extends Service {
     public void onDestroy() {
         // Cancel the persistent notification.
         // Tell the user we stopped.
+        doDisconnect();
         Toast.makeText(this, R.string.service_stop, Toast.LENGTH_SHORT).show();
         messageReceive.clear();
         message_topic.clear();
@@ -406,7 +401,7 @@ public class OlmatixService extends Service {
         String state="";
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
-        Log.d("DEBUG", "toastAndNotif: 5 "+NodeID+" / "+Channel+" / " +detailNodeModel.getNice_name_d());
+        //Log.d("DEBUG", "toastAndNotif: 5 "+NodeID+" / "+Channel+" / " +detailNodeModel.getNice_name_d());
 
         if (detailNodeModel.getNice_name_d().equals("")){
             nameNice = detailNodeModel.getName();
@@ -655,7 +650,14 @@ public class OlmatixService extends Service {
 
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
-        detailNodeModel.setStatus(mMessage);
+        if (mMessage.equals("ON")) {
+            mMessage = "true";
+            detailNodeModel.setStatus(mMessage);
+        } else if(mMessage.equals("OFF")) {
+            mMessage = "false";
+            detailNodeModel.setStatus(mMessage);
+        }else {detailNodeModel.setStatus(mMessage);}
+
         Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
         detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 
@@ -677,7 +679,7 @@ public class OlmatixService extends Service {
     }
     private void doSubscribeIfOnline(){
         String topic = "devices/" + NodeID + "/#";
-        int qos = 1;
+        int qos = 2;
         try {
             IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
             subToken.setActionCallback(new IMqttActionListener() {

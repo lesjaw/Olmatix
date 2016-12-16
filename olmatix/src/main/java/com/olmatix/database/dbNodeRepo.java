@@ -132,7 +132,7 @@ public class dbNodeRepo {
         }
         if (installedNodeModel.getOnline()!=null) {
             values.put(KEY_ONLINE, installedNodeModel.getOnline());
-            Log.d("DEBUG", "updateNode Online: " +installedNodeModel.getOnline());
+//            Log.d("DEBUG", "updateNode Online: " +installedNodeModel.getOnline());
 
         }
         if (installedNodeModel.getNodesID()!=null) {
@@ -157,7 +157,7 @@ public class dbNodeRepo {
                 String.valueOf(installedNodeModel.getNodesID())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateNode: " + String.valueOf(installedNodeModel.getNodesID()));
+        //Log.d("DEBUG", "updateNode: " + String.valueOf(installedNodeModel.getNodesID()));
 
     }
 
@@ -177,7 +177,7 @@ public class dbNodeRepo {
                 String.valueOf(installedNodeModel.getNodesID())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateNiceName: " + String.valueOf(installedNodeModel.getNodesID()));
+        //Log.d("DEBUG", "updateNiceName: " + String.valueOf(installedNodeModel.getNodesID()));
 
     }
 
@@ -191,7 +191,7 @@ public class dbNodeRepo {
         if (detailNodeModel.getChannel()!=null) {
             values.put(KEY_CHANNEL, detailNodeModel.getChannel());
         }
-        if (detailNodeModel.getStatus()!=null) {
+        if (detailNodeModel.getStatus()!=null || detailNodeModel.getStatus() != "ON" || detailNodeModel.getStatus() != "OFF") {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
             Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
 
@@ -221,10 +221,29 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getChannel())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
-                String.valueOf(detailNodeModel.getChannel()));
+        //Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
+        //        String.valueOf(detailNodeModel.getChannel()));
 
     }
+
+    public void update_detail_NiceName(Detail_NodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
+
+        if (detailNodeModel.getNice_name_d()!=null) {
+            values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
+        }
+
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel())
+        });
+        db.close(); // Closing database connection
+
+    }
+
     public void update_detailSensor(Detail_NodeModel detailNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();

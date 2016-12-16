@@ -1,5 +1,7 @@
 package com.olmatix.ui.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -39,13 +41,24 @@ public class SplashActivity extends AppCompatActivity {
                 startService(i);
                 flagReceiver = 1;
             }
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+           /* Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);*/
         }
-        finish();
     }
 
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
 
+            String message = intent.getStringExtra("StartMain");
+            if (message==null){
+                message = "false";
+            }
+            if (message.equals("true")) {
+            finish();
+            }
+        }
+    };
 
     @Override
     protected void onStop() {

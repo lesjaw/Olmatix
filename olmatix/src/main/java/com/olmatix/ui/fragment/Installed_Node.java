@@ -51,7 +51,6 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -73,7 +72,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
     private static ArrayList<Installed_NodeModel> data;
     private Paint p = new Paint();
     private ItemTouchHelper mItemTouchHelper;
-    HashMap<String,String> messageReceive = new HashMap<>();
     public static dbNodeRepo dbNodeRepo;
     private Installed_NodeModel installedNodeModel;
     private String inputResult;
@@ -102,6 +100,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         setupView();
         onClickListener();
         refreshHeader();
+        doSubAll();
     }
 
     private void refreshHeader() {
@@ -167,6 +166,36 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         adapter.setClickListener(this);
 
     }
+    private void doSubAll(){
+
+    int countDB = dbNodeRepo.getNodeList().size();
+        Log.d("DEBUG", "Count list: "+countDB);
+
+        for (int i = 0; i < countDB; i++) {
+            final String mNodeID = data.get(i).getNodesID();
+            Log.d("DEBUG", "Count list: "+mNodeID);
+            String topic = "devices/" + mNodeID + "/#";
+            int qos = 2;
+            try {
+                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                subToken.setActionCallback(new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d("Subscribe", " device = " + mNodeID);
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    }
+                });
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+    }
 
     @Override
     public void onPause() {
@@ -196,7 +225,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
                             public void onClick(DialogInterface dialog, int which) {
                                 inputResult =mEditText.getText().toString();
                                 String topic = "devices/" + inputResult + "/$online";
-                                int qos = 1;
+                                int qos = 2;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
                                     subToken.setActionCallback(new IMqttActionListener() {
@@ -220,11 +249,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
 
             }
         };
-    }
-
-    private void doSubWhenStart(){
-        /*final int position = viewHolder.getAdapterPosition();
-        String NodeID = data.get(position).getNodesID();*/
     }
 
     private void setupView() {
@@ -322,7 +346,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
                     final EditText input = new EditText(getActivity());
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
-                    input.setText(installedNodeModel.getNice_name_n());
+                    input.setText(data.get(position).getNice_name_n());
 
                     builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override

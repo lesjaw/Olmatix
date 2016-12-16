@@ -36,7 +36,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="16dp"
-                android:src="@drawable/ic_node_offline"
+                android:src="@drawable/ic_check_green"
                 />
 
             <TextView

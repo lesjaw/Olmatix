@@ -143,10 +143,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (serverconnected) {
-            menu.findItem(R.id.state_conn).setTitle("Connected");
+            //menu.findItem(R.id.state_conn).setTitle("Connected");
+            menu.findItem(R.id.state_conn).setIcon(R.drawable.ic_conn_green);
         } else
-            menu.findItem(R.id.state_conn).setTitle("Not Connected");
-
+            //menu.findItem(R.id.state_conn).setTitle("Not Connected");
+            menu.findItem(R.id.state_conn).setIcon(R.drawable.ic_conn_red);
         return super.onPrepareOptionsMenu(menu);
     }
 

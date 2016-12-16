@@ -14,6 +14,8 @@ import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_CHANNEL;
@@ -56,7 +58,7 @@ public class dbNodeRepo {
         values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
         values.put(KEY_ONLINE, installedNodeModel.getOnline());
         values.put(KEY_ICON, installedNodeModel.getIcon());
-        values.put(KEY_ADDING, installedNodeModel.getAdding());
+        values.put(KEY_ADDING, String.valueOf(installedNodeModel.getAdding()));
         values.put(KEY_SIGNAL, installedNodeModel.getSignal());
         values.put(KEY_UPTIME, installedNodeModel.getUptime());
         values.put(KEY_RESET, installedNodeModel.getReset());
@@ -137,7 +139,7 @@ public class dbNodeRepo {
             values.put(KEY_ICON, installedNodeModel.getIcon());
         }
         if (installedNodeModel.getAdding()!=null) {
-            values.put(KEY_ADDING, installedNodeModel.getAdding());
+            values.put(KEY_ADDING, String.valueOf(installedNodeModel.getAdding()));
         }
         if (installedNodeModel.getSignal()!=null) {
             values.put(KEY_SIGNAL, installedNodeModel.getSignal());
@@ -217,7 +219,7 @@ public class dbNodeRepo {
                 node.setFwVersion( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
                 node.setOnline( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
                 node.setIcon( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
-                node.setAdding( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ADDING)));
+                node.setAdding( cursor.getLong(cursor.getColumnIndex(dbNode.KEY_ADDING)));
                 node.setSignal( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
                 node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
                 node.setReset( cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));

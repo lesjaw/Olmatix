@@ -1,5 +1,7 @@
 package com.olmatix.model;
 
+import java.util.Calendar;
+
 /**
  * Created              : Rahman on 12/6/2016.
  * Date Created         : 12/6/2016 / 11:11 PM.
@@ -20,16 +22,17 @@ public class Installed_NodeModel {
     private String online;
     private String signal;
     private String icon;
-    private String adding;
+
     private String uptime;
     private String reset;
     private String ota;
+    private Long adding;
 
     public Installed_NodeModel() {
     }
 
     public Installed_NodeModel(String node_id, String nodes, String name, String nice_name_n, String localip, String fwName,
-                               String fwVersion, String icon, String adding, String online, String signal, String uptime,
+                               String fwVersion, String icon, Long adding, String online, String signal, String uptime,
                                String reset, String ota) {
 
         this.node_id = node_id;
@@ -122,11 +125,11 @@ public class Installed_NodeModel {
         this.icon = icon;
     }
 
-    public String getAdding() {
+    public Long getAdding() {
         return adding;
     }
 
-    public void setAdding(String adding) {
+    public void setAdding(long adding) {
         this.adding = adding;
     }
 
@@ -169,4 +172,6 @@ public class Installed_NodeModel {
     public void setOta(String ota) {
         this.ota = ota;
     }
+
+
 }

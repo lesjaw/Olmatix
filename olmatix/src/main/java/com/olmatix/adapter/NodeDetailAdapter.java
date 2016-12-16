@@ -217,10 +217,10 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
 
                 if(mInstalledNodeModel.getStatus_sensor().equals("true")) {
                     holder.sensorStatus.setText("Door Close!");
-                    holder.imgSensor.setImageResource(R.drawable.door_close);
+                    //holder.imgSensor.setImageResource(R.drawable.door_close);
                 }else {
                     holder.sensorStatus.setText("Door Open!");
-                    holder.imgSensor.setImageResource(R.drawable.door_open);
+                    //holder.imgSensor.setImageResource(R.drawable.door_open);
                 }
                 Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_sensor());
 

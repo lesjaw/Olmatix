@@ -171,8 +171,6 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
 
         }
-        //adapter = new NodeDetailAdapter(dbNodeRepo.getNodeDetailID(node_id),node_name,detail_nodeActivity,this);
-       // mRecycleView.setAdapter(adapter);
     }
 
 

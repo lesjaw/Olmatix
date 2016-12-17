@@ -65,7 +65,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
     private AlertDialog.Builder alertDialog;
     private View view;
     private Timer autoUpdate;
-    private static NodeAdapter adapter;
+    private NodeAdapter adapter;
     private TextView etTopic,version;
     ImageView icon_node;
     private RecyclerView.LayoutManager layoutManager;
@@ -166,6 +166,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
 
 
     private void updatelist (){
+        adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
 
@@ -176,6 +177,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
 
         }
+        assert adapter != null;
         adapter.setClickListener(this);
 
     }

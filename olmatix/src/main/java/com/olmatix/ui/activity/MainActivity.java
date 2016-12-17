@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             LocalBroadcastManager.getInstance(this).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
             flagReceiver = 1;
-            Log.d("MainAcitivity = ", "Starting OlmatixService");
+            Log.d("Receiver ", "MainActivity = Starting..");
         }
             super.onStart();
     }
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
 
             String message = intent.getStringExtra("MQTT State");
-            //Log.d("receiver", "Status MQTT : " + message);
+
             if (message==null){
                 message = "false";
 

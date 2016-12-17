@@ -233,10 +233,10 @@ public class OlmatixService extends Service {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
-                   /* flagAct = false;
+                    flagAct = false;
                     if (flagAct==false) {
                         doSubAll();
-                    }*/
+                    }
 
 
                     Connection.getClient().setCallback(new MqttEventCallback());
@@ -262,8 +262,7 @@ public class OlmatixService extends Service {
                             public void onSuccess(IMqttToken asyncActionToken) {
                                 /*Intent intent = new Intent(getApplication(), MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-*/
+                                startActivity(intent);*/
                                 stateoffMqtt = "true";
                                 Log.d("Sender", "MQTT Status after sub: " +stateoffMqtt);
                                 sendMessage();
@@ -339,7 +338,6 @@ public class OlmatixService extends Service {
     private void sendMessage() {
         Intent intent = new Intent("MQTTStatus");
         intent.putExtra("MQTT State", stateoffMqtt);
-        intent.putExtra("StartMain","true");
         intent.putExtra("NotifyChangeNode", mChange);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -540,7 +538,7 @@ public class OlmatixService extends Service {
                 installedNodeModel.setNodesID(NodeID);
                 if (dbNodeRepo.hasObject(installedNodeModel)) {
 
-                    Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID +", updating Node status", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID +", its exist, we are updating Node status", Toast.LENGTH_LONG).show();
                     //flagExist = 1;
                     Log.d("saveFirst", "You already have this Node, DB = " + NodeID+", Exist, we are updating Node status");
                     saveDatabase();
@@ -731,34 +729,38 @@ public class OlmatixService extends Service {
         }
     }
 
-    private void doSubAll(){
+    private void doSubAll() {
 
         int countDB = dbNodeRepo.getNodeList().size();
-        Log.d("DEBUG", "Count list: "+countDB);
+        Log.d("DEBUG", "Count list: " + countDB);
+        data.addAll(dbNodeRepo.getNodeList());
 
-        for (int i = 0; i < countDB; i++) {
-            final String mNodeID = data.get(i).getNodesID();
-            Log.d("DEBUG", "Count list: "+mNodeID);
-            String topic = "devices/" + mNodeID + "/#";
-            int qos = 2;
-            try {
-                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                subToken.setActionCallback(new IMqttActionListener() {
-                    @Override
-                    public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.d("Subscribe", " device = " + mNodeID);
-                    }
+        if (countDB != 0) {
 
-                    @Override
-                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    }
-                });
-            } catch (MqttException e) {
-                e.printStackTrace();
+            for (int i = 0; i < countDB; i++) {
+                final String mNodeID = data.get(i).getNodesID();
+                Log.d("DEBUG", "Count list: " + mNodeID);
+                String topic = "devices/" + mNodeID + "/#";
+                int qos = 2;
+                try {
+                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                    subToken.setActionCallback(new IMqttActionListener() {
+                        @Override
+                        public void onSuccess(IMqttToken asyncActionToken) {
+                            Log.d("Subscribe", " device = " + mNodeID);
+                        }
+
+                        @Override
+                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        }
+                    });
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
             }
         }
+        data.clear();
     }
-
 }
 
 

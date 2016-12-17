@@ -1,16 +1,10 @@
 package com.olmatix.ui.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.olmatix.service.OlmatixService;
 
@@ -37,19 +31,19 @@ public class SplashActivity extends AppCompatActivity {
             {
                 Intent i = new Intent(this, OlmatixService.class);
                 startService(i);
-                LocalBroadcastManager.getInstance(this).registerReceiver(
+                /*LocalBroadcastManager.getInstance(this).registerReceiver(
                         mMessageReceiver, new IntentFilter("MQTTStatus"));
                 flagReceiver = 1;
-                Log.d("Splash = ", "Starting OlmatixService");
+                Log.d("Splash = ", "Starting OlmatixService");*/
                 flagReceiver = 1;
             }
-           /* Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);*/
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
 
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    /*private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
@@ -58,7 +52,7 @@ public class SplashActivity extends AppCompatActivity {
                 message = "false";
 
             } else if (message.equals("false")){
-                Toast.makeText(getApplicationContext(),"No Internet connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"No Internet connection, Olmatix closing the App", Toast.LENGTH_LONG).show();
                 finish();
 
             } else if (message.equals("true")) {
@@ -68,7 +62,7 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
         }
-    };
+    };*/
 
     @Override
     protected void onStop() {

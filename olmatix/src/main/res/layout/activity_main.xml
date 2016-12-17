@@ -34,7 +34,7 @@
                 android:layout_height = "wrap_content"
                 android:layout_width = "wrap_content"
                 android:id="@+id/conn_state"
-                android:src="@drawable/ic_conn_green"
+                android:src="@drawable/ic_conn_red"
                 android:paddingRight="5sp"
                 android:layout_gravity = "right" />
 

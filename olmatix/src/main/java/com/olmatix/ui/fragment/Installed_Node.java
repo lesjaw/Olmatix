@@ -103,7 +103,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         setupView();
         onClickListener();
         refreshHeader();
-        doSubAll();
+        //doSubAll();
 
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
                 mRecycleView, new ClickListener() {
@@ -206,15 +206,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     @Override
     public void onStart() {
 
-        if (flagReceiver==0) {
-            /*Intent i = new Intent(getActivity(), OlmatixService.class);
-            getActivity().startService(i);*/
 
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                    mMessageReceiver, new IntentFilter("MQTTStatus"));
-            Log.d("Receiver ", "Installed_Node = Starting..");
-            flagReceiver = 1;
-        }
         super.onStart();
     }
 
@@ -236,7 +228,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 Log.d("receiver", "NotifyChangeNode : " + mChange);
 
             }
-
         }
     };
 
@@ -300,6 +291,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
+
             Log.d("Receiver ", "Installed_Node = Starting..");
             flagReceiver = 1;
         }

@@ -154,6 +154,9 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
             }else if (mChange.equals("2")) {
                 if (adapter != null)
                     adapter.notifyDataSetChanged();
+                    data.clear();
+                    data.addAll(dbNodeRepo.getNodeList());
+
                 Log.d("receiver", "NotifyChange : " + mChange);
 
             }
@@ -320,8 +323,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         version = (TextView) view.findViewById(R.id.version);
         icon_node = (ImageView) view.findViewById(R.id.icon_node);
     }
-
-
 
     private void initSwipe(){
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {

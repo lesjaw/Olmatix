@@ -254,10 +254,10 @@ public class OlmatixService extends Service {
                         Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
-                                Intent intent = new Intent(getApplication(), MainActivity.class);
+                                /*Intent intent = new Intent(getApplication(), MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
-
+*/
                                 stateoffMqtt = "true";
                                 Log.d("Sender", "MQTT Status after sub: " +stateoffMqtt);
                                 sendMessage();
@@ -499,6 +499,7 @@ public class OlmatixService extends Service {
             sendMessageDetail();
         }
     }
+
     private void updateDetail(){
         String[] outputDevices = TopicID.split("/");
         NodeID = outputDevices[1];
@@ -533,9 +534,9 @@ public class OlmatixService extends Service {
                 installedNodeModel.setNodesID(NodeID);
                 if (dbNodeRepo.hasObject(installedNodeModel)) {
 
-                    Toast.makeText(getApplicationContext(), "You already have this Node ID : " + NodeID +", updating Node status", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID +", updating Node status", Toast.LENGTH_LONG).show();
                     //flagExist = 1;
-                    Log.d("saveFirst", "You already have this Node, DB = " + NodeID+", updating Node status");
+                    Log.d("saveFirst", "You already have this Node, DB = " + NodeID+", Exist, we are updating Node status");
                     saveDatabase();
 
                 } else {
@@ -547,7 +548,7 @@ public class OlmatixService extends Service {
                     installedNodeModel.setAdding(now.getTimeInMillis());
 
                     dbNodeRepo.insertDb(installedNodeModel);
-                    Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Successfully Add Node", Toast.LENGTH_LONG).show();
                     Log.d("saveFirst", "Add Node success, ");
                     messageReceive.clear();
                     data.clear();

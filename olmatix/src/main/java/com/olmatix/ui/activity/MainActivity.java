@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.lesjaw.olmatix.R;
@@ -39,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     int flagReceiver=0;
     OrientationEventListener mOrientationListener;
     TabLayout tabLayout;
+    ImageView imgStatus;
+    TextView connStat;
+
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         // super.onSaveInstanceState(outState);
@@ -52,6 +57,10 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        imgStatus = (ImageView) findViewById(R.id.conn_state);
+        connStat = (TextView) findViewById(R.id.conn_state1);
+
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
@@ -120,8 +129,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
-            // Get extra data included in the Intent
+
             String message = intent.getStringExtra("MQTT State");
             //Log.d("receiver", "Status MQTT : " + message);
             if (message==null){
@@ -130,10 +138,13 @@ public class MainActivity extends AppCompatActivity {
             }
             if (message.equals("true")){
                 serverconnected = true;
-                invalidateOptionsMenu();
-            } else
-                serverconnected = false;
-            invalidateOptionsMenu();
+                imgStatus.setImageResource(R.drawable.ic_conn_green);
+                connStat.setText("Connected");
+
+            } else if (message.equals("false")) {
+                imgStatus.setImageResource(R.drawable.ic_conn_red);
+                connStat.setText("Not Connected");
+            }
         }
     };
 
@@ -141,12 +152,8 @@ public class MainActivity extends AppCompatActivity {
     // Override this method to do what you want when the menu is recreated
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (serverconnected) {
-            //menu.findItem(R.id.state_conn).setTitle("Connected");
-            menu.findItem(R.id.state_conn).setIcon(R.drawable.ic_conn_green);
-        } else
-            //menu.findItem(R.id.state_conn).setTitle("Not Connected");
-            menu.findItem(R.id.state_conn).setIcon(R.drawable.ic_conn_red);
+
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -166,10 +173,6 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
 
-        if (id == R.id.state_conn) {
-
-            return true;
-        }
         if (id == R.id.action_settings) {
             Intent i = new Intent(this,SettingsActivity.class);
             startActivity(i);

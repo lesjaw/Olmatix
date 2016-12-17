@@ -18,7 +18,31 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_conn"
+                android:id="@+id/conn_state1"
+                android:paddingRight="0sp"
+                android:textSize="15sp"
+                android:layout_gravity = "right"/>
+
+
+            <ImageView
+                android:layout_height = "wrap_content"
+                android:layout_width = "wrap_content"
+                android:id="@+id/conn_state"
+                android:src="@drawable/ic_conn_green"
+                android:paddingRight="5sp"
+                android:layout_gravity = "right" />
+
+
+
+        </android.support.v7.widget.Toolbar>
+
+
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tab_layout"

@@ -20,10 +20,4 @@
         android:title="@string/action_exit"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/state_conn"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_conn_green"
-        android:title="@string/status_conn"
-        app:showAsAction="always|withText" />
 </menu>

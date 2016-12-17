@@ -3,10 +3,14 @@ package com.olmatix.ui.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.olmatix.service.OlmatixService;
 
@@ -24,12 +28,6 @@ public class SplashActivity extends AppCompatActivity {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String mUserName = sharedPref.getString("user_name", "olmatix1");
 
-        /*if (flagReceiver==0) {
-            Intent i = new Intent(this, OlmatixService.class);
-            startService(i);
-            flagReceiver =1;
-        }*/
-
         if (mUserName.equals("olmatix1") ) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -39,23 +37,35 @@ public class SplashActivity extends AppCompatActivity {
             {
                 Intent i = new Intent(this, OlmatixService.class);
                 startService(i);
+                LocalBroadcastManager.getInstance(this).registerReceiver(
+                        mMessageReceiver, new IntentFilter("MQTTStatus"));
+                flagReceiver = 1;
+                Log.d("Splash = ", "Starting OlmatixService");
                 flagReceiver = 1;
             }
            /* Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);*/
         }
+
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            String message = intent.getStringExtra("StartMain");
+            String message = intent.getStringExtra("MQTT State");
             if (message==null){
                 message = "false";
-            }
-            if (message.equals("true")) {
-            finish();
+
+            } else if (message.equals("false")){
+                Toast.makeText(getApplicationContext(),"No Internet connection", Toast.LENGTH_SHORT).show();
+                finish();
+
+            } else if (message.equals("true")) {
+                Intent i = new Intent(getApplication(), MainActivity.class);
+                startActivity(i);
+                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+                finish();
             }
         }
     };

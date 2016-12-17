@@ -257,6 +257,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         //adapter.setClickListener(this);
 
     }
+
     private void doSubAll(){
 
     int countDB = dbNodeRepo.getNodeList().size();

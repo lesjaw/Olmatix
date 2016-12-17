@@ -233,6 +233,12 @@ public class OlmatixService extends Service {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
+                   /* flagAct = false;
+                    if (flagAct==false) {
+                        doSubAll();
+                    }*/
+
+
                     Connection.getClient().setCallback(new MqttEventCallback());
 
                     try {
@@ -724,6 +730,35 @@ public class OlmatixService extends Service {
             e.printStackTrace();
         }
     }
+
+    private void doSubAll(){
+
+        int countDB = dbNodeRepo.getNodeList().size();
+        Log.d("DEBUG", "Count list: "+countDB);
+
+        for (int i = 0; i < countDB; i++) {
+            final String mNodeID = data.get(i).getNodesID();
+            Log.d("DEBUG", "Count list: "+mNodeID);
+            String topic = "devices/" + mNodeID + "/#";
+            int qos = 2;
+            try {
+                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                subToken.setActionCallback(new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d("Subscribe", " device = " + mNodeID);
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    }
+                });
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
 
 

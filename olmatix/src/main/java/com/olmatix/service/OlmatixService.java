@@ -80,6 +80,7 @@ public class OlmatixService extends Service {
     private String mNodeID;
     private String TopicID;
     boolean flagAct=true;
+    private String mChange="";
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -333,8 +334,9 @@ public class OlmatixService extends Service {
         Intent intent = new Intent("MQTTStatus");
         // You can also include some extra data.
         intent.putExtra("MQTT State", stateoffMqtt);
-        intent.putExtra("NotifyChange", "true");
         intent.putExtra("StartMain","true");
+        intent.putExtra("NotifyChange", mChange);
+
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -392,7 +394,40 @@ public class OlmatixService extends Service {
         public void deliveryComplete(IMqttDeliveryToken token) {
 
         }
+    }
 
+    private void addNode (){
+        String[] outputDevices = TopicID.split("/");
+        NodeID = outputDevices[1];
+        String  mNodeIdSplit = mNodeID;
+        mNodeIdSplit = mNodeIdSplit.substring(mNodeIdSplit.indexOf("$")+1,mNodeIdSplit.length());
+        messageReceive.put(mNodeIdSplit,mMessage);
+        checkValidation();
+    }
+
+    private void checkValidation() {
+        Log.d("messageReceive ", "= " + messageReceive);
+        if (messageReceive.containsKey("online")) {
+            Log.d("CheckValid online", "Passed");
+            if (mMessage.equals("true")){
+                Log.d("CheckValid online", " true Passed");
+                saveFirst();
+
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.deviceoffline, Toast.LENGTH_LONG).show();
+                installedNodeModel.setNodesID(NodeID);
+                if (dbNodeRepo.hasObject(installedNodeModel)) {
+
+                    Toast.makeText(getApplicationContext(), "Updating status device : " + NodeID, Toast.LENGTH_LONG).show();
+                    Log.d("Updating", "status device = " + NodeID);
+                    statusDevices();
+
+                } else {
+                    doUnsubscribe();
+                }
+            }
+        }
+        saveDatabase();
     }
 
     private void toastAndNotif(){
@@ -401,7 +436,7 @@ public class OlmatixService extends Service {
         String state="";
         detailNodeModel.setNode_id(NodeID);
         detailNodeModel.setChannel(Channel);
-        //Log.d("DEBUG", "toastAndNotif: 5 "+NodeID+" / "+Channel+" / " +detailNodeModel.getNice_name_d());
+        Log.d("DEBUG", "toastAndNotif: 5 "+NodeID+" / "+Channel+" / " +detailNodeModel.getNice_name_d());
 
         if (detailNodeModel.getNice_name_d().equals("")){
             nameNice = detailNodeModel.getName();
@@ -453,16 +488,6 @@ public class OlmatixService extends Service {
         sendMessage();
     }
 
-
-    private void addNode (){
-        String[] outputDevices = TopicID.split("/");
-        NodeID = outputDevices[1];
-        String  mNodeIdSplit = mNodeID;
-        mNodeIdSplit = mNodeIdSplit.substring(mNodeIdSplit.indexOf("$")+1,mNodeIdSplit.length());
-        messageReceive.put(mNodeIdSplit,mMessage);
-        checkValidation();
-    }
-
     private void updateDetail(){
         String[] outputDevices = TopicID.split("/");
         NodeID = outputDevices[1];
@@ -473,29 +498,6 @@ public class OlmatixService extends Service {
 
     }
 
-    private void checkValidation() {
-        Log.d("messageReceive ", "= " + messageReceive);
-        if (messageReceive.containsKey("online")) {
-            Log.d("CheckValid online", "Passed");
-            if (mMessage.equals("true")){
-                Log.d("CheckValid online", " true Passed");
-                saveFirst();
-            } else {
-                Toast.makeText(getApplicationContext(), R.string.deviceoffline, Toast.LENGTH_LONG).show();
-                installedNodeModel.setNodesID(NodeID);
-                if (dbNodeRepo.hasObject(installedNodeModel)) {
-
-                    Toast.makeText(getApplicationContext(), "Updating status device : " + NodeID, Toast.LENGTH_LONG).show();
-                    Log.d("Updating", "status device = " + NodeID);
-                    statusDevices();
-
-                } else {
-                    doUnsubscribe();
-                }
-            }
-        }
-        saveDatabase();
-    }
 
     private void saveFirst() {
 
@@ -513,6 +515,9 @@ public class OlmatixService extends Service {
                 messageReceive.clear();
                 data.clear();
                 doSubscribeIfOnline();
+                mChange="1";
+                sendMessage();
+
 
             } else {
                 installedNodeModel.setNodesID(NodeID);
@@ -537,9 +542,13 @@ public class OlmatixService extends Service {
                     messageReceive.clear();
                     data.clear();
                     doSubscribeIfOnline();
+                    mChange="1";
+                    sendMessage();
+
                 }
             }
     }
+
     private  void addNodeDetail() {
         Log.d("messageReceiveDetail ", "= " + message_topic);
 
@@ -608,6 +617,10 @@ public class OlmatixService extends Service {
             dbNodeRepo.update(installedNodeModel);
             messageReceive.clear();
             data.clear();
+            mChange="2";
+            sendMessage();
+
+
         }
 
     }
@@ -642,7 +655,8 @@ public class OlmatixService extends Service {
                 dbNodeRepo.update(installedNodeModel);
                 messageReceive.clear();
                 data.clear();
-                sendMessage();
+        mChange="2";
+        sendMessage();
 
     }
 
@@ -662,21 +676,11 @@ public class OlmatixService extends Service {
         detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 
         dbNodeRepo.update_detail(detailNodeModel);
+        mChange="2";
         sendMessage();
 
     }
-    private void saveDatabase_sensor() {
 
-        detailNodeModel.setNode_id(NodeID);
-        detailNodeModel.setChannel(Channel);
-        detailNodeModel.setStatus(mMessage);
-        if (message_topic.containsKey("close")) {
-            detailNodeModel.setStatus_sensor(mMessage);
-        }
-        dbNodeRepo.update_detail(detailNodeModel);
-        sendMessage();
-
-    }
     private void doSubscribeIfOnline(){
         String topic = "devices/" + NodeID + "/#";
         int qos = 2;
@@ -686,27 +690,6 @@ public class OlmatixService extends Service {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.d("Subscribe", " device = " + NodeID);
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void doSubscribeStatusIfOnline(){
-        String topic = "devices/" + NodeID + "/light/"+Channel+"/set";
-        int qos = 1;
-        try {
-            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-            subToken.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("Subscribe", " status device = " + NodeID);
                 }
 
                 @Override

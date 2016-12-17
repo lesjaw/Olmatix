@@ -143,18 +143,24 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
             // Get extra data included in the Intent
-            String message = intent.getStringExtra("NotifyChange");
-            //Log.d("receiver", "NotifyChange : " + message);
-            if (message==null){
-                message = "false";
+            String mChange = intent.getStringExtra("NotifyChange");
 
+            if (mChange==null){
+                mChange ="0";
             }
-            if (message.equals("true")){
+            if (mChange.equals("1")){
                 updatelist();
+                Log.d("receiver", "NotifyAdd : " + mChange);
+            }else if (mChange.equals("2")) {
+                if (adapter != null)
+                    adapter.notifyDataSetChanged();
+                Log.d("receiver", "NotifyChange : " + mChange);
 
             }
+
         }
     };
+
 
     private void updatelist (){
         adapter.notifyDataSetChanged();
@@ -191,10 +197,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
             } catch (MqttException e) {
                 e.printStackTrace();
             }
-
-
         }
-
     }
 
     @Override
@@ -207,8 +210,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
 
         super.onResume();
     }
-
-
 
     private View.OnClickListener mFabClickListener() {
         return new View.OnClickListener() {

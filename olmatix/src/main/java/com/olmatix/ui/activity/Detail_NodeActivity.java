@@ -152,10 +152,10 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
             String message = intent.getStringExtra("NotifyChange");
             //Log.d("receiver", "NotifyChange : " + message);
             if (message==null){
-                message = "false";
+                message = "1";
 
             }
-            if (message.equals("true")){
+            if (message.equals("2")){
                 updatelist();
 
             }
@@ -227,8 +227,6 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
                     });
 
                     builder.show();
-
-
                 }
             }
 

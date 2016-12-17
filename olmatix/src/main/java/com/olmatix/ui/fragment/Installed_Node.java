@@ -44,7 +44,6 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Installed_NodeModel;
-import com.olmatix.ui.activity.Detail_NodeActivity;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -114,7 +113,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 nice_name = data.get(position).getNice_name_n();
 
 
-                Intent i= new Intent(getActivity(), Detail_NodeActivity.class);
+                Intent i= new Intent(getActivity(), Detail_Node.class);
                 i.putExtra("node_id",data.get(position).getNodesID());
                 i.putExtra("node_name",fwName);
                 i.putExtra("nice_name",nice_name);
@@ -205,8 +204,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     @Override
     public void onStart() {
-
-
         super.onStart();
     }
 

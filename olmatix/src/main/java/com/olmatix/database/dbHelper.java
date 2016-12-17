@@ -12,7 +12,7 @@ public class dbHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     // Database Name
     private static final String DATABASE_NAME = "olmatix";
@@ -54,8 +54,18 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_TIMESTAMPS + " TEXT, "
                 + dbNode.KEY_SENSOR + " TEXT )";
 
+        String CREATE_TABLE_FAVORITE = "CREATE TABLE " + dbNode.TABLE_FAV  + "("
+                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_NODE_ID + " TEXT, "
+                + dbNode.KEY_CHANNEL + " TEXT, "
+                + dbNode.KEY_NODE_TYPE + " TEXT )";
+
+
+
         db.execSQL(CREATE_TABLE_NODE);
         db.execSQL(CREATE_TABLE_NODE_INSTALLED);
+        db.execSQL(CREATE_TABLE_FAVORITE);
+
 
     }
 
@@ -64,6 +74,8 @@ public class dbHelper extends SQLiteOpenHelper {
         // Drop older table if existed, all data will be gone!!!
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_NODE);
+        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_FAV);
+
 
         // Create tables again
         onCreate(db);

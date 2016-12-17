@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.ui.fragment.Favorite;
+import com.olmatix.ui.fragment.Favorite_Node;
 import com.olmatix.ui.fragment.Installed_Node;
 
 /**
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     //Fragement for Fav Tab
-                    return new Favorite();
+                    return new Favorite_Node();
                 case 1:
                     //Fragment for Nodes Tab
                     return new Installed_Node();

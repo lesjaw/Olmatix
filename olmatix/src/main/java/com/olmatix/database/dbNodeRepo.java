@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.model.Favorite_NodeModel;
 
 import java.util.ArrayList;
 
@@ -37,6 +38,7 @@ import static com.olmatix.database.dbNode.KEY_STATUS_THEFT;
 import static com.olmatix.database.dbNode.KEY_TIMESTAMPS;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
 import static com.olmatix.database.dbNode.TABLE;
+import static com.olmatix.database.dbNode.TABLE_FAV;
 import static com.olmatix.database.dbNode.TABLE_NODE;
 
 public class dbNodeRepo {
@@ -84,6 +86,22 @@ public class dbNodeRepo {
         values.put(KEY_STATUS_SENSOR, nodeModel.getStatus_sensor());
 
         long node_Id = db.insert(TABLE_NODE, null, values);
+        db.close(); // Closing database connection
+        Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
+
+        return (int) node_Id;
+    }
+
+    public int insertFavNode(Favorite_NodeModel nodeFavorite){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID,nodeFavorite.getFavNodeID());
+        values.put(KEY_CHANNEL, nodeFavorite.getFavChannel());
+        values.put(KEY_STATUS, nodeFavorite.getFavNodeType());
+
+        long node_Id = db.insert(TABLE_FAV, null, values);
         db.close(); // Closing database connection
         Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
 
@@ -311,6 +329,31 @@ public class dbNodeRepo {
 
             } while (cursor.moveToNext());
         }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
+    public ArrayList<Favorite_NodeModel> getNodeFav() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT * FROM " + TABLE_FAV;
+
+        ArrayList<Favorite_NodeModel> nodeList = new ArrayList<Favorite_NodeModel>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Favorite_NodeModel node = new Favorite_NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setFavChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setFavNodeType( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_TYPE)));
+                node.setFavNodeID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
         //Log.d("getlist", "getNodeList: " +cursor.getCount());
         cursor.close();
         db.close();
@@ -320,9 +363,9 @@ public class dbNodeRepo {
     public ArrayList<Detail_NodeModel> getNodeDetailID(String node_id) {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT * FROM "+TABLE + " installed_node INNER JOIN "+  TABLE_NODE + " detail_node ON installed_node."+KEY_NODE_ID+" = detail_node."+KEY_NODE_ID +" WHERE detail_node." +KEY_NODE_ID +"=?";
-
-       // String MY_QUERY = "SELECT * FROM table_a a INNER JOIN table_b b ON a.id=b.other_id WHERE b.property_id=?";
+        String selectQuery =  "SELECT * FROM "+TABLE + " installed_node INNER JOIN "+  TABLE_NODE +
+                " detail_node ON installed_node."+KEY_NODE_ID+" = detail_node."+KEY_NODE_ID +
+                " WHERE detail_node." +KEY_NODE_ID +"=?";
 
         ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
         Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(node_id)});
@@ -342,9 +385,6 @@ public class dbNodeRepo {
                 node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
                 node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
-
-
-
 
                 nodeList.add(node);
 

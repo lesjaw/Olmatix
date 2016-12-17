@@ -166,12 +166,16 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
 
 
     private void updatelist (){
-        adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
 
-        adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
-        mRecycleView.setAdapter(adapter);
+        //adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
+        //mRecycleView.setAdapter(adapter);
+        if(adapter != null)
+        {
+            adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+
+        }
         adapter.setClickListener(this);
 
     }
@@ -269,7 +273,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
-        adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
+        adapter = new NodeAdapter(data,this);
         mRecycleView.setAdapter(adapter);
 
 
@@ -298,7 +302,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
 
-        adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
+        adapter = new NodeAdapter(data,this);
         mRecycleView.setAdapter(adapter);
         adapter.setClickListener(this);
 

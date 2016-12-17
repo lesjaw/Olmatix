@@ -135,9 +135,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             holder.lastAdd.setText("Updated : "+OlmatixUtils.getTimeAgo(cal));
             //System.out.println("data date " + OlmatixUtils.getTimeAgo(cal));
         }
-
     }
-
 
     public static String calculateTime(long seconds) {
         //Log.d("DEBUG", "calculateTime: " + seconds);
@@ -167,8 +165,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     }
 
     public void removeItem(int position) {
-        //Installed_Node.dbNodeRepo.delete("809ed5e0");
-        String inputResult;
+
         Installed_Node.dbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
         String topic = "devices/"+nodeList.get(position).getNodesID()+"/#";
         try {

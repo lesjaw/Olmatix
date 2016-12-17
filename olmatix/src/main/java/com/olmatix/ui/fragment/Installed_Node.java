@@ -28,7 +28,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -43,20 +45,21 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.Detail_NodeActivity;
-import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Installed_Node extends Fragment implements  OnStartDragListener, ClickListener {
+public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     private View mView;
     private List<Installed_NodeModel> nodeList = new ArrayList<>();
@@ -101,6 +104,83 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         onClickListener();
         refreshHeader();
         doSubAll();
+
+        mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
+                mRecycleView, new ClickListener() {
+            @Override
+            public void onClick(View view, final int position) {
+                //Values are passing to activity & to fragment as well
+                fwName = data.get(position).getFwName();
+                nice_name = data.get(position).getNice_name_n();
+
+
+                Intent i= new Intent(getActivity(), Detail_NodeActivity.class);
+                i.putExtra("node_id",data.get(position).getNodesID());
+                i.putExtra("node_name",fwName);
+                i.putExtra("nice_name",nice_name);
+
+                startActivity(i);
+
+                /*ImageView picture=(ImageView)view.findViewById(R.id.state_conn);
+                picture.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getActivity(), "Single Click on Image :"+position,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });*/
+            }
+
+            @Override
+            public void onLongClick(View view, final int position) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Reset this Node?");
+                builder.setMessage(data.get(position).getNice_name_n());
+
+                builder.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String nodeid = data.get(position).getNodesID();
+                        String statusnode = data.get(position).getOnline();
+                        if (statusnode.equals("true")) {
+
+                            if (Connection.getClient().isConnected()) {
+                                String topic = "devices/" + nodeid + "/$reset";
+                                String payload = "true";
+                                byte[] encodedPayload = new byte[0];
+                                try {
+                                    encodedPayload = payload.getBytes("UTF-8");
+                                    MqttMessage message = new MqttMessage(encodedPayload);
+                                    message.setQos(1);
+                                    message.setRetained(true);
+                                    Connection.getClient().publish(topic, message);
+
+                                } catch (UnsupportedEncodingException | MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                Toast.makeText(getActivity(), "You don't connect to the server", Toast.LENGTH_LONG).show();
+                                setRefresh();
+                            }
+                            Toast.makeText(getActivity(), "Successfully Reset", Toast.LENGTH_LONG).show();
+                            //setRefresh();
+                        } else {Toast.makeText(getActivity(), "Your device Offline, No reset have been done", Toast.LENGTH_LONG).show();}
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
+            }
+        }));
+
+
     }
 
     private void refreshHeader() {
@@ -141,23 +221,19 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
-            // Get extra data included in the Intent
-            String mChange = intent.getStringExtra("NotifyChange");
+
+            String mChange = intent.getStringExtra("NotifyChangeNode");
 
             if (mChange==null){
                 mChange ="0";
             }
             if (mChange.equals("1")){
                 updatelist();
-                Log.d("receiver", "NotifyAdd : " + mChange);
+                //Log.d("receiver", "NotifyAdd : " + mChange);
             }else if (mChange.equals("2")) {
                 if (adapter != null)
-                    adapter.notifyDataSetChanged();
-                    data.clear();
-                    data.addAll(dbNodeRepo.getNodeList());
-
-                Log.d("receiver", "NotifyChange : " + mChange);
+                    updatelist();
+                Log.d("receiver", "NotifyChangeNode : " + mChange);
 
             }
 
@@ -178,7 +254,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
 
         }
         assert adapter != null;
-        adapter.setClickListener(this);
+        //adapter.setClickListener(this);
 
     }
     private void doSubAll(){
@@ -210,13 +286,22 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
+        super.onDestroy();
     }
 
     @Override
     public void onResume() {
+        if (flagReceiver==0) {
+            /*Intent i = new Intent(getActivity(), OlmatixService.class);
+            getActivity().startService(i);*/
 
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                    mMessageReceiver, new IntentFilter("MQTTStatus"));
+            Log.d("Receiver ", "Installed_Node = Starting..");
+            flagReceiver = 1;
+        }
         super.onResume();
     }
 
@@ -295,7 +380,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
-        adapter.setClickListener(this);
+        //adapter.setClickListener(this);
 
     }
 
@@ -306,7 +391,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
 
         adapter = new NodeAdapter(data,this);
         mRecycleView.setAdapter(adapter);
-        adapter.setClickListener(this);
+        //adapter.setClickListener(this);
 
         mSwipeRefreshLayout.setRefreshing(false);
     }
@@ -343,7 +428,30 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
                 final int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT){
-                    adapter.removeItem(position);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Delete this Node?");
+                    builder.setMessage(data.get(position).getNice_name_n());
+
+
+                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            adapter.removeItem(position);
+                            Toast.makeText(getActivity(),"Successfully Inserted",Toast.LENGTH_LONG).show();
+                            setRefresh();
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+
                 } else {
                     //removeView();
                     adapter.notifyDataSetChanged();
@@ -419,20 +527,59 @@ public class Installed_Node extends Fragment implements  OnStartDragListener, Cl
         mItemTouchHelper.startDrag(viewHolder);
     }
 
-    @Override
+    /*@Override
     public void itemClicked(View view, int position) {
 
-        fwName = data.get(position).getFwName();
-        nice_name = data.get(position).getNice_name_n();
+    }*/
 
-
-        Intent i= new Intent(getActivity(), Detail_NodeActivity.class);
-        i.putExtra("node_id",data.get(position).getNodesID());
-        i.putExtra("node_name",fwName);
-        i.putExtra("nice_name",nice_name);
-
-        startActivity(i);
+    public static interface ClickListener{
+        public void onClick(View view,int position);
+        public void onLongClick(View view,int position);
     }
 
+    class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
+
+        private ClickListener clicklistener;
+        private GestureDetector gestureDetector;
+
+        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final ClickListener clicklistener){
+
+            this.clicklistener=clicklistener;
+            gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    View child=recycleView.findChildViewUnder(e.getX(),e.getY());
+                    if(child!=null && clicklistener!=null){
+                        clicklistener.onLongClick(child,recycleView.getChildAdapterPosition(child));
+                    }
+                }
+            });
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            View child=rv.findChildViewUnder(e.getX(),e.getY());
+            if(child!=null && clicklistener!=null && gestureDetector.onTouchEvent(e)){
+                clicklistener.onClick(child,rv.getChildAdapterPosition(child));
+            }
+
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
+    }
 
 }

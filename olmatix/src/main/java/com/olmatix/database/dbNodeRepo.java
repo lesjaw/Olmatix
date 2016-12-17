@@ -90,10 +90,6 @@ public class dbNodeRepo {
         return (int) node_Id;
     }
 
-    /**
-     * SQL DELETE PROSES DATA BY ID
-     * */
-
     public void deleteNode(String node_Id) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -161,8 +157,6 @@ public class dbNodeRepo {
 
     }
 
-
-
     public void updateNameNice(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -194,23 +188,11 @@ public class dbNodeRepo {
         if (detailNodeModel.getStatus()!=null || detailNodeModel.getStatus() != "ON" || detailNodeModel.getStatus() != "OFF") {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
             Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
-
         }
-        if (detailNodeModel.getNice_name_d()!=null) {
-            values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
-        }
-        if (detailNodeModel.getSensor()!=null) {
+        /*if (detailNodeModel.getSensor()!=null) {
             values.put(KEY_SENSOR, detailNodeModel.getSensor());
-        }
+        }*/
 
-        if (detailNodeModel.getStatus_sensor()!=null) {
-            values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
-        }
-        if (detailNodeModel.getStatus_theft()!=null) {
-            values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
-            Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
-        }
         if (detailNodeModel.getTimestamps()!=null) {
             values.put(KEY_TIMESTAMPS, detailNodeModel.getTimestamps());
             Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
@@ -235,7 +217,6 @@ public class dbNodeRepo {
         if (detailNodeModel.getNice_name_d()!=null) {
             values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
         }
-
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
                 String.valueOf(detailNodeModel.getNode_id()),
                 String.valueOf(detailNodeModel.getChannel())

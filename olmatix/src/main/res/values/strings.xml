@@ -62,5 +62,6 @@
     <string name="signal">100</string>
     <string name="deviceoffline">Your devices OFFLINE!</string>
     <string name="latestAdding">Adding</string>
+    <string name="reseting">is going to do a factory reset..</string>
 
 </resources>

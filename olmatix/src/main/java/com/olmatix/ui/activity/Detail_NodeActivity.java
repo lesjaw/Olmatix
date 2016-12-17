@@ -57,9 +57,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     private TextView label_node;
     private String nicename;
     Detail_NodeActivity detail_nodeActivity;
-
     private static ArrayList<Detail_NodeModel> data;
-
     int flagReceiver=0;
 
     @Override
@@ -133,12 +131,9 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     public void onStart() {
 
         if (flagReceiver==0) {
-            /*Intent i = new Intent(getActivity(), OlmatixService.class);
-            getActivity().startService(i);*/
-
             LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
-                    mMessageReceiver, new IntentFilter("MQTTStatus"));
-            Log.d("Receiver ", "Installed_Node = Starting..");
+                    mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
+            Log.d("Receiver ", "Detail_Node = Starting..");
             flagReceiver = 1;
         }
         super.onStart();
@@ -147,17 +142,14 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
-            // Get extra data included in the Intent
-            String message = intent.getStringExtra("NotifyChange");
-            //Log.d("receiver", "NotifyChange : " + message);
+
+            String message = intent.getStringExtra("NotifyChangeDetail");
             if (message==null){
                 message = "1";
-
             }
             if (message.equals("2")){
                 updatelist();
-
+                Log.d("receiver", "NotifyChangeDetail : " + message);
             }
         }
     };
@@ -172,7 +164,6 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
 
         }
     }
-
 
     private void initSwipe(){
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -197,9 +188,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
                 else
                 {
 
-                    //removeView();
                     adapter.notifyDataSetChanged();
-
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(Detail_NodeActivity.this);
                     builder.setTitle("Rename Node detail");
@@ -286,6 +275,30 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
 
     @Override
     protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onStop();
+    }
+
+    @Override
+    protected void onPostResume() {
+        if (flagReceiver==0) {
+            LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
+                    mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
+            Log.d("Receiver ", "Detail_Node = Starting..");
+            flagReceiver = 1;
+        }
+        super.onPostResume();
     }
 }

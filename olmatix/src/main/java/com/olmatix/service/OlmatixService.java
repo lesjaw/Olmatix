@@ -78,6 +78,7 @@ public class OlmatixService extends Service {
     HashMap<String,String>  messageReceive = new HashMap<>();
     HashMap<String,String> message_topic = new HashMap<>();
     private String mNodeID;
+    private String NodeIDSensor;
     private String TopicID;
     boolean flagAct=true;
     private String mChange="";
@@ -330,12 +331,17 @@ public class OlmatixService extends Service {
     }
 
     private void sendMessage() {
-        //Log.d("sender", "Broadcasting message MQTT status = " +stateoffMqtt);
         Intent intent = new Intent("MQTTStatus");
-        // You can also include some extra data.
         intent.putExtra("MQTT State", stateoffMqtt);
         intent.putExtra("StartMain","true");
-        intent.putExtra("NotifyChange", mChange);
+        intent.putExtra("NotifyChangeNode", mChange);
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendMessageDetail() {
+        Intent intent = new Intent("MQTTStatusDetail");
+        intent.putExtra("NotifyChangeDetail", mChange);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -343,8 +349,6 @@ public class OlmatixService extends Service {
     public String getThread(){
         return Long.valueOf(thread.getId()).toString();
     }
-
-
 
     @Override
     public void onDestroy() {
@@ -365,7 +369,6 @@ public class OlmatixService extends Service {
         return null;
     }
 
-
     private class MqttEventCallback implements MqttCallback  {
 
         @Override
@@ -379,6 +382,8 @@ public class OlmatixService extends Service {
             TopicID = topic;
             mNodeID = topic;
             mMessage = message.toString();
+            String[] outputDevices = TopicID.split("/");
+            NodeIDSensor = outputDevices[1];
 
             if (mNodeID.contains("$")) {
                 addNode();
@@ -466,28 +471,34 @@ public class OlmatixService extends Service {
 
     private void updateSensorDoor(){
 
-        detailNodeModel.setNode_id(NodeID);
-        detailNodeModel.setChannel("0");
-        detailNodeModel.setStatus_sensor(mMessage);
-        Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-        detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
+        if (!mNodeID.contains("light")) {
+            Log.d("DEBUG", "updateSensorDoor: ");
+            detailNodeModel.setNode_id(NodeIDSensor);
+            detailNodeModel.setChannel("0");
+            detailNodeModel.setStatus_sensor(mMessage);
+            Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
+            detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 
-        dbNodeRepo.update_detailSensor(detailNodeModel);
-        sendMessage();
+            dbNodeRepo.update_detailSensor(detailNodeModel);
+            mChange = "2";
+            sendMessageDetail();
+        }
     }
 
-    private void updateSensorTheft(){
+    private void updateSensorTheft() {
+        if (!mNodeID.contains("light")) {
+            Log.d("DEBUG", "updateSensorTheft: ");
+            detailNodeModel.setNode_id(NodeIDSensor);
+            detailNodeModel.setChannel("0");
+            detailNodeModel.setStatus_theft(mMessage);
+            Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
+            detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 
-        detailNodeModel.setNode_id(NodeID);
-        detailNodeModel.setChannel("0");
-        detailNodeModel.setStatus_theft(mMessage);
-        Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-        detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
-
-        dbNodeRepo.update_detailSensor(detailNodeModel);
-        sendMessage();
+            dbNodeRepo.update_detailSensor(detailNodeModel);
+            mChange = "2";
+            sendMessageDetail();
+        }
     }
-
     private void updateDetail(){
         String[] outputDevices = TopicID.split("/");
         NodeID = outputDevices[1];
@@ -497,7 +508,6 @@ public class OlmatixService extends Service {
         toastAndNotif();
 
     }
-
 
     private void saveFirst() {
 
@@ -619,8 +629,6 @@ public class OlmatixService extends Service {
             data.clear();
             mChange="2";
             sendMessage();
-
-
         }
 
     }
@@ -662,23 +670,27 @@ public class OlmatixService extends Service {
 
     private void saveDatabase_Detail() {
 
-        detailNodeModel.setNode_id(NodeID);
-        detailNodeModel.setChannel(Channel);
-        if (mMessage.equals("ON")) {
-            mMessage = "true";
-            detailNodeModel.setStatus(mMessage);
-        } else if(mMessage.equals("OFF")) {
-            mMessage = "false";
-            detailNodeModel.setStatus(mMessage);
-        }else {detailNodeModel.setStatus(mMessage);}
+        if (!mNodeID.contains("door")) {
+            Log.d("DEBUG", "saveDatabase_Detail: ");
+            detailNodeModel.setNode_id(NodeID);
+            detailNodeModel.setChannel(Channel);
+            if (mMessage.equals("ON")) {
+                mMessage = "true";
+                detailNodeModel.setStatus(mMessage);
+            } else if (mMessage.equals("OFF")) {
+                mMessage = "false";
+                detailNodeModel.setStatus(mMessage);
+            } else {
+                detailNodeModel.setStatus(mMessage);
+            }
 
-        Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-        detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
+            Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
+            detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 
-        dbNodeRepo.update_detail(detailNodeModel);
-        mChange="2";
-        sendMessage();
-
+            dbNodeRepo.update_detail(detailNodeModel);
+            mChange = "2";
+            sendMessageDetail();
+        }
     }
 
     private void doSubscribeIfOnline(){

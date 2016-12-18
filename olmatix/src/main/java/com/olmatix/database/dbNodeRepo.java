@@ -395,7 +395,6 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-
     public boolean hasObject(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selectString = "SELECT * FROM " + dbNode.TABLE + " WHERE " + KEY_NODE_ID + " =?";
@@ -457,7 +456,6 @@ public class dbNodeRepo {
         db.close();              //AND your Database!
         return hasObject;
     }
-
 
     public dbNode getNodeByNode(Installed_NodeModel installedNodeModel){
         SQLiteDatabase db = dbHelper.getReadableDatabase();

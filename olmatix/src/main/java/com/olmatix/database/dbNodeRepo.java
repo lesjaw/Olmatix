@@ -193,7 +193,6 @@ public class dbNodeRepo {
 
     }
 
-
     public void update_detail(Detail_NodeModel detailNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -339,7 +338,7 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM " + TABLE_FAV;
 
-        ArrayList<Dashboard_NodeModel> nodeList = new ArrayList<Dashboard_NodeModel>();
+        ArrayList<Dashboard_NodeModel> favList = new ArrayList<Dashboard_NodeModel>();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
@@ -350,14 +349,14 @@ public class dbNodeRepo {
                 node.setFavNodeType( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_TYPE)));
                 node.setFavNodeID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
 
-                nodeList.add(node);
+                favList.add(node);
 
             } while (cursor.moveToNext());
         }
         //Log.d("getlist", "getNodeList: " +cursor.getCount());
         cursor.close();
         db.close();
-        return nodeList;
+        return favList;
     }
 
     public ArrayList<Detail_NodeModel> getNodeDetailID(String node_id) {

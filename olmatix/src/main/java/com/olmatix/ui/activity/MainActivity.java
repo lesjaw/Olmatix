@@ -20,11 +20,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.ui.fragment.Dashboard;
 import com.olmatix.ui.fragment.Favorite;
 import com.olmatix.ui.fragment.Installed_Node;
 
@@ -35,19 +39,52 @@ import com.olmatix.ui.fragment.Installed_Node;
 public class MainActivity extends AppCompatActivity {
 
     boolean serverconnected;
-    private ViewPager mViewPager;
-    private SectionsPagerAdapter mSectionsPagerAdapter;
     int backButtonCount;
-    int flagReceiver=0;
-    OrientationEventListener mOrientationListener;
-    TabLayout tabLayout;
-    ImageView imgStatus;
-    TextView connStat;
+    int flagReceiver = 0;
+    private OrientationEventListener mOrientationListener;
+    private TabLayout tabLayout;
+    private ImageView imgStatus;
+    private TextView connStat;
+    private Animation animConn;
+    private Toolbar mToolbar;
+    public static int[] tabIcons = {
+            R.drawable.ic_dashboard,
+            R.drawable.ic_fav,
+            R.drawable.ic_node,
+    };
+    private ViewPager mViewPager;
+    private OlmatixPagerAdapter mOlmatixAdapter;
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("MQTT State");
+
+            if (message == null) {
+                message = "false";
+
+            }
+            if (message.equals("true")) {
+                serverconnected = true;
+                imgStatus.setImageResource(R.drawable.ic_conn_green);
+                imgStatus.startAnimation(animConn);
+                connStat.setText("Connected");
+                connStat.startAnimation(animConn);
+
+            } else if (message.equals("false")) {
+                imgStatus.setImageResource(R.drawable.ic_conn_red);
+                imgStatus.startAnimation(animConn);
+                connStat.setText("Not Connected");
+                connStat.startAnimation(animConn);
+            }
+        }
+    };
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         // super.onSaveInstanceState(outState);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,45 +92,49 @@ public class MainActivity extends AppCompatActivity {
 
         //Get current screen orientation
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        imgStatus = (ImageView) findViewById(R.id.conn_state);
-        connStat = (TextView) findViewById(R.id.conn_state1);
-
-
-        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-
-                               tabLayout.addTab(tabLayout.newTab().setText("Dashboard").setIcon(R.drawable.ic_fav));
-                               tabLayout.addTab(tabLayout.newTab().setText("Nodes").setIcon(R.drawable.ic_node));
-
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                mViewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
+        initView();
+        setupToolbar();
+        setupTabs();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
+    }
+
+
+
+    private void initView() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        imgStatus = (ImageView) findViewById(R.id.conn_state);
+        connStat = (TextView) findViewById(R.id.conn_state1);
+        animConn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink);
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        setupViewPager(mViewPager);
+    }
+
+    private void setupToolbar() {
+        setSupportActionBar(mToolbar);
+    }
+
+    private void setupTabs(){
+        tabLayout.setupWithViewPager(mViewPager);
+        setupTabIcons();
+    }
+
+    private void setupTabIcons() {
+
+        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
+        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
+        tabLayout.getTabAt(2).setIcon(tabIcons[2]);
+    }
+
+    private void setupViewPager(ViewPager viewPager) {
+
+        mOlmatixAdapter.addFrag(new Dashboard(), "Dashboard");
+        mOlmatixAdapter.addFrag(new Favorite(), "Favorite");
+        mOlmatixAdapter.addFrag(new Installed_Node(), "Node");
+        viewPager.setAdapter(mOlmatixAdapter);
     }
 
     @Override
@@ -113,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             flagReceiver = 1;
             Log.d("Receiver ", "MainActivity = Starting..");
         }
-            super.onStart();
+        super.onStart();
     }
 
     @Override
@@ -125,29 +166,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
     }
-
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            String message = intent.getStringExtra("MQTT State");
-
-            if (message==null){
-                message = "false";
-
-            }
-            if (message.equals("true")){
-                serverconnected = true;
-                imgStatus.setImageResource(R.drawable.ic_conn_green);
-                connStat.setText("Connected");
-
-            } else if (message.equals("false")) {
-                imgStatus.setImageResource(R.drawable.ic_conn_red);
-                connStat.setText("Not Connected");
-            }
-        }
-    };
-
 
     // Override this method to do what you want when the menu is recreated
     @Override
@@ -174,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
 
         if (id == R.id.action_settings) {
-            Intent i = new Intent(this,SettingsActivity.class);
+            Intent i = new Intent(this, SettingsActivity.class);
             startActivity(i);
             return true;
         }
@@ -186,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.action_about) {
-            Intent i = new Intent(this,AboutActivity.class);
+            Intent i = new Intent(this, AboutActivity.class);
             startActivity(i);
             return true;
         }
@@ -194,70 +212,22 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter  {
-
-
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-
-
-            switch (position) {
-                case 0:
-                    //Fragement for Fav Tab
-                    return new Favorite();
-                case 1:
-                    //Fragment for Nodes Tab
-                    return new Installed_Node();
-            }
-            return null;
-        }
-
-
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-
-            }
-            return null;
-        }
-    }
-
     @Override
     public void onBackPressed() {
 
-        if(backButtonCount >= 1)
-        {
+        if (backButtonCount >= 1) {
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
             System.exit(0);
-        }
-        else
-        {
+        } else {
             Toast.makeText(this, R.string.backbutton, Toast.LENGTH_SHORT).show();
             backButtonCount++;
         }
     }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -267,4 +237,5 @@ public class MainActivity extends AppCompatActivity {
 
     private void InitializeUI() {
     }
+
 }

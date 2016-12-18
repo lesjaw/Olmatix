@@ -26,7 +26,10 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,10 +58,15 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private Detail_NodeModel detailNodeModel;
     private Paint p = new Paint();
     private TextView label_node;
+    private ImageView imgStatus;
+    private TextView connStat;
+    private Animation animConn;
+    boolean serverconnected;
     private String nicename;
     Detail_Node detail_node;
     private static ArrayList<Detail_NodeModel> data;
     int flagReceiver=0;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,18 +81,16 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         data = new ArrayList<>();
         dbNodeRepo =new dbNodeRepo(getApplicationContext());
         detailNodeModel = new Detail_NodeModel();
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         setupView();
+        setupToolbar();
 
 
     }
 
+
     private void setupView() {
         label_node = (TextView) findViewById(R.id.label_node);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mRecycleView    = (RecyclerView) findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         mRecycleView.setHasFixedSize(true);
@@ -127,6 +133,11 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
+    private void setupToolbar(){
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
     @Override
     public void onStart() {
 
@@ -144,6 +155,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         public void onReceive(Context context, Intent intent) {
 
             String message = intent.getStringExtra("NotifyChangeDetail");
+            String msg = intent.getStringExtra("MQTT State");
             if (message==null){
                 message = "1";
             }
@@ -153,6 +165,8 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
             }
         }
     };
+
+
 
     private void updatelist (){
         adapter.notifyDataSetChanged();
@@ -184,9 +198,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
                     mItemTouchHelper = new ItemTouchHelper(callback);
                     mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
-                }
-                else
-                {
+                }else{
 
                     adapter.notifyDataSetChanged();
 

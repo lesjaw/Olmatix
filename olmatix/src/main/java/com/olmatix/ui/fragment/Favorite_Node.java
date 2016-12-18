@@ -166,8 +166,7 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
         adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeFav());
-        if(adapter != null)
-        {
+        if(adapter != null){
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
 
         }
@@ -191,8 +190,7 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
                     mItemTouchHelper = new ItemTouchHelper(callback);
                     mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
-                }
-                else{
+                }else{
 
                 }
             }

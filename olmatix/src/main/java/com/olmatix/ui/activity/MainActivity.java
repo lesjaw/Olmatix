@@ -147,8 +147,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
 
         if (flagReceiver == 0) {
-            /*Intent i = new Intent(this, OlmatixService.class);
-            startService(i);*/
             LocalBroadcastManager.getInstance(this).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
             flagReceiver = 1;
@@ -228,14 +226,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        setContentView(R.layout.activity_main);
-        InitializeUI();
-    }
 
-    private void InitializeUI() {
-    }
 
 }

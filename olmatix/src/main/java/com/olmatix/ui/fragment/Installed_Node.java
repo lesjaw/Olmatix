@@ -101,7 +101,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         initDialog();
         setupView();
         onClickListener();
-        refreshHeader();
+        //refreshHeader();
         //doSubAll();
 
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
@@ -205,6 +205,21 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     @Override
     public void onStart() {
         super.onStart();
+        refreshHeader();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        autoUpdate.cancel();
+        Log.d("DEBUG", "onPause: Cancel");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        autoUpdate.cancel();
+        Log.d("DEBUG", "onPause: Stop");
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

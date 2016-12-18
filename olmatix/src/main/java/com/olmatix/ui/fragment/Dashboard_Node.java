@@ -22,11 +22,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
@@ -35,6 +37,8 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.model.Detail_NodeModel;
+import com.olmatix.model.Installed_NodeModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,13 +55,17 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Dashboard_NodeModel dashboardNodeModel;
+    private Spinner mSpinner;
     public static dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
+    private static ArrayList<Detail_NodeModel> dataNode;
+    private Detail_NodeModel nodeDetail;
     Dashboard_Node dashboard_node;
     String node_id,node_name;
 
     private int flagReceiver;
+    private int position;
 
 
     @Nullable
@@ -79,6 +87,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         setupView();
         onClickListener();
 
+
+
     }
 
     private void onClickListener() {
@@ -89,7 +99,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Spinner mSpinner = new Spinner(getContext());
+                mSpinner = new Spinner(getContext());
 
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")
@@ -100,6 +110,12 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 //do add fav
+                                List<String> lables = dbNodeRepo.getAllName();
+                                Log.d("DEBUG", "loadSpinnerData: " + lables.size());
+
+                                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, lables);
+                                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                mSpinner.setAdapter(dataAdapter);
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -109,6 +125,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
             }
         };
     }
+
+
 
 
     private void setupView() {
@@ -279,4 +297,6 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
         }
     }
+
+
 }

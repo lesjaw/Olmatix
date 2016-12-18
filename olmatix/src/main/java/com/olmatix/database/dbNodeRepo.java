@@ -15,6 +15,7 @@ import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.model.Dashboard_NodeModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_CHANNEL;
@@ -334,6 +335,30 @@ public class dbNodeRepo {
         return nodeList;
     }
 
+    public List<String> getAllName(){
+        List<String> labels = new ArrayList<String>();
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                labels.add(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+            } while (cursor.moveToNext());
+        }
+
+        // closing connection
+        cursor.close();
+        db.close();
+
+        // returning lables
+        return labels;
+    }
+
     public ArrayList<Dashboard_NodeModel> getNodeFav() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -395,6 +420,8 @@ public class dbNodeRepo {
         db.close();
         return nodeList;
     }
+
+
 
 
     public boolean hasObject(Installed_NodeModel installedNodeModel) {

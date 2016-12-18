@@ -29,7 +29,7 @@ import android.widget.Toast;
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.ui.fragment.Dashboard;
-import com.olmatix.ui.fragment.Favorite;
+import com.olmatix.ui.fragment.Favorite_Node;
 import com.olmatix.ui.fragment.Installed_Node;
 
 /**
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
 
         mOlmatixAdapter.addFrag(new Dashboard(), "Dashboard");
-        mOlmatixAdapter.addFrag(new Favorite(), "Favorite");
+        mOlmatixAdapter.addFrag(new Favorite_Node(), "Favorite");
         mOlmatixAdapter.addFrag(new Installed_Node(), "Node");
         viewPager.setAdapter(mOlmatixAdapter);
     }

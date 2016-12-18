@@ -9,6 +9,8 @@ public class dbNode {
     // Labels table name
     public static final String TABLE = "Node";
     public static final String TABLE_NODE = "Node_Installed";
+    public static final String TABLE_FAV = "Node_Favorite";
+
 
     // Labels Table Columns names
     public static final String KEY_ID           = "id";
@@ -33,7 +35,7 @@ public class dbNode {
     public static final String KEY_STATUS_SENSOR  = "status_sensor" ;
     public static final String KEY_STATUS_THEFT  = "status_theft" ;
     public static final String KEY_TIMESTAMPS  = "status_theft_time" ;
-
+    public static final String KEY_NODE_TYPE  = "node_type" ;
 
 
     // property help us to keep data
@@ -55,6 +57,7 @@ public class dbNode {
     public String uptime;
     public String reset;
     public String ota;
+    public String node_type;
 
 
 

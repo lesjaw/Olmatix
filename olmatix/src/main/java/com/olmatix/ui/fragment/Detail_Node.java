@@ -1,4 +1,4 @@
-package com.olmatix.ui.activity;
+package com.olmatix.ui.fragment;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,7 +43,7 @@ import java.util.ArrayList;
  * Created by android on 12/13/2016.
  */
 
-public class Detail_NodeActivity extends AppCompatActivity implements OnStartDragListener {
+public class Detail_Node extends AppCompatActivity implements OnStartDragListener {
 
     dbNodeRepo dbNodeRepo;
     String node_id,node_name;
@@ -56,7 +56,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     private Paint p = new Paint();
     private TextView label_node;
     private String nicename;
-    Detail_NodeActivity detail_nodeActivity;
+    Detail_Node detail_node;
     private static ArrayList<Detail_NodeModel> data;
     int flagReceiver=0;
 
@@ -65,7 +65,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_node);
 
-        detail_nodeActivity =this;
+        detail_node =this;
         Intent i = getIntent();
         node_id = i.getStringExtra("node_id");
         node_name = i.getStringExtra("node_name");
@@ -94,7 +94,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailID(node_id));
-        adapter = new NodeDetailAdapter(data,node_name,detail_nodeActivity,this);
+        adapter = new NodeDetailAdapter(data,node_name, detail_node,this);
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -122,7 +122,7 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
     private void setRefresh() {
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailID(node_id));
-        adapter = new NodeDetailAdapter(data,node_name,detail_nodeActivity,this);
+        adapter = new NodeDetailAdapter(data,node_name, detail_node,this);
         mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }
@@ -190,10 +190,10 @@ public class Detail_NodeActivity extends AppCompatActivity implements OnStartDra
 
                     adapter.notifyDataSetChanged();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Detail_NodeActivity.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Detail_Node.this);
                     builder.setTitle("Rename Node detail");
 
-                    final EditText input = new EditText(Detail_NodeActivity.this);
+                    final EditText input = new EditText(Detail_Node.this);
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
                     input.setText(data.get(position).getNice_name_d());

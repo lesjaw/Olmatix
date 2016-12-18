@@ -1,7 +1,5 @@
 package com.olmatix.model;
 
-import java.util.Calendar;
-
 /**
  * Created              : Rahman on 12/6/2016.
  * Date Created         : 12/6/2016 / 11:11 PM.
@@ -22,7 +20,6 @@ public class Installed_NodeModel {
     private String online;
     private String signal;
     private String icon;
-
     private String uptime;
     private String reset;
     private String ota;

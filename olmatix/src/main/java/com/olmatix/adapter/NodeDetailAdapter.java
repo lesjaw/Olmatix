@@ -17,6 +17,7 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.utils.Connection;
+import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -29,19 +30,241 @@ import java.util.List;
  * Created by android on 12/13/2016.
  */
 
-public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.ViewHolder> implements ItemTouchHelperAdapter
-{
+public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.ViewHolder> implements ItemTouchHelperAdapter {
 
-    List<Detail_NodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
+    List<Detail_NodeModel> nodeList;
     Context context;
     String fw_name;
+
+    public NodeDetailAdapter(List<Detail_NodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
+
+        this.nodeList = nodeList;
+        this.fw_name = fw_name;
+        mDragStartListener = dragStartListener;
+        this.context = context;
+
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return nodeList.size();
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView;
+
+        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
+            itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.frag_node_button, parent, false);
+
+            return new OlmatixHolder(itemView);
+
+        } else if (fw_name.equals("smartsensordoor")) {
+            itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.frag_node_sensor, parent, false);
+
+            return new OlmatixSensorHolder(itemView);
+        }
+
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
+        //final int pos = position;
+        final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
+        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
+
+            //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
+            final OlmatixHolder holder = (OlmatixHolder) viewHolder;
+
+            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+            holder.imgNode.setImageResource(R.drawable.olmatixlogo);
+
+            if (mInstalledNodeModel.getNice_name_d() != null) {
+                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+            } else holder.node_name.setText(mInstalledNodeModel.getName());
+
+            holder.upTime.setText(OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
+
+            holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+
+            if (mInstalledNodeModel.getStatus().equals("true")) {
+                holder.imgNode.setImageResource(R.mipmap.onlamp);
+                holder.status.setText("Status : " + "ON");
+
+            } else {
+                holder.imgNode.setImageResource(R.mipmap.offlamp);
+                holder.status.setText("Status : " + "OFF");
+            }
+            holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (Connection.getClient().isConnected()) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
+                        String payload = "ON";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.status.setText("ON");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                    }
+
+                }
+            });
+
+            holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (Connection.getClient().isConnected()) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
+                        String payload = "OFF";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.status.setText("OFF");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                    }
+
+                }
+
+            });
+
+
+        } else if (fw_name.equals("smartsensordoor")) {
+            final OlmatixSensorHolder holder = (OlmatixSensorHolder) viewHolder;
+
+            holder.imgNode.setImageResource(R.drawable.olmatixlogo);
+            if (mInstalledNodeModel.getNice_name_d() != null) {
+                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+            } else {
+                holder.node_name.setText(mInstalledNodeModel.getName());
+            }
+
+
+            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+
+            holder.upTime.setText("Uptime : "+ OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
+            holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+
+            if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
+                Log.d("DEBUG", "onBindViewHolder: "+ mInstalledNodeModel.getStatus_sensor());
+                holder.sensorStatus.setText("Door Close!");
+                holder.imgSensor.setImageResource(R.drawable.door_close);
+            } else {
+                holder.sensorStatus.setText("Door Open!");
+                holder.imgSensor.setImageResource(R.drawable.door_open);
+            }
+
+
+            if (mInstalledNodeModel.getStatus().equals("true")) {
+                holder.imgNode.setImageResource(R.mipmap.armed);
+                holder.status.setText("Status : " + "ARMED");
+
+            } else {
+                holder.imgNode.setImageResource(R.mipmap.not_armed);
+                holder.status.setText("Status : " + "NOT ARMED");
+            }
+
+            if (mInstalledNodeModel.getStatus_theft().equals("true")) {
+                holder.status.setText("Status : " + "ALARM!!");
+                holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                holder.status.setTypeface(null, Typeface.BOLD);
+
+            }
+            Log.d("DEBUG", "Adapter: " + mInstalledNodeModel.getStatus_sensor());
+
+
+            holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (Connection.getClient().isConnected()) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
+                        String payload = "ON";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.status.setText("ARMED");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                    }
+
+                }
+            });
+
+            holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (Connection.getClient().isConnected()) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
+                        String payload = "OFF";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.status.setText("NOT ARMED");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                    }
+
+                }
+
+            });
+        }
+
+
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        Collections.swap(nodeList, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View v) {
             super(v);
         }
     }
+
     public class OlmatixHolder extends ViewHolder {
         public TextView node_name, upTime, status, fwName;
         public ImageView imgNode;
@@ -61,7 +284,7 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
     }
 
     public class OlmatixSensorHolder extends ViewHolder {
-        public TextView node_name, upTime, status,sensorStatus, fwName;
+        public TextView node_name, upTime, status, sensorStatus, fwName;
         public ImageView imgNode, imgSensor;
         Button btn_off, btn_on;
 
@@ -78,231 +301,6 @@ public class NodeDetailAdapter  extends RecyclerView.Adapter<NodeDetailAdapter.V
             imgSensor = (ImageView) view.findViewById(R.id.door);
 
         }
-    }
-
-    public NodeDetailAdapter(List<Detail_NodeModel> nodeList,String fw_name,Context context,OnStartDragListener dragStartListener) {
-
-        this.nodeList = nodeList;
-        this.fw_name = fw_name;
-        mDragStartListener = dragStartListener;
-        this.context = context;
-
-
-    }
-    @Override
-    public int getItemCount() {
-        return nodeList.size();
-    }
-
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView;
-
-        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
-            itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.frag_node_button, parent, false);
-
-              return new OlmatixHolder(itemView);
-
-        }
-        else if(fw_name.equals("smartsensordoor"))
-        {
-            itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.frag_node_sensor, parent, false);
-
-            return new OlmatixSensorHolder(itemView);
-        }
-
-        return null;
-    }
-
-    @Override
-    public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-        //final int pos = position;
-        final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
-        if(fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch"))
-        {
-
-            //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
-            final OlmatixHolder holder = (OlmatixHolder) viewHolder;
-
-            holder.fwName.setText(mInstalledNodeModel.getNode_id());
-            holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-
-            if (mInstalledNodeModel.getNice_name_d() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            }
-             else holder.node_name.setText(mInstalledNodeModel.getName());
-
-            holder.upTime.setText(mInstalledNodeModel.getUptime());
-
-            holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
-
-            if (mInstalledNodeModel.getStatus().equals("true")){
-                holder.imgNode.setImageResource(R.mipmap.onlamp);
-                holder.status.setText("Status : "+"ON");
-
-            }else {
-                holder.imgNode.setImageResource(R.mipmap.offlamp);
-                holder.status.setText("Status : " + "OFF");
-            }
-            holder.btn_on.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (Connection.getClient().isConnected()) {
-                        String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+mInstalledNodeModel.getChannel()+"/set";
-                        String payload = "ON";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.status.setText("ON");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else
-                    {}
-
-                }
-            });
-
-            holder.btn_off.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (Connection.getClient().isConnected()) {
-                        String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/"+mInstalledNodeModel.getChannel()+"/set";
-                        String payload = "OFF";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.status.setText("OFF");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else
-                    {}
-
-                }
-
-            });
-
-
-        }else if(fw_name.equals("smartsensordoor"))
-        {
-            final OlmatixSensorHolder holder = (OlmatixSensorHolder) viewHolder;
-
-            holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-            if (mInstalledNodeModel.getNice_name_d() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            }
-
-            else holder.node_name.setText(mInstalledNodeModel.getName());
-
-
-            holder.fwName.setText(mInstalledNodeModel.getNode_id());
-
-            holder.upTime.setText(mInstalledNodeModel.getUptime());
-            holder.status.setText("Status : "+mInstalledNodeModel.getStatus());
-
-                if(mInstalledNodeModel.getStatus_sensor().equals("true")) {
-                    holder.sensorStatus.setText("Door Close!");
-                    holder.imgSensor.setImageResource(R.drawable.door_close);
-                }else {
-                    holder.sensorStatus.setText("Door Open!");
-                    holder.imgSensor.setImageResource(R.drawable.door_open);
-                }
-
-
-            if (mInstalledNodeModel.getStatus().equals("true")){
-                holder.imgNode.setImageResource(R.mipmap.armed);
-                holder.status.setText("Status : "+"ARMED");
-
-            }else {
-                holder.imgNode.setImageResource(R.mipmap.not_armed);
-                holder.status.setText("Status : " + "NOT ARMED");
-            }
-
-            if (mInstalledNodeModel.getStatus_theft().equals("true")){
-                holder.status.setText("Status : " + "ALARM!!");
-                holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-                holder.status.setTypeface(null, Typeface.BOLD);
-
-            }
-            Log.d("DEBUG", "Adapter: " +mInstalledNodeModel.getStatus_sensor());
-
-
-            holder.btn_on.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (Connection.getClient().isConnected()) {
-                        String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/0/set";
-                        String payload = "ON";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.status.setText("ARMED");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else
-                    {}
-
-                }
-            });
-
-            holder.btn_off.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (Connection.getClient().isConnected()) {
-                        String topic = "devices/"+mInstalledNodeModel.getNode_id()+"/light/0/set";
-                        String payload = "OFF";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.status.setText("NOT ARMED");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else
-                    {}
-
-                }
-
-            });
-        }
-
-
-    }
-
-    @Override
-    public boolean onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(nodeList, fromPosition, toPosition);
-        notifyItemMoved(fromPosition, toPosition);
-        return true;
-    }
-
-        @Override
-    public void onItemDismiss(int position) {
-
     }
 
 

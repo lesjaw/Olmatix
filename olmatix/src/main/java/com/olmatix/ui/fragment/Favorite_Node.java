@@ -48,7 +48,7 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
     private AlertDialog.Builder alertDialog;
     private RecyclerView.LayoutManager layoutManager;
     private NodeFavoriteAdapter adapter;
-    SwipeRefreshLayout mSwipeRefreshLayout;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Favorite_NodeModel favoriteNodeModel;
     public static dbNodeRepo dbNodeRepo;
@@ -58,7 +58,7 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
     String node_id,node_name;
 
     private int flagReceiver;
-    //private int mDatasetTypes[] = {WEATHER, SCORE, NEWS, NEWS}; //view types
+
 
     @Nullable
     @Override
@@ -113,9 +113,7 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
-
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
-
         mRecycleView.setHasFixedSize(true);
 
         final int spanCount = getResources().getInteger(R.integer.grid_columns);
@@ -187,16 +185,14 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
 
-                if (direction == ItemTouchHelper.LEFT)
-                {
+                if (direction == ItemTouchHelper.LEFT){
                     adapter.notifyDataSetChanged();
                     ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
                     mItemTouchHelper = new ItemTouchHelper(callback);
                     mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
                 }
-                else
-                {
+                else{
 
                 }
             }

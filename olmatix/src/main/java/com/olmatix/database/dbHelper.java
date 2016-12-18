@@ -69,6 +69,7 @@ public class dbHelper extends SQLiteOpenHelper {
 
     }
 
+    //FAVORITE = DASHBOARD
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed, all data will be gone!!!

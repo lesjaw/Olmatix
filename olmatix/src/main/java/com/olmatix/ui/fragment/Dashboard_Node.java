@@ -27,7 +27,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -89,11 +89,12 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText mEditText = new EditText(getContext());
+                final Spinner mSpinner = new Spinner(getContext());
+
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")
                         .setMessage("Please type Olmatix product ID!")
-                        .setView(mEditText)
+                        .setView(mSpinner)
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
 
                             @Override

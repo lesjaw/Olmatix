@@ -331,7 +331,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                inputResult =mEditText.getText().toString();
+                                inputResult = mEditText.getText().toString();
                                 String topic = "devices/" + inputResult + "/$online";
                                 int qos = 2;
                                 try {

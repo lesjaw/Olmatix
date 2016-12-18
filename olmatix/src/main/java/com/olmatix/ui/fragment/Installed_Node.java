@@ -132,51 +132,60 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
             @Override
             public void onLongClick(View view, final int position) {
+                ImageView imgNode;
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Reset this Node?");
-                builder.setMessage(data.get(position).getNice_name_n());
-
-                builder.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
+                imgNode=(ImageView)view.findViewById(R.id.icon_node);
+                imgNode.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String nodeid = data.get(position).getNodesID();
-                        String statusnode = data.get(position).getOnline();
-                        if (statusnode.equals("true")) {
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle("Reset this Node?");
+                        builder.setMessage(data.get(position).getNice_name_n());
 
-                            if (Connection.getClient().isConnected()) {
-                                String topic = "devices/" + nodeid + "/$reset";
-                                String payload = "true";
-                                byte[] encodedPayload = new byte[0];
-                                try {
-                                    encodedPayload = payload.getBytes("UTF-8");
-                                    MqttMessage message = new MqttMessage(encodedPayload);
-                                    message.setQos(1);
-                                    message.setRetained(true);
-                                    Connection.getClient().publish(topic, message);
+                        builder.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String nodeid = data.get(position).getNodesID();
+                                String statusnode = data.get(position).getOnline();
+                                if (statusnode.equals("true")) {
 
-                                } catch (UnsupportedEncodingException | MqttException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                Toast.makeText(getActivity(), "You don't connect to the server", Toast.LENGTH_LONG).show();
-                                setRefresh();
+                                    if (Connection.getClient().isConnected()) {
+                                        String topic = "devices/" + nodeid + "/$reset";
+                                        String payload = "true";
+                                        byte[] encodedPayload = new byte[0];
+                                        try {
+                                            encodedPayload = payload.getBytes("UTF-8");
+                                            MqttMessage message = new MqttMessage(encodedPayload);
+                                            message.setQos(1);
+                                            message.setRetained(true);
+                                            Connection.getClient().publish(topic, message);
+
+                                        } catch (UnsupportedEncodingException | MqttException e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        Toast.makeText(getActivity(), "You don't connect to the server", Toast.LENGTH_LONG).show();
+                                        setRefresh();
+                                    }
+                                    Toast.makeText(getActivity(), "Successfully Reset", Toast.LENGTH_LONG).show();
+                                    //setRefresh();
+                                } else {Toast.makeText(getActivity(), "Your device Offline, No reset have been done", Toast.LENGTH_LONG).show();}
                             }
-                            Toast.makeText(getActivity(), "Successfully Reset", Toast.LENGTH_LONG).show();
-                            //setRefresh();
-                        } else {Toast.makeText(getActivity(), "Your device Offline, No reset have been done", Toast.LENGTH_LONG).show();}
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
+                        });
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        builder.show();
+
+
                     }
                 });
 
-                builder.show();
-
-            }
+                            }
         }));
 
 

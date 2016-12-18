@@ -538,9 +538,11 @@ public class OlmatixService extends Service {
                 installedNodeModel.setNodesID(NodeID);
                 if (dbNodeRepo.hasObject(installedNodeModel)) {
 
-                    Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID +", its exist, we are updating Node status", Toast.LENGTH_LONG).show();
-                    //flagExist = 1;
-                    Log.d("saveFirst", "You already have this Node, DB = " + NodeID+", Exist, we are updating Node status");
+                    if (flagAct) {
+                        Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID + ", its exist, we are updating Node status", Toast.LENGTH_LONG).show();
+                        flagAct = true;
+                    }
+                    //Log.d("saveFirst", "You already have this Node, DB = " + NodeID+", Exist, we are updating Node status");
                     saveDatabase();
 
                 } else {
@@ -730,7 +732,7 @@ public class OlmatixService extends Service {
     }
 
     private void doSubAll() {
-
+        flagAct=false;
         int countDB = dbNodeRepo.getNodeList().size();
         Log.d("DEBUG", "Count list: " + countDB);
         data.addAll(dbNodeRepo.getNodeList());

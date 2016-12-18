@@ -26,10 +26,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,10 +55,6 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private Detail_NodeModel detailNodeModel;
     private Paint p = new Paint();
     private TextView label_node;
-    private ImageView imgStatus;
-    private TextView connStat;
-    private Animation animConn;
-    boolean serverconnected;
     private String nicename;
     Detail_Node detail_node;
     private static ArrayList<Detail_NodeModel> data;

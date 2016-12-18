@@ -60,13 +60,9 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_CHANNEL + " TEXT, "
                 + dbNode.KEY_NODE_TYPE + " TEXT )";
 
-
-
         db.execSQL(CREATE_TABLE_NODE);
         db.execSQL(CREATE_TABLE_NODE_INSTALLED);
         db.execSQL(CREATE_TABLE_FAVORITE);
-
-
     }
 
     //FAVORITE = DASHBOARD

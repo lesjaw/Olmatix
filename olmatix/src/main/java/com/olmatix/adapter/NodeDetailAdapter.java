@@ -44,8 +44,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         mDragStartListener = dragStartListener;
         this.context = context;
 
-
     }
+
+
+
 
     @Override
     public int getItemCount() {

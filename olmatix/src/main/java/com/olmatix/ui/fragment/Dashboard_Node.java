@@ -30,31 +30,34 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
+import com.olmatix.adapter.NodeDetailAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.model.Detail_NodeModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
     private View mView;
-    private List<Dashboard_NodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
     private AlertDialog.Builder alertDialog;
     private RecyclerView.LayoutManager layoutManager;
     private NodeDashboardAdapter adapter;
+    private NodeDetailAdapter adapterSpinner;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Dashboard_NodeModel dashboardNodeModel;
     public static dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
+    private static ArrayList<Detail_NodeModel> dataSpinner;
     Dashboard_Node dashboard_node;
+    Detail_Node detail_node;
     String node_id,node_name;
 
     private int flagReceiver;
@@ -76,6 +79,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         dbNodeRepo = new dbNodeRepo(getActivity());
         dashboardNodeModel = new Dashboard_NodeModel();
         dashboard_node =this;
+
         setupView();
         onClickListener();
 
@@ -90,6 +94,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
             @Override
             public void onClick(View v) {
                 final Spinner mSpinner = new Spinner(getContext());
+                dataSpinner = new ArrayList<>();
+                ArrayList<Detail_NodeModel> nodes = dbNodeRepo.getNodeDetail();
 
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")

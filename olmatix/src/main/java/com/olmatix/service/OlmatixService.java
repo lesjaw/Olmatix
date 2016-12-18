@@ -325,14 +325,10 @@ public class OlmatixService extends Service {
         if (flagAct) {
             Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
             Log.d("Service = ", "Starting..");
-            flagAct = false;
         }
 
         sendMessage();
-        boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
-        Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
-
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     private void sendMessage() {

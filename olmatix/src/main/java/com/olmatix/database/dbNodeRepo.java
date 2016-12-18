@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
-import com.olmatix.model.Favorite_NodeModel;
+import com.olmatix.model.Dashboard_NodeModel;
 
 import java.util.ArrayList;
 
@@ -92,7 +92,7 @@ public class dbNodeRepo {
         return (int) node_Id;
     }
 
-    public int insertFavNode(Favorite_NodeModel nodeFavorite){
+    public int insertFavNode(Dashboard_NodeModel nodeFavorite){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -334,17 +334,17 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-    public ArrayList<Favorite_NodeModel> getNodeFav() {
+    public ArrayList<Dashboard_NodeModel> getNodeFav() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM " + TABLE_FAV;
 
-        ArrayList<Favorite_NodeModel> nodeList = new ArrayList<Favorite_NodeModel>();
+        ArrayList<Dashboard_NodeModel> nodeList = new ArrayList<Dashboard_NodeModel>();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                Favorite_NodeModel node = new Favorite_NodeModel();
+                Dashboard_NodeModel node = new Dashboard_NodeModel();
                 //ArrayList<String> node = new ArrayList<>();
                 node.setFavChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
                 node.setFavNodeType( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_TYPE)));

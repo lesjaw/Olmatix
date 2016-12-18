@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 /**
  * Created by Rahman on 12/18/2016.
  */
-public class Dashboard extends Fragment {
+public class Scene extends Fragment {
 
 
-    public Dashboard() {
+    public Scene() {
     }
 
     @Nullable

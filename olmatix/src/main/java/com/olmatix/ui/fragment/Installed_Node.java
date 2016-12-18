@@ -185,7 +185,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                     }
                 });
 
-                            }
+            }
         }));
 
 
@@ -205,7 +205,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             }
         }, 100, 5000); // updates GUI each 40 secs
     }
-
 
     private void onClickListener() {
         mFab.setOnClickListener(mFabClickListener());
@@ -540,11 +539,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
     }
-
-    /*@Override
-    public void itemClicked(View view, int position) {
-
-    }*/
 
     public static interface ClickListener{
         public void onClick(View view,int position);

@@ -29,32 +29,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.olmatix.adapter.NodeFavoriteAdapter;
+import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Favorite_NodeModel;
+import com.olmatix.model.Dashboard_NodeModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Favorite_Node extends Fragment implements  OnStartDragListener {
+public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
     private View mView;
-    private List<Favorite_NodeModel> nodeList = new ArrayList<>();
+    private List<Dashboard_NodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
     private AlertDialog.Builder alertDialog;
     private RecyclerView.LayoutManager layoutManager;
-    private NodeFavoriteAdapter adapter;
+    private NodeDashboardAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
-    private Favorite_NodeModel favoriteNodeModel;
+    private Dashboard_NodeModel dashboardNodeModel;
     public static dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
-    private static ArrayList<Favorite_NodeModel> data;
-    Favorite_Node favorite_node;
+    private static ArrayList<Dashboard_NodeModel> data;
+    Dashboard_Node dashboard_node;
     String node_id,node_name;
 
     private int flagReceiver;
@@ -64,7 +64,7 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        mView = inflater.inflate(R.layout.frag_favorite, container, false);
+        mView = inflater.inflate(R.layout.frag_dashboard, container, false);
         return mView;
     }
 
@@ -74,8 +74,8 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
 
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
-        favoriteNodeModel = new Favorite_NodeModel();
-        favorite_node=this;
+        dashboardNodeModel = new Dashboard_NodeModel();
+        dashboard_node =this;
         setupView();
         onClickListener();
 
@@ -123,7 +123,7 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeFav());
-        adapter = new NodeFavoriteAdapter(data,node_name, favorite_node,this);
+        adapter = new NodeDashboardAdapter(data,node_name, dashboard_node,this);
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -145,7 +145,7 @@ public class Favorite_Node extends Fragment implements  OnStartDragListener {
         data.clear();
         data.addAll(dbNodeRepo.getNodeFav());
 
-        adapter = new NodeFavoriteAdapter(data,node_name, favorite_node,this);
+        adapter = new NodeDashboardAdapter(data,node_name, dashboard_node,this);
         mRecycleView.setAdapter(adapter);
         //adapter.setClickListener(this);
 

@@ -11,8 +11,8 @@ import android.widget.TextView;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Favorite_NodeModel;
-import com.olmatix.ui.fragment.Favorite_Node;
+import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.ui.fragment.Dashboard_Node;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,10 +21,10 @@ import java.util.List;
  * Created by Lesjaw on 17/12/2016.
  */
 
-public class NodeFavoriteAdapter extends RecyclerView.Adapter<NodeFavoriteAdapter.ViewHolder> implements ItemTouchHelperAdapter
+public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdapter.ViewHolder> implements ItemTouchHelperAdapter
 {
 
-    List<Favorite_NodeModel> nodeList;
+    List<Dashboard_NodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
     Context context;
     String fw_name;
@@ -34,7 +34,7 @@ public class NodeFavoriteAdapter extends RecyclerView.Adapter<NodeFavoriteAdapte
             super(v);
         }
     }
-    public class ButtonHolder extends NodeFavoriteAdapter.ViewHolder {
+    public class ButtonHolder extends NodeDashboardAdapter.ViewHolder {
         public TextView node_name, upTime, status, fwName;
         public ImageButton imgNode;
 
@@ -46,7 +46,7 @@ public class NodeFavoriteAdapter extends RecyclerView.Adapter<NodeFavoriteAdapte
         }
     }
 
-    public class StatusHolder extends NodeFavoriteAdapter.ViewHolder {
+    public class StatusHolder extends NodeDashboardAdapter.ViewHolder {
         public TextView node_name, upTime, status, fwName;
         public ImageButton imgNode;
 
@@ -58,7 +58,7 @@ public class NodeFavoriteAdapter extends RecyclerView.Adapter<NodeFavoriteAdapte
         }
     }
 
-    public NodeFavoriteAdapter(List<Favorite_NodeModel> nodeList, String fw_name, OnStartDragListener dragStartListener, Favorite_Node favorite_node) {
+    public NodeDashboardAdapter(List<Dashboard_NodeModel> nodeList, String fw_name, OnStartDragListener dragStartListener, Dashboard_Node dashboard_node) {
 
         this.nodeList = nodeList;
         mDragStartListener = dragStartListener;
@@ -74,7 +74,7 @@ public class NodeFavoriteAdapter extends RecyclerView.Adapter<NodeFavoriteAdapte
     }
 
     @Override
-    public NodeFavoriteAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public NodeDashboardAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView;
 
 
@@ -82,7 +82,7 @@ public class NodeFavoriteAdapter extends RecyclerView.Adapter<NodeFavoriteAdapte
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_button, parent, false);
 
-            return new NodeFavoriteAdapter.ButtonHolder(itemView);
+            return new NodeDashboardAdapter.ButtonHolder(itemView);
 
         }
         else if(fw_name.equals("sensor"))
@@ -90,20 +90,20 @@ public class NodeFavoriteAdapter extends RecyclerView.Adapter<NodeFavoriteAdapte
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_sensor, parent, false);
 
-            return new NodeFavoriteAdapter.StatusHolder(itemView);
+            return new NodeDashboardAdapter.StatusHolder(itemView);
         }
 
         return null;
     }
 
 
-    public void onBindViewHolder(final NodeFavoriteAdapter.ViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(final NodeDashboardAdapter.ViewHolder viewHolder, final int position) {
         //final int pos = position;
-        final Favorite_NodeModel mFavoriteModel = nodeList.get(position);
+        final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
         if(fw_name.equals("ligth")) {
 
             //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
-            final NodeFavoriteAdapter.ButtonHolder holder = (NodeFavoriteAdapter.ButtonHolder) viewHolder;
+            final NodeDashboardAdapter.ButtonHolder holder = (NodeDashboardAdapter.ButtonHolder) viewHolder;
 
             holder.fwName.setText(mFavoriteModel.getFavNodeID());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
@@ -112,7 +112,7 @@ public class NodeFavoriteAdapter extends RecyclerView.Adapter<NodeFavoriteAdapte
 
         }else if(fw_name.equals("sensor"))
         {
-            final NodeFavoriteAdapter.StatusHolder holder = (NodeFavoriteAdapter.StatusHolder) viewHolder;
+            final NodeDashboardAdapter.StatusHolder holder = (NodeDashboardAdapter.StatusHolder) viewHolder;
 
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
 

@@ -4,7 +4,7 @@ package com.olmatix.model;
  * Created by Lesjaw on 17/12/2016.
  */
 
-public class Favorite_NodeModel {
+public class Dashboard_NodeModel {
 
     private int FavId;
     private String FavNodeID;

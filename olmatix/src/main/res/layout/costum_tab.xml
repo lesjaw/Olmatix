@@ -6,7 +6,7 @@
         android:id="@+id/tab_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:icon="@drawable/ic_fav"
+        android:icon="@drawable/ic_scene"
         android:layout_marginRight="5dp"/>
 
     <TextView android:id="@+id/tab_text"

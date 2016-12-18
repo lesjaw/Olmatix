@@ -5,13 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -28,9 +24,9 @@ import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.ui.fragment.Dashboard;
-import com.olmatix.ui.fragment.Favorite_Node;
+import com.olmatix.ui.fragment.Dashboard_Node;
 import com.olmatix.ui.fragment.Installed_Node;
+import com.olmatix.ui.fragment.Scene;
 
 /**
  * Created by Lesjaw on 02/12/2016.
@@ -38,7 +34,8 @@ import com.olmatix.ui.fragment.Installed_Node;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean serverconnected;
+    boolean serverconnected =false;
+    boolean mSwitch_Conn;
     int backButtonCount;
     int flagReceiver = 0;
     private OrientationEventListener mOrientationListener;
@@ -49,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     public static int[] tabIcons = {
             R.drawable.ic_dashboard,
-            R.drawable.ic_fav,
+            R.drawable.ic_scene,
             R.drawable.ic_node,
     };
     private ViewPager mViewPager;
@@ -59,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
 
             String message = intent.getStringExtra("MQTT State");
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = sharedPref.edit();
 
             if (message == null) {
                 message = "false";
@@ -66,12 +65,17 @@ public class MainActivity extends AppCompatActivity {
             }
             if (message.equals("true")) {
                 serverconnected = true;
+                editor.putBoolean("switch_conn", true);
+                editor.apply();
                 imgStatus.setImageResource(R.drawable.ic_conn_green);
                 imgStatus.startAnimation(animConn);
                 connStat.setText("Connected");
-                connStat.startAnimation(animConn);
+                //connStat.startAnimation(animConn);
 
             } else if (message.equals("false")) {
+                serverconnected = false;
+                editor.putBoolean("switch_conn", false);
+                editor.apply();
                 imgStatus.setImageResource(R.drawable.ic_conn_red);
                 imgStatus.startAnimation(animConn);
                 connStat.setText("Not Connected");
@@ -96,8 +100,21 @@ public class MainActivity extends AppCompatActivity {
         setupToolbar();
         setupTabs();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
+        mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
+
+        if (mSwitch_Conn) {
+            imgStatus.setImageResource(R.drawable.ic_conn_green);
+            imgStatus.startAnimation(animConn);
+            connStat.setText("Connected");
+            //connStat.startAnimation(animConn);
+
+        } else if (!mSwitch_Conn) {
+            imgStatus.setImageResource(R.drawable.ic_conn_red);
+            imgStatus.startAnimation(animConn);
+            connStat.setText("Not Connected");
+            connStat.startAnimation(animConn);
+        }
     }
 
 
@@ -107,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         imgStatus = (ImageView) findViewById(R.id.conn_state);
         connStat = (TextView) findViewById(R.id.conn_state1);
         animConn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink);
+
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -131,8 +149,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
 
-        mOlmatixAdapter.addFrag(new Dashboard(), "Dashboard");
-        mOlmatixAdapter.addFrag(new Favorite_Node(), "Favorite");
+        mOlmatixAdapter.addFrag(new Dashboard_Node(), "Dashboard");
+        mOlmatixAdapter.addFrag(new Scene(), "Scene");
         mOlmatixAdapter.addFrag(new Installed_Node(), "Node");
         viewPager.setAdapter(mOlmatixAdapter);
     }

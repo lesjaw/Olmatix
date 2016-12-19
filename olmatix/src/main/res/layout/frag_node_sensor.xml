@@ -105,8 +105,8 @@
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@+id/btn_on"
-                android:src="@mipmap/door"
-                android:paddingTop="10sp"
+                android:src="@drawable/door_close"
+                android:paddingTop="0sp"
                 />
 
 

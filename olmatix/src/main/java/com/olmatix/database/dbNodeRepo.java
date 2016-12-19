@@ -28,7 +28,6 @@ import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
 import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
 import static com.olmatix.database.dbNode.KEY_NODES;
 import static com.olmatix.database.dbNode.KEY_NODE_ID;
-import static com.olmatix.database.dbNode.KEY_NODE_TYPE;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
 import static com.olmatix.database.dbNode.KEY_OTA;
 import static com.olmatix.database.dbNode.KEY_RESET;
@@ -74,7 +73,6 @@ public class dbNodeRepo {
         return (int) Id;
     }
 
-
     public int insertInstalledNode(Detail_NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -99,15 +97,13 @@ public class dbNodeRepo {
 
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODE_ID,dashboardNodeModel.getFavNodeID());
-        values.put(KEY_CHANNEL, dashboardNodeModel.getFavChannel());
-        values.put(KEY_NODE_TYPE, dashboardNodeModel.getFavNodeType());
+        values.put(KEY_NICE_NAME_D,dashboardNodeModel.getNice_name_d());
 
         //long node_Id = db.insert(TABLE_FAV, null, values);
         db.insert(TABLE_FAV, null, values);
 
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
+        Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NICE_NAME_D));
 
         return;
     }
@@ -319,7 +315,8 @@ public class dbNodeRepo {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                labels.add(cursor.getString(3)+" || "+ cursor.getString(1));
+                //labels.add(cursor.getString(1)+" | "+ cursor.getString(3));
+                labels.add(cursor.getString(3));
 
             } while (cursor.moveToNext());
         }
@@ -372,9 +369,7 @@ public class dbNodeRepo {
             do {
                 Dashboard_NodeModel node = new Dashboard_NodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setFavChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
-                node.setFavNodeType( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_TYPE)));
-                node.setFavNodeID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
 
                 favList.add(node);
 
@@ -386,20 +381,19 @@ public class dbNodeRepo {
         return favList;
     }
 
-    public ArrayList<Detail_NodeModel> getNodeDetailID(String node_id) {
+    public ArrayList<Dashboard_NodeModel> getNodeDetailDash() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT * FROM "+TABLE + " installed_node INNER JOIN "+  TABLE_NODE +
-                " detail_node ON installed_node."+KEY_NODE_ID+" = detail_node."+KEY_NODE_ID +
-                " WHERE detail_node." +KEY_NODE_ID +"=?";
+        String selectQuery =  "SELECT * FROM "+TABLE_FAV + " favorite_node INNER JOIN "+  TABLE_NODE +
+                " detail_node ON favorite_node."+KEY_NICE_NAME_D+" = detail_node."+KEY_NICE_NAME_D;
 
-        ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
-        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(node_id)});
+        ArrayList<Dashboard_NodeModel> nodeList = new ArrayList<>();
+        Cursor cursor = db.rawQuery(selectQuery,  null);
 
         if (cursor.moveToFirst()) {
             do {
-                Detail_NodeModel node = new Detail_NodeModel();
-                //ArrayList<String> node = new ArrayList<>();
+                Dashboard_NodeModel node = new Dashboard_NodeModel();
+
                 node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
@@ -416,7 +410,43 @@ public class dbNodeRepo {
 
             } while (cursor.moveToNext());
         }
-        //Log.d("getlist", "getNodeList: " +cursor.getCount());
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
+
+    public ArrayList<Detail_NodeModel> getNodeDetailID(String node_id) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT * FROM "+TABLE + " installed_node INNER JOIN "+  TABLE_NODE +
+                " detail_node ON installed_node."+KEY_NODE_ID+" = detail_node."+KEY_NODE_ID +
+                " WHERE detail_node." +KEY_NODE_ID +"=?";
+
+        ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
+        Cursor cursor = db.rawQuery(selectQuery,  new String[]{String.valueOf(node_id)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Detail_NodeModel node = new Detail_NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+
+                node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
+                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
         cursor.close();
         db.close();
         return nodeList;

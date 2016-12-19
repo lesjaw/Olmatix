@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
@@ -57,9 +58,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     private static ArrayList<Dashboard_NodeModel> data;
     private static ArrayList<Detail_NodeModel> dataSpinner;
     Dashboard_Node dashboard_node;
-    Detail_Node detail_node;
-    String node_id,node_name;
-
+    Spinner mSpinner;
     private int flagReceiver;
 
 
@@ -80,6 +79,16 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         dashboardNodeModel = new Dashboard_NodeModel();
         dashboard_node =this;
 
+        mSpinner = new Spinner(getContext());
+        dataSpinner = new ArrayList<>();
+        dataSpinner.addAll(dbNodeRepo.getNodeDetail());
+        //set spinner adapter
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,dataSpinner,android.R.layout.simple_spinner_item);
+        // Drop down layout style - list view with radio button
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // attaching data adapter to spinner
+        mSpinner.setAdapter(spinnerAdapter);
+
         setupView();
         onClickListener();
 
@@ -93,13 +102,11 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Spinner mSpinner = new Spinner(getContext());
-                dataSpinner = new ArrayList<>();
-                ArrayList<Detail_NodeModel> nodes = dbNodeRepo.getNodeDetail();
+
 
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")
-                        .setMessage("Please type Olmatix product ID!")
+                        .setMessage("Please choose from existing Nodes!")
                         .setView(mSpinner)
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
 
@@ -130,7 +137,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeFav());
-        adapter = new NodeDashboardAdapter(data,node_name, dashboard_node,this);
+        //adapter = new NodeDashboardAdapter(data,dashboard_node,this);
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -152,7 +159,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         data.clear();
         data.addAll(dbNodeRepo.getNodeFav());
 
-        adapter = new NodeDashboardAdapter(data,node_name, dashboard_node,this);
+        //adapter = new NodeDashboardAdapter(data,node_name, dashboard_node,this);
         mRecycleView.setAdapter(adapter);
         //adapter.setClickListener(this);
 

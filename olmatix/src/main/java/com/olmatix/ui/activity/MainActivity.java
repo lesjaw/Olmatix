@@ -34,7 +34,7 @@ import com.olmatix.ui.fragment.Scene;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean serverconnected =false;
+    boolean serverconnected;
     boolean mSwitch_Conn;
     int backButtonCount;
     int flagReceiver = 0;
@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
             }
             if (message.equals("true")) {
                 serverconnected = true;
-                editor.putBoolean("switch_conn", true);
-                editor.apply();
+                /*editor.putBoolean("switch_conn", true);
+                editor.apply();*/
                 imgStatus.setImageResource(R.drawable.ic_conn_green);
                 imgStatus.startAnimation(animConn);
                 connStat.setText("Connected");
@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
 
             } else if (message.equals("false")) {
                 serverconnected = false;
-                editor.putBoolean("switch_conn", false);
-                editor.apply();
+                /*editor.putBoolean("switch_conn", false);
+                editor.apply();*/
                 imgStatus.setImageResource(R.drawable.ic_conn_red);
                 imgStatus.startAnimation(animConn);
                 connStat.setText("Not Connected");
@@ -103,13 +103,13 @@ public class MainActivity extends AppCompatActivity {
         mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
 
-        if (mSwitch_Conn) {
+        if (serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_green);
             imgStatus.startAnimation(animConn);
             connStat.setText("Connected");
             //connStat.startAnimation(animConn);
 
-        } else if (!mSwitch_Conn) {
+        } else if (!serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_red);
             imgStatus.startAnimation(animConn);
             connStat.setText("Not Connected");

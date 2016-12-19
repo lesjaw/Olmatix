@@ -10,9 +10,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
-import com.olmatix.model.Dashboard_NodeModel;
 
 import java.util.ArrayList;
 

@@ -47,8 +47,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
 
-
-
     @Override
     public int getItemCount() {
         return nodeList.size();

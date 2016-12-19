@@ -8,7 +8,7 @@ import android.widget.Toast;
  * Created by Lesjaw on 19/12/2016.
  */
 
-public class SpinnerDashOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
+public class SpinnerListener implements AdapterView.OnItemSelectedListener {
 
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         Toast.makeText(parent.getContext(),

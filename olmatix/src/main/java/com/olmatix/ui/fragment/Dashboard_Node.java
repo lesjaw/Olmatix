@@ -39,7 +39,7 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
-import com.olmatix.utils.SpinnerDashOnItemSelectedListener;
+import com.olmatix.utils.SpinnerListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,8 +82,6 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         dashboardNodeModel = new Dashboard_NodeModel();
         dashboard_node =this;
 
-        // Spinner click listener
-
         setupView();
         onClickListener();
 
@@ -112,9 +110,13 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mSpinner.setOnItemSelectedListener(new SpinnerDashOnItemSelectedListener());
+                                mSpinner.setOnItemSelectedListener(new SpinnerListener());
                                 Toast.makeText(getContext(),"You have add : " +String.valueOf(mSpinner.getSelectedItem()),Toast.LENGTH_SHORT).show();
-                                //do add fav
+                                String NiceName= String.valueOf(mSpinner.getSelectedItem());
+
+                                dashboardNodeModel.setFavNodeID(NiceName);
+                                dbNodeRepo.insertFavNode(dashboardNodeModel);
+
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {

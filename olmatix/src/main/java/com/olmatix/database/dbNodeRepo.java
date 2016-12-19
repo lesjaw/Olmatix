@@ -28,6 +28,7 @@ import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
 import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
 import static com.olmatix.database.dbNode.KEY_NODES;
 import static com.olmatix.database.dbNode.KEY_NODE_ID;
+import static com.olmatix.database.dbNode.KEY_NODE_TYPE;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
 import static com.olmatix.database.dbNode.KEY_OTA;
 import static com.olmatix.database.dbNode.KEY_RESET;
@@ -93,20 +94,22 @@ public class dbNodeRepo {
         return (int) node_Id;
     }
 
-    public int insertFavNode(Dashboard_NodeModel nodeFavorite){
+    public void insertFavNode(Dashboard_NodeModel dashboardNodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODE_ID,nodeFavorite.getFavNodeID());
-        values.put(KEY_CHANNEL, nodeFavorite.getFavChannel());
-        values.put(KEY_STATUS, nodeFavorite.getFavNodeType());
+        values.put(KEY_NODE_ID,dashboardNodeModel.getFavNodeID());
+        values.put(KEY_CHANNEL, dashboardNodeModel.getFavChannel());
+        values.put(KEY_NODE_TYPE, dashboardNodeModel.getFavNodeType());
 
-        long node_Id = db.insert(TABLE_FAV, null, values);
+        //long node_Id = db.insert(TABLE_FAV, null, values);
+        db.insert(TABLE_FAV, null, values);
+
         db.close(); // Closing database connection
         Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
 
-        return (int) node_Id;
+        return;
     }
 
     public void deleteNode(String node_Id) {
@@ -316,8 +319,7 @@ public class dbNodeRepo {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                labels.add(cursor.getString(3));
-                //labels.add(cursor.getString(3)) ;
+                labels.add(cursor.getString(3)+" || "+ cursor.getString(1));
 
             } while (cursor.moveToNext());
         }

@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.adapter.NodeDetailAdapter;
@@ -38,8 +39,10 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
+import com.olmatix.utils.SpinnerDashOnItemSelectedListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
@@ -58,8 +61,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     private static ArrayList<Dashboard_NodeModel> data;
     private static ArrayList<Detail_NodeModel> dataSpinner;
     Dashboard_Node dashboard_node;
-    Spinner mSpinner;
     private int flagReceiver;
+    Spinner mSpinner;
 
 
     @Nullable
@@ -79,6 +82,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         dashboardNodeModel = new Dashboard_NodeModel();
         dashboard_node =this;
 
+        // Spinner click listener
+
         setupView();
         onClickListener();
 
@@ -92,26 +97,23 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 mSpinner = new Spinner(getContext());
-                dataSpinner = new ArrayList<>();
-                dataSpinner.addAll(dbNodeRepo.getNodeDetail());
-                //set spinner adapter
-                ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,dataSpinner,android.R.layout.simple_spinner_item);
-                // Drop down layout style - list view with radio button
-                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                // attaching data adapter to spinner
-                mSpinner.setAdapter(spinnerAdapter);
-
+                List<String> lables = dbNodeRepo.getAllLabels();
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
+                        android.R.layout.simple_spinner_item, lables);
+                dataAdapter
+                        .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                mSpinner.setAdapter(dataAdapter);
 
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")
                         .setMessage("Please choose from existing Nodes!")
                         .setView(mSpinner)
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
-
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                mSpinner.setOnItemSelectedListener(new SpinnerDashOnItemSelectedListener());
+                                Toast.makeText(getContext(),"You have add : " +String.valueOf(mSpinner.getSelectedItem()),Toast.LENGTH_SHORT).show();
                                 //do add fav
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -155,6 +157,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
     }
+
     private void setRefresh() {
         data.clear();
         data.addAll(dbNodeRepo.getNodeFav());
@@ -241,12 +244,12 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(mRecycleView);
     }
+
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
 
     }
-
 
     class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
 

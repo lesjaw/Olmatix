@@ -15,6 +15,7 @@ import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_CHANNEL;
@@ -301,6 +302,30 @@ public class dbNodeRepo {
         cursor.close();
         db.close();
         return nodeList;
+    }
+
+    public List<String> getAllLabels(){
+        List<String> labels = new ArrayList<String>();
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_NODE;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                labels.add(cursor.getString(3));
+                //labels.add(cursor.getString(3)) ;
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return labels;
     }
 
     public ArrayList<Detail_NodeModel> getNodeDetail() {

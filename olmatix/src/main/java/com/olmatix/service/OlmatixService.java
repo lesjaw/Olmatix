@@ -315,8 +315,6 @@ public class OlmatixService extends Service {
         }
     }
 
-
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -604,7 +602,6 @@ public class OlmatixService extends Service {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
                 if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
-                   // saveDatabase_sensor();
                 } else {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel("0");

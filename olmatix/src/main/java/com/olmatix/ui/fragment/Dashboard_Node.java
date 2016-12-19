@@ -79,16 +79,6 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         dashboardNodeModel = new Dashboard_NodeModel();
         dashboard_node =this;
 
-        mSpinner = new Spinner(getContext());
-        dataSpinner = new ArrayList<>();
-        dataSpinner.addAll(dbNodeRepo.getNodeDetail());
-        //set spinner adapter
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,dataSpinner,android.R.layout.simple_spinner_item);
-        // Drop down layout style - list view with radio button
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // attaching data adapter to spinner
-        mSpinner.setAdapter(spinnerAdapter);
-
         setupView();
         onClickListener();
 
@@ -102,6 +92,16 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                mSpinner = new Spinner(getContext());
+                dataSpinner = new ArrayList<>();
+                dataSpinner.addAll(dbNodeRepo.getNodeDetail());
+                //set spinner adapter
+                ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,dataSpinner,android.R.layout.simple_spinner_item);
+                // Drop down layout style - list view with radio button
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                // attaching data adapter to spinner
+                mSpinner.setAdapter(spinnerAdapter);
 
 
                 new AlertDialog.Builder(getContext())

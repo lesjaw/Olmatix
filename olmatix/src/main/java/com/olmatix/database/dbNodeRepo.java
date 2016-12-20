@@ -189,7 +189,6 @@ public class dbNodeRepo {
                 String.valueOf(installedNodeModel.getNodesID())
         });
         db.close(); // Closing database connection
-        //Log.d("DEBUG", "updateNiceName: " + String.valueOf(installedNodeModel.getNodesID()));
 
     }
 
@@ -327,13 +326,20 @@ public class dbNodeRepo {
         return labels;
     }
 
-    public ArrayList<Detail_NodeModel> getNodeDetail() {
+    public ArrayList<Detail_NodeModel> getNodeDetail(String node_id, String Channel) {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT * FROM " + TABLE_NODE;
 
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =? AND "+KEY_CHANNEL +" =?";
+
+        // Add the String you are searching by here.
+        // Put it in an array to avoid an unrecognized token error
         ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
-        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        Cursor cursor = db.rawQuery(selectString, new String[] {
+                String.valueOf(node_id),
+                String.valueOf(Channel) });
+
 
         if (cursor.moveToFirst()) {
             do {
@@ -381,8 +387,6 @@ public class dbNodeRepo {
         return favList;
     }
 
-
-
     public ArrayList<Dashboard_NodeModel> getNodeDetailDash() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -419,7 +423,6 @@ public class dbNodeRepo {
         db.close();
         return nodeList;
     }
-
 
     public ArrayList<Detail_NodeModel> getNodeDetailID(String node_id) {
 
@@ -553,4 +556,6 @@ public class dbNodeRepo {
         db.close();
         return node;
     }
+
+
 }

@@ -18,6 +18,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -78,11 +79,17 @@ public class OlmatixService extends Service {
     HashMap<String,String>  messageReceive = new HashMap<>();
     HashMap<String,String> message_topic = new HashMap<>();
     private String mNodeID;
+    private String mNiceName;
     private String NodeIDSensor;
     private String TopicID;
     boolean flagAct=true;
     private String mChange="";
     CharSequence text;
+    CharSequence textNode;
+    CharSequence titleNode;
+
+
+    ArrayList<Detail_NodeModel> data1;
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -162,6 +169,7 @@ public class OlmatixService extends Service {
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         data = new ArrayList<>();
+        data1 = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new Installed_NodeModel();
         detailNodeModel = new Detail_NodeModel();
@@ -190,6 +198,23 @@ public class OlmatixService extends Service {
 
         // Send the notification.
         mNM.notify(NOTIFICATION, notification);
+    }
+
+    private void showNotificationNode() {
+        NotificationCompat.Builder builder =
+                (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.olmatixsmall)
+                        .setContentTitle(titleNode)
+                        .setContentText(textNode);
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
     }
 
     @Override
@@ -424,13 +449,14 @@ public class OlmatixService extends Service {
                 saveFirst();
 
             } else {
-                Toast.makeText(getApplicationContext(), R.string.deviceoffline, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), R.string.deviceoffline, Toast.LENGTH_SHORT).show();
                 installedNodeModel.setNodesID(NodeID);
                 if (dbNodeRepo.hasObject(installedNodeModel)) {
 
-                    Toast.makeText(getApplicationContext(), "Updating status device : " + NodeID, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Updating status device : " + NodeID, Toast.LENGTH_SHORT).show();
                     Log.d("Updating", "status device = " + NodeID);
                     statusDevices();
+                    flagAct = true;
 
                 } else {
                     doUnsubscribe();
@@ -441,37 +467,47 @@ public class OlmatixService extends Service {
     }
 
     private void toastAndNotif(){
+        if (flagAct) {
+            String state = "";
+            detailNodeModel.setNode_id(NodeID);
+            detailNodeModel.setChannel(Channel);
+            data1.addAll(dbNodeRepo.getNodeDetail(NodeID, Channel));
+            int countDB = dbNodeRepo.getNodeDetail(NodeID, Channel).size();
 
-        String nameNice = "";
-        String state="";
-        detailNodeModel.setNode_id(NodeID);
-        detailNodeModel.setChannel(Channel);
-        Log.d("DEBUG", "toastAndNotif: 5 "+NodeID+" / "+Channel+" / " +detailNodeModel.getNice_name_d());
+            if (countDB != 0) {
 
-        if (detailNodeModel.getNice_name_d().equals("")){
-            nameNice = detailNodeModel.getName();
-            Log.d("DEBUG", "toastAndNotif : 1");
-        } else
-            nameNice = detailNodeModel.getNice_name_d();
-            Log.d("DEBUG", "toastAndNotif: 2");
+                for (int i = 0; i < countDB; i++) {
+                    if (data1.get(i).getNice_name_d() != null) {
+                        mNiceName = data1.get(i).getNice_name_d();
+                    } else {
+                        mNiceName = data1.get(i).getName();
+                    }
+                    state = data1.get(i).getStatus();
+                }
+            }
+            Log.d("DEBUG", "state: "+state);
 
-        if (mNodeID.contains("light")) {
-            if (mMessage.equals("true")){
+            if (state.equals("true")) {
                 state = "ON";
-                Log.d("DEBUG", "toastAndNotif: 3");
-            }else
+            }
+            if (state.equals("false")) {
                 state = "OFF";
-            Log.d("DEBUG", "toastAndNotif: 4");
+            }
+
+            if (mNiceName != null) {
+                Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
+
+                titleNode = mNiceName;
+                textNode = state;
+                showNotificationNode();
+
+            }
+            messageReceive.clear();
+            message_topic.clear();
+            data1.clear();
+            Channel = "";
+            flagAct =true;
         }
-
-        Log.d("DEBUG", "toastAndNotif: 5");
-
-        Toast.makeText(getApplicationContext(), nameNice + state, Toast.LENGTH_LONG).show();
-        messageReceive.clear();
-        message_topic.clear();
-        data.clear();
-        Channel = "";
-
     }
 
     private void updateSensorDoor(){
@@ -526,7 +562,7 @@ public class OlmatixService extends Service {
                 installedNodeModel.setAdding(now.getTimeInMillis());
 
                 dbNodeRepo.insertDb(installedNodeModel);
-                Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_SHORT).show();
                 Log.d("saveFirst", "Add Node success, ");
                 messageReceive.clear();
                 data.clear();
@@ -540,7 +576,7 @@ public class OlmatixService extends Service {
                 if (dbNodeRepo.hasObject(installedNodeModel)) {
 
                     if (flagAct) {
-                        Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID + ", its exist, we are updating Node status", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID + ", its exist, we are updating Node status", Toast.LENGTH_SHORT).show();
                         flagAct = true;
                     }
                     //Log.d("saveFirst", "You already have this Node, DB = " + NodeID+", Exist, we are updating Node status");
@@ -555,7 +591,7 @@ public class OlmatixService extends Service {
                     installedNodeModel.setAdding(now.getTimeInMillis());
 
                     dbNodeRepo.insertDb(installedNodeModel);
-                    Toast.makeText(getApplicationContext(), "Successfully Add Node", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Successfully Add Node", Toast.LENGTH_SHORT).show();
                     Log.d("saveFirst", "Add Node success, ");
                     messageReceive.clear();
                     data.clear();
@@ -678,7 +714,6 @@ public class OlmatixService extends Service {
     private void saveDatabase_Detail() {
 
         if (!mNodeID.contains("door")) {
-            Log.d("DEBUG", "saveDatabase_Detail: ");
             detailNodeModel.setNode_id(NodeID);
             detailNodeModel.setChannel(Channel);
             if (mMessage.equals("ON")) {
@@ -732,36 +767,39 @@ public class OlmatixService extends Service {
     }
 
     private void doSubAll() {
-        flagAct=false;
-        int countDB = dbNodeRepo.getNodeList().size();
-        Log.d("DEBUG", "Count list: " + countDB);
-        data.addAll(dbNodeRepo.getNodeList());
+        if (Connection.getClient().isConnected()) {
 
-        if (countDB != 0) {
+            flagAct = false;
+            int countDB = dbNodeRepo.getNodeList().size();
+            Log.d("DEBUG", "Count list: " + countDB);
+            data.addAll(dbNodeRepo.getNodeList());
 
-            for (int i = 0; i < countDB; i++) {
-                final String mNodeID = data.get(i).getNodesID();
-                Log.d("DEBUG", "Count list: " + mNodeID);
-                String topic = "devices/" + mNodeID + "/#";
-                int qos = 2;
-                try {
-                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                    subToken.setActionCallback(new IMqttActionListener() {
-                        @Override
-                        public void onSuccess(IMqttToken asyncActionToken) {
-                            Log.d("Subscribe", " device = " + mNodeID);
-                        }
+            if (countDB != 0) {
 
-                        @Override
-                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                        }
-                    });
-                } catch (MqttException e) {
-                    e.printStackTrace();
+                for (int i = 0; i < countDB; i++) {
+                    final String mNodeID = data.get(i).getNodesID();
+                    Log.d("DEBUG", "Count list: " + mNodeID);
+                    String topic = "devices/" + mNodeID + "/#";
+                    int qos = 2;
+                    try {
+                        IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                        subToken.setActionCallback(new IMqttActionListener() {
+                            @Override
+                            public void onSuccess(IMqttToken asyncActionToken) {
+                                Log.d("Subscribe", " device = " + mNodeID);
+                            }
+
+                            @Override
+                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                            }
+                        });
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+            data.clear();
         }
-        data.clear();
     }
 }
 

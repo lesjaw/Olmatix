@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     };
     private ViewPager mViewPager;
     private OlmatixPagerAdapter mOlmatixAdapter;
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

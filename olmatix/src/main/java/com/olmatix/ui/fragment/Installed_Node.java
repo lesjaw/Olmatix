@@ -98,11 +98,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
         installedNodeModel = new Installed_NodeModel();
-        initDialog();
         setupView();
         onClickListener();
-        //refreshHeader();
-        //doSubAll();
 
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
                 mRecycleView, new ClickListener() {
@@ -111,7 +108,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 //Values are passing to activity & to fragment as well
                 fwName = data.get(position).getFwName();
                 nice_name = data.get(position).getNice_name_n();
-                
+
                 String state = data.get(position).getOnline();
                 if (state.equals("true")) {
 
@@ -186,8 +183,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                         });
 
                         builder.show();
-
-
                     }
                 });
 
@@ -239,9 +234,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             String mChange = intent.getStringExtra("NotifyChangeNode");
-
             if (mChange==null){
                 mChange ="0";
             }
@@ -252,7 +245,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 if (adapter != null)
                     updatelist();
                 Log.d("receiver", "NotifyChangeNode : " + mChange);
-
             }
         }
     };
@@ -314,7 +306,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         if (flagReceiver==0) {
             /*Intent i = new Intent(getActivity(), OlmatixService.class);
             getActivity().startService(i);*/
-
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
 
@@ -322,6 +313,12 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             flagReceiver = 1;
         }
         super.onResume();
+    }
+
+    private void sendMessage() {
+        Intent intent = new Intent("addNode");
+        intent.putExtra("NodeID", inputResult);
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 
     private View.OnClickListener mFabClickListener() {
@@ -337,8 +334,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+
                                 inputResult = mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/$online";
+                                sendMessage();
+
+                                /*String topic = "devices/" + inputResult + "/$online";
                                 int qos = 2;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
@@ -354,7 +354,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                                     });
                                 } catch (MqttException e) {
                                     e.printStackTrace();
-                                }
+                                }*/
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -382,7 +382,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         adapter = new NodeAdapter(data,this);
         mRecycleView.setAdapter(adapter);
 
-
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -392,7 +391,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             }
         });
 
-
         initSwipe();
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
@@ -400,7 +398,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
         //adapter.setClickListener(this);
-
     }
 
     private void setRefresh() {
@@ -413,25 +410,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         //adapter.setClickListener(this);
 
         mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    private void initDialog(){
-        alertDialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater myLayout = LayoutInflater.from(getActivity());
-        view = myLayout.inflate(R.layout.dialog_layout,null);
-        alertDialog.setView(view);
-        alertDialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                adapter.notifyDataSetChanged();
-                dialog.dismiss();
-
-            }
-        });
-        etTopic = (TextView) view.findViewById(R.id.et_topic);
-        version = (TextView) view.findViewById(R.id.version);
-        icon_node = (ImageView) view.findViewById(R.id.icon_node);
     }
 
     private void initSwipe(){

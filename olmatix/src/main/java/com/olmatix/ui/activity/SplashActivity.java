@@ -30,6 +30,7 @@ public class SplashActivity extends AppCompatActivity {
             if (flagReceiver == 0);
             {
                 Intent i = new Intent(this, OlmatixService.class);
+                i.putExtra("node_id", "true");
                 startService(i);
                 /*LocalBroadcastManager.getInstance(this).registerReceiver(
                         mMessageReceiver, new IntentFilter("MQTTStatus"));

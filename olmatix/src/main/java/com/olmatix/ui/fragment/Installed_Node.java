@@ -111,15 +111,21 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 //Values are passing to activity & to fragment as well
                 fwName = data.get(position).getFwName();
                 nice_name = data.get(position).getNice_name_n();
+                
+                String state = data.get(position).getOnline();
+                if (state.equals("true")) {
 
+                    Intent i = new Intent(getActivity(), Detail_Node.class);
+                    i.putExtra("node_id", data.get(position).getNodesID());
+                    i.putExtra("node_name", fwName);
+                    i.putExtra("nice_name", nice_name);
 
-                Intent i= new Intent(getActivity(), Detail_Node.class);
-                i.putExtra("node_id",data.get(position).getNodesID());
-                i.putExtra("node_name",fwName);
-                i.putExtra("nice_name",nice_name);
-
-                startActivity(i);
-
+                    startActivity(i);
+                } else {
+                        Toast.makeText(getActivity(), nice_name + " is OFFLINE!, please check it, if the " + nice_name
+                                        + " blue led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",
+                                Toast.LENGTH_LONG).show();
+                }
                 /*ImageView picture=(ImageView)view.findViewById(R.id.state_conn);
                 picture.setOnClickListener(new View.OnClickListener() {
                     @Override

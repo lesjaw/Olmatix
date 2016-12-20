@@ -475,8 +475,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                     final EditText input = new EditText(getActivity());
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
-                    input.setText(data.get(position).getNice_name_n());
-
+                    if (data.get(position).getNice_name_n()!=null) {
+                        input.setText(data.get(position).getNice_name_n());
+                    } else{
+                        input.setText(data.get(position).getFwName());
+                    }
                     builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

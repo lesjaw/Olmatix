@@ -201,8 +201,11 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
                     final EditText input = new EditText(Detail_Node.this);
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
-                    input.setText(data.get(position).getNice_name_d());
-
+                    if (data.get(position).getNice_name_d()!=null) {
+                        input.setText(data.get(position).getNice_name_d());
+                    }else {
+                        input.setText(data.get(position).getName());
+                    }
                     builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

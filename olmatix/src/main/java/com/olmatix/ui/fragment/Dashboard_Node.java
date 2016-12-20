@@ -134,11 +134,13 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
+
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
+
         mRecycleView.setHasFixedSize(true);
 
-        final int spanCount = getResources().getInteger(R.integer.grid_columns);
-        final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
+        int spanCount = getResources().getInteger(R.integer.grid_columns);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 

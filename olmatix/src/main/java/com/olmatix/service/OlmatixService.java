@@ -82,6 +82,7 @@ public class OlmatixService extends Service {
     private String TopicID;
     boolean flagAct=true;
     private String mChange="";
+    CharSequence text;
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -112,6 +113,10 @@ public class OlmatixService extends Service {
                 stateoffMqtt = "false";
                 Log.d("Sender", "MQTT Status No Internet: " +stateoffMqtt);
                 sendMessage();
+                text = "Disconnected";
+                showNotification();
+
+
             }
 
             hasConnectivity = hasMmobile || hasWifi;
@@ -165,7 +170,7 @@ public class OlmatixService extends Service {
     }
     private void showNotification() {
         // In this sample, we'll use the same text for the ticker and the expanded notification
-        CharSequence text = getText(R.string.local_service_started);
+        //text = getText(R.string.local_service_started);
 
         // The PendingIntent to launch our activity if the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
@@ -238,6 +243,8 @@ public class OlmatixService extends Service {
                         doSubAll();
                     }
 
+                    text = "Connected";
+                    showNotification();
 
                     Connection.getClient().setCallback(new MqttEventCallback());
 

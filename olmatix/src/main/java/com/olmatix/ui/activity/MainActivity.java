@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.Dashboard_Node;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.ui.fragment.Scene;
@@ -96,6 +97,15 @@ public class MainActivity extends AppCompatActivity {
 
         //Get current screen orientation
 
+        if (flagReceiver == 0) {
+            Intent i = new Intent(this, OlmatixService.class);
+            startService(i);
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                    mMessageReceiver, new IntentFilter("MQTTStatus"));
+            flagReceiver = 1;
+            Log.d("Receiver ", "MainActivity = Starting..");
+        }
+
         initView();
         setupToolbar();
         setupTabs();
@@ -164,12 +174,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
 
-        if (flagReceiver == 0) {
-            LocalBroadcastManager.getInstance(this).registerReceiver(
-                    mMessageReceiver, new IntentFilter("MQTTStatus"));
-            flagReceiver = 1;
-            Log.d("Receiver ", "MainActivity = Starting..");
-        }
         super.onStart();
     }
 
@@ -186,8 +190,6 @@ public class MainActivity extends AppCompatActivity {
     // Override this method to do what you want when the menu is recreated
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-
-
         return super.onPrepareOptionsMenu(menu);
     }
 

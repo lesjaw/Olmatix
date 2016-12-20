@@ -381,11 +381,16 @@ public class dbNodeRepo {
         return favList;
     }
 
+
+
     public ArrayList<Dashboard_NodeModel> getNodeDetailDash() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM "+TABLE_FAV + " favorite_node INNER JOIN "+  TABLE_NODE +
                 " detail_node ON favorite_node."+KEY_NICE_NAME_D+" = detail_node."+KEY_NICE_NAME_D;
+        
+
+
 
         ArrayList<Dashboard_NodeModel> nodeList = new ArrayList<>();
         Cursor cursor = db.rawQuery(selectQuery,  null);

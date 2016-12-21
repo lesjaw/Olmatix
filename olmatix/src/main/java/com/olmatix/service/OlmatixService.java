@@ -78,6 +78,7 @@ public class OlmatixService extends Service {
     HashMap<String,String> message_topic = new HashMap<>();
     private String mNodeID;
     private String mNiceName;
+    private String mNiceNameN;
     private String NodeIDSensor;
     private String TopicID;
     private String mChange="";
@@ -85,11 +86,12 @@ public class OlmatixService extends Service {
     CharSequence textNode;
     CharSequence titleNode;
     ArrayList<Detail_NodeModel> data1;
+    ArrayList<Installed_NodeModel> data2;
     String add_NodeID;
     boolean flagAct=true;
     boolean flagSub=true;
     boolean flagNode=false;
-
+    int notifyID=0;
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -179,6 +181,8 @@ public class OlmatixService extends Service {
 
         data = new ArrayList<>();
         data1 = new ArrayList<>();
+        data2 = new ArrayList<>();
+
         dbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new Installed_NodeModel();
         detailNodeModel = new Detail_NodeModel();
@@ -226,7 +230,7 @@ public class OlmatixService extends Service {
 
         // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
+        manager.notify(notifyID, builder.build());
     }
 
     @Override
@@ -535,6 +539,11 @@ public class OlmatixService extends Service {
     }
 
     private void toastAndNotif(){
+        int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
+        int ch = Integer.parseInt(Channel.replaceAll("[\\D]", ""));
+
+        int notid = id+ch;
+
         if (!flagSub) {
             String state="";
             detailNodeModel.setNode_id(NodeID);
@@ -564,6 +573,7 @@ public class OlmatixService extends Service {
                     // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
                     titleNode = mNiceName;
                     textNode = state;
+                    notifyID = notid;
                     showNotificationNode();
                 }
             }
@@ -617,7 +627,6 @@ public class OlmatixService extends Service {
         message_topic.put(Channel, mMessage);
         saveDatabase_Detail();
         toastAndNotif();
-
     }
 
     private  void addNodeDetail() {
@@ -655,7 +664,7 @@ public class OlmatixService extends Service {
                         detailNodeModel.setNode_id(NodeID);
                         detailNodeModel.setChannel(String.valueOf(i));
                         detailNodeModel.setStatus("false");
-                        detailNodeModel.setNice_name_d(NodeID);
+                        detailNodeModel.setNice_name_d(NodeID +" Ch "+String.valueOf(i+1));
 
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
                     }
@@ -686,14 +695,26 @@ public class OlmatixService extends Service {
         if (dbNodeRepo.hasObject(installedNodeModel)) {
             if (messageReceive.get("online") != null) {
                 installedNodeModel.setOnline(messageReceive.get("online"));
-            }
-            dbNodeRepo.update(installedNodeModel);
-            messageReceive.clear();
-            data.clear();
-            mChange="2";
-            sendMessage();
-        }
 
+                dbNodeRepo.update(installedNodeModel);
+
+
+                if (mMessage.equals("true")) {
+                    titleNode = mNiceName;
+                    textNode = "ONLINE";
+                    showNotificationNode();
+                } else {
+                    titleNode = mNiceName;
+                    textNode = "OFFLINE";
+                    showNotificationNode();
+                }
+
+                messageReceive.clear();
+                data.clear();
+                mChange = "2";
+                sendMessage();
+            }
+        }
     }
 
     private void saveDatabase() {
@@ -708,6 +729,33 @@ public class OlmatixService extends Service {
                         addNodeDetail();
                     }
                     installedNodeModel.setOnline(messageReceive.get("online"));
+                            if (messageReceive.containsKey("online")) {
+
+                                data2.addAll(dbNodeRepo.getNodeListbyNode(NodeID));
+                                int countDB = dbNodeRepo.getNodeListbyNode(NodeID).size();
+                                if (countDB != 0) {
+                                    for (int i = 0; i < countDB; i++) {
+                                        if (data2.get(i).getNice_name_n() != null) {
+                                            mNiceNameN = data2.get(i).getNice_name_n();
+                                        } else {
+                                            mNiceNameN = data2.get(i).getFwName();
+                                        }
+                                    }
+                                }
+
+                                int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
+                                notifyID = id;
+
+                                if (mMessage.equals("true")) {
+                                    titleNode = mNiceNameN;
+                                    textNode = "ONLINE";
+                                    showNotificationNode();
+                                } else {
+                                    titleNode = mNiceNameN;
+                                    textNode = "OFFLINE";
+                                    showNotificationNode();
+                                }
+                            }
                     installedNodeModel.setSignal(messageReceive.get("signal"));
                     installedNodeModel.setUptime(messageReceive.get("uptime"));
                     if(messageReceive.containsKey("uptime")) {

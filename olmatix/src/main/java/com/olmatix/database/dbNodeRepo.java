@@ -363,6 +363,43 @@ public class dbNodeRepo {
         return nodeList;
     }
 
+    public ArrayList<Installed_NodeModel> getNodeListbyNode(String node_id) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT * FROM " + TABLE + " WHERE " + KEY_NODE_ID + " =?";
+
+        ArrayList<Installed_NodeModel> nodeList = new ArrayList<Installed_NodeModel>();
+
+        Cursor cursor = db.rawQuery(selectQuery, new String[] {
+                String.valueOf(node_id)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Installed_NodeModel node = new Installed_NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNodesID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNodes( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
+                node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setNice_name_n( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_N)));
+                node.setLocalip( cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
+                node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
+                node.setFwVersion( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
+                node.setOnline( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.setIcon( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
+                node.setAdding( cursor.getLong(cursor.getColumnIndex(dbNode.KEY_ADDING)));
+                node.setSignal( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
+                node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setReset( cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));
+                node.setOta( cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
     public ArrayList<Dashboard_NodeModel> getNodeFav() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();

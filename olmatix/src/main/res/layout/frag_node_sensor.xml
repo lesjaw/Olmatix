@@ -31,15 +31,6 @@
                 android:src="@mipmap/olmatixlogo"
                 />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/uptime"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:paddingTop="10sp"
-                android:layout_marginRight="16dp"
-                android:text="Uptime"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -48,9 +39,20 @@
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@id/uptime"
                 android:layout_alignParentTop="true"
+                android:textStyle="bold"
                 android:textSize="20sp"
                 android:text="Node Name"
                 />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/uptime"
+                android:layout_alignParentRight="true"
+                android:layout_above="@+id/btn_off"
+                android:paddingTop="0sp"
+                android:layout_marginRight="0dp"
+                android:text="Uptime"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -60,7 +62,8 @@
                 android:text="Sensor Status"
                 android:layout_alignBottom="@+id/icon_node"
                 android:layout_toRightOf="@+id/icon_node"
-                android:layout_toEndOf="@+id/icon_node" />
+                android:layout_toEndOf="@+id/icon_node"
+                android:textStyle="bold"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -87,7 +90,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/status"
                 android:layout_alignParentRight="true"
-                android:text="OFF" />
+                android:text="OFF"
+                android:textStyle="bold"/>
 
             <Button
                 android:id="@+id/btn_on"
@@ -95,7 +99,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/status"
                 android:layout_toLeftOf="@id/btn_off"
-                android:text="ON" />
+                android:text="ON"
+                android:textStyle="bold"/>
 
             <ImageView
                 android:layout_width="wrap_content"

@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_scene,
             R.drawable.ic_node,
     };
+
     private ViewPager mViewPager;
     private OlmatixPagerAdapter mOlmatixAdapter;
 
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
+
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         // super.onSaveInstanceState(outState);
@@ -106,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
             flagReceiver = 1;
             Log.d("Receiver ", "MainActivity = Starting..");
         }
+
+
 
         initView();
         setupToolbar();

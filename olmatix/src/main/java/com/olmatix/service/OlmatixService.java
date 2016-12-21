@@ -1,9 +1,13 @@
 package com.olmatix.service;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +31,7 @@ import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.MainActivity;
+import com.olmatix.ui.fragment.Detail_Node;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -45,6 +50,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 /**
@@ -92,6 +100,8 @@ public class OlmatixService extends Service {
     boolean flagSub=true;
     boolean flagNode=false;
     int notifyID=0;
+    String currentApp = "NULL";
+
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -124,7 +134,7 @@ public class OlmatixService extends Service {
                 sendMessage();
                 text = "Disconnected";
                 showNotification();
-                flagSub= true;
+                //flagSub= true;
             }
 
             hasConnectivity = hasMmobile || hasWifi;
@@ -145,6 +155,7 @@ public class OlmatixService extends Service {
             add_NodeID = intent.getStringExtra("NodeID");
             Log.d("DEBUG", "onReceive: "+add_NodeID);
             doAddNodeSub();
+
         }
     };
 
@@ -285,7 +296,7 @@ public class OlmatixService extends Service {
                     //Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
                     if (flagSub) {
                         doSubAll();
-                        flagSub = false;
+                        //flagSub = false;
                     }
 
                     text = "Connected";
@@ -538,50 +549,111 @@ public class OlmatixService extends Service {
         }
     }
 
+    private void printForegroundTask() {
+        //String currentApp = "NULL";
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            UsageStatsManager usm = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);
+            long time = System.currentTimeMillis();
+            List<UsageStats> appList = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,  time - 1000*1000, time);
+            if (appList != null && appList.size() > 0) {
+                SortedMap<Long, UsageStats> mySortedMap = new TreeMap<Long, UsageStats>();
+                for (UsageStats usageStats : appList) {
+                    mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
+                }
+                if (mySortedMap != null && !mySortedMap.isEmpty()) {
+                    currentApp = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
+                }
+            }
+        } else {
+            ActivityManager am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningAppProcessInfo> tasks = am.getRunningAppProcesses();
+            currentApp = tasks.get(0).processName;
+        }
+
+        Log.e(TAG, "Current App in foreground is: " + currentApp);
+    }
+
     private void toastAndNotif(){
+
+        printForegroundTask();
+
         int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
         int ch = Integer.parseInt(Channel.replaceAll("[\\D]", ""));
-
         int notid = id+ch;
 
-        if (!flagSub) {
-            String state="";
-            detailNodeModel.setNode_id(NodeID);
-            detailNodeModel.setChannel(Channel);
-            data1.addAll(dbNodeRepo.getNodeDetail(NodeID, Channel));
-            int countDB = dbNodeRepo.getNodeDetail(NodeID, Channel).size();
-            if (countDB != 0) {
-                for (int i = 0; i < countDB; i++) {
-                    if (data1.get(i).getNice_name_d() != null) {
-                        mNiceName = data1.get(i).getNice_name_d();
-                    } else {
-                        mNiceName = data1.get(i).getName();
+        checkActivityForeground();
+        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
+            if (!flagSub) {
+                String state = "";
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel(Channel);
+                data1.addAll(dbNodeRepo.getNodeDetail(NodeID, Channel));
+                int countDB = dbNodeRepo.getNodeDetail(NodeID, Channel).size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        if (data1.get(i).getNice_name_d() != null) {
+                            mNiceName = data1.get(i).getNice_name_d();
+                        } else {
+                            mNiceName = data1.get(i).getName();
+                        }
+                        state = data1.get(i).getStatus();
                     }
-                    state = data1.get(i).getStatus();
                 }
-            }
 
-            if (state.equals("true")||state.equals("ON")) {
-                state = "ON";
-            }
-            if (state.equals("false")||state.equals("OFF")) {
-                state = "OFF";
-            }
-
-            if (mNiceName != null) {
-                if (!state.equals("")) {
-                    // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
-                    titleNode = mNiceName;
-                    textNode = state;
-                    notifyID = notid;
-                    showNotificationNode();
+                if (state.equals("true") || state.equals("ON")) {
+                    state = "ON";
                 }
+                if (state.equals("false") || state.equals("OFF")) {
+                    state = "OFF";
+                }
+
+                if (mNiceName != null) {
+                    if (!state.equals("")) {
+                        // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
+                        titleNode = mNiceName;
+                        textNode = state;
+                        notifyID = notid;
+                        showNotificationNode();
+                    }
+                }
+                messageReceive.clear();
+                message_topic.clear();
+                data1.clear();
+                Channel = "";
             }
-            messageReceive.clear();
-            message_topic.clear();
-            data1.clear();
-            Channel = "";
         }
+    }
+
+    protected void checkActivityForeground() {
+        //Log.d(TAG, "start checking for Activity in foreground");
+        Intent intent = new Intent();
+        intent.setAction(Detail_Node.UE_ACTION);
+        sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int result = getResultCode();
+
+                if (result != Activity.RESULT_CANCELED) { // Activity caught it
+                    //Log.d(TAG, "An activity caught the broadcast, result " + result);
+                    activityInForeground();
+                    return;
+                }
+                //Log.d(TAG, "No activity did catch the broadcast.");
+                noActivityInForeground();
+            }
+        }, null, Activity.RESULT_CANCELED, null, null);
+    }
+
+    protected void activityInForeground() {
+        // TODO something you want to happen when an Activity is in the foreground
+        flagSub = true;
+    }
+
+    protected void noActivityInForeground() {
+        // TODO something you want to happen when no Activity is in the foreground
+        flagSub = false;
+        //stopSelf(); // quit
     }
 
     private void updateSensorDoor(){
@@ -729,31 +801,33 @@ public class OlmatixService extends Service {
                         addNodeDetail();
                     }
                     installedNodeModel.setOnline(messageReceive.get("online"));
-                            if (messageReceive.containsKey("online")) {
-
-                                data2.addAll(dbNodeRepo.getNodeListbyNode(NodeID));
-                                int countDB = dbNodeRepo.getNodeListbyNode(NodeID).size();
-                                if (countDB != 0) {
-                                    for (int i = 0; i < countDB; i++) {
-                                        if (data2.get(i).getNice_name_n() != null) {
-                                            mNiceNameN = data2.get(i).getNice_name_n();
-                                        } else {
-                                            mNiceNameN = data2.get(i).getFwName();
+                        if (messageReceive.containsKey("online")) {
+                            checkActivityForeground();
+                            if (!flagSub) {
+                                    data2.addAll(dbNodeRepo.getNodeListbyNode(NodeID));
+                                    int countDB = dbNodeRepo.getNodeListbyNode(NodeID).size();
+                                    if (countDB != 0) {
+                                        for (int i = 0; i < countDB; i++) {
+                                            if (data2.get(i).getNice_name_n() != null) {
+                                                mNiceNameN = data2.get(i).getNice_name_n();
+                                            } else {
+                                                mNiceNameN = data2.get(i).getFwName();
+                                            }
                                         }
                                     }
-                                }
 
-                                int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
-                                notifyID = id;
+                                    int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
+                                    notifyID = id;
 
-                                if (mMessage.equals("true")) {
-                                    titleNode = mNiceNameN;
-                                    textNode = "ONLINE";
-                                    showNotificationNode();
-                                } else {
-                                    titleNode = mNiceNameN;
-                                    textNode = "OFFLINE";
-                                    showNotificationNode();
+                                    if (mMessage.equals("true")) {
+                                        titleNode = mNiceNameN;
+                                        textNode = "ONLINE";
+                                        showNotificationNode();
+                                    } else {
+                                        titleNode = mNiceNameN;
+                                        textNode = "OFFLINE";
+                                        showNotificationNode();
+                                    }
                                 }
                             }
                     installedNodeModel.setSignal(messageReceive.get("signal"));

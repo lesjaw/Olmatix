@@ -1,5 +1,6 @@
 package com.olmatix.ui.fragment;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -60,11 +61,16 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private static ArrayList<Detail_NodeModel> data;
     int flagReceiver=0;
     private Toolbar mToolbar;
+    public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
+    private IntentFilter mIntentFilter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_node);
+
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(UE_ACTION);
 
         detail_node =this;
         Intent i = getIntent();
@@ -79,6 +85,17 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
 
     }
+
+    private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(UE_ACTION)) {
+                Log.d("Olmatix", "i'm in the foreground");
+                this.setResultCode(Activity.RESULT_OK);
+            }
+        }
+    };
 
 
     private void setupView() {
@@ -289,6 +306,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
     @Override
     protected void onPause() {
+        unregisterReceiver(mIntentReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
@@ -307,6 +325,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
             Log.d("Receiver ", "Detail_Node = Starting..");
             flagReceiver = 1;
         }
+        registerReceiver(mIntentReceiver, mIntentFilter);
         super.onPostResume();
     }
 }

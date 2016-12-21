@@ -81,7 +81,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     SwipeRefreshLayout mSwipeRefreshLayout;
     String nice_name;
     String fwName;
-
+    Context installed_node;
 
     @Nullable
     @Override
@@ -94,6 +94,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        installed_node=getContext();
 
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
@@ -379,7 +381,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
-        adapter = new NodeAdapter(data,this);
+        adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -405,7 +407,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
 
-        adapter = new NodeAdapter(data,this);
+        adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
         //adapter.setClickListener(this);
 
@@ -435,7 +437,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             adapter.removeItem(position);
-                            Toast.makeText(getActivity(),"Successfully Inserted",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(),"Successfully Deleted",Toast.LENGTH_LONG).show();
                             setRefresh();
 
                         }

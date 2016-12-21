@@ -19,7 +19,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:padding="5sp">
 
             <ImageView
                 android:layout_width="70dp"
@@ -32,29 +32,17 @@
                 android:src="@mipmap/olmatixlogo"
                 />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/uptime"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:paddingTop="25sp"
-                android:layout_marginRight="16dp"
-                android:text="Uptime"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/node_name"
                 android:layout_toRightOf="@+id/icon_node"
-                android:layout_below="@id/uptime"
                 android:layout_alignParentTop="true"
                 android:textSize="20sp"
                 android:text="Node Name"
                 android:textStyle="bold"
                 />
-
-
 
 
             <TextView
@@ -69,29 +57,38 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/uptime"
+                android:layout_marginRight="0sp"
+                android:text="Uptime"
+                android:layout_toRightOf="@+id/icon_node"
+                android:layout_below="@id/status"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/fw_name"
                 android:layout_toRightOf="@+id/icon_node"
-                android:layout_below="@id/status"
+                android:layout_below="@id/uptime"
                 android:textSize="10sp"
                 android:text="fw Name"
                 />
 
 
             <Button
-                android:id="@+id/btn_off"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/status"
-                android:layout_alignParentRight="true"
-                android:text="OFF" />
-
-            <Button
                 android:id="@+id/btn_on"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/status"
-                android:layout_toLeftOf="@id/btn_off"
+                android:layout_alignParentRight="true"
                 android:text="ON" />
+
+            <Button
+                android:id="@+id/btn_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OFF"
+                android:layout_alignTop="@+id/uptime"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
         </RelativeLayout>
 

@@ -1,8 +1,12 @@
 package com.olmatix.adapter;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +20,7 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Detail_NodeModel;
+import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
@@ -36,6 +41,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     List<Detail_NodeModel> nodeList;
     Context context;
     String fw_name;
+    CharSequence textNode;
+    CharSequence titleNode;
 
     public NodeDetailAdapter(List<Detail_NodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
 
@@ -86,7 +93,11 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            } else holder.node_name.setText(mInstalledNodeModel.getName());
+                titleNode = mInstalledNodeModel.getNice_name_d();
+            } else
+                holder.node_name.setText(mInstalledNodeModel.getName());
+                titleNode = mInstalledNodeModel.getName();
+
 
             holder.upTime.setText(OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
 
@@ -99,6 +110,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             } else {
                 holder.imgNode.setImageResource(R.mipmap.offlamp);
                 holder.status.setText("Status : " + "OFF");
+
             }
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -113,7 +125,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            holder.status.setText("ON");
+                            //holder.status.setText("ON");
+
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -137,7 +150,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            holder.status.setText("OFF");
+                            //holder.status.setText("OFF");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -156,6 +169,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+
             } else {
                 holder.node_name.setText(mInstalledNodeModel.getName());
             }
@@ -180,6 +194,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.imgNode.setImageResource(R.mipmap.armed);
                 holder.status.setText("Status : " + "ARMED");
 
+
             } else {
                 holder.imgNode.setImageResource(R.mipmap.not_armed);
                 holder.status.setText("Status : " + "NOT ARMED");
@@ -189,7 +204,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.status.setText("Status : " + "ALARM!!");
                 holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 holder.status.setTypeface(null, Typeface.BOLD);
-
             }
             Log.d("DEBUG", "Adapter: " + mInstalledNodeModel.getStatus_sensor());
 
@@ -207,7 +221,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            holder.status.setText("ARMED");
+                            //holder.status.setText("ARMED");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -231,7 +245,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            holder.status.setText("NOT ARMED");
+                            //holder.status.setText("NOT ARMED");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -245,6 +259,23 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         }
 
 
+    }
+
+    private void showNotificationNode() {
+        NotificationCompat.Builder builder =
+                (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.olmatixsmall)
+                        .setContentTitle(titleNode)
+                        .setContentText(textNode);
+
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
     }
 
     @Override

@@ -122,6 +122,7 @@ public class OlmatixService extends Service {
                 sendMessage();
                 text = "Disconnected";
                 showNotification();
+                flagSub= true;
             }
 
             hasConnectivity = hasMmobile || hasWifi;
@@ -207,7 +208,6 @@ public class OlmatixService extends Service {
                 .setOngoing(true)
                 .build();
 
-
         // Send the notification.
         mNM.notify(NOTIFICATION, notification);
     }
@@ -249,7 +249,7 @@ public class OlmatixService extends Service {
     }
 
     private void doConnect() {
-        Toast.makeText(getApplicationContext(), R.string.connecting, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), R.string.connecting, Toast.LENGTH_SHORT).show();
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
@@ -267,6 +267,10 @@ public class OlmatixService extends Service {
         options.setWill(topic, payload ,1,true);
         options.setKeepAliveInterval(300);
         Connection.setClient(client);
+
+        text = "Connecting to server..";
+        showNotification();
+
         try {
 
             IMqttToken token = client.connect(options);
@@ -274,7 +278,7 @@ public class OlmatixService extends Service {
 
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
                     if (flagSub) {
                         doSubAll();
                         flagSub = false;
@@ -310,11 +314,13 @@ public class OlmatixService extends Service {
                                 stateoffMqtt = "true";
                                 Log.d("Sender", "MQTT Status after sub: " +stateoffMqtt);
                                 sendMessage();
+                                text = "Connected";
+                                showNotification();
                             }
 
                             @Override
                             public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                                Toast.makeText(getApplicationContext(), R.string.sub_fail, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), R.string.sub_fail, Toast.LENGTH_SHORT).show();
                                 Log.e("error",exception.toString());
 
                             }
@@ -327,10 +333,12 @@ public class OlmatixService extends Service {
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Toast.makeText(getApplicationContext(), R.string.conn_fail+exception.toString(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), R.string.conn_fail+exception.toString(), Toast.LENGTH_SHORT).show();
                     Log.e("mqtt",exception.toString());
                     stateoffMqtt = "false";
                     sendMessage();
+                    text = "Not Connected";
+                    showNotification();
                 }
             });
 
@@ -339,34 +347,43 @@ public class OlmatixService extends Service {
         } catch (MqttException e) {
             switch (e.getReasonCode()) {
                 case MqttException.REASON_CODE_BROKER_UNAVAILABLE:
+                    Toast.makeText(getApplicationContext(), "Server Offline", Toast.LENGTH_SHORT).show();
                 case MqttException.REASON_CODE_CLIENT_TIMEOUT:
+                    Toast.makeText(getApplicationContext(), "Olmatix connect timed out", Toast.LENGTH_SHORT).show();
                 case MqttException.REASON_CODE_CONNECTION_LOST:
+                    Toast.makeText(getApplicationContext(), "Connection Lost", Toast.LENGTH_SHORT).show();
                 case MqttException.REASON_CODE_SERVER_CONNECT_ERROR:
                     Log.v(TAG, "c" + e.getMessage());
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Server connection error", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                     break;
                 case MqttException.REASON_CODE_FAILED_AUTHENTICATION:
                     Intent i = new Intent("RAISEALLARM");
                     i.putExtra("ALLARM", e);
                     Log.e(TAG, "b" + e.getMessage());
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Failed wrong auth (bad user name or password", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     Log.e(TAG, "a" + e.getMessage());
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    text = "Disconnected";
+                    showNotification();
             }
         }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(TAG, "onStartCommand()");
+
         if (flagAct) {
-            Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
+           // Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
             Log.d("Service = ", "Starting..");
+            text = "Starting...";
+            showNotification();
+
             flagAct = false;
         }
+
 
         sendMessage();
         return START_STICKY;
@@ -524,9 +541,7 @@ public class OlmatixService extends Service {
             detailNodeModel.setChannel(Channel);
             data1.addAll(dbNodeRepo.getNodeDetail(NodeID, Channel));
             int countDB = dbNodeRepo.getNodeDetail(NodeID, Channel).size();
-
             if (countDB != 0) {
-
                 for (int i = 0; i < countDB; i++) {
                     if (data1.get(i).getNice_name_d() != null) {
                         mNiceName = data1.get(i).getNice_name_d();
@@ -536,7 +551,6 @@ public class OlmatixService extends Service {
                     state = data1.get(i).getStatus();
                 }
             }
-            Log.d("DEBUG", "state: "+state);
 
             if (state.equals("true")||state.equals("ON")) {
                 state = "ON";
@@ -547,8 +561,7 @@ public class OlmatixService extends Service {
 
             if (mNiceName != null) {
                 if (!state.equals("")) {
-                    //Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
-
+                    // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
                     titleNode = mNiceName;
                     textNode = state;
                     showNotificationNode();
@@ -558,14 +571,12 @@ public class OlmatixService extends Service {
             message_topic.clear();
             data1.clear();
             Channel = "";
-            flagAct =true;
         }
     }
 
     private void updateSensorDoor(){
 
         if (!mNodeID.contains("light")) {
-            Log.d("DEBUG", "updateSensorDoor: ");
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_sensor(mMessage);
@@ -580,7 +591,6 @@ public class OlmatixService extends Service {
 
     private void updateSensorTheft() {
         if (!mNodeID.contains("light")) {
-            Log.d("DEBUG", "updateSensorTheft: ");
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_theft(mMessage);
@@ -590,6 +600,13 @@ public class OlmatixService extends Service {
             dbNodeRepo.update_detailSensor(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
+            //Log.d("DEBUG", "updateSensorTheft: "+mMessage);
+
+            if (mMessage.equals("true")) {
+                titleNode = mNiceName;
+                textNode = "ALARM!!";
+                showNotificationNode();
+            }
         }
     }
 
@@ -620,6 +637,7 @@ public class OlmatixService extends Service {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel("0");
                     detailNodeModel.setStatus("false");
+                    detailNodeModel.setNice_name_d(NodeID);
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
 
@@ -637,6 +655,7 @@ public class OlmatixService extends Service {
                         detailNodeModel.setNode_id(NodeID);
                         detailNodeModel.setChannel(String.valueOf(i));
                         detailNodeModel.setStatus("false");
+                        detailNodeModel.setNice_name_d(NodeID);
 
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
                     }
@@ -652,6 +671,7 @@ public class OlmatixService extends Service {
                     detailNodeModel.setStatus("false");
                     detailNodeModel.setStatus_sensor("false");
                     detailNodeModel.setStatus_theft("false");
+                    detailNodeModel.setNice_name_d(NodeID);
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
 
@@ -723,7 +743,6 @@ public class OlmatixService extends Service {
             } else {
                 detailNodeModel.setStatus(mMessage);
             }
-
             Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
             detailNodeModel.setTimestamps(String.valueOf(currentDateTimeString));
 

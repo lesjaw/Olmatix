@@ -498,7 +498,6 @@ public class dbNodeRepo {
             do {
                 Detail_NodeModel node = new Detail_NodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-
                 node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));

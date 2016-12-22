@@ -56,7 +56,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Dashboard_NodeModel dashboardNodeModel;
-    public static dbNodeRepo dbNodeRepo;
+    public  dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
     Dashboard_Node dashboard_node;
@@ -146,9 +146,9 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-        //data.clear();
-        //data.addAll(dbNodeRepo.getNodeDetailDash());
-        //adapter = new NodeDashboardAdapter(data,this);
+        data.clear();
+        data.addAll(dbNodeRepo.getNodeDetailDash());
+        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),this);
         dashboardNodeModel= new Dashboard_NodeModel();
         mRecycleView.setAdapter(adapter);
 

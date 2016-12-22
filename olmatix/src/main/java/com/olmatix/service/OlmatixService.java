@@ -716,6 +716,7 @@ public class OlmatixService extends Service {
                     detailNodeModel.setChannel("0");
                     detailNodeModel.setStatus("false");
                     detailNodeModel.setNice_name_d(NodeID);
+                    detailNodeModel.setSensor("light");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
 
@@ -734,6 +735,8 @@ public class OlmatixService extends Service {
                         detailNodeModel.setChannel(String.valueOf(i));
                         detailNodeModel.setStatus("false");
                         detailNodeModel.setNice_name_d(NodeID +" Ch "+String.valueOf(i+1));
+                        detailNodeModel.setSensor("light");
+
 
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
                     }

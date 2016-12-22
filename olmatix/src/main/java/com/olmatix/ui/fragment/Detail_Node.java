@@ -307,13 +307,11 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     @Override
     protected void onPause() {
         unregisterReceiver(mIntentReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onStop();
     }
 

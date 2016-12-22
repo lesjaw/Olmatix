@@ -404,6 +404,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     private void setRefresh() {
 
+        //doSubAll();
+
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
 

@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Get current screen orientation
-
+        //enableFullScreen(true);
         if (flagReceiver == 0) {
             Intent i = new Intent(this, OlmatixService.class);
             startService(i);
@@ -109,8 +110,6 @@ public class MainActivity extends AppCompatActivity {
             flagReceiver = 1;
             Log.d("Receiver ", "MainActivity = Starting..");
         }
-
-
 
         initView();
         setupToolbar();
@@ -133,7 +132,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    protected void enableFullScreen(boolean enabled) {
+        int newVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 
+        if(enabled) {
+            newVisibility |= View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            Log.d("DEBUG", "enableFullScreen: ");
+
+        }
+
+        getDecorView().setSystemUiVisibility(newVisibility);
+    }
+
+    private View getDecorView() {
+        return getWindow().getDecorView();
+    }
 
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);

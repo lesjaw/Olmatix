@@ -8,7 +8,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
@@ -69,7 +68,7 @@ public class dbNodeRepo {
 
         long Id = db.insert(TABLE, null, values);
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
     }
 
@@ -87,7 +86,7 @@ public class dbNodeRepo {
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
+        //Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
 
         return (int) node_Id;
     }
@@ -103,7 +102,7 @@ public class dbNodeRepo {
         db.insert(TABLE_FAV, null, values);
 
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NICE_NAME_D));
+        //Log.d("DEBUG", "insertFav: " + String.valueOf(KEY_NICE_NAME_D));
 
         return;
     }
@@ -146,7 +145,6 @@ public class dbNodeRepo {
         }
         if (installedNodeModel.getOnline()!=null) {
             values.put(KEY_ONLINE, installedNodeModel.getOnline());
-//            Log.d("DEBUG", "updateNode Online: " +installedNodeModel.getOnline());
 
         }
         if (installedNodeModel.getNodesID()!=null) {
@@ -203,7 +201,7 @@ public class dbNodeRepo {
         }
         if (detailNodeModel.getStatus()!=null || detailNodeModel.getStatus() != "ON" || detailNodeModel.getStatus() != "OFF") {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
-            Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
+            //Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
         }
         /*if (detailNodeModel.getSensor()!=null) {
             values.put(KEY_SENSOR, detailNodeModel.getSensor());
@@ -211,7 +209,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getTimestamps()!=null) {
             values.put(KEY_TIMESTAMPS, detailNodeModel.getTimestamps());
-            Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
+            //Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
@@ -249,11 +247,11 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_sensor()!=null) {
             values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+            //Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
         }
         if (detailNodeModel.getStatus_theft()!=null) {
             values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
-            Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
+            //Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
@@ -261,8 +259,8 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getChannel())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateDetailSensor: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
-                String.valueOf(detailNodeModel.getChannel()));
+        //Log.d("DEBUG", "updateDetailSensor: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
+                //String.valueOf(detailNodeModel.getChannel()));
 
     }
 
@@ -362,6 +360,42 @@ public class dbNodeRepo {
         db.close();
         return nodeList;
     }
+
+    public ArrayList<Detail_NodeModel> getNodeDetailList() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE;
+
+        // Add the String you are searching by here.
+        // Put it in an array to avoid an unrecognized token error
+        ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
+
+        Cursor cursor = db.rawQuery(selectString,null);
+
+
+        if (cursor.moveToFirst()) {
+            do {
+                Detail_NodeModel node = new Detail_NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus_sensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
+                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
 
     public ArrayList<Installed_NodeModel> getNodeListbyNode(String node_id) {
 
@@ -516,7 +550,7 @@ public class dbNodeRepo {
                 count++;
             }
             //here, count is records found
-            Log.d("hasObject", String.format("%d records found", count));
+            //Log.d("hasObject", String.format("%d records found", count));
 
             //endregion
 
@@ -548,7 +582,7 @@ public class dbNodeRepo {
                 count++;
             }
             //here, count is records found
-            Log.d("hasObjectDetail", String.format("%d records found", count));
+            //Log.d("hasObjectDetail", String.format("%d records found", count));
 
             //endregion
 
@@ -596,3 +630,4 @@ public class dbNodeRepo {
 
 
 }
+

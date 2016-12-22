@@ -118,8 +118,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
                                 Toast.makeText(getContext(),"You have add : " +String.valueOf(mSpinner.getSelectedItem()),Toast.LENGTH_SHORT).show();
                                 String NiceName= String.valueOf(mSpinner.getSelectedItem());
-                                dashboardNodeModel.setNice_name_d(NiceName);
-                                dbNodeRepo.insertFavNode(dashboardNodeModel);
+                                //dashboardNodeModel.setNice_name_d(NiceName);
+                                //dbNodeRepo.insertFavNode(dashboardNodeModel);
 
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

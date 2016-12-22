@@ -123,6 +123,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
                                 dashboardNodeModel.setNice_name_d(NiceName);
                                 dbNodeRepo.insertFavNode(dashboardNodeModel);
 
+                                setRefresh();
+
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {

@@ -780,7 +780,6 @@ public class OlmatixService extends Service {
                     installedNodeModel.setName(messageReceive.get("name"));
                     installedNodeModel.setLocalip(messageReceive.get("localip"));
                     installedNodeModel.setFwName(messageReceive.get("fwname"));
-                    Log.d(TAG, "saveDatabase: "+messageReceive.get("fwname"));
                     installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
                     if(installedNodeModel.getFwName() != null) {
                         addNodeDetail();

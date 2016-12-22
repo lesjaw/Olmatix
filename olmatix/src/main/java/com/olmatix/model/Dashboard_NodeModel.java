@@ -8,6 +8,7 @@ public class Dashboard_NodeModel {
 
     private  int id;
     private String nice_name_d;
+    private String sensor;
 
     public int getId() {
         return id;
@@ -23,5 +24,13 @@ public class Dashboard_NodeModel {
 
     public void setNice_name_d(String nice_name_d) {
         this.nice_name_d = nice_name_d;
+    }
+
+    public String getSensor() {
+        return sensor;
+    }
+
+    public void setSensor(String sensor) {
+        this.sensor = sensor;
     }
 }

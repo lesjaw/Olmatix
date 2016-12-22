@@ -472,7 +472,7 @@ public class dbNodeRepo {
 
 
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
-
+                node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

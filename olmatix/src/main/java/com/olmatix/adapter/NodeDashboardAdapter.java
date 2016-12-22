@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
@@ -39,11 +40,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     }
     public class ButtonHolder extends NodeDashboardAdapter.ViewHolder {
         public TextView node_name, upTime, status, nodeType;
-        public ImageButton imgNode;
+        public ImageView imgNode;
 
         public ButtonHolder(View view) {
             super(view);
-            imgNode = (ImageButton) view.findViewById(R.id.icon_node);
+            imgNode = (ImageView) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
 
         }
@@ -51,11 +52,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     public class StatusHolder extends NodeDashboardAdapter.ViewHolder {
         public TextView node_name, upTime, status, nodeType;
-        public ImageButton imgNode;
+        public ImageView imgNode;
 
         public StatusHolder(View view) {
             super(view);
-            imgNode = (ImageButton) view.findViewById(R.id.icon_node);
+            imgNode = (ImageView) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
 
         }
@@ -75,15 +76,16 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public NodeDashboardAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View itemView;
+        final Dashboard_NodeModel mFavoriteModel = nodeList.get(viewType);
 
-        if (nodeType.equals("light")) {
+        if (mFavoriteModel.getSensor().equals("light")) {
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_button, parent, false);
 
             return new NodeDashboardAdapter.ButtonHolder(itemView);
 
         }
-        else if(nodeType.equals("sensor"))
+        else if(mFavoriteModel.getSensor().equals("sensor"))
         {
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_sensor, parent, false);
@@ -98,20 +100,21 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public void onBindViewHolder(final NodeDashboardAdapter.ViewHolder viewHolder, final int position) {
         //final int pos = position;
         final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
-        if(nodeType.equals("ligth")) {
+        if(mFavoriteModel.getSensor().equals("ligth")) {
 
             //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
-            final NodeDashboardAdapter.ButtonHolder holder = (NodeDashboardAdapter.ButtonHolder) viewHolder;
+             NodeDashboardAdapter.ButtonHolder holder = (NodeDashboardAdapter.ButtonHolder) viewHolder;
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
 
 
 
-        }else if(nodeType.equals("sensor"))
+        }else if(mFavoriteModel.getSensor().equals("sensor"))
         {
-            final NodeDashboardAdapter.StatusHolder holder = (NodeDashboardAdapter.StatusHolder) viewHolder;
+            NodeDashboardAdapter.StatusHolder holder = (NodeDashboardAdapter.StatusHolder) viewHolder;
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
+
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
 
 

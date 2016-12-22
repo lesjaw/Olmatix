@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -32,7 +33,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             super(v);
         }
     }
-    public class ButtonHolder extends NodeDashboardAdapter.ViewHolder {
+    public class ButtonHolder extends ViewHolder {
         public TextView node_name, status;
         public ImageView imgNode;
 
@@ -44,7 +45,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         }
     }
 
-    public class StatusHolder extends NodeDashboardAdapter.ViewHolder {
+    public class StatusHolder extends ViewHolder {
         public TextView node_name, status;
         public ImageView imgNode;
 
@@ -67,7 +68,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     }
 
     @Override
-    public NodeDashboardAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View itemView;
         final Dashboard_NodeModel mFavoriteModel = nodeList.get(viewType);
@@ -76,7 +77,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_dash_button, parent, false);
 
-            return new NodeDashboardAdapter.ButtonHolder(itemView);
+            return new ButtonHolder(itemView);
 
         }
         else if(mFavoriteModel.getSensor().equals("close"))
@@ -84,27 +85,28 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_dash_status, parent, false);
 
-            return new NodeDashboardAdapter.StatusHolder(itemView);
+            return new StatusHolder(itemView);
         }
 
         return null;
     }
 
-
-    public void onBindViewHolder(final NodeDashboardAdapter.ViewHolder viewHolder, final int position) {
+    @Override
+    public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         //final int pos = position;
-        final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
-        if(mFavoriteModel.getSensor().equals("ligth")) {
+       final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
+
+        if((mFavoriteModel.getSensor().trim()).equals("light")) {
             Log.d("DEBUG", "onBindViewHolder: 1 "+mFavoriteModel.getSensor());
 
-            NodeDashboardAdapter.ButtonHolder holder = (NodeDashboardAdapter.ButtonHolder) viewHolder;
+            final ButtonHolder holder = (ButtonHolder) viewHolder;
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
             holder.imgNode.setImageResource(R.mipmap.offlamp);
 
 
 
-        }else if(mFavoriteModel.getSensor().equals("sensor")) {
+        }else if((mFavoriteModel.getSensor().trim()).equals("sensor")) {
             Log.d("DEBUG", "onBindViewHolder: 2 "+mFavoriteModel.getSensor());
 
             NodeDashboardAdapter.StatusHolder holder = (NodeDashboardAdapter.StatusHolder) viewHolder;

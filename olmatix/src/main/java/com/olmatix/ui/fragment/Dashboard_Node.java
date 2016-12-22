@@ -22,6 +22,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -118,8 +119,9 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
                                 Toast.makeText(getContext(),"You have add : " +String.valueOf(mSpinner.getSelectedItem()),Toast.LENGTH_SHORT).show();
                                 String NiceName= String.valueOf(mSpinner.getSelectedItem());
-                                //dashboardNodeModel.setNice_name_d(NiceName);
-                                //dbNodeRepo.insertFavNode(dashboardNodeModel);
+                                Log.d("DEBUG", "onClick: "+NiceName);
+                                dashboardNodeModel.setNice_name_d(NiceName);
+                                dbNodeRepo.insertFavNode(dashboardNodeModel);
 
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -147,6 +149,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         //data.clear();
         //data.addAll(dbNodeRepo.getNodeDetailDash());
         //adapter = new NodeDashboardAdapter(data,this);
+        dashboardNodeModel= new Dashboard_NodeModel();
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

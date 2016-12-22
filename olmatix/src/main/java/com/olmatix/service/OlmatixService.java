@@ -987,7 +987,7 @@ public class OlmatixService extends Service {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID = data1.get(i).getNode_id();
                     final String mChannel = data1.get(i).getChannel();
-                        topic1 = "devices/" + mNodeID + "/light/" + mChannel + "/set";
+                        topic1 = "devices/" + mNodeID + "/light/" + mChannel;
                         int qos = 2;
                         try {
                             IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);

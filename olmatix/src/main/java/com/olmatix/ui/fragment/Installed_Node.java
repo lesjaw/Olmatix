@@ -35,7 +35,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.NodeAdapter;
@@ -64,12 +63,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     private List<Installed_NodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
-    private AlertDialog.Builder alertDialog;
-    private View view;
     private Timer autoUpdate;
     private NodeAdapter adapter;
-    private TextView etTopic,version;
-    ImageView icon_node;
     private RecyclerView.LayoutManager layoutManager;
     private static ArrayList<Installed_NodeModel> data;
     private Paint p = new Paint();

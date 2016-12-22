@@ -98,7 +98,6 @@ public class dbNodeRepo {
 
         values.put(KEY_NICE_NAME_D,dashboardNodeModel.getNice_name_d());
 
-        //long node_Id = db.insert(TABLE_FAV, null, values);
         db.insert(TABLE_FAV, null, values);
 
         db.close(); // Closing database connection
@@ -463,9 +462,6 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM "+TABLE_FAV + " favorite_node INNER JOIN "+  TABLE_NODE +
                 " detail_node ON favorite_node."+KEY_NICE_NAME_D+" = detail_node."+KEY_NICE_NAME_D;
-        
-
-
 
         ArrayList<Dashboard_NodeModel> nodeList = new ArrayList<>();
         Cursor cursor = db.rawQuery(selectQuery,  null);
@@ -474,17 +470,8 @@ public class dbNodeRepo {
             do {
                 Dashboard_NodeModel node = new Dashboard_NodeModel();
 
-                node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
-                node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
-                node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
-                node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
-                node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
-                node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
-                node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
-                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
-                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
-                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
 
                 nodeList.add(node);
 

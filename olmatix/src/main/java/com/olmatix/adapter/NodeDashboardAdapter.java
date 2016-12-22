@@ -79,7 +79,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             return new NodeDashboardAdapter.ButtonHolder(itemView);
 
         }
-        else if(mFavoriteModel.getSensor().equals("sensor"))
+        else if(mFavoriteModel.getSensor().equals("close"))
         {
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_dash_status, parent, false);

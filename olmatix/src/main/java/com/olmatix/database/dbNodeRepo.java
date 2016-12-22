@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
@@ -138,6 +139,8 @@ public class dbNodeRepo {
         }
         if (installedNodeModel.getFwName()!=null) {
             values.put(KEY_FWNAME, installedNodeModel.getFwName());
+            Log.d("DEBUG", "updateNode: " +installedNodeModel.getFwName());
+
         }
         if (installedNodeModel.getFwVersion()!=null) {
             values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
@@ -394,7 +397,6 @@ public class dbNodeRepo {
         db.close();
         return nodeList;
     }
-
 
     public ArrayList<Installed_NodeModel> getNodeListbyNode(String node_id) {
 

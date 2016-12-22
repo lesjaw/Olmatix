@@ -762,55 +762,12 @@ public class OlmatixService extends Service {
     private void statusDevices(){
         installedNodeModel.setNodesID(NodeID);
         if (dbNodeRepo.hasObject(installedNodeModel)) {
-            Log.d(TAG, "statusDevices: 1");
-            if (messageReceive.containsKey("online")) {
-                Log.d(TAG, "statusDevices: 2");
-                checkActivityForeground();
-                printForegroundTask();
-                if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
-                    if (!flagSub) {
-                        installedNodeModel.setNodesID(NodeID);
-                        data2.addAll(dbNodeRepo.getNodeListbyNode(NodeID));
-                        Log.d(TAG, "statusDevices: 3");
-                        int countDB = dbNodeRepo.getNodeListbyNode(NodeID).size();
-                        Log.d(TAG, "statusDevices: 4 / "+countDB);
-                        if (countDB != 0) {
-                            for (int i = 0; i < countDB; i++) {
-                                if (data2.get(i).getNice_name_n() != null) {
-                                    mNiceNameN = data2.get(i).getNice_name_n();
-                                } else {
-                                    mNiceNameN = data2.get(i).getFwName();
-                                }
-                                int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
 
-                                notifyID = id+2;
-
-                                Log.d(TAG, "statusDevices: 5 / "+notifyID);
-
-
-                                if (mMessage.equals("true")) {
-                                    titleNode = mNiceNameN;
-                                    textNode = "ONLINE";
-                                    showNotificationNode();
-                                } else {
-                                    titleNode = mNiceNameN;
-                                    textNode = "OFFLINE";
-                                    showNotificationNode();
-
-                                }
-                            }
-                        }
-                    }
-                    data2.clear();
-                }
-                installedNodeModel.setOnline(messageReceive.get("online"));
-                dbNodeRepo.update(installedNodeModel);
-                messageReceive.clear();
-                data.clear();
-                mChange = "2";
-                sendMessage();
-            }
         }
+        messageReceive.clear();
+        data.clear();
+        mChange = "2";
+        sendMessage();
     }
 
     private void saveDatabase() {
@@ -820,45 +777,46 @@ public class OlmatixService extends Service {
                     installedNodeModel.setName(messageReceive.get("name"));
                     installedNodeModel.setLocalip(messageReceive.get("localip"));
                     installedNodeModel.setFwName(messageReceive.get("fwname"));
+                    Log.d(TAG, "saveDatabase: "+messageReceive.get("fwname"));
                     installedNodeModel.setFwVersion(messageReceive.get("fwversion"));
                     if(installedNodeModel.getFwName() != null) {
                         addNodeDetail();
                     }
-
                     installedNodeModel.setOnline(messageReceive.get("online"));
                     if (messageReceive.containsKey("online")) {
-                            checkActivityForeground();
-                            printForegroundTask();
-                            if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
-                                if (!flagSub) {
-                                    installedNodeModel.setNodesID(NodeID);
-                                    data2.addAll(dbNodeRepo.getNodeListbyNode(NodeID));
-                                    int countDB = dbNodeRepo.getNodeListbyNode(NodeID).size();
-                                    if (countDB != 0) {
-                                        for (int i = 0; i < countDB; i++) {
-                                            if (data2.get(i).getNice_name_n() != null) {
-                                                mNiceNameN = data2.get(i).getNice_name_n();
-                                            } else {
-                                                mNiceNameN = data2.get(i).getFwName();
+                        checkActivityForeground();
+                        printForegroundTask();
+                        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
+                            if (!flagSub) {
+                                installedNodeModel.setNodesID(NodeID);
+                                data2.addAll(dbNodeRepo.getNodeListbyNode(NodeID));
+                                int countDB = dbNodeRepo.getNodeListbyNode(NodeID).size();
+                                if (countDB != 0) {
+                                    for (int i = 0; i < countDB; i++) {
+                                        if (data2.get(i).getNice_name_n() != null) {
+                                            mNiceNameN = data2.get(i).getNice_name_n();
+                                        } else {
+                                            mNiceNameN = data2.get(i).getFwName();
+                                        }
+                                        int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
 
-                                            int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
-                                            notifyID = id;
+                                        notifyID = id+2;
 
-                                            if (mMessage.equals("true")) {
-                                                titleNode = mNiceNameN;
-                                                textNode = "ONLINE";
-                                                showNotificationNode();
-                                            } else {
-                                                titleNode = mNiceNameN;
-                                                textNode = "OFFLINE";
-                                                    showNotificationNode();
+                                        if (mMessage.equals("true")) {
+                                            titleNode = mNiceNameN;
+                                            textNode = "ONLINE";
+                                            showNotificationNode();
+                                        } else {
+                                            titleNode = mNiceNameN;
+                                            textNode = "OFFLINE";
+                                            showNotificationNode();
 
-                                                }
-                                            }
                                         }
                                     }
                                 }
                             }
+                            data2.clear();
+                        }
                     }
 
                     installedNodeModel.setSignal(messageReceive.get("signal"));
@@ -874,8 +832,10 @@ public class OlmatixService extends Service {
                     //System.out.println("data " + now.getTimeInMillis());
                     installedNodeModel.setAdding(now.getTimeInMillis());
 
-                dbNodeRepo.update(installedNodeModel);
-                mChange="2";
+        dbNodeRepo.update(installedNodeModel);
+        messageReceive.clear();
+        data.clear();
+        mChange="2";
                 sendMessage();
 
     }

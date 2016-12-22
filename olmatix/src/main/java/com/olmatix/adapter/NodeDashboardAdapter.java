@@ -73,8 +73,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     @Override
     public NodeDashboardAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView;
 
+        View itemView;
 
         if (nodeType.equals("light")) {
             itemView = LayoutInflater.from(parent.getContext())

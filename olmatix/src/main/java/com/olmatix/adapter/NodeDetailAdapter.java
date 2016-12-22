@@ -125,7 +125,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            //holder.status.setText("ON");
+                            holder.status.setText("Send ON");
 
 
                         } catch (UnsupportedEncodingException | MqttException e) {
@@ -150,7 +150,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            //holder.status.setText("OFF");
+                            holder.status.setText("Send OFF");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -221,7 +221,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            //holder.status.setText("ARMED");
+                            holder.status.setText("Send ARMED");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -245,7 +245,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            //holder.status.setText("NOT ARMED");
+                            holder.status.setText("Send NOT ARMED");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();

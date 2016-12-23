@@ -474,6 +474,8 @@ public class dbNodeRepo {
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setNodeid(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

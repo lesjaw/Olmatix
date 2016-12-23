@@ -5,9 +5,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -29,17 +29,16 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     private final OnStartDragListener mDragStartListener;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(View v) {
-            super(v);
-        }
+        public ViewHolder(View v) {super(v);}
     }
+
     public class ButtonHolder extends ViewHolder {
         public TextView node_name, status;
-        public ImageView imgNode;
+        public ImageButton imgNode;
 
         public ButtonHolder(View view) {
             super(view);
-            imgNode = (ImageView) view.findViewById(R.id.icon_node);
+            imgNode = (ImageButton) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
 
         }
@@ -68,26 +67,28 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
-        View itemView;
+        View v;
         final Dashboard_NodeModel mFavoriteModel = nodeList.get(viewType);
+        Log.d("DEBUG", "onCreateViewHolder 0: "+mFavoriteModel.getSensor());
+        Log.d("DEBUG", "onCreateViewHolder 1: "+mFavoriteModel.getNodeid());
 
-        if (mFavoriteModel.getSensor().equals("light")) {
-            itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.frag_dash_button, parent, false);
+        if (mFavoriteModel.getSensor().trim().equals("light")) {
+            v = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.frag_dash_button, viewGroup, false);
 
-            return new ButtonHolder(itemView);
+            return new ButtonHolder(v);
 
         }
-        else if(mFavoriteModel.getSensor().equals("close"))
+        else if(mFavoriteModel.getSensor().trim().equals("close"))
         {
-            itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.frag_dash_status, parent, false);
+            v = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.frag_dash_status, viewGroup, false);
+            Log.d("DEBUG", "onCreateViewHolder 2: "+mFavoriteModel.getNodeid());
 
-            return new StatusHolder(itemView);
+            return new StatusHolder(v);
         }
-
         return null;
     }
 
@@ -97,27 +98,30 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
        final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
 
         if((mFavoriteModel.getSensor().trim()).equals("light")) {
-            Log.d("DEBUG", "onBindViewHolder: 1 "+mFavoriteModel.getSensor());
 
             final ButtonHolder holder = (ButtonHolder) viewHolder;
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
-            holder.imgNode.setImageResource(R.mipmap.offlamp);
+            if (mFavoriteModel.getStatus().trim().equals("false")) {
+                holder.imgNode.setImageResource(R.mipmap.offlamp);
+            }else {
+                holder.imgNode.setImageResource(R.mipmap.onlamp);
+            }
 
 
+        }else if((mFavoriteModel.getSensor().trim()).equals("close")) {
 
-        }else if((mFavoriteModel.getSensor().trim()).equals("sensor")) {
-            Log.d("DEBUG", "onBindViewHolder: 2 "+mFavoriteModel.getSensor());
+            //final StatusHolder holder = (StatusHolder) viewHolder;
+            final ButtonHolder holder = (ButtonHolder) viewHolder;
 
-            NodeDashboardAdapter.StatusHolder holder = (NodeDashboardAdapter.StatusHolder) viewHolder;
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
-
-            holder.imgNode.setImageResource(R.mipmap.not_armed);
-
+            if (mFavoriteModel.getStatus().trim().equals("false")) {
+                holder.imgNode.setImageResource(R.mipmap.not_armed);
+            }else {
+                holder.imgNode.setImageResource(R.mipmap.armed);
+            }
 
         }
-
-
     }
 
     @Override

@@ -22,45 +22,31 @@ import java.util.List;
  * Created by Lesjaw on 17/12/2016.
  */
 
-public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdapter.ViewHolder> implements ItemTouchHelperAdapter
-{
+public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdapter.ViewHolder> implements ItemTouchHelperAdapter {
 
-    List<Dashboard_NodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(View v) {super(v);}
-    }
-
-    public class ButtonHolder extends ViewHolder {
-        public TextView node_name, status;
-        public ImageButton imgNode;
-
-        public ButtonHolder(View view) {
-            super(view);
-            imgNode = (ImageButton) view.findViewById(R.id.icon_node);
-            node_name = (TextView) view.findViewById(R.id.node_name);
-
-        }
-    }
-
-    public class StatusHolder extends ViewHolder {
-        public TextView node_name, status;
-        public ImageView imgNode;
-
-        public StatusHolder(View view) {
-            super(view);
-            imgNode = (ImageView) view.findViewById(R.id.icon_node);
-            node_name = (TextView) view.findViewById(R.id.node_name);
-
-        }
-    }
+    List<Dashboard_NodeModel> nodeList;
 
     public NodeDashboardAdapter(ArrayList<Dashboard_NodeModel> data, OnStartDragListener dragStartListener) {
         this.nodeList = data;
         mDragStartListener = dragStartListener;
 
     }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        int viewType = 0;
+        if ((nodeList.get(position).getSensor().trim()).equals("light")) {
+            viewType = 0;
+
+        } else if ((nodeList.get(position).getSensor().trim()).equals("close")) {
+            viewType = 1;
+        }
+
+        return viewType;
+    }
+
     @Override
     public int getItemCount() {
         return nodeList.size();
@@ -70,55 +56,64 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
         View v;
-        final Dashboard_NodeModel mFavoriteModel = nodeList.get(viewType);
 
-        if (mFavoriteModel.getSensor().trim().equals("light")) {
-            v = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.frag_dash_button, viewGroup, false);
 
-            return new ButtonHolder(v);
+        switch (viewType) {
+            case 0:
 
+
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.frag_dash_button, viewGroup, false);
+
+                return new ButtonHolder(v);
+
+
+            case 1:
+
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.frag_dash_status, viewGroup, false);
+
+                return new StatusHolder(v);
+            default:
         }
-        else if(mFavoriteModel.getSensor().trim().equals("close"))
-        {
-            v = LayoutInflater.from(viewGroup.getContext())
-                    .inflate(R.layout.frag_dash_status, viewGroup, false);
-            Log.d("DEBUG", "onCreateViewHolder 2: "+mFavoriteModel.getNodeid());
 
-            return new StatusHolder(v);
-        }
         return null;
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         //final int pos = position;
-       final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
-        Log.d("DEBUG", "onCreateViewHolder 0: "+mFavoriteModel.getSensor());
-        Log.d("DEBUG", "onCreateViewHolder 1: "+mFavoriteModel.getNodeid());
 
-        if((mFavoriteModel.getSensor().trim()).equals("light")) {
+
+        final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
+        Log.d("DEBUG", "onCreateViewHolder 0: " + mFavoriteModel.getSensor());
+        Log.d("DEBUG", "onCreateViewHolder 1: " + mFavoriteModel.getNodeid());
+
+        if ((mFavoriteModel.getSensor().trim()).equals("light")) {
 
             final ButtonHolder holder = (ButtonHolder) viewHolder;
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
             if (mFavoriteModel.getStatus().trim().equals("false")) {
                 holder.imgNode.setImageResource(R.mipmap.offlamp);
-            }else {
+            } else {
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
             }
 
 
-        }else if((mFavoriteModel.getSensor().trim()).equals("close")) {
+        } else if ((mFavoriteModel.getSensor().trim()).equals("close")) {
 
             final StatusHolder holder = (StatusHolder) viewHolder;
-            //final ButtonHolder holder = (ButtonHolder) viewHolder;
 
-            holder.node_name.setText(mFavoriteModel.getNice_name_d());
-            if (mFavoriteModel.getStatus().trim().equals("false")) {
-                holder.imgNode.setImageResource(R.mipmap.not_armed);
-            }else {
-                holder.imgNode.setImageResource(R.mipmap.armed);
+            holder.node_names.setText(mFavoriteModel.getNice_name_d());
+
+            if ((mFavoriteModel.getStatus().trim()).equals("false")) {
+                holder.status.setText("DOOR OPEN");
+                holder.imgNodes.setImageResource(R.mipmap.not_armed);
+            } else {
+                holder.status.setText("DOOR CLOSE");
+                holder.imgNodes.setImageResource(R.mipmap.armed);
+
             }
 
         }
@@ -136,5 +131,33 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     }
 
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ViewHolder(View v) {
+            super(v);
+        }
+    }
 
+    public class ButtonHolder extends ViewHolder {
+        public TextView node_name, status;
+        public ImageButton imgNode;
+
+        public ButtonHolder(View view) {
+            super(view);
+            imgNode = (ImageButton) view.findViewById(R.id.icon_node);
+            node_name = (TextView) view.findViewById(R.id.node_name);
+
+        }
+    }
+
+    public class StatusHolder extends ViewHolder {
+        public TextView node_names, status;
+        public ImageView imgNodes;
+
+        public StatusHolder(View view) {
+            super(view);
+            imgNodes = (ImageView) view.findViewById(R.id.icon_node);
+            node_names = (TextView) view.findViewById(R.id.node_name);
+            status = (TextView) view.findViewById(R.id.node_status);
+        }
+    }
 }

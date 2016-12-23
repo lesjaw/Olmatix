@@ -6,6 +6,7 @@ package com.olmatix.ui.fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,11 +24,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -43,6 +46,7 @@ import com.olmatix.utils.SpinnerListener;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
@@ -62,6 +66,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     Dashboard_Node dashboard_node;
     private int flagReceiver;
     Spinner mSpinner;
+
 
 
     @Nullable
@@ -93,14 +98,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
             @Override
             public void onClick(View v) {
                 mSpinner = new Spinner(getContext());
-                //String typicals;
                 List<String> lables = dbNodeRepo.getAllLabels();
-
-                /*List<String> NamaTypical = new ArrayList<String>();
-                for(int i=0; i<lables.size(); i++) {
-                        typicals = lables.get(i).toString().substring(lables.indexOf("$")+10,lables.get(i).toString().length());
-                        NamaTypical.add(typicals);
-                }*/
 
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
                         android.R.layout.simple_spinner_item,lables);
@@ -122,7 +120,6 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
                                 Log.d("DEBUG", "onClick: "+NiceName);
                                 dashboardNodeModel.setNice_name_d(NiceName);
                                 dbNodeRepo.insertFavNode(dashboardNodeModel);
-
                                 setRefresh();
 
                             }
@@ -144,15 +141,20 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         mRecycleView.setHasFixedSize(true);
 
         int spanCount = getResources().getInteger(R.integer.grid_columns);
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
-        mRecycleView.setLayoutManager(layoutManager);
+        if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+        }else{
+            mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 4));
+        }
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
         adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),this);
+        adapter.notifyDataSetChanged();
         dashboardNodeModel= new Dashboard_NodeModel();
         mRecycleView.setAdapter(adapter);
+
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -170,10 +172,13 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
     }
 
+
+
     private void setRefresh() {
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
         mRecycleView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
 
     <android.support.v7.widget.CardView
@@ -11,30 +10,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="2dp"
-        card_view:cardElevation="2dp">
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true">
+
 
         <RelativeLayout
-            android:layout_width="100dp"
-            android:layout_height="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/icon_node"
-                android:layout_width="80sp"
-                android:layout_height="80sp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_centerInParent="true"
-                android:scaleType="fitXY"
+                android:layout_marginRight="16dp"
+                android:fitsSystemWindows="true"
                 android:src="@mipmap/olmatixlogo" />
 
             <TextView
                 android:id="@+id/node_name"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_below="@+id/icon_node"
                 android:layout_centerInParent="true"
-                android:text="Name Button"
-                android:textAlignment="center" />
+                android:text="Name Button" />
+
+
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

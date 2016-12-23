@@ -217,14 +217,18 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     @Override
     public void onPause() {
         super.onPause();
-        autoUpdate.cancel();
+        if (autoUpdate != null) {
+            autoUpdate.cancel();
+        }
         Log.d("DEBUG", "onPause: Cancel");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        autoUpdate.cancel();
+         if (autoUpdate != null){
+             autoUpdate.cancel();
+         }
         Log.d("DEBUG", "onPause: Stop");
     }
 
@@ -254,8 +258,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
         //adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
         //mRecycleView.setAdapter(adapter);
-        if(adapter != null)
-        {
+        if(adapter != null) {
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
 
         }

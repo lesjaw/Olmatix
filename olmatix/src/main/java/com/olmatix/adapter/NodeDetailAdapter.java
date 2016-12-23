@@ -187,17 +187,22 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             if (mInstalledNodeModel.getStatus().equals("true")) {
                 holder.imgNode.setImageResource(R.mipmap.armed);
+                holder.sensorStatus.setText("Door Close!");
+                holder.imgSensor.setImageResource(R.drawable.door_close);
                 holder.status.setText("Status : " + "ARMED");
 
 
             } else {
                 holder.imgNode.setImageResource(R.mipmap.not_armed);
+                holder.sensorStatus.setText("Door Open!");
                 holder.status.setText("Status : " + "NOT ARMED");
+                holder.imgSensor.setImageResource(R.drawable.door_open);
             }
 
             if (mInstalledNodeModel.getStatus_theft().equals("true")) {
                 holder.status.setText("Status : " + "ALARM!!");
-                holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                holder.imgSensor.setImageResource(R.drawable.door_open);
+                holder.status.setTextColor(ContextCompat.getColor(context, R.color.red));
                 holder.status.setTypeface(null, Typeface.BOLD);
             }
             Log.d("DEBUG", "Adapter: " + mInstalledNodeModel.getStatus_sensor());

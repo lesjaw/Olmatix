@@ -150,13 +150,6 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
     @Override
     public void onStart() {
-
-        if (flagReceiver==0) {
-            LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
-                    mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
-            Log.d("Receiver ", "Detail_Node = Starting..");
-            flagReceiver = 1;
-        }
         super.onStart();
     }
 
@@ -231,7 +224,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
                             detailNodeModel.setChannel(data.get(position).getChannel());
                             detailNodeModel.setNice_name_d(nice_name);
                             dbNodeRepo.update_detail_NiceName(detailNodeModel);
-                            Toast.makeText(getApplicationContext(),"Successfully Inserted",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"Renaming button success",Toast.LENGTH_LONG).show();
                             setRefresh();
 
                         }
@@ -300,30 +293,32 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
     @Override
     protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     protected void onPause() {
-        unregisterReceiver(mIntentReceiver);
         super.onPause();
+        unregisterReceiver(mIntentReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     protected void onPostResume() {
-        if (flagReceiver==0) {
-            LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
+        super.onPostResume();
+
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
             Log.d("Receiver ", "Detail_Node = Starting..");
             flagReceiver = 1;
-        }
+
         registerReceiver(mIntentReceiver, mIntentFilter);
-        super.onPostResume();
     }
 }

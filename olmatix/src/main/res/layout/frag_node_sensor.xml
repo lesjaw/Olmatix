@@ -44,15 +44,6 @@
                 android:text="Node Name"
                 />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/uptime"
-                android:layout_alignParentRight="true"
-                android:layout_above="@+id/btn_off"
-                android:paddingTop="0sp"
-                android:layout_marginRight="0dp"
-                android:text="Uptime"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -68,39 +59,71 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/status"
+                android:id="@+id/statuslabel"
+                android:textSize="20sp"
                 android:layout_toRightOf="@+id/icon_node"
-                android:layout_below="@id/sensorstatus"
-                android:text="Status"
+                android:layout_below="@+id/sensorstatus"
+                android:text="Status: "
+                />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/status"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="5sp"
+                android:paddingLeft="5sp"
+                android:layout_toRightOf="@+id/statuslabel"
+                android:layout_below="@+id/sensorstatus"
+                android:text="ON"
+                android:background="@drawable/border"
                 />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/fw_name"
-                android:layout_toRightOf="@+id/icon_node"
-                android:layout_below="@id/status"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/uptime"
                 android:textSize="10sp"
                 android:text="fw Name"
                 />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/uptime"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/btn_off"
+                android:paddingTop="0sp"
+                android:layout_marginRight="30dp"
+                android:text="Uptime"/>
 
             <Button
                 android:id="@+id/btn_off"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/status"
-                android:layout_alignParentRight="true"
+                android:padding="15sp"
                 android:text="OFF"
-                android:textStyle="bold"/>
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/status"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:theme="@style/AppTheme.Button_off" />
 
             <Button
                 android:id="@+id/btn_on"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="15sp"
                 android:layout_below="@id/status"
                 android:layout_toLeftOf="@id/btn_off"
                 android:text="ON"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:theme="@style/AppTheme.Button_on"/>
 
             <ImageView
                 android:layout_width="wrap_content"

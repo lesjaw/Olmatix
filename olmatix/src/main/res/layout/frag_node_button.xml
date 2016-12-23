@@ -44,14 +44,29 @@
                 android:textStyle="bold"
                 />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/statuslabel"
+                android:textSize="20sp"
+                android:layout_toRightOf="@+id/icon_node"
+                android:layout_below="@+id/node_name"
+                android:text="Status: "
+                />
+
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/status"
-                android:layout_toRightOf="@+id/icon_node"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="5sp"
+                android:paddingLeft="5sp"
+                android:layout_toRightOf="@+id/statuslabel"
                 android:layout_below="@+id/node_name"
-                android:text="Status"
+                android:text="ON"
+                android:background="@drawable/border"
                 />
 
             <TextView
@@ -78,19 +93,25 @@
                 android:id="@+id/btn_on"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="15sp"
                 android:layout_alignParentRight="true"
                 android:text="ON"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:theme="@style/AppTheme.Button_on"/>
 
             <Button
                 android:id="@+id/btn_off"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="15sp"
                 android:text="OFF"
                 android:layout_alignTop="@+id/uptime"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:theme="@style/AppTheme.Button_off" />
 
         </RelativeLayout>
 

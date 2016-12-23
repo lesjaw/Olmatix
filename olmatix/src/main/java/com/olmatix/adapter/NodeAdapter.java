@@ -44,6 +44,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     Context context;
     CharSequence textNode;
     CharSequence titleNode;
+    String topic;
 
 
     public class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -196,25 +197,31 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     }
 
     public void removeItem(int position) {
-
         Installed_Node.dbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
-        String topic = "devices/"+nodeList.get(position).getNodesID()+"/#";
-        try {
-            Connection.getClient().unsubscribe(topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-        String topic1 = "devices/"+nodeList.get(position).getNodesID()+"/$online";
-        try {
-            Connection.getClient().unsubscribe(topic1);
-        } catch (MqttException e) {
-            e.printStackTrace();
+
+        String mNodeID = nodeList.get(position).getNodesID();
+        for (int a=0; a < 10 ;a++) {
+            if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
+            if (a == 1) {topic = "devices/" + mNodeID + "/$fwname";}
+            if (a == 2) {topic = "devices/" + mNodeID + "/$signal";}
+            if (a == 3) {topic = "devices/" + mNodeID + "/$uptime";}
+            if (a == 4) {topic = "devices/" + mNodeID + "/$name";}
+            if (a == 5) {topic = "devices/" + mNodeID + "/$localip";}
+            if (a == 6) {topic = "devices/" + mNodeID + "/light/0";}
+            if (a == 7) {topic = "devices/" + mNodeID + "/light/1";}
+            if (a == 8) {topic = "devices/" + mNodeID + "/light/2";}
+            if (a == 9) {topic = "devices/" + mNodeID + "/light/3";}
+
+            try {
+                Connection.getClient().unsubscribe(topic);
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
         }
         nodeList.remove(position);
 
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, nodeList.size());
-
     }
 
     @Override

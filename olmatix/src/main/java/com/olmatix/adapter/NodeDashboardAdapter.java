@@ -1,7 +1,6 @@
 package com.olmatix.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,8 +85,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
 
         final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
-        Log.d("DEBUG", "onCreateViewHolder 0: " + mFavoriteModel.getSensor());
-        Log.d("DEBUG", "onCreateViewHolder 1: " + mFavoriteModel.getNodeid());
+        //Log.d("DEBUG", "onCreateViewHolder 0: " + mFavoriteModel.getSensor());
+        //Log.d("DEBUG", "onCreateViewHolder 1: " + mFavoriteModel.getNodeid());
 
         if ((mFavoriteModel.getSensor().trim()).equals("light")) {
 
@@ -107,7 +106,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             holder.node_names.setText(mFavoriteModel.getNice_name_d());
 
-            if ((mFavoriteModel.getStatus().trim()).equals("false")) {
+            if ((mFavoriteModel.getStatus().trim()).equals("true")) {
                 holder.status.setText("DOOR OPEN");
                 holder.imgNodes.setImageResource(R.mipmap.not_armed);
             } else {

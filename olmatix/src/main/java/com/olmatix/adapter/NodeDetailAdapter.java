@@ -1,8 +1,12 @@
 package com.olmatix.adapter;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +20,7 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Detail_NodeModel;
+import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
@@ -91,20 +96,31 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 titleNode = mInstalledNodeModel.getNice_name_d();
             } else
                 holder.node_name.setText(mInstalledNodeModel.getName());
-                titleNode = mInstalledNodeModel.getName();
+            titleNode = mInstalledNodeModel.getName();
 
 
             holder.upTime.setText(OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
 
-            holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+            holder.status.setText(mInstalledNodeModel.getStatus());
 
             if (mInstalledNodeModel.getStatus().equals("true")) {
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
-                holder.status.setText("Status : " + "ON");
+                holder.statuslabel.setText("Status:");
+                holder.status.setText("ON");
+                holder.status.setTextColor(ContextCompat.getColor(context, R.color.green));
+                holder.btn_on.setEnabled(false);
+                holder.btn_off.setEnabled(true);
+
+
 
             } else {
                 holder.imgNode.setImageResource(R.mipmap.offlamp);
-                holder.status.setText("Status : " + "OFF");
+                holder.statuslabel.setText("Status:");
+                holder.status.setText("OFF");
+                holder.status.setTextColor(ContextCompat.getColor(context, R.color.red));
+                holder.btn_on.setEnabled(true);
+                holder.btn_off.setEnabled(false);
+
 
             }
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +136,9 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            holder.status.setText("Send ON");
+                            holder.statuslabel.setText("Sending");
+                            holder.status.setText(" ON");
+                            holder.status.setSingleLine();
 
 
                         } catch (UnsupportedEncodingException | MqttException e) {
@@ -145,7 +163,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            holder.status.setText("Send OFF");
+                            holder.statuslabel.setText("Sending");
+                            holder.status.setText(" OFF");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -187,25 +206,23 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             if (mInstalledNodeModel.getStatus().equals("true")) {
                 holder.imgNode.setImageResource(R.mipmap.armed);
-                holder.sensorStatus.setText("Door Close!");
-                holder.imgSensor.setImageResource(R.drawable.door_close);
-                holder.status.setText("Status : " + "ARMED");
+                holder.statuslabel.setText("Status:");
+                holder.status.setText("ARMED");
 
 
             } else {
                 holder.imgNode.setImageResource(R.mipmap.not_armed);
-                holder.sensorStatus.setText("Door Open!");
-                holder.status.setText("Status : " + "NOT ARMED");
-                holder.imgSensor.setImageResource(R.drawable.door_open);
+                holder.statuslabel.setText("Status:");
+                holder.status.setText("NOT ARMED");
             }
 
             if (mInstalledNodeModel.getStatus_theft().equals("true")) {
-                holder.status.setText("Status : " + "ALARM!!");
-                holder.imgSensor.setImageResource(R.drawable.door_open);
-                holder.status.setTextColor(ContextCompat.getColor(context, R.color.red));
+                holder.statuslabel.setText("Status:");
+                holder.status.setText("ALARM!!");
+                holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 holder.status.setTypeface(null, Typeface.BOLD);
             }
-            Log.d("DEBUG", "Adapter: " + mInstalledNodeModel.getStatus_sensor());
+            //Log.d("DEBUG", "Adapter: " + mInstalledNodeModel.getStatus_sensor());
 
 
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
@@ -221,7 +238,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            holder.status.setText("Send ARMED");
+                            holder.statuslabel.setText("Sending");
+                            holder.status.setText(" ARMED");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -245,7 +263,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-                            holder.status.setText("Send NOT ARMED");
+                            holder.statuslabel.setText("Sending");
+                            holder.status.setText(" NOT ARMED");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -259,6 +278,23 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         }
 
 
+    }
+
+    private void showNotificationNode() {
+        NotificationCompat.Builder builder =
+                (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.olmatixsmall)
+                        .setContentTitle(titleNode)
+                        .setContentText(textNode);
+
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
     }
 
     @Override
@@ -280,7 +316,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
     public class OlmatixHolder extends ViewHolder {
-        public TextView node_name, upTime, status, fwName;
+        public TextView node_name, upTime, status, fwName, statuslabel;
         public ImageView imgNode;
         Button btn_off, btn_on;
 
@@ -289,6 +325,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             imgNode = (ImageView) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
             fwName = (TextView) view.findViewById(R.id.fw_name);
+            statuslabel = (TextView) view.findViewById(R.id.statuslabel);
             status = (TextView) view.findViewById(R.id.status);
             upTime = (TextView) view.findViewById(R.id.uptime);
             btn_off = (Button) view.findViewById(R.id.btn_off);
@@ -298,7 +335,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
     public class OlmatixSensorHolder extends ViewHolder {
-        public TextView node_name, upTime, status, sensorStatus, fwName;
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel;
         public ImageView imgNode, imgSensor;
         Button btn_off, btn_on;
 
@@ -309,6 +346,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             fwName = (TextView) view.findViewById(R.id.fw_name);
             sensorStatus = (TextView) view.findViewById(R.id.sensorstatus);
             status = (TextView) view.findViewById(R.id.status);
+            statuslabel = (TextView) view.findViewById(R.id.statuslabel);
             upTime = (TextView) view.findViewById(R.id.uptime);
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);

@@ -117,7 +117,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                     startActivity(i);
                 } else {
                         Toast.makeText(getActivity(), nice_name + " is OFFLINE!, please check it, if the " + nice_name
-                                        + " blue led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",
+                                        + " led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",
                                 Toast.LENGTH_LONG).show();
                 }
                 /*ImageView picture=(ImageView)view.findViewById(R.id.state_conn);
@@ -220,7 +220,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         if (autoUpdate != null) {
             autoUpdate.cancel();
         }
-        Log.d("DEBUG", "onPause: Cancel");
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
@@ -229,7 +229,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
          if (autoUpdate != null){
              autoUpdate.cancel();
          }
-        Log.d("DEBUG", "onPause: Stop");
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -297,21 +297,18 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     @Override
     public void onDestroy() {
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
-        if (flagReceiver==0) {
             /*Intent i = new Intent(getActivity(), OlmatixService.class);
             getActivity().startService(i);*/
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
 
             Log.d("Receiver ", "Installed_Node = Starting..");
-            flagReceiver = 1;
-        }
+
         super.onResume();
     }
 
@@ -473,7 +470,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                             installedNodeModel.setNodesID(data.get(position).getNodesID());
                             installedNodeModel.setNice_name_n(nice_name);
                             dbNodeRepo.updateNameNice(installedNodeModel);
-                            Toast.makeText(getActivity(),"Successfully Inserted",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(),"Renaming Node success",Toast.LENGTH_LONG).show();
                             setRefresh();
 
                         }

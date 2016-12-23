@@ -12,8 +12,8 @@
         android:id="@+id/cv">
 
             <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="200sp"
+                android:layout_height="100sp">
                 <ImageView
                     android:layout_width="80sp"
                     android:layout_height="80sp"

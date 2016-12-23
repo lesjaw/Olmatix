@@ -71,8 +71,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
         View v;
         final Dashboard_NodeModel mFavoriteModel = nodeList.get(viewType);
-        Log.d("DEBUG", "onCreateViewHolder 0: "+mFavoriteModel.getSensor());
-        Log.d("DEBUG", "onCreateViewHolder 1: "+mFavoriteModel.getNodeid());
 
         if (mFavoriteModel.getSensor().trim().equals("light")) {
             v = LayoutInflater.from(viewGroup.getContext())
@@ -96,6 +94,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         //final int pos = position;
        final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
+        Log.d("DEBUG", "onCreateViewHolder 0: "+mFavoriteModel.getSensor());
+        Log.d("DEBUG", "onCreateViewHolder 1: "+mFavoriteModel.getNodeid());
 
         if((mFavoriteModel.getSensor().trim()).equals("light")) {
 
@@ -111,8 +111,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
         }else if((mFavoriteModel.getSensor().trim()).equals("close")) {
 
-            //final StatusHolder holder = (StatusHolder) viewHolder;
-            final ButtonHolder holder = (ButtonHolder) viewHolder;
+            final StatusHolder holder = (StatusHolder) viewHolder;
+            //final ButtonHolder holder = (ButtonHolder) viewHolder;
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
             if (mFavoriteModel.getStatus().trim().equals("false")) {

@@ -10,6 +10,8 @@ public class Dashboard_NodeModel {
     private String nice_name_d;
     private String sensor;
     private String status;
+    private String channel;
+    private String nodeid;
 
     public int getId() {
         return id;
@@ -41,5 +43,21 @@ public class Dashboard_NodeModel {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public String getNodeid() {
+        return nodeid;
+    }
+
+    public void setNodeid(String nodeid) {
+        this.nodeid = nodeid;
     }
 }

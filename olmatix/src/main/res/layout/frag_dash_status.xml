@@ -27,7 +27,7 @@
                 android:id="@+id/icon_node"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginRight="16dp"
+                android:layout_marginRight="0dp"
                 android:fitsSystemWindows="true"
                 android:src="@mipmap/olmatixlogo"
                 android:layout_centerInParent="true"

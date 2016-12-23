@@ -6,40 +6,40 @@ package com.olmatix.model;
 
 public class Dashboard_NodeModel {
 
-    private int FavId;
-    private String FavNodeID;
-    private String FavChannel;
-    private String FavNodeType;
+    private  int id;
+    private String nice_name_d;
+    private String sensor;
+    private String status;
 
-    public int getFavId() {
-        return FavId;
+    public int getId() {
+        return id;
     }
 
-    public void setFavId(int favId) {
-        FavId = favId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getFavNodeID() {
-        return FavNodeID;
+    public String getNice_name_d() {
+        return nice_name_d;
     }
 
-    public void setFavNodeID(String favNodeID) {
-        FavNodeID = favNodeID;
+    public void setNice_name_d(String nice_name_d) {
+        this.nice_name_d = nice_name_d;
     }
 
-    public String getFavChannel() {
-        return FavChannel;
+    public String getSensor() {
+        return sensor;
     }
 
-    public void setFavChannel(String favChannel) {
-        FavChannel = favChannel;
+    public void setSensor(String sensor) {
+        this.sensor = sensor;
     }
 
-    public String getFavNodeType() {
-        return FavNodeType;
+    public String getStatus() {
+        return status;
     }
 
-    public void setFavNodeType(String favNodeType) {
-        FavNodeType = favNodeType;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -1,5 +1,6 @@
 package com.olmatix.ui.fragment;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -60,11 +61,16 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private static ArrayList<Detail_NodeModel> data;
     int flagReceiver=0;
     private Toolbar mToolbar;
+    public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
+    private IntentFilter mIntentFilter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_node);
+
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(UE_ACTION);
 
         detail_node =this;
         Intent i = getIntent();
@@ -79,6 +85,17 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
 
     }
+
+    private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(UE_ACTION)) {
+                Log.d("Olmatix", "i'm in the foreground");
+                this.setResultCode(Activity.RESULT_OK);
+            }
+        }
+    };
 
 
     private void setupView() {
@@ -201,8 +218,11 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
                     final EditText input = new EditText(Detail_Node.this);
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
-                    input.setText(data.get(position).getNice_name_d());
-
+                    if (data.get(position).getNice_name_d()!=null) {
+                        input.setText(data.get(position).getNice_name_d());
+                    }else {
+                        input.setText(data.get(position).getName());
+                    }
                     builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -286,13 +306,12 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        unregisterReceiver(mIntentReceiver);
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onStop();
     }
 
@@ -304,6 +323,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
             Log.d("Receiver ", "Detail_Node = Starting..");
             flagReceiver = 1;
         }
+        registerReceiver(mIntentReceiver, mIntentFilter);
         super.onPostResume();
     }
 }

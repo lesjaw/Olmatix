@@ -35,7 +35,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.NodeAdapter;
@@ -64,12 +63,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     private List<Installed_NodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
-    private AlertDialog.Builder alertDialog;
-    private View view;
     private Timer autoUpdate;
     private NodeAdapter adapter;
-    private TextView etTopic,version;
-    ImageView icon_node;
     private RecyclerView.LayoutManager layoutManager;
     private static ArrayList<Installed_NodeModel> data;
     private Paint p = new Paint();
@@ -81,7 +76,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     SwipeRefreshLayout mSwipeRefreshLayout;
     String nice_name;
     String fwName;
-
+    Context installed_node;
 
     @Nullable
     @Override
@@ -95,14 +90,13 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        installed_node=getContext();
+
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
         installedNodeModel = new Installed_NodeModel();
-        initDialog();
         setupView();
         onClickListener();
-        //refreshHeader();
-        //doSubAll();
 
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
                 mRecycleView, new ClickListener() {
@@ -112,14 +106,20 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 fwName = data.get(position).getFwName();
                 nice_name = data.get(position).getNice_name_n();
 
+                String state = data.get(position).getOnline();
+                if (state.equals("true")) {
 
-                Intent i= new Intent(getActivity(), Detail_Node.class);
-                i.putExtra("node_id",data.get(position).getNodesID());
-                i.putExtra("node_name",fwName);
-                i.putExtra("nice_name",nice_name);
+                    Intent i = new Intent(getActivity(), Detail_Node.class);
+                    i.putExtra("node_id", data.get(position).getNodesID());
+                    i.putExtra("node_name", fwName);
+                    i.putExtra("nice_name", nice_name);
 
-                startActivity(i);
-
+                    startActivity(i);
+                } else {
+                        Toast.makeText(getActivity(), nice_name + " is OFFLINE!, please check it, if the " + nice_name
+                                        + " blue led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",
+                                Toast.LENGTH_LONG).show();
+                }
                 /*ImageView picture=(ImageView)view.findViewById(R.id.state_conn);
                 picture.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -180,8 +180,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                         });
 
                         builder.show();
-
-
                     }
                 });
 
@@ -233,9 +231,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             String mChange = intent.getStringExtra("NotifyChangeNode");
-
             if (mChange==null){
                 mChange ="0";
             }
@@ -246,7 +242,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 if (adapter != null)
                     updatelist();
                 Log.d("receiver", "NotifyChangeNode : " + mChange);
-
             }
         }
     };
@@ -308,7 +303,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         if (flagReceiver==0) {
             /*Intent i = new Intent(getActivity(), OlmatixService.class);
             getActivity().startService(i);*/
-
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
 
@@ -316,6 +310,12 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             flagReceiver = 1;
         }
         super.onResume();
+    }
+
+    private void sendMessage() {
+        Intent intent = new Intent("addNode");
+        intent.putExtra("NodeID", inputResult);
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 
     private View.OnClickListener mFabClickListener() {
@@ -331,8 +331,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+
                                 inputResult = mEditText.getText().toString();
-                                String topic = "devices/" + inputResult + "/$online";
+                                sendMessage();
+
+                                /*String topic = "devices/" + inputResult + "/$online";
                                 int qos = 2;
                                 try {
                                     IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
@@ -348,7 +351,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                                     });
                                 } catch (MqttException e) {
                                     e.printStackTrace();
-                                }
+                                }*/
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -373,9 +376,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
-        adapter = new NodeAdapter(data,this);
+        adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
-
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -386,7 +388,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             }
         });
 
-
         initSwipe();
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
@@ -394,38 +395,20 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
         //adapter.setClickListener(this);
-
     }
 
     private void setRefresh() {
 
+        //doSubAll();
+
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
 
-        adapter = new NodeAdapter(data,this);
+        adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
         //adapter.setClickListener(this);
 
         mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    private void initDialog(){
-        alertDialog = new AlertDialog.Builder(getActivity());
-        LayoutInflater myLayout = LayoutInflater.from(getActivity());
-        view = myLayout.inflate(R.layout.dialog_layout,null);
-        alertDialog.setView(view);
-        alertDialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                adapter.notifyDataSetChanged();
-                dialog.dismiss();
-
-            }
-        });
-        etTopic = (TextView) view.findViewById(R.id.et_topic);
-        version = (TextView) view.findViewById(R.id.version);
-        icon_node = (ImageView) view.findViewById(R.id.icon_node);
     }
 
     private void initSwipe(){
@@ -451,7 +434,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             adapter.removeItem(position);
-                            Toast.makeText(getActivity(),"Successfully Inserted",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(),"Successfully Deleted",Toast.LENGTH_LONG).show();
                             setRefresh();
 
                         }
@@ -475,8 +458,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                     final EditText input = new EditText(getActivity());
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
-                    input.setText(data.get(position).getNice_name_n());
-
+                    if (data.get(position).getNice_name_n()!=null) {
+                        input.setText(data.get(position).getNice_name_n());
+                    } else{
+                        input.setText(data.get(position).getFwName());
+                    }
                     builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

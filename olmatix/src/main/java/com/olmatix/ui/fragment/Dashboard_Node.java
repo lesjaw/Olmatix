@@ -30,15 +30,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
+import com.olmatix.adapter.NodeDetailAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
-import com.olmatix.model.Detail_NodeModel;
-import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.utils.SpinnerListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,26 +47,21 @@ import java.util.List;
 public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
     private View mView;
-    private List<Dashboard_NodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
     private AlertDialog.Builder alertDialog;
     private RecyclerView.LayoutManager layoutManager;
     private NodeDashboardAdapter adapter;
+    private NodeDetailAdapter adapterSpinner;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Dashboard_NodeModel dashboardNodeModel;
-    private Spinner mSpinner;
-    public static dbNodeRepo dbNodeRepo;
+    public  dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
-    private static ArrayList<Detail_NodeModel> dataNode;
-    private Detail_NodeModel nodeDetail;
     Dashboard_Node dashboard_node;
-    String node_id,node_name;
-
     private int flagReceiver;
-    private int position;
+    Spinner mSpinner;
 
 
     @Nullable
@@ -82,12 +78,9 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
-        dashboardNodeModel = new Dashboard_NodeModel();
-        dashboard_node =this;
+
         setupView();
         onClickListener();
-
-
 
     }
 
@@ -100,22 +93,38 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
             @Override
             public void onClick(View v) {
                 mSpinner = new Spinner(getContext());
+                //String typicals;
+                List<String> lables = dbNodeRepo.getAllLabels();
+
+                /*List<String> NamaTypical = new ArrayList<String>();
+                for(int i=0; i<lables.size(); i++) {
+                        typicals = lables.get(i).toString().substring(lables.indexOf("$")+10,lables.get(i).toString().length());
+                        NamaTypical.add(typicals);
+                }*/
+
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
+                        android.R.layout.simple_spinner_item,lables);
+                dataAdapter
+                        .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                mSpinner.setAdapter(dataAdapter);
 
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")
-                        .setMessage("Please type Olmatix product ID!")
+                        .setMessage("Please choose your existing Nodes!")
                         .setView(mSpinner)
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
-
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                //do add fav
-                                List<String> lables = dbNodeRepo.getAllName();
-                                Log.d("DEBUG", "loadSpinnerData: " + lables.size());
+                                mSpinner.setOnItemSelectedListener(new SpinnerListener());
 
-                                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, lables);
-                                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                mSpinner.setAdapter(dataAdapter);
+                                Toast.makeText(getContext(),"You have add : " +String.valueOf(mSpinner.getSelectedItem()),Toast.LENGTH_SHORT).show();
+                                String NiceName= String.valueOf(mSpinner.getSelectedItem());
+                                Log.d("DEBUG", "onClick: "+NiceName);
+                                dashboardNodeModel.setNice_name_d(NiceName);
+                                dbNodeRepo.insertFavNode(dashboardNodeModel);
+
+                                setRefresh();
+
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -126,23 +135,23 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         };
     }
 
-
-
-
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
+
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
+
         mRecycleView.setHasFixedSize(true);
 
-        final int spanCount = getResources().getInteger(R.integer.grid_columns);
-        final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
+        int spanCount = getResources().getInteger(R.integer.grid_columns);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
         data.clear();
-        data.addAll(dbNodeRepo.getNodeFav());
-        adapter = new NodeDashboardAdapter(data,node_name, dashboard_node,this);
+        data.addAll(dbNodeRepo.getNodeDetailDash());
+        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),this);
+        dashboardNodeModel= new Dashboard_NodeModel();
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -160,14 +169,11 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
     }
+
     private void setRefresh() {
         data.clear();
-        data.addAll(dbNodeRepo.getNodeFav());
-
-        adapter = new NodeDashboardAdapter(data,node_name, dashboard_node,this);
+        data.addAll(dbNodeRepo.getNodeDetailDash());
         mRecycleView.setAdapter(adapter);
-        //adapter.setClickListener(this);
-
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
@@ -184,7 +190,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     private void updatelist (){
         adapter.notifyDataSetChanged();
         data.clear();
-        data.addAll(dbNodeRepo.getNodeFav());
+        data.addAll(dbNodeRepo.getNodeDetailDash());
         if(adapter != null){
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
 
@@ -246,12 +252,12 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(mRecycleView);
     }
+
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
 
     }
-
 
     class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
 
@@ -297,6 +303,4 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
         }
     }
-
-
 }

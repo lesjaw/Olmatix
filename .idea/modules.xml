@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Olmatix.iml" filepath="$PROJECT_DIR$/Olmatix.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lesjawNew.iml" filepath="$PROJECT_DIR$/lesjawNew.iml" />
       <module fileurl="file://$PROJECT_DIR$/olmatix/olmatix.iml" filepath="$PROJECT_DIR$/olmatix/olmatix.iml" />
     </modules>
   </component>

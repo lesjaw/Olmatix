@@ -8,11 +8,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
+import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
-import com.olmatix.model.Dashboard_NodeModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,10 +68,9 @@ public class dbNodeRepo {
 
         long Id = db.insert(TABLE, null, values);
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
     }
-
 
     public int insertInstalledNode(Detail_NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -88,25 +86,24 @@ public class dbNodeRepo {
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
+        //Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
 
         return (int) node_Id;
     }
 
-    public int insertFavNode(Dashboard_NodeModel nodeFavorite){
+    public void insertFavNode(Dashboard_NodeModel dashboardNodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODE_ID,nodeFavorite.getFavNodeID());
-        values.put(KEY_CHANNEL, nodeFavorite.getFavChannel());
-        values.put(KEY_STATUS, nodeFavorite.getFavNodeType());
+        values.put(KEY_NICE_NAME_D,dashboardNodeModel.getNice_name_d());
 
-        long node_Id = db.insert(TABLE_FAV, null, values);
+        db.insert(TABLE_FAV, null, values);
+
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDetail: " + String.valueOf(KEY_NODE_ID));
+        //Log.d("DEBUG", "insertFav: " + String.valueOf(KEY_NICE_NAME_D));
 
-        return (int) node_Id;
+        return;
     }
 
     public void deleteNode(String node_Id) {
@@ -141,13 +138,13 @@ public class dbNodeRepo {
         }
         if (installedNodeModel.getFwName()!=null) {
             values.put(KEY_FWNAME, installedNodeModel.getFwName());
+            //Log.d("DEBUG", "updateNode: " +installedNodeModel.getFwName());
         }
         if (installedNodeModel.getFwVersion()!=null) {
             values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
         }
         if (installedNodeModel.getOnline()!=null) {
             values.put(KEY_ONLINE, installedNodeModel.getOnline());
-//            Log.d("DEBUG", "updateNode Online: " +installedNodeModel.getOnline());
 
         }
         if (installedNodeModel.getNodesID()!=null) {
@@ -190,10 +187,8 @@ public class dbNodeRepo {
                 String.valueOf(installedNodeModel.getNodesID())
         });
         db.close(); // Closing database connection
-        //Log.d("DEBUG", "updateNiceName: " + String.valueOf(installedNodeModel.getNodesID()));
 
     }
-
 
     public void update_detail(Detail_NodeModel detailNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -206,7 +201,7 @@ public class dbNodeRepo {
         }
         if (detailNodeModel.getStatus()!=null || detailNodeModel.getStatus() != "ON" || detailNodeModel.getStatus() != "OFF") {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
-            Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
+            //Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
         }
         /*if (detailNodeModel.getSensor()!=null) {
             values.put(KEY_SENSOR, detailNodeModel.getSensor());
@@ -214,7 +209,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getTimestamps()!=null) {
             values.put(KEY_TIMESTAMPS, detailNodeModel.getTimestamps());
-            Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
+            //Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
@@ -252,11 +247,11 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_sensor()!=null) {
             values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+            //Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
         }
         if (detailNodeModel.getStatus_theft()!=null) {
             values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
-            Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
+            //Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
@@ -264,8 +259,8 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getChannel())
         });
         db.close(); // Closing database connection
-        Log.d("DEBUG", "updateDetailSensor: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
-                String.valueOf(detailNodeModel.getChannel()));
+        //Log.d("DEBUG", "updateDetailSensor: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
+                //String.valueOf(detailNodeModel.getChannel()));
 
     }
 
@@ -305,13 +300,44 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-    public ArrayList<Detail_NodeModel> getNodeDetail() {
+    public List<String> getAllLabels(){
+        List<String> labels = new ArrayList<String>();
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_NODE;
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT * FROM " + TABLE_NODE;
-
-        ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
         Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                //labels.add(cursor.getString(1)+" | "+ cursor.getString(3));
+                labels.add(cursor.getString(3));
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return labels;
+    }
+
+    public ArrayList<Detail_NodeModel> getNodeDetail(String node_id, String Channel) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =? AND "+KEY_CHANNEL +" =?";
+
+        // Add the String you are searching by here.
+        // Put it in an array to avoid an unrecognized token error
+        ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
+
+        Cursor cursor = db.rawQuery(selectString, new String[] {
+                String.valueOf(node_id),
+                String.valueOf(Channel) });
+
 
         if (cursor.moveToFirst()) {
             do {
@@ -335,28 +361,76 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-    public List<String> getAllName(){
-        List<String> labels = new ArrayList<String>();
-
-        // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE;
+    public ArrayList<Detail_NodeModel> getNodeDetailList() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
 
-        // looping through all rows and adding to list
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE;
+
+        // Add the String you are searching by here.
+        // Put it in an array to avoid an unrecognized token error
+        ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
+
+        Cursor cursor = db.rawQuery(selectString,null);
+
+
         if (cursor.moveToFirst()) {
             do {
-                labels.add(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                Detail_NodeModel node = new Detail_NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNode_id( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus_sensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
+                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
+
+                nodeList.add(node);
+
             } while (cursor.moveToNext());
         }
-
-        // closing connection
         cursor.close();
         db.close();
+        return nodeList;
+    }
 
-        // returning lables
-        return labels;
+    public ArrayList<Installed_NodeModel> getNodeListbyNode(String node_id) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT * FROM " + TABLE + " WHERE " + KEY_NODE_ID + " =?";
+
+        ArrayList<Installed_NodeModel> nodeList = new ArrayList<Installed_NodeModel>();
+
+        Cursor cursor = db.rawQuery(selectQuery, new String[] {
+                String.valueOf(node_id)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Installed_NodeModel node = new Installed_NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNodesID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNodes( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
+                node.setName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setNice_name_n( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_N)));
+                node.setLocalip( cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
+                node.setFwName( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
+                node.setFwVersion( cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
+                node.setOnline( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.setIcon( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
+                node.setAdding( cursor.getLong(cursor.getColumnIndex(dbNode.KEY_ADDING)));
+                node.setSignal( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
+                node.setUptime( cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setReset( cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));
+                node.setOta( cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
     }
 
     public ArrayList<Dashboard_NodeModel> getNodeFav() {
@@ -364,22 +438,46 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM " + TABLE_FAV;
 
-        ArrayList<Dashboard_NodeModel> nodeList = new ArrayList<Dashboard_NodeModel>();
+        ArrayList<Dashboard_NodeModel> favList = new ArrayList<Dashboard_NodeModel>();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
                 Dashboard_NodeModel node = new Dashboard_NodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setFavChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
-                node.setFavNodeType( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_TYPE)));
-                node.setFavNodeID( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
 
-                nodeList.add(node);
+                favList.add(node);
 
             } while (cursor.moveToNext());
         }
         //Log.d("getlist", "getNodeList: " +cursor.getCount());
+        cursor.close();
+        db.close();
+        return favList;
+    }
+
+    public ArrayList<Dashboard_NodeModel> getNodeDetailDash() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT * FROM "+TABLE_FAV + " favorite_node INNER JOIN "+  TABLE_NODE +
+                " detail_node ON favorite_node."+KEY_NICE_NAME_D+" = detail_node."+KEY_NICE_NAME_D;
+
+        ArrayList<Dashboard_NodeModel> nodeList = new ArrayList<>();
+        Cursor cursor = db.rawQuery(selectQuery,  null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Dashboard_NodeModel node = new Dashboard_NodeModel();
+
+
+                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
         cursor.close();
         db.close();
         return nodeList;
@@ -415,14 +513,10 @@ public class dbNodeRepo {
 
             } while (cursor.moveToNext());
         }
-        //Log.d("getlist", "getNodeList: " +cursor.getCount());
         cursor.close();
         db.close();
         return nodeList;
     }
-
-
-
 
     public boolean hasObject(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -443,7 +537,7 @@ public class dbNodeRepo {
                 count++;
             }
             //here, count is records found
-            Log.d("hasObject", String.format("%d records found", count));
+            //Log.d("hasObject", String.format("%d records found", count));
 
             //endregion
 
@@ -475,7 +569,7 @@ public class dbNodeRepo {
                 count++;
             }
             //here, count is records found
-            Log.d("hasObjectDetail", String.format("%d records found", count));
+            //Log.d("hasObjectDetail", String.format("%d records found", count));
 
             //endregion
 
@@ -485,7 +579,6 @@ public class dbNodeRepo {
         db.close();              //AND your Database!
         return hasObject;
     }
-
 
     public dbNode getNodeByNode(Installed_NodeModel installedNodeModel){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -521,4 +614,7 @@ public class dbNodeRepo {
         db.close();
         return node;
     }
+
+
 }
+

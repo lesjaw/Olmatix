@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.Dashboard_Node;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.ui.fragment.Scene;
@@ -34,7 +36,7 @@ import com.olmatix.ui.fragment.Scene;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean serverconnected =false;
+    boolean serverconnected;
     boolean mSwitch_Conn;
     int backButtonCount;
     int flagReceiver = 0;
@@ -49,8 +51,10 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_scene,
             R.drawable.ic_node,
     };
+
     private ViewPager mViewPager;
     private OlmatixPagerAdapter mOlmatixAdapter;
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -65,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
             }
             if (message.equals("true")) {
                 serverconnected = true;
-                editor.putBoolean("switch_conn", true);
-                editor.apply();
+                /*editor.putBoolean("switch_conn", true);
+                editor.apply();*/
                 imgStatus.setImageResource(R.drawable.ic_conn_green);
                 imgStatus.startAnimation(animConn);
                 connStat.setText("Connected");
@@ -74,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
 
             } else if (message.equals("false")) {
                 serverconnected = false;
-                editor.putBoolean("switch_conn", false);
-                editor.apply();
+                /*editor.putBoolean("switch_conn", false);
+                editor.apply();*/
                 imgStatus.setImageResource(R.drawable.ic_conn_red);
                 imgStatus.startAnimation(animConn);
                 connStat.setText("Not Connected");
@@ -83,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
@@ -95,6 +101,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Get current screen orientation
+        //enableFullScreen(true);
+        if (flagReceiver == 0) {
+            Intent i = new Intent(this, OlmatixService.class);
+            startService(i);
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                    mMessageReceiver, new IntentFilter("MQTTStatus"));
+            flagReceiver = 1;
+            Log.d("Receiver ", "MainActivity = Starting..");
+        }
 
         initView();
         setupToolbar();
@@ -103,13 +118,13 @@ public class MainActivity extends AppCompatActivity {
         mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
         Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
 
-        if (mSwitch_Conn) {
+        if (serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_green);
             imgStatus.startAnimation(animConn);
             connStat.setText("Connected");
             //connStat.startAnimation(animConn);
 
-        } else if (!mSwitch_Conn) {
+        } else if (!serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_red);
             imgStatus.startAnimation(animConn);
             connStat.setText("Not Connected");
@@ -117,7 +132,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    protected void enableFullScreen(boolean enabled) {
+        int newVisibility =  View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 
+        if(enabled) {
+            newVisibility |= View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            Log.d("DEBUG", "enableFullScreen: ");
+
+        }
+
+        getDecorView().setSystemUiVisibility(newVisibility);
+    }
+
+    private View getDecorView() {
+        return getWindow().getDecorView();
+    }
 
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -164,12 +199,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
 
-        if (flagReceiver == 0) {
-            LocalBroadcastManager.getInstance(this).registerReceiver(
-                    mMessageReceiver, new IntentFilter("MQTTStatus"));
-            flagReceiver = 1;
-            Log.d("Receiver ", "MainActivity = Starting..");
-        }
         super.onStart();
     }
 
@@ -186,8 +215,6 @@ public class MainActivity extends AppCompatActivity {
     // Override this method to do what you want when the menu is recreated
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-
-
         return super.onPrepareOptionsMenu(menu);
     }
 

@@ -4,7 +4,12 @@ package com.olmatix.adapter;
  * Created by Lesjaw on 04/12/2016.
  */
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,6 +22,7 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
@@ -35,6 +41,10 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     List<Installed_NodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
     private ClickListener clicklistener = null;
+    Context context;
+    CharSequence textNode;
+    CharSequence titleNode;
+
 
     public class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView fwName, ipAddrs, upTime, siGnal, nodeid,lastAdd;
@@ -50,7 +60,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             upTime      = (TextView) view.findViewById(R.id.uptime);
             nodeid      = (TextView) view.findViewById(R.id.nodeid);
             lastAdd     = (TextView) view.findViewById(R.id.latestAdd);
-
             view.setOnClickListener(this);
         }
 
@@ -65,11 +74,28 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         this.clicklistener = clicklistener;
     }
 
+    private void showNotificationNode() {
 
-    public NodeAdapter(List<Installed_NodeModel> nodeList, OnStartDragListener dragStartListener) {
+        NotificationCompat.Builder builder =
+                (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.olmatixsmall)
+                        .setContentTitle(titleNode)
+                        .setContentText(textNode);
 
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
+    }
+
+    public NodeAdapter(List<Installed_NodeModel> nodeList, Context context, OnStartDragListener dragStartListener) {
         this.nodeList = nodeList;
         mDragStartListener = dragStartListener;
+        this.context = context;
 
     }
 
@@ -84,7 +110,9 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     @Override
     public void onBindViewHolder(final OlmatixHolder holder, int position) {
 
+
         final Installed_NodeModel mInstalledNodeModel = nodeList.get(position);
+
         if(mInstalledNodeModel.getOnline() != null) {
             if (mInstalledNodeModel.getOnline().equals("true")) {
                 holder.imgStatus.setImageResource(R.drawable.ic_check_green);
@@ -115,7 +143,10 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
 
         if(mInstalledNodeModel.getNice_name_n() != null) {
             holder.fwName.setText(mInstalledNodeModel.getNice_name_n());
-        } else holder.fwName.setText(mInstalledNodeModel.getFwName());
+            titleNode = mInstalledNodeModel.getNice_name_n();
+        } else
+            holder.fwName.setText(mInstalledNodeModel.getFwName());
+//            titleNode = mInstalledNodeModel.getFwName();
 
         holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
         holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");
@@ -197,7 +228,4 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     public void onItemDismiss(int position) {
 
     }
-
-
-
 }

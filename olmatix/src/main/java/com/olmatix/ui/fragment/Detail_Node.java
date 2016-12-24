@@ -59,7 +59,6 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private String nicename;
     Detail_Node detail_node;
     private static ArrayList<Detail_NodeModel> data;
-    int flagReceiver=0;
     private Toolbar mToolbar;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
@@ -82,8 +81,6 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         detailNodeModel = new Detail_NodeModel();
         setupView();
         setupToolbar();
-
-
     }
 
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
@@ -317,7 +314,6 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
             Log.d("Receiver ", "Detail_Node = Starting..");
-            flagReceiver = 1;
 
         registerReceiver(mIntentReceiver, mIntentFilter);
     }

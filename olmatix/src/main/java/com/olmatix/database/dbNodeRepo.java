@@ -476,6 +476,8 @@ public class dbNodeRepo {
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
                 node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
                 node.setNodeid(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

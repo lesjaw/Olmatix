@@ -4,12 +4,8 @@ package com.olmatix.adapter;
  * Created by Lesjaw on 04/12/2016.
  */
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,7 +18,6 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Installed_NodeModel;
-import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
@@ -70,27 +65,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                 clicklistener.itemClicked(v, getAdapterPosition());
             }
         }
-    }
-    public void setClickListener(ClickListener clicklistener) {
-        this.clicklistener = clicklistener;
-    }
-
-    private void showNotificationNode() {
-
-        NotificationCompat.Builder builder =
-                (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.olmatixsmall)
-                        .setContentTitle(titleNode)
-                        .setContentText(textNode);
-
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
-
-        // Add as notification
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
     }
 
     public NodeAdapter(List<Installed_NodeModel> nodeList, Context context, OnStartDragListener dragStartListener) {

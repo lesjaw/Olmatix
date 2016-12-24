@@ -12,7 +12,12 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.utils.Connection;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,10 +61,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
         View v;
 
-
         switch (viewType) {
             case 0:
-
 
                 v = LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.frag_dash_button, viewGroup, false);
@@ -81,12 +84,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-        //final int pos = position;
-
 
         final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
-        //Log.d("DEBUG", "onCreateViewHolder 0: " + mFavoriteModel.getSensor());
-        //Log.d("DEBUG", "onCreateViewHolder 1: " + mFavoriteModel.getNodeid());
 
         if ((mFavoriteModel.getSensor().trim()).equals("light")) {
 
@@ -94,10 +93,39 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
             if (mFavoriteModel.getStatus().trim().equals("false")) {
-                holder.imgNode.setImageResource(R.mipmap.offlamp);
+                holder.imgNode.setImageResource(R.drawable.offlamp1);
             } else {
-                holder.imgNode.setImageResource(R.mipmap.onlamp);
+                holder.imgNode.setImageResource(R.drawable.onlamp1);
             }
+
+            holder.imgNode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String payload1 = "ON";
+                    if (Connection.getClient().isConnected()) {
+                        String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
+                        if (mFavoriteModel.getStatus().trim().equals("false")){
+                            payload1 = "ON";
+                        }else {
+                            payload1 = "OFF";
+                        }
+                        String payload = payload1;
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                    }
+                }
+            });
 
 
         } else if ((mFavoriteModel.getSensor().trim()).equals("close")) {
@@ -107,14 +135,46 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             holder.node_names.setText(mFavoriteModel.getNice_name_d());
 
             if ((mFavoriteModel.getStatus().trim()).equals("true")) {
-                holder.status.setText("DOOR OPEN");
-                holder.imgNodes.setImageResource(R.mipmap.not_armed);
+                holder.imgNodesBut.setImageResource(R.drawable.onsec);
             } else {
-                holder.status.setText("DOOR CLOSE");
-                holder.imgNodes.setImageResource(R.mipmap.armed);
+                holder.imgNodesBut.setImageResource(R.drawable.offsec);
 
             }
 
+            if ((mFavoriteModel.getStatus_sensor().trim().equals("true"))) {
+                holder.imgNodes.setImageResource(R.drawable.door_close);
+            } else {
+                holder.imgNodes.setImageResource(R.drawable.door_open);
+
+            }
+            holder.imgNodesBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String payload1 = "ON";
+                    if (Connection.getClient().isConnected()) {
+                        String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
+                        if (mFavoriteModel.getStatus().trim().equals("false")){
+                            payload1 = "ON";
+                        }else {
+                            payload1 = "OFF";
+                        }
+                        String payload = payload1;
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                    }
+                }
+            });
         }
     }
 
@@ -151,12 +211,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public class StatusHolder extends ViewHolder {
         public TextView node_names, status;
         public ImageView imgNodes;
+        public ImageButton imgNodesBut;
 
         public StatusHolder(View view) {
             super(view);
             imgNodes = (ImageView) view.findViewById(R.id.icon_node);
+            imgNodesBut = (ImageButton) view.findViewById(R.id.icon_node_button);
             node_names = (TextView) view.findViewById(R.id.node_name);
-            status = (TextView) view.findViewById(R.id.node_status);
         }
     }
 }

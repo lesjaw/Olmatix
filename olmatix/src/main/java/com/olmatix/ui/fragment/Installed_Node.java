@@ -189,8 +189,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
             }
         }));
-
-
     }
 
     private void refreshHeader() {
@@ -269,7 +267,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
-
         //adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
         //mRecycleView.setAdapter(adapter);
         if(adapter != null) {
@@ -417,16 +414,10 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     }
 
     private void setRefresh() {
-
-        //doSubAll();
-
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
-
         adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
-        //adapter.setClickListener(this);
-
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

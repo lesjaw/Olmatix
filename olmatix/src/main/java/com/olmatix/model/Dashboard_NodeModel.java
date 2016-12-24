@@ -12,6 +12,8 @@ public class Dashboard_NodeModel {
     private String status;
     private String channel;
     private String nodeid;
+    private String status_sensor;
+    private String status_theft;
 
     public int getId() {
         return id;
@@ -59,5 +61,21 @@ public class Dashboard_NodeModel {
 
     public void setNodeid(String nodeid) {
         this.nodeid = nodeid;
+    }
+
+    public String getStatus_sensor() {
+        return status_sensor;
+    }
+
+    public void setStatus_sensor(String status_sensor) {
+        this.status_sensor = status_sensor;
+    }
+
+    public String getStatus_theft() {
+        return status_theft;
+    }
+
+    public void setStatus_theft(String status_theft) {
+        this.status_theft = status_theft;
     }
 }

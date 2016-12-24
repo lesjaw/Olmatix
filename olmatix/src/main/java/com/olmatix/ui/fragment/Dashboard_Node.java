@@ -4,8 +4,11 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +20,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -24,13 +28,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -83,6 +85,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
+        dashboardNodeModel= new Dashboard_NodeModel();
 
         setupView();
         onClickListener();
@@ -151,10 +154,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
         adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),this);
-        adapter.notifyDataSetChanged();
-        dashboardNodeModel= new Dashboard_NodeModel();
         mRecycleView.setAdapter(adapter);
-
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -166,19 +166,18 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         });
 
         initSwipe();
+
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
     }
 
-
-
     private void setRefresh() {
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
+        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),this);
         mRecycleView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
@@ -192,14 +191,53 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         super.onStart();
     }
 
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("NotifyChangeDetail");
+            String msg = intent.getStringExtra("MQTT State");
+            if (message==null){
+                message = "1";
+            }
+            if (message.equals("2")){
+                updatelist();
+                Log.d("receiver", "Notifydashboard : " + message);
+            }
+        }
+    };
+
     private void updatelist (){
         adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
         if(adapter != null){
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
-
         }
+        assert adapter != null;
+        setRefresh();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
+        Log.d("Receiver ", "Dashboard = Starting..");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+
     }
 
     private void initSwipe(){

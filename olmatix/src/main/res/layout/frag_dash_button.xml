@@ -23,9 +23,8 @@
                 android:layout_height="80sp"
                 android:layout_alignParentTop="true"
                 android:layout_centerInParent="true"
-                android:scaleType="fitXY"
                 android:padding="0sp"
-                android:src="@mipmap/olmatixlogo" />
+                android:src="@drawable/offlamp1" />
 
             <TextView
                 android:id="@+id/node_name"

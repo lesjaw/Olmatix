@@ -19,6 +19,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -132,11 +133,10 @@ public class OlmatixService extends Service {
                 Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
                 toast.show();
                 stateoffMqtt = "false";
-                Log.d("Sender", "MQTT Status No Internet: " +stateoffMqtt);
                 sendMessage();
                 text = "Disconnected";
                 showNotification();
-                //flagSub= true;
+                flagAct= true;
             }
 
             hasConnectivity = hasMmobile || hasWifi;
@@ -145,6 +145,7 @@ public class OlmatixService extends Service {
             if (hasConnectivity && hasChanged && (mqttClient == null || !mqttClient.isConnected())) {
                 doConnect();
                 Log.d(TAG, "Connecting");
+                //callDis();
 
             } else if (!hasConnectivity && mqttClient != null && mqttClient.isConnected()) {
                 doDisconnect();
@@ -152,6 +153,24 @@ public class OlmatixService extends Service {
             }
         }
 
+    }
+
+    private void callDis(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doDisconnect();
+                callCon();
+            }
+        }, 2000);
+    }
+    private void callCon(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doConnect();
+            }
+        }, 2000);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -166,11 +185,9 @@ public class OlmatixService extends Service {
 
 
     private void doDisconnect() {
-        IMqttToken token;
         Log.d(TAG, "doDisconnect()");
         try {
-            token = mqttClient.disconnect();
-            token.waitForCompletion(1000);
+            Connection.getClient().disconnect();
             stateoffMqtt = "false";
             sendMessage();
         } catch (MqttException e) {
@@ -216,8 +233,8 @@ public class OlmatixService extends Service {
             Log.d("Service = ", "Starting..");
             text = "Starting...";
             showNotification();
-
             flagAct = false;
+            doConnect();
         }
 
         sendMessage();
@@ -306,6 +323,7 @@ public class OlmatixService extends Service {
 
         text = "Connecting to server..";
         showNotification();
+        Log.d(TAG, "doConnect: "+deviceId);
 
         try {
 
@@ -322,6 +340,8 @@ public class OlmatixService extends Service {
 
                     text = "Connected";
                     showNotification();
+                    stateoffMqtt = "true";
+                    sendMessage();
 
                     Connection.getClient().setCallback(new MqttEventCallback());
 
@@ -344,14 +364,15 @@ public class OlmatixService extends Service {
                         Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
-                                /*Intent intent = new Intent(getApplication(), MainActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);*/
-                                stateoffMqtt = "true";
-                                //Log.d("Sender", "MQTT Status after sub: " +stateoffMqtt);
-                                sendMessage();
                                 text = "Connected";
                                 showNotification();
+                                stateoffMqtt = "true";
+                                sendMessage();
+                                if (flagAct){
+                                    callDis();
+                                    flagAct = false;
+                                }
+
                             }
 
                             @Override
@@ -372,6 +393,7 @@ public class OlmatixService extends Service {
                     //Toast.makeText(getApplicationContext(), R.string.conn_fail+exception.toString(), Toast.LENGTH_SHORT).show();
                     Log.e("mqtt",exception.toString());
                     stateoffMqtt = "false";
+                    Log.d("Sender", "After fail: " +stateoffMqtt);
                     sendMessage();
                     text = "Not Connected";
                     showNotification();
@@ -417,8 +439,8 @@ public class OlmatixService extends Service {
 
     private void sendMessageDetail() {
         Intent intent = new Intent("MQTTStatusDetail");
+        intent.putExtra("ServerConn", stateoffMqtt);
         intent.putExtra("NotifyChangeDetail", mChange);
-
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -454,6 +476,8 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final  MqttMessage message) throws Exception {
+
+
             Log.d("Receive MQTTMessage", " = " + topic + " message = " + message.toString());
             TopicID = topic;
             mNodeID = topic;
@@ -688,12 +712,23 @@ public class OlmatixService extends Service {
             mChange = "2";
             sendMessageDetail();
             //Log.d("DEBUG", "updateSensorTheft: "+mMessage);
-
+            data1.addAll(dbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
+            int countDB = dbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    if (data1.get(i).getNice_name_d() != null) {
+                        mNiceName = data1.get(i).getNice_name_d();
+                    } else {
+                        mNiceName = data1.get(i).getName();
+                    }
+                }
+            }
             if (mMessage.equals("true")) {
                 titleNode = mNiceName;
                 textNode = "ALARM!!";
                 showNotificationNode();
             }
+        data1.clear();
         }
     }
 
@@ -845,7 +880,7 @@ public class OlmatixService extends Service {
         messageReceive.clear();
         data.clear();
         mChange="2";
-                sendMessage();
+        sendMessage();
 
     }
 

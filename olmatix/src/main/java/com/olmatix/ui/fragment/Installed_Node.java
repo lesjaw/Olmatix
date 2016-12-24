@@ -72,7 +72,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     public static dbNodeRepo dbNodeRepo;
     private Installed_NodeModel installedNodeModel;
     private String inputResult;
-    int flagReceiver=0;
+    Boolean stateMqtt=false;
     SwipeRefreshLayout mSwipeRefreshLayout;
     String nice_name;
     String fwName;
@@ -102,24 +102,25 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 mRecycleView, new ClickListener() {
             @Override
             public void onClick(View view, final int position) {
-                //Values are passing to activity & to fragment as well
-                fwName = data.get(position).getFwName();
-                nice_name = data.get(position).getNice_name_n();
+                if (stateMqtt) {
+                    Log.d("DEBUG", "onClick: "+stateMqtt);
+                    fwName = data.get(position).getFwName();
+                    nice_name = data.get(position).getNice_name_n();
 
-                String state = data.get(position).getOnline();
-                if (state.equals("true")) {
+                    String state = data.get(position).getOnline();
+                    if (state.equals("true")) {
 
-                    Intent i = new Intent(getActivity(), Detail_Node.class);
-                    i.putExtra("node_id", data.get(position).getNodesID());
-                    i.putExtra("node_name", fwName);
-                    i.putExtra("nice_name", nice_name);
+                        Intent i = new Intent(getActivity(), Detail_Node.class);
+                        i.putExtra("node_id", data.get(position).getNodesID());
+                        i.putExtra("node_name", fwName);
+                        i.putExtra("nice_name", nice_name);
 
-                    startActivity(i);
-                } else {
+                        startActivity(i);
+                    } else {
                         Toast.makeText(getActivity(), nice_name + " is OFFLINE!, please check it, if the " + nice_name
                                         + " led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",
                                 Toast.LENGTH_LONG).show();
-                }
+                    }
                 /*ImageView picture=(ImageView)view.findViewById(R.id.state_conn);
                 picture.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -128,8 +129,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                                 Toast.LENGTH_SHORT).show();
                     }
                 });*/
+                } else {
+                    Toast.makeText(getActivity(),"Server disconnected, check your internet connection",
+                            Toast.LENGTH_LONG).show();
+                }
             }
-
             @Override
             public void onLongClick(View view, final int position) {
                 ImageView imgNode;
@@ -235,7 +239,17 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            String serverCon =intent.getStringExtra("ServerConn");
             String mChange = intent.getStringExtra("NotifyChangeNode");
+
+            if (serverCon==null){
+
+            } else if (serverCon.equals("true")){
+                stateMqtt=true;
+            }else {
+                stateMqtt=false;
+            }
+
             if (mChange==null){
                 mChange ="0";
             }
@@ -308,6 +322,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
 
             Log.d("Receiver ", "Installed_Node = Starting..");
+        if(Connection.getClient().isConnected()){
+            stateMqtt=true;
+        } else {stateMqtt=false;}
+
+        Log.d("DEBUG", "Server: "+stateMqtt);
 
         super.onResume();
     }

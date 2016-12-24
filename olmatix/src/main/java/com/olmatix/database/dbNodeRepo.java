@@ -53,8 +53,8 @@ public class dbNodeRepo {
         ContentValues values = new ContentValues();
         values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
         values.put(KEY_NODES, installedNodeModel.getNodes());
-        values.put(KEY_NAME, installedNodeModel.getName());
-        values.put(KEY_NICE_NAME_N, installedNodeModel.getNice_name_n());
+        values.put(KEY_NAME, installedNodeModel.getFwName());
+        values.put(KEY_NICE_NAME_N, installedNodeModel.getFwName());
         values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
         values.put(KEY_FWNAME, installedNodeModel.getFwName());
         values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());

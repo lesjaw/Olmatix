@@ -165,12 +165,35 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
             }
         });
 
+
         initSwipe();
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
+        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                if (dy > 0 ||dy<0 && mFab.isShown())
+                {
+                    mFab.hide();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    mFab.show();
+                }
+
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
     }
 
     private void setRefresh() {
@@ -346,4 +369,5 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
         }
     }
+
 }

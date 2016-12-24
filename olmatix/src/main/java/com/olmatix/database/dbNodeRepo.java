@@ -460,17 +460,18 @@ public class dbNodeRepo {
     public ArrayList<Dashboard_NodeModel> getNodeDetailDash() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT * FROM "+TABLE_FAV + " favorite_node INNER JOIN "+  TABLE_NODE +
-                " detail_node ON favorite_node."+KEY_NICE_NAME_D+" = detail_node."+KEY_NICE_NAME_D;
+        String selectQuery =  "SELECT * FROM "+TABLE_FAV +
+                " favorite_node INNER JOIN "+TABLE_NODE +
+                " detail_node ON favorite_node."+KEY_NICE_NAME_D+" = detail_node."+KEY_NICE_NAME_D+
+                " INNER JOIN "+TABLE +
+                " installed_node ON installed_node."+KEY_NODE_ID+" = detail_node."+KEY_NODE_ID;
+
 
         ArrayList<Dashboard_NodeModel> nodeList = new ArrayList<>();
         Cursor cursor = db.rawQuery(selectQuery,  null);
-
         if (cursor.moveToFirst()) {
             do {
                 Dashboard_NodeModel node = new Dashboard_NodeModel();
-
-
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
@@ -478,6 +479,7 @@ public class dbNodeRepo {
                 node.setNodeid(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
+                node.setOnline(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

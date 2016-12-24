@@ -97,6 +97,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             } else {
                 holder.imgNode.setImageResource(R.drawable.onlamp1);
             }
+            if(mFavoriteModel.getOnline().trim().equals("true")){
+                holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+            }else {
+                holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+
+            }
 
             holder.imgNode.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -140,6 +146,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 holder.imgNodesBut.setImageResource(R.drawable.offsec);
 
             }
+
+            if (mFavoriteModel.getOnline().trim().equals("true")){
+                holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+            }else {
+                holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+            }
+
 
             if ((mFavoriteModel.getStatus_sensor().trim().equals("true"))) {
                 holder.imgNodes.setImageResource(R.drawable.door_close);
@@ -198,19 +211,21 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     public class ButtonHolder extends ViewHolder {
         public TextView node_name, status;
+        public ImageView imgOnline;
         public ImageButton imgNode;
 
         public ButtonHolder(View view) {
             super(view);
             imgNode = (ImageButton) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
+            imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
 
         }
     }
 
     public class StatusHolder extends ViewHolder {
         public TextView node_names, status;
-        public ImageView imgNodes;
+        public ImageView imgNodes, imgOnline;
         public ImageButton imgNodesBut;
 
         public StatusHolder(View view) {
@@ -218,6 +233,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             imgNodes = (ImageView) view.findViewById(R.id.icon_node);
             imgNodesBut = (ImageButton) view.findViewById(R.id.icon_node_button);
             node_names = (TextView) view.findViewById(R.id.node_name);
+            imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
+
         }
     }
+
 }

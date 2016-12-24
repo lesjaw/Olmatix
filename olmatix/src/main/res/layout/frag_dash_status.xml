@@ -25,6 +25,17 @@
                     android:src="@drawable/offsec" />
 
                 <ImageView
+                    android:layout_width="20sp"
+                    android:layout_height="20sp"
+                    android:id="@+id/icon_conn"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_check_red"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="30sp"/>
+
+                <ImageView
                     android:layout_width="30sp"
                     android:layout_height="30sp"
                     android:id="@+id/icon_node"

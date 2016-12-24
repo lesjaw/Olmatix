@@ -56,6 +56,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.olmatix.lesjaw.olmatix.R.id.fab;
+
 
 public class Installed_Node extends Fragment implements  OnStartDragListener {
 
@@ -84,6 +86,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
         mView = inflater.inflate(R.layout.frag_installed_node, container, false);
         return mView;
+
+
     }
 
     @Override
@@ -382,7 +386,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
 
-        mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
+        mFab            = (FloatingActionButton) mView.findViewById(fab);
 
         mRecycleView.setHasFixedSize(true);
 
@@ -410,8 +414,29 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
-        //adapter.setClickListener(this);
-    }
+
+        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                if (dy > 0 ||dy<0 && mFab.isShown())
+                {
+                    mFab.hide();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    mFab.show();
+                }
+
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });    }
 
     private void setRefresh() {
         data.clear();

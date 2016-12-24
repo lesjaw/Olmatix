@@ -14,6 +14,7 @@ public class Dashboard_NodeModel {
     private String nodeid;
     private String status_sensor;
     private String status_theft;
+    private String online;
 
     public int getId() {
         return id;
@@ -77,5 +78,13 @@ public class Dashboard_NodeModel {
 
     public void setStatus_theft(String status_theft) {
         this.status_theft = status_theft;
+    }
+
+    public String getOnline() {
+        return online;
+    }
+
+    public void setOnline(String online) {
+        this.online = online;
     }
 }

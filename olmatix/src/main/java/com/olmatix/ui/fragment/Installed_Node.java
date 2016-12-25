@@ -286,11 +286,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     int countDB = dbNodeRepo.getNodeList().size();
         Log.d("DEBUG", "Count list: "+countDB);
-
+        data.addAll(dbNodeRepo.getNodeList());
         for (int i = 0; i < countDB; i++) {
             final String mNodeID = data.get(i).getNodesID();
             Log.d("DEBUG", "Count list: "+mNodeID);
-            String topic = "devices/" + mNodeID + "/#";
+            String topic = "devices/" + mNodeID + "/$online";
             int qos = 2;
             try {
                 IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
@@ -308,6 +308,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 e.printStackTrace();
             }
         }
+        data.clear();
     }
 
     @Override
@@ -440,6 +441,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     private void setRefresh() {
         data.clear();
+        doSubAll();
         data.addAll(dbNodeRepo.getNodeList());
         adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);

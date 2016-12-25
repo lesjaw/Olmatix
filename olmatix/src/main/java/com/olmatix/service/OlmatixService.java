@@ -82,7 +82,7 @@ public class OlmatixService extends Service {
     private String NodeID,Channel;
     private String mMessage;
     private NotificationManager mNM;
-    private int NOTIFICATION = R.string.local_service_started;
+    private int NOTIFICATION = R.string.local_service_label;
     HashMap<String,String>  messageReceive = new HashMap<>();
     HashMap<String,String> message_topic = new HashMap<>();
     private String mNodeID;

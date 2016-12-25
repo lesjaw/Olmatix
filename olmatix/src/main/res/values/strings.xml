@@ -32,8 +32,7 @@
     <string name="switch_title">Enable connection</string>
 
     <string name="err_internet">No internet connection</string>
-    <string name="local_service_started">Olmatix 2.0</string>
-    <string name="local_service_label">Omatix Service</string>
+    <string name="local_service_label">Olmatix 2.0</string>
 
     <string name="add_node_dialog">Add Node</string>
     <string name="add_node_dialog_sum">Type Olmatix product ID</string>

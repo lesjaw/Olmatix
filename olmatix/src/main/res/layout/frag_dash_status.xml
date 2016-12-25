@@ -22,7 +22,8 @@
                     android:layout_alignParentTop="true"
                     android:layout_centerInParent="true"
                     android:padding="0sp"
-                    android:src="@drawable/offsec" />
+                    android:src="@drawable/offsec"
+                    android:theme="@style/AppTheme.Button"/>
 
                 <ImageView
                     android:layout_width="20sp"
@@ -33,7 +34,8 @@
                     android:scaleType="fitXY"
                     android:src="@drawable/ic_check_red"
                     android:layout_centerInParent="true"
-                    android:layout_marginBottom="30sp"/>
+                    android:layout_marginBottom="30sp"
+                    android:foregroundGravity="top"/>
 
                 <ImageView
                     android:layout_width="30sp"
@@ -44,7 +46,8 @@
                     android:scaleType="fitXY"
                     android:src="@drawable/door_close"
                     android:layout_centerInParent="true"
-                    android:layout_marginBottom="30sp"/>
+                    android:layout_marginBottom="30sp"
+                    android:foregroundGravity="top"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

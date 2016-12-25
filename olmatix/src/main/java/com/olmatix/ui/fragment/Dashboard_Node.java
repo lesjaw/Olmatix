@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -24,7 +23,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -44,6 +42,8 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.utils.GridAutofitLayoutManager;
+import com.olmatix.utils.GridSpacingItemDecoration;
 import com.olmatix.utils.SpinnerListener;
 
 import java.util.ArrayList;
@@ -137,19 +137,30 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
+        //mRecyclerView = (AutoFitGridRecyclerView)view.findViewById(R.id.poster_grid_recyclerview);
+
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
 
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
 
         mRecycleView.setHasFixedSize(true);
 
-        int spanCount = getResources().getInteger(R.integer.grid_columns);
-        if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+        GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getActivity(), 200 );
+        mRecycleView.setLayoutManager(layoutManager);
+
+
+        int mNoOfColumns = GridAutofitLayoutManager.DEFAULT_SPAN_COUNT;
+        int spacing = 10;
+        boolean includeEdge = true;
+        mRecycleView.addItemDecoration(new GridSpacingItemDecoration(mNoOfColumns, spacing, includeEdge));
+
+        /*if(getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), mNoOfColumns));
         }else{
-            mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 4));
-        }
+            mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(),mNoOfColumns));
+        }*/
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
+
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());

@@ -10,7 +10,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="0sp">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -22,9 +23,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="0sp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingTop="5sp"/>
+        android:paddingLeft="0sp"
+        android:paddingRight="0dp"
+        android:paddingTop="0sp"
+        />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

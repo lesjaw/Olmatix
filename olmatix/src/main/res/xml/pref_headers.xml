@@ -8,6 +8,11 @@
         android:title="@string/pref_network" />
 
     <header
+        android:fragment="com.olmatix.ui.activity.SettingsActivity$MiscPreferenceFragment"
+        android:icon="@drawable/ic_settings_black"
+        android:title="@string/pref_misc" />
+
+    <header
         android:fragment="com.olmatix.ui.activity.SettingsActivity$SetupPreferenceFragment"
         android:icon="@drawable/ic_setup_black"
         android:title="@string/pref_setup" />

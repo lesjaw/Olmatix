@@ -1,9 +1,16 @@
 package com.olmatix.ui.activity;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -11,12 +18,24 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.text.Html;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.ui.fragment.SettingsFragment;
+import com.olmatix.utils.OlmatixUtils;
 
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -24,8 +43,6 @@ import java.util.List;
  */
 
 public class SettingsActivity extends SettingsFragment {
-
-
 
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
@@ -114,6 +131,7 @@ public class SettingsActivity extends SettingsFragment {
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || NetworkPreferenceFragment.class.getName().equals(fragmentName)
+                || MiscPreferenceFragment.class.getName().equals(fragmentName)
                 || SetupPreferenceFragment.class.getName().equals(fragmentName)
                 || AboutPreferenceFragment.class.getName().equals(fragmentName);
 
@@ -142,18 +160,108 @@ public class SettingsActivity extends SettingsFragment {
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class MiscPreferenceFragment extends PreferenceFragment {
+        private SharedPreferences pref;
+        private LocationManager mLocationMgr;
+        private String mProvider;
+        private Preference setLocation;
+
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_misc);
+            setHasOptionsMenu(true);
+
+            //SettingsActivity.bindPreferenceSummaryToValue(findPreference("setHomeLocation"));
+
+
+            initLocationPref();
+            //resetMesg(setHomeLocation);
+
+        }
+
+
+        private void initLocationPref() {
+            final Preference setLocation = findPreference("setLocation");
+            mLocationMgr = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            setLocation.setOnPreferenceClickListener(LocationClickListener());
+            resetMesg(setLocation);
+        }
+
+        private Preference.OnPreferenceClickListener LocationClickListener() {
+
+            return new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    final PreferenceHelper mPrefHelper;
+                    try {
+                        mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
+                        Location mLocation = mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        if (mLocation == null){
+                            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        }
+                        mPrefHelper = new PreferenceHelper(getActivity());
+                        mPrefHelper.setHomeLatitude(mLocation.getLatitude());
+                        mPrefHelper.setHomeLongitude(mLocation.getLongitude());
+                        //PreferenceHelper.initializePrefs();
+                        resetMesg(setLocation);
+
+                        Toast.makeText(getActivity(), getString(R.string.opt_homepos_set), Toast.LENGTH_SHORT).show();
+                    } catch (SecurityException ex) {
+                        Log.d("DEBUG", "Permission Denied: " + ex );
+                        Toast.makeText(getActivity(), "Permission location denied from user", Toast.LENGTH_SHORT).show();
+                    } catch (IllegalArgumentException e){
+                        Log.e("DEBUG", getString(R.string.opt_homepos_err), e);
+                        Toast.makeText(getActivity(), getString(R.string.opt_homepos_err), Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
+                }
+            };
+
+        }
+
+
+
+        private void resetMesg(Preference setHomeLocation) {
+            String loc = null;
+            final PreferenceHelper mPrefHelper = new PreferenceHelper(getActivity());
+            if (mPrefHelper.getHomeLatitude() != 0) {
+
+                Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+                List<Address> list;
+                try {
+                    list = geocoder.getFromLocation(mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), 1);
+                    if (list != null && list.size() > 0) {
+                        Address address = list.get(0);
+                        loc = address.getLocality();
+                        Log.d("DEBUG", "resetMesg: " + loc);
+                    }
+                } catch (IOException e) {
+                    Log.e("DEBUG", "LOCATION ERR:" + e.getMessage());
+                }
+
+                Log.d("DEBUG", "resetMesg: " + mPrefHelper.getHomeLatitude() + ":" + mPrefHelper.getHomeLongitude());
+                setHomeLocation.setSummary(getString(R.string.opt_homepos_set) + ": " + (loc == null ? "" : loc) + " ("
+                        + mPrefHelper.getHomeLatitude() + " : " + mPrefHelper.getHomeLongitude() + ")");
+
+            }
+
+
+           // setLocation.setSummary(mPrefHelper.getHomeLatitude() + " : " + mPrefHelper.getHomeLongitude() );
+        }
+
+
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class SetupPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_setup);
             setHasOptionsMenu(true);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            // bindPreferenceSummaryToValue(findPreference("server_conn"));
 
             bindPreferenceSummaryToValue(findPreference("ssid"));
             bindPreferenceSummaryToValue(findPreference("password_wifi"));

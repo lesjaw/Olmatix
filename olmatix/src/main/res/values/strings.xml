@@ -62,5 +62,13 @@
     <string name="deviceoffline">Your devices OFFLINE!</string>
     <string name="latestAdding">Adding</string>
     <string name="reseting">is going to do a factory reset..</string>
+    <string name="pref_misc">Miscellaneous</string>
+    <string name="pref_location">Location</string>
+    <string name="servicehomepos">Setup your location</string>
+    <string name="opt_servicehomepos">Your Home Location</string>
+    <string name="opt_Thold_desc">Range at which you\\\'ll be considered out of home when you leave</string>
+    <string name="opt_Thold">Distance From Home</string>
+    <string name="opt_homepos_err">Error getting current position</string>
+    <string name="opt_homepos_set">Home position set</string>
 
 </resources>

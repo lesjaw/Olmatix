@@ -1,5 +1,8 @@
 package com.olmatix.utils;
 
+import android.location.Criteria;
+
+import java.text.DecimalFormat;
 import java.util.Calendar;
 
 /**
@@ -11,6 +14,12 @@ import java.util.Calendar;
  * Copyright            : Copyright @ 2016 Indogamers.
  */
 public class OlmatixUtils {
+    private static Criteria criteria;
+
+    public static final int OLMATIX_PERMISSIONS_ACCESS_COARSE_LOCATION = 18;
+    public static final long POSITION_UPDATE_INTERVAL = 10 * 1000;//5 seconds
+    public static final long POSITION_UPDATE_MIN_DIST = 25;
+    public static DecimalFormat gpsDecimalFormat = new DecimalFormat("#.######");
 
     public static String getTimeAgo(Calendar ref) {
         Calendar now = Calendar.getInstance();
@@ -68,4 +77,14 @@ public class OlmatixUtils {
         }
         return data;
     }
+
+    public static Criteria getGeoCriteria() {
+
+        if (criteria == null)
+            criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        return criteria;
+    }
+
 }

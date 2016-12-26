@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:olmatix="http://olmatix.com">
+
+    <PreferenceCategory
+        android:title="@string/pref_location">
+
+        <Preference
+            android:name="setLocation"
+            android:key="setLocation"
+            android:icon="@drawable/ic_location_black"
+            android:summary="@string/servicehomepos"
+            android:title="@string/opt_servicehomepos" />
+
+        <com.olmatix.utils.OlmatixSeekBarPreference
+            android:defaultValue="150"
+            android:key="distanceThold"
+            android:max="1200"
+            android:summary="@string/opt_Thold_desc"
+            android:title="@string/opt_Thold"
+            olmatix:min="30"
+            olmatix:unitsLeft=""
+            olmatix:unitsRight="m." />
+
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

@@ -15,6 +15,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.location.Geocoder;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -44,6 +46,7 @@ import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.utils.GridAutofitLayoutManager;
 import com.olmatix.utils.GridSpacingItemDecoration;
+import com.olmatix.utils.OlmatixUtils;
 import com.olmatix.utils.SpinnerListener;
 
 import java.util.ArrayList;
@@ -71,6 +74,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
 
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -90,7 +94,11 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         setupView();
         onClickListener();
 
+
+
     }
+
+
 
     private void onClickListener() {
         mFab.setOnClickListener(mFabClickListener());

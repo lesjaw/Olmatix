@@ -88,6 +88,14 @@
                 android:text="fw Name"
                 />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/duration"
+                android:layout_toRightOf="@+id/icon_node"
+                android:layout_below="@id/fw_name"
+                android:text="duration"
+                />
 
             <Button
                 android:id="@+id/btn_on"

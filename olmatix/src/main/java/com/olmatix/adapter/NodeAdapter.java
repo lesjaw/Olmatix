@@ -121,7 +121,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             titleNode = mInstalledNodeModel.getNice_name_n();
         } else
             holder.fwName.setText(mInstalledNodeModel.getFwName());
-//            titleNode = mInstalledNodeModel.getFwName();
 
         holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
         holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");
@@ -129,7 +128,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             long seconds = Long.parseLong(mInstalledNodeModel.getUptime());
             calculateTime(seconds);
             holder.upTime.setText("Uptime : " + calculateTime(seconds));
-
         }
 
         if(mInstalledNodeModel.getAdding() != null) {
@@ -159,8 +157,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         } else {
             uptimeUpd = sec + "s" ;
         }
-
-
                // System.out.println(uptimeUpd);
         return uptimeUpd;
     }

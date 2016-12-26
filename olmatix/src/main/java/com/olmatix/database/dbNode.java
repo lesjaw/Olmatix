@@ -34,9 +34,9 @@ public class dbNode {
     public static final String KEY_SENSOR       = "sensor" ;
     public static final String KEY_STATUS_SENSOR  = "status_sensor" ;
     public static final String KEY_STATUS_THEFT  = "status_theft" ;
-    public static final String KEY_TIMESTAMPS  = "status_theft_time" ;
-    public static final String KEY_NODE_TYPE  = "node_type" ;
-
+    public static final String KEY_TIMESTAMPSON  = "timeon" ;
+    public static final String KEY_TIMESTAMPSOFF  = "timeoff" ;
+    public static final String KEY_ONDURATION  = "onduration" ;
 
     // property help us to keep data
     public int id;

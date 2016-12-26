@@ -85,6 +85,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
+            holder.duration.setText(OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getDuration())));
 
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
@@ -294,7 +295,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
     public class OlmatixHolder extends ViewHolder {
-        public TextView node_name, upTime, status, fwName, statuslabel;
+        public TextView node_name, upTime, status, fwName, statuslabel, duration;
         public ImageView imgNode;
         Button btn_off, btn_on;
 
@@ -305,6 +306,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             fwName = (TextView) view.findViewById(R.id.fw_name);
             statuslabel = (TextView) view.findViewById(R.id.statuslabel);
             status = (TextView) view.findViewById(R.id.status);
+            duration = (TextView) view.findViewById(R.id.duration);
             upTime = (TextView) view.findViewById(R.id.uptime);
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);

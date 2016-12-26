@@ -27,6 +27,7 @@ import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
 import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
 import static com.olmatix.database.dbNode.KEY_NODES;
 import static com.olmatix.database.dbNode.KEY_NODE_ID;
+import static com.olmatix.database.dbNode.KEY_ONDURATION;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
 import static com.olmatix.database.dbNode.KEY_OTA;
 import static com.olmatix.database.dbNode.KEY_RESET;
@@ -35,7 +36,8 @@ import static com.olmatix.database.dbNode.KEY_SIGNAL;
 import static com.olmatix.database.dbNode.KEY_STATUS;
 import static com.olmatix.database.dbNode.KEY_STATUS_SENSOR;
 import static com.olmatix.database.dbNode.KEY_STATUS_THEFT;
-import static com.olmatix.database.dbNode.KEY_TIMESTAMPS;
+import static com.olmatix.database.dbNode.KEY_TIMESTAMPSOFF;
+import static com.olmatix.database.dbNode.KEY_TIMESTAMPSON;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
 import static com.olmatix.database.dbNode.TABLE;
 import static com.olmatix.database.dbNode.TABLE_FAV;
@@ -83,6 +85,8 @@ public class dbNodeRepo {
         values.put(KEY_NICE_NAME_D, nodeModel.getNice_name_d());
         values.put(KEY_SENSOR, nodeModel.getSensor());
         values.put(KEY_STATUS_SENSOR, nodeModel.getStatus_sensor());
+        values.put(KEY_ONDURATION, nodeModel.getDuration());
+
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
@@ -203,12 +207,17 @@ public class dbNodeRepo {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
             //Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
         }
-        /*if (detailNodeModel.getSensor()!=null) {
-            values.put(KEY_SENSOR, detailNodeModel.getSensor());
-        }*/
+        if (detailNodeModel.getTimestampson()!=null) {
+            values.put(KEY_TIMESTAMPSON, detailNodeModel.getTimestampson());
+            //Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
+        }
 
-        if (detailNodeModel.getTimestamps()!=null) {
-            values.put(KEY_TIMESTAMPS, detailNodeModel.getTimestamps());
+        if (detailNodeModel.getTimestampsoff()!=null) {
+            values.put(KEY_TIMESTAMPSOFF, detailNodeModel.getTimestampsoff());
+            //Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
+        }
+        if (detailNodeModel.getDuration()!=null) {
+            values.put(KEY_ONDURATION, detailNodeModel.getDuration());
             //Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
         }
 
@@ -350,7 +359,8 @@ public class dbNodeRepo {
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus_sensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
-                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
+                node.setTimestampson(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPSON)));
+                node.setDuration(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONDURATION)));
 
                 nodeList.add(node);
 
@@ -385,7 +395,8 @@ public class dbNodeRepo {
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus_sensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
-                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
+                node.setTimestampson(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPSON)));
+                node.setDuration(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONDURATION)));
 
                 nodeList.add(node);
 
@@ -513,7 +524,8 @@ public class dbNodeRepo {
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
-                node.setTimestamps(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS)));
+                node.setTimestampson(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPSON)));
+                node.setDuration(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONDURATION)));
 
                 nodeList.add(node);
 

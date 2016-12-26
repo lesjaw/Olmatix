@@ -148,7 +148,7 @@ public class OlmatixService extends Service {
             if (hasConnectivity && hasChanged && (mqttClient == null || !mqttClient.isConnected())) {
                 doConnect();
                 Log.d(TAG, "Connecting");
-                //callDis();
+                callDis();
 
             } else if (!hasConnectivity && mqttClient != null && mqttClient.isConnected()) {
                 doDisconnect();
@@ -165,7 +165,7 @@ public class OlmatixService extends Service {
                 doDisconnect();
                 callCon();
             }
-        }, 2000);
+        }, 5000);
     }
 
     private void callCon(){
@@ -174,7 +174,7 @@ public class OlmatixService extends Service {
             public void run() {
                 doConnect();
             }
-        }, 2000);
+        }, 1000);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -367,10 +367,10 @@ public class OlmatixService extends Service {
                                 showNotification();
                                 stateoffMqtt = "true";
                                 sendMessage();
-                                if (flagAct){
+                                /*if (flagAct){
                                     callDis();
                                     flagAct = false;
-                                }
+                                }*/
 
                             }
 
@@ -744,11 +744,26 @@ public class OlmatixService extends Service {
                     detailNodeModel.setNice_name_d(NodeID);
                     detailNodeModel.setSensor("light");
                     detailNodeModel.setDuration("0");
-                    detailNodeModel.setTimestampson("0");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
-                    doSubAllDetail();
+                    //doSubAllDetail();
+                    topic1 = "devices/" + NodeID + "/light/0";
+                    int qos = 1;
+                    try {
+                        IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                        subToken.setActionCallback(new IMqttActionListener() {
+                            @Override
+                            public void onSuccess(IMqttToken asyncActionToken) {
+                                Log.d("SubscribeButton", " device = " + NodeID);
+                            }
 
+                            @Override
+                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                            }
+                        });
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
 
                 }
 
@@ -767,10 +782,26 @@ public class OlmatixService extends Service {
                         detailNodeModel.setNice_name_d(NodeID +" Ch "+String.valueOf(i+1));
                         detailNodeModel.setSensor("light");
                         detailNodeModel.setDuration("0");
-                        detailNodeModel.setTimestampson("0");
 
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
-                        doSubAllDetail();
+                        //doSubAllDetail();
+                        topic1 = "devices/" + NodeID + "/light/"+i;
+                        int qos = 1;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeButton", " device = " + NodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
 
                     }
                 }
@@ -786,11 +817,32 @@ public class OlmatixService extends Service {
                     detailNodeModel.setStatus_sensor("false");
                     detailNodeModel.setStatus_theft("false");
                     detailNodeModel.setNice_name_d(NodeID);
-                    detailNodeModel.setTimestampson("0");
                     detailNodeModel.setDuration("0");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
-                    doSubAllDetail();
+                    //doSubAllDetail();
+                    for (int a = 0; a < 3; a++) {
+                        if (a == 0) {topic1 = "devices/" + NodeID + "/light/0";}
+                        if (a == 1) {topic1 = "devices/" + NodeID + "/door/close";}
+                        if (a == 2) {topic1 = "devices/" + NodeID + "/door/theft";}
+
+                        int qos = 1;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeSensor", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }
@@ -1050,7 +1102,7 @@ public class OlmatixService extends Service {
                 }
             }
         data1.clear();
-        doAllsubDetailSensor();
+        //doAllsubDetailSensor();
 
     }
 

@@ -81,21 +81,22 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/fw_name"
+                android:id="@+id/duration"
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@id/uptime"
-                android:textSize="10sp"
-                android:text="fw Name"
+                android:text="duration"
                 />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/duration"
+                android:id="@+id/fw_name"
                 android:layout_toRightOf="@+id/icon_node"
-                android:layout_below="@id/fw_name"
-                android:text="duration"
+                android:layout_below="@id/duration"
+                android:textSize="10sp"
+                android:text="fw Name"
                 />
+
 
             <Button
                 android:id="@+id/btn_on"

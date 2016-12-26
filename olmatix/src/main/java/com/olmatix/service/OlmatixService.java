@@ -34,7 +34,6 @@ import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.ui.fragment.Detail_Node;
 import com.olmatix.utils.Connection;
-import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -919,19 +918,27 @@ public class OlmatixService extends Service {
                 if(on!=null) {
                     Log.d(TAG, "dur: " + dur);
                     Log.d(TAG, "on: " + on);
-                    off = Calendar.getInstance().getTimeInMillis();
+
+                    Long off = Calendar.getInstance().getTimeInMillis();
                     Log.d(TAG, "off: " + off);
 
-                    Long duration = (off - on) + dur;
+                    /*Calendar cal = Calendar.getInstance();
+                    cal.setTime(new Date(on));
+                    cal.getTimeInMillis();*/
+                    Long dur1 = (off - on)/1000;
+                    Log.d(TAG, "dur1: " + dur1);
+
+                    Long duration = dur1 + dur;
                     Log.d(TAG, "saveDatabase_Detail: " + duration);
 
-                    detailNodeModel.setDuration(OlmatixUtils.getDuration(duration));
+                    detailNodeModel.setDuration(String.valueOf(duration));
                 }
             }
 
             dbNodeRepo.update_detail(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
+            data1.clear();
         }
     }
 

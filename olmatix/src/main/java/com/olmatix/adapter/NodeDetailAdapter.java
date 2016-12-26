@@ -85,7 +85,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-            holder.duration.setText(mInstalledNodeModel.getDuration());
+            holder.duration.setText("ON duration: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getDuration())));
 
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
@@ -95,7 +95,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             titleNode = mInstalledNodeModel.getName();
 
 
-            holder.upTime.setText(OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
+            holder.upTime.setText("Uptime: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
 
             holder.status.setText(mInstalledNodeModel.getStatus());
 

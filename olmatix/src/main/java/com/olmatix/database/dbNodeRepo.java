@@ -8,7 +8,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
@@ -23,12 +22,12 @@ import static com.olmatix.database.dbNode.KEY_FWNAME;
 import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
+import static com.olmatix.database.dbNode.KEY_MESSAGE;
 import static com.olmatix.database.dbNode.KEY_NAME;
 import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
 import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
 import static com.olmatix.database.dbNode.KEY_NODES;
 import static com.olmatix.database.dbNode.KEY_NODE_ID;
-import static com.olmatix.database.dbNode.KEY_ONDURATION;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
 import static com.olmatix.database.dbNode.KEY_OTA;
 import static com.olmatix.database.dbNode.KEY_RESET;
@@ -37,11 +36,11 @@ import static com.olmatix.database.dbNode.KEY_SIGNAL;
 import static com.olmatix.database.dbNode.KEY_STATUS;
 import static com.olmatix.database.dbNode.KEY_STATUS_SENSOR;
 import static com.olmatix.database.dbNode.KEY_STATUS_THEFT;
-import static com.olmatix.database.dbNode.KEY_TIMESTAMPSOFF;
-import static com.olmatix.database.dbNode.KEY_TIMESTAMPSON;
+import static com.olmatix.database.dbNode.KEY_TOPIC;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
 import static com.olmatix.database.dbNode.TABLE;
 import static com.olmatix.database.dbNode.TABLE_FAV;
+import static com.olmatix.database.dbNode.TABLE_MQTT;
 import static com.olmatix.database.dbNode.TABLE_NODE;
 
 public class dbNodeRepo {
@@ -75,6 +74,18 @@ public class dbNodeRepo {
         return (int) Id;
     }
 
+    public int insertDbMqtt(dbNode dbNode){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_TOPIC, dbNode.getTopic());
+        values.put(KEY_MESSAGE, dbNode.getMessage());
+
+        long Id = db.insert(TABLE_MQTT, null, values);
+        db.close(); // Closing database connection
+        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        return (int) Id;
+    }
+
     public int insertInstalledNode(Detail_NodeModel nodeModel){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -86,9 +97,6 @@ public class dbNodeRepo {
         values.put(KEY_NICE_NAME_D, nodeModel.getNice_name_d());
         values.put(KEY_SENSOR, nodeModel.getSensor());
         values.put(KEY_STATUS_SENSOR, nodeModel.getStatus_sensor());
-        values.put(KEY_ONDURATION, nodeModel.getDuration());
-        //values.put(KEY_TIMESTAMPSON, nodeModel.getTimestampson());
-
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
@@ -208,19 +216,6 @@ public class dbNodeRepo {
         if (detailNodeModel.getStatus()!=null || detailNodeModel.getStatus() != "ON" || detailNodeModel.getStatus() != "OFF") {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
             //Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
-        }
-        if (detailNodeModel.getTimestampson()!=null) {
-            values.put(KEY_TIMESTAMPSON, detailNodeModel.getTimestampson());
-            //Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
-        }
-
-        if (detailNodeModel.getTimestampsoff()!=null) {
-            values.put(KEY_TIMESTAMPSOFF, detailNodeModel.getTimestampsoff());
-            //Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
-        }
-        if (detailNodeModel.getDuration()!=null) {
-            values.put(KEY_ONDURATION, detailNodeModel.getDuration());
-            Log.d("DEBUG", "updateDetail duration : " +detailNodeModel.getDuration());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
@@ -361,8 +356,6 @@ public class dbNodeRepo {
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus_sensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
-                node.setTimestampson(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPSON)));
-                node.setDuration(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONDURATION)));
 
                 nodeList.add(node);
 
@@ -397,8 +390,6 @@ public class dbNodeRepo {
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus_sensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
-                node.setTimestampson(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPSON)));
-                node.setDuration(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONDURATION)));
 
                 nodeList.add(node);
 
@@ -502,8 +493,6 @@ public class dbNodeRepo {
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
-                node.setTimestampson(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPSON)));
-                node.setDuration(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONDURATION)));
 
                 nodeList.add(node);
 

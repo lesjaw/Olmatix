@@ -25,7 +25,7 @@ public class dbNode {
     public static final String KEY_ONLINE       = "online";
     public static final String KEY_SIGNAL       = "signal";
     public static final String KEY_ICON         = "icon";
-    public static final String KEY_ADDING       = "adding"; //this is the timestamps when the node added
+    public static final String KEY_ADDING       = "adding";
     public static final String KEY_UPTIME       = "uptime";
     public static final String KEY_RESET        = "reset";
     public static final String KEY_OTA          = "ota";
@@ -36,8 +36,6 @@ public class dbNode {
     public static final String KEY_SENSOR       = "sensor" ;
     public static final String KEY_STATUS_SENSOR  = "status_sensor" ;
     public static final String KEY_STATUS_THEFT  = "status_theft" ;
-    public static final String KEY_TIMESTAMPSON  = "timeon" ;
-    public static final String KEY_TIMESTAMPSOFF  = "timeoff" ;
     public static final String KEY_ONDURATION  = "onduration" ;
     public static final String KEY_TOPIC  = "topic" ;
     public static final String KEY_MESSAGE  = "message" ;
@@ -46,18 +44,25 @@ public class dbNode {
 
     // property help us to keep data
     public int id;
-    public String node_id;
-    public String nodes;
+    public String topic;
+    public String message;
     public String name;
-    public String localip;
-    public String fwname;
-    public String fwversion;
-    public String online;
-    public String signal;
     public String icon;
-    public String adding;
     public String uptime;
-    public String reset;
-    public String ota;
 
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

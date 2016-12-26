@@ -1,15 +1,12 @@
 package com.olmatix.ui.activity;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,13 +15,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.text.Html;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.olmatix.helper.PreferenceHelper;
@@ -33,7 +25,6 @@ import com.olmatix.ui.fragment.SettingsFragment;
 import com.olmatix.utils.OlmatixUtils;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,7 +36,9 @@ import java.util.Locale;
 public class SettingsActivity extends SettingsFragment {
 
 
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener
+            = new Preference.OnPreferenceChangeListener() {
+
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
@@ -91,8 +84,6 @@ public class SettingsActivity extends SettingsFragment {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-
-
     }
 
     @Override
@@ -165,6 +156,7 @@ public class SettingsActivity extends SettingsFragment {
         private LocationManager mLocationMgr;
         private String mProvider;
         private Preference setLocation;
+        String loc = null;
 
 
         @Override
@@ -173,12 +165,10 @@ public class SettingsActivity extends SettingsFragment {
             addPreferencesFromResource(R.xml.pref_misc);
             setHasOptionsMenu(true);
 
-            //SettingsActivity.bindPreferenceSummaryToValue(findPreference("setHomeLocation"));
-
+            bindPreferenceSummaryToValue(findPreference("setLocation"));
 
             initLocationPref();
-            //resetMesg(setHomeLocation);
-
+            //resetMesg(setLocation);
         }
 
 
@@ -201,13 +191,14 @@ public class SettingsActivity extends SettingsFragment {
                         if (mLocation == null){
                             mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         }
-                        mPrefHelper = new PreferenceHelper(getActivity());
+                        mPrefHelper = new PreferenceHelper(getActivity().getApplicationContext());
                         mPrefHelper.setHomeLatitude(mLocation.getLatitude());
                         mPrefHelper.setHomeLongitude(mLocation.getLongitude());
-                        //PreferenceHelper.initializePrefs();
+                        mPrefHelper.initializePrefs();
                         resetMesg(setLocation);
 
                         Toast.makeText(getActivity(), getString(R.string.opt_homepos_set), Toast.LENGTH_SHORT).show();
+
                     } catch (SecurityException ex) {
                         Log.d("DEBUG", "Permission Denied: " + ex );
                         Toast.makeText(getActivity(), "Permission location denied from user", Toast.LENGTH_SHORT).show();
@@ -223,9 +214,8 @@ public class SettingsActivity extends SettingsFragment {
 
 
 
-        private void resetMesg(Preference setHomeLocation) {
-            String loc = null;
-            final PreferenceHelper mPrefHelper = new PreferenceHelper(getActivity());
+        private void resetMesg(Preference setLocation) {
+            final PreferenceHelper mPrefHelper = new PreferenceHelper(getActivity().getApplicationContext());
             if (mPrefHelper.getHomeLatitude() != 0) {
 
                 Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
@@ -242,12 +232,13 @@ public class SettingsActivity extends SettingsFragment {
                 }
 
                 Log.d("DEBUG", "resetMesg: " + mPrefHelper.getHomeLatitude() + ":" + mPrefHelper.getHomeLongitude());
-                setHomeLocation.setSummary(getString(R.string.opt_homepos_set) + ": " + (loc == null ? "" : loc) + " ("
-                        + mPrefHelper.getHomeLatitude() + " : " + mPrefHelper.getHomeLongitude() + ")");
 
+                if (setLocation!=null) {
+
+                    setLocation.setSummary(getString(R.string.opt_homepos_set) + ": " + (loc == null ? "" : loc) + " ("
+                            + mPrefHelper.getHomeLatitude() + " : " + mPrefHelper.getHomeLongitude() + ")");
+                }
             }
-
-
            // setLocation.setSummary(mPrefHelper.getHomeLatitude() + " : " + mPrefHelper.getHomeLongitude() );
         }
 

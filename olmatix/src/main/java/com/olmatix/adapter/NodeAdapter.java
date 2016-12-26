@@ -166,10 +166,9 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     }
 
     public void removeItem(int position) {
-        Installed_Node.dbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
 
         String mNodeID = nodeList.get(position).getNodesID();
-        for (int a=0; a < 10 ;a++) {
+        for (int a=0; a < 12 ;a++) {
             if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
             if (a == 1) {topic = "devices/" + mNodeID + "/$fwname";}
             if (a == 2) {topic = "devices/" + mNodeID + "/$signal";}
@@ -180,14 +179,18 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             if (a == 7) {topic = "devices/" + mNodeID + "/light/1";}
             if (a == 8) {topic = "devices/" + mNodeID + "/light/2";}
             if (a == 9) {topic = "devices/" + mNodeID + "/light/3";}
+            if (a == 10) {topic = "devices/" + mNodeID + "/door/close";}
+            if (a == 11) {topic = "devices/" + mNodeID + "/door/theft";}
 
             try {
                 Connection.getClient().unsubscribe(topic);
             } catch (MqttException e) {
                 e.printStackTrace();
             }
-            Log.d("DEBUS", "removeItem: " +a);
+            Log.d("DEBUG", "removeItem: " +a +" / "+mNodeID);
         }
+
+        Installed_Node.dbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
         nodeList.remove(position);
 
         notifyItemRemoved(position);

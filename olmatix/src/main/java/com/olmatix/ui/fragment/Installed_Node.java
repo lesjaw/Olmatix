@@ -106,8 +106,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 mRecycleView, new ClickListener() {
             @Override
             public void onClick(View view, final int position) {
-                if (stateMqtt) {
-                    Log.d("DEBUG", "onClick: "+stateMqtt);
+                /*if (stateMqtt) {
+                    Log.d("DEBUG", "onClick: "+stateMqtt);*/
                     fwName = data.get(position).getFwName();
                     nice_name = data.get(position).getNice_name_n();
 
@@ -133,10 +133,10 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                                 Toast.LENGTH_SHORT).show();
                     }
                 });*/
-                } else {
-                    Toast.makeText(getActivity(),"Server disconnected, check your internet connection",
-                            Toast.LENGTH_LONG).show();
-                }
+                //} else {
+                   // Toast.makeText(getActivity(),"Server disconnected, check your internet connection",
+                   //         Toast.LENGTH_LONG).show();
+                //}
             }
             @Override
             public void onLongClick(View view, final int position) {
@@ -290,22 +290,28 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         for (int i = 0; i < countDB; i++) {
             final String mNodeID = data.get(i).getNodesID();
             Log.d("DEBUG", "Count list: "+mNodeID);
-            String topic = "devices/" + mNodeID + "/$online";
-            int qos = 2;
-            try {
-                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                subToken.setActionCallback(new IMqttActionListener() {
-                    @Override
-                    public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.d("Subscribe", " device = " + mNodeID);
-                    }
+            for (int a=0; a < 4 ;a++) {
+                String topic="";
+                if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
+                if (a == 1) {topic = "devices/" + mNodeID + "/$signal";}
+                if (a == 2) {topic = "devices/" + mNodeID + "/$uptime";}
+                if (a == 3) {topic = "devices/" + mNodeID + "/$localip";}
+                int qos = 2;
+                try {
+                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                    subToken.setActionCallback(new IMqttActionListener() {
+                        @Override
+                        public void onSuccess(IMqttToken asyncActionToken) {
+                            Log.d("Subscribe", " device = " + mNodeID);
+                        }
 
-                    @Override
-                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    }
-                });
-            } catch (MqttException e) {
-                e.printStackTrace();
+                        @Override
+                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        }
+                    });
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
             }
         }
         data.clear();
@@ -324,9 +330,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
 
             Log.d("Receiver ", "Installed_Node = Starting..");
+/*
         if(Connection.getClient().isConnected()){
             stateMqtt=true;
         } else {stateMqtt=false;}
+*/
 
         Log.d("DEBUG", "Server: "+stateMqtt);
 
@@ -563,7 +571,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         mItemTouchHelper.startDrag(viewHolder);
     }
 
-    public static interface ClickListener{
+    public interface ClickListener{
         public void onClick(View view,int position);
         public void onLongClick(View view,int position);
     }

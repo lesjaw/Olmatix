@@ -15,9 +15,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 
@@ -53,7 +51,7 @@ public class SplashActivity extends AppCompatActivity {
         mProvider  = sharedPref.getString("setHomeLocation", "");
         Log.d("DEBUG", "onCreate: HomeLocation  " + mProvider);
 
-        if (mUserName.equals("olmatix1") || mProvider.equals("")) {
+        if (mUserName.equals("olmatix1")) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
 

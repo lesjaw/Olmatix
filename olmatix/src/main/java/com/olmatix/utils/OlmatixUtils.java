@@ -54,7 +54,7 @@ public class OlmatixUtils {
         long diffMinutes = secondi / 60;
         secondi = secondi % 60;//resto
         if (diffMinutes < 120)
-            return "" + diffMinutes + " minute " + secondi + " second";
+            return "" + diffMinutes + " minute & " + secondi + " second";
         long diffHours = diffMinutes / (60);
         diffMinutes = diffMinutes % 60;
         return "" + diffHours + " hours " + diffMinutes + " minute";

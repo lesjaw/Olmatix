@@ -10,6 +10,8 @@ public class dbNode {
     public static final String TABLE = "Node";
     public static final String TABLE_NODE = "Node_Installed";
     public static final String TABLE_FAV = "Node_Favorite";
+    public static final String TABLE_MQTT = "mqtt";
+
 
 
     // Labels Table Columns names
@@ -37,16 +39,16 @@ public class dbNode {
     public static final String KEY_TIMESTAMPSON  = "timeon" ;
     public static final String KEY_TIMESTAMPSOFF  = "timeoff" ;
     public static final String KEY_ONDURATION  = "onduration" ;
+    public static final String KEY_TOPIC  = "topic" ;
+    public static final String KEY_MESSAGE  = "message" ;
+
+
 
     // property help us to keep data
     public int id;
     public String node_id;
     public String nodes;
     public String name;
-    public String sensor;
-    public String status_sensor;
-    public String status_theft;
-    public String timestamps;
     public String localip;
     public String fwname;
     public String fwversion;
@@ -57,8 +59,5 @@ public class dbNode {
     public String uptime;
     public String reset;
     public String ota;
-    public String node_type;
-
-
 
 }

@@ -34,7 +34,6 @@ import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.ui.fragment.Detail_Node;
 import com.olmatix.utils.Connection;
-import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -107,7 +106,6 @@ public class OlmatixService extends Service {
     String topic1;
     Long dur;
     Long on;
-    Long off;
 
 
     /**
@@ -150,7 +148,7 @@ public class OlmatixService extends Service {
             if (hasConnectivity && hasChanged && (mqttClient == null || !mqttClient.isConnected())) {
                 doConnect();
                 Log.d(TAG, "Connecting");
-                //callDis();
+                callDis();
 
             } else if (!hasConnectivity && mqttClient != null && mqttClient.isConnected()) {
                 doDisconnect();
@@ -167,7 +165,7 @@ public class OlmatixService extends Service {
                 doDisconnect();
                 callCon();
             }
-        }, 2000);
+        }, 5000);
     }
 
     private void callCon(){
@@ -176,7 +174,7 @@ public class OlmatixService extends Service {
             public void run() {
                 doConnect();
             }
-        }, 2000);
+        }, 1000);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -338,11 +336,6 @@ public class OlmatixService extends Service {
 
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    //Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
-                    if (flagSub) {
-                        //doSubAll();
-                        //flagSub = false;
-                    }
 
                     text = "Connected";
                     showNotification();
@@ -374,10 +367,10 @@ public class OlmatixService extends Service {
                                 showNotification();
                                 stateoffMqtt = "true";
                                 sendMessage();
-                                if (flagAct){
+                                /*if (flagAct){
                                     callDis();
                                     flagAct = false;
-                                }
+                                }*/
 
                             }
 
@@ -551,10 +544,7 @@ public class OlmatixService extends Service {
             Log.d("saveFirst", "Add Node success, ");
             messageReceive.clear();
             data.clear();
-            //doSubscribeIfOnline();
             doSubAll();
-            //mChange="1";
-            //sendMessage();
 
         } else {
             installedNodeModel.setNodesID(NodeID);
@@ -576,10 +566,7 @@ public class OlmatixService extends Service {
                 Log.d("saveFirst", "Add Node success, ");
                 messageReceive.clear();
                 data.clear();
-                //doSubscribeIfOnline();
                 doSubAll();
-                //mChange="1";
-                //sendMessage();
 
             }
         }
@@ -617,7 +604,6 @@ public class OlmatixService extends Service {
 
         printForegroundTask();
         //checkActivityForeground();
-        Log.d(TAG, "toastAndNotif: "+flagSub);
         if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
                 String state = "";
                 detailNodeModel.setNode_id(NodeID);
@@ -697,8 +683,6 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_sensor(mMessage);
-            Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-            detailNodeModel.setTimestampson(String.valueOf(currentDateTimeString));
 
             dbNodeRepo.update_detailSensor(detailNodeModel);
             mChange = "2";
@@ -711,13 +695,10 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_theft(mMessage);
-            Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-            detailNodeModel.setTimestampson(String.valueOf(currentDateTimeString));
 
             dbNodeRepo.update_detailSensor(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
-            //Log.d("DEBUG", "updateSensorTheft: "+mMessage);
             data1.addAll(dbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
             int countDB = dbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
             if (countDB != 0) {
@@ -764,10 +745,25 @@ public class OlmatixService extends Service {
                     detailNodeModel.setSensor("light");
                     detailNodeModel.setDuration("0");
 
-
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
-                    doSubAllDetail();
+                    //doSubAllDetail();
+                    topic1 = "devices/" + NodeID + "/light/0";
+                    int qos = 1;
+                    try {
+                        IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                        subToken.setActionCallback(new IMqttActionListener() {
+                            @Override
+                            public void onSuccess(IMqttToken asyncActionToken) {
+                                Log.d("SubscribeButton", " device = " + NodeID);
+                            }
 
+                            @Override
+                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                            }
+                        });
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
 
                 }
 
@@ -787,9 +783,25 @@ public class OlmatixService extends Service {
                         detailNodeModel.setSensor("light");
                         detailNodeModel.setDuration("0");
 
-
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
-                        doSubAllDetail();
+                        //doSubAllDetail();
+                        topic1 = "devices/" + NodeID + "/light/"+i;
+                        int qos = 1;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeButton", " device = " + NodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
 
                     }
                 }
@@ -808,7 +820,29 @@ public class OlmatixService extends Service {
                     detailNodeModel.setDuration("0");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
-                    doSubAllDetail();
+                    //doSubAllDetail();
+                    for (int a = 0; a < 3; a++) {
+                        if (a == 0) {topic1 = "devices/" + NodeID + "/light/0";}
+                        if (a == 1) {topic1 = "devices/" + NodeID + "/door/close";}
+                        if (a == 2) {topic1 = "devices/" + NodeID + "/door/theft";}
+
+                        int qos = 1;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeSensor", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }
@@ -903,6 +937,8 @@ public class OlmatixService extends Service {
                 detailNodeModel.setStatus(mMessage);
                 Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
                 detailNodeModel.setTimestampson(String.valueOf(currentDateTimeString));
+                detailNodeModel.setDuration(null);
+
             } else if (mMessage.equals("false")) {
                 detailNodeModel.setStatus(mMessage);
 
@@ -914,24 +950,24 @@ public class OlmatixService extends Service {
                     for (int i = 0; i < countDB; i++) {
                         dur = Long.valueOf(data1.get(i).getDuration());
                         on = Long.valueOf(data1.get(i).getTimestampson());
+                        mNodeID = data1.get(i).getNode_id();
+                        Channel = data1.get(i).getChannel();
                     }
                 }
                 if(on!=null) {
-                    Log.d(TAG, "dur: " + dur);
-                    Log.d(TAG, "on: " + on);
-                    off = Calendar.getInstance().getTimeInMillis();
-                    Log.d(TAG, "off: " + off);
-
-                    Long duration = (off - on) + dur;
+                    Long off = Calendar.getInstance().getTimeInMillis();
+                    Long dur1 = (off - on);
+                    Long duration = dur1 + dur;
                     Log.d(TAG, "saveDatabase_Detail: " + duration);
 
-                    detailNodeModel.setDuration(OlmatixUtils.getDuration(duration));
+                    detailNodeModel.setDuration(String.valueOf(duration));
                 }
             }
 
             dbNodeRepo.update_detail(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
+            data1.clear();
         }
     }
 
@@ -1066,7 +1102,7 @@ public class OlmatixService extends Service {
                 }
             }
         data1.clear();
-        doAllsubDetailSensor();
+        //doAllsubDetailSensor();
 
     }
 

@@ -7,6 +7,7 @@ package com.olmatix.adapter;
 import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -131,13 +132,11 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         }
 
         if(mInstalledNodeModel.getAdding() != null) {
-            //String dateTimeAgo = timeAgo(Long.parseLong(mInstalledNodeModel.getAdding()));
             holder.nodeid.setText(mInstalledNodeModel.getNodesID());
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date(mInstalledNodeModel.getAdding()));
             cal.getTimeInMillis();
             holder.lastAdd.setText("Updated : "+OlmatixUtils.getTimeAgo(cal));
-            //System.out.println("data date " + OlmatixUtils.getTimeAgo(cal));
         }
     }
 
@@ -187,6 +186,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             } catch (MqttException e) {
                 e.printStackTrace();
             }
+            Log.d("DEBUS", "removeItem: " +a);
         }
         nodeList.remove(position);
 

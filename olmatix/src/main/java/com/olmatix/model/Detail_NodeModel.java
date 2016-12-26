@@ -22,7 +22,6 @@ public class Detail_NodeModel {
     private String duration;
 
 
-
     public int getId() {
         return id;
     }
@@ -95,6 +94,14 @@ public class Detail_NodeModel {
         this.status_sensor = status_sensor;
     }
 
+    public String getFwName() {
+        return fwName;
+    }
+
+    public void setFwName(String fwName) {
+        this.fwName = fwName;
+    }
+
     public String getStatus_theft() {
         return status_theft;
     }
@@ -109,14 +116,6 @@ public class Detail_NodeModel {
 
     public void setTimestampson(String timestampson) {
         this.timestampson = timestampson;
-    }
-
-    public String getFwName() {
-        return fwName;
-    }
-
-    public void setFwName(String fwName) {
-        this.fwName = fwName;
     }
 
     public String getTimestampsoff() {

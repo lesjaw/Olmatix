@@ -106,7 +106,6 @@ public class OlmatixService extends Service {
     String topic1;
     Long dur;
     Long on;
-    Long off;
 
 
     /**
@@ -337,11 +336,6 @@ public class OlmatixService extends Service {
 
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    //Toast.makeText(getApplicationContext(),  R.string.conn_success, Toast.LENGTH_SHORT).show();
-                    if (flagSub) {
-                        //doSubAll();
-                        //flagSub = false;
-                    }
 
                     text = "Connected";
                     showNotification();
@@ -550,10 +544,7 @@ public class OlmatixService extends Service {
             Log.d("saveFirst", "Add Node success, ");
             messageReceive.clear();
             data.clear();
-            //doSubscribeIfOnline();
             doSubAll();
-            //mChange="1";
-            //sendMessage();
 
         } else {
             installedNodeModel.setNodesID(NodeID);
@@ -575,10 +566,7 @@ public class OlmatixService extends Service {
                 Log.d("saveFirst", "Add Node success, ");
                 messageReceive.clear();
                 data.clear();
-                //doSubscribeIfOnline();
                 doSubAll();
-                //mChange="1";
-                //sendMessage();
 
             }
         }
@@ -616,7 +604,6 @@ public class OlmatixService extends Service {
 
         printForegroundTask();
         //checkActivityForeground();
-        Log.d(TAG, "toastAndNotif: "+flagSub);
         if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
                 String state = "";
                 detailNodeModel.setNode_id(NodeID);
@@ -696,8 +683,6 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_sensor(mMessage);
-            Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-            detailNodeModel.setTimestampson(String.valueOf(currentDateTimeString));
 
             dbNodeRepo.update_detailSensor(detailNodeModel);
             mChange = "2";
@@ -710,13 +695,10 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_theft(mMessage);
-            Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
-            detailNodeModel.setTimestampson(String.valueOf(currentDateTimeString));
 
             dbNodeRepo.update_detailSensor(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
-            //Log.d("DEBUG", "updateSensorTheft: "+mMessage);
             data1.addAll(dbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
             int countDB = dbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
             if (countDB != 0) {
@@ -762,7 +744,7 @@ public class OlmatixService extends Service {
                     detailNodeModel.setNice_name_d(NodeID);
                     detailNodeModel.setSensor("light");
                     detailNodeModel.setDuration("0");
-
+                    detailNodeModel.setTimestampson("0");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
                     doSubAllDetail();
@@ -785,7 +767,7 @@ public class OlmatixService extends Service {
                         detailNodeModel.setNice_name_d(NodeID +" Ch "+String.valueOf(i+1));
                         detailNodeModel.setSensor("light");
                         detailNodeModel.setDuration("0");
-
+                        detailNodeModel.setTimestampson("0");
 
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
                         doSubAllDetail();
@@ -804,6 +786,7 @@ public class OlmatixService extends Service {
                     detailNodeModel.setStatus_sensor("false");
                     detailNodeModel.setStatus_theft("false");
                     detailNodeModel.setNice_name_d(NodeID);
+                    detailNodeModel.setTimestampson("0");
                     detailNodeModel.setDuration("0");
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
@@ -902,6 +885,8 @@ public class OlmatixService extends Service {
                 detailNodeModel.setStatus(mMessage);
                 Long currentDateTimeString = Calendar.getInstance().getTimeInMillis();
                 detailNodeModel.setTimestampson(String.valueOf(currentDateTimeString));
+                detailNodeModel.setDuration(null);
+
             } else if (mMessage.equals("false")) {
                 detailNodeModel.setStatus(mMessage);
 
@@ -913,21 +898,13 @@ public class OlmatixService extends Service {
                     for (int i = 0; i < countDB; i++) {
                         dur = Long.valueOf(data1.get(i).getDuration());
                         on = Long.valueOf(data1.get(i).getTimestampson());
+                        mNodeID = data1.get(i).getNode_id();
+                        Channel = data1.get(i).getChannel();
                     }
                 }
                 if(on!=null) {
-                    Log.d(TAG, "dur: " + dur);
-                    Log.d(TAG, "on: " + on);
-
                     Long off = Calendar.getInstance().getTimeInMillis();
-                    Log.d(TAG, "off: " + off);
-
-                    /*Calendar cal = Calendar.getInstance();
-                    cal.setTime(new Date(on));
-                    cal.getTimeInMillis();*/
-                    Long dur1 = (off - on)/1000;
-                    Log.d(TAG, "dur1: " + dur1);
-
+                    Long dur1 = (off - on);
                     Long duration = dur1 + dur;
                     Log.d(TAG, "saveDatabase_Detail: " + duration);
 

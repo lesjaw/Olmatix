@@ -79,8 +79,8 @@
                 android:layout_below="@id/status"/>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="160sp"
+                android:layout_height="40sp"
                 android:id="@+id/duration"
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_below="@id/uptime"
@@ -91,10 +91,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/fw_name"
-                android:layout_toRightOf="@+id/icon_node"
-                android:layout_below="@id/duration"
+                android:layout_below="@id/icon_node"
                 android:textSize="10sp"
                 android:text="fw Name"
+                android:paddingLeft="10sp"
+
                 />
 
 

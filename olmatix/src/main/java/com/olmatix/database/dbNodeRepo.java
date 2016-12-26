@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
@@ -86,6 +87,7 @@ public class dbNodeRepo {
         values.put(KEY_SENSOR, nodeModel.getSensor());
         values.put(KEY_STATUS_SENSOR, nodeModel.getStatus_sensor());
         values.put(KEY_ONDURATION, nodeModel.getDuration());
+        //values.put(KEY_TIMESTAMPSON, nodeModel.getTimestampson());
 
 
         long node_Id = db.insert(TABLE_NODE, null, values);
@@ -218,7 +220,7 @@ public class dbNodeRepo {
         }
         if (detailNodeModel.getDuration()!=null) {
             values.put(KEY_ONDURATION, detailNodeModel.getDuration());
-            //Log.d("DEBUG", "updateDetail timestamps : " +detailNodeModel.getTimestamps());
+            Log.d("DEBUG", "updateDetail duration : " +detailNodeModel.getDuration());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " +dbNode.KEY_CHANNEL +"=?", new String[] {
@@ -444,30 +446,6 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-    public ArrayList<Dashboard_NodeModel> getNodeFav() {
-
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT * FROM " + TABLE_FAV;
-
-        ArrayList<Dashboard_NodeModel> favList = new ArrayList<Dashboard_NodeModel>();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                Dashboard_NodeModel node = new Dashboard_NodeModel();
-                //ArrayList<String> node = new ArrayList<>();
-                node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
-
-                favList.add(node);
-
-            } while (cursor.moveToNext());
-        }
-        //Log.d("getlist", "getNodeList: " +cursor.getCount());
-        cursor.close();
-        db.close();
-        return favList;
-    }
-
     public ArrayList<Dashboard_NodeModel> getNodeDetailDash() {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -596,41 +574,6 @@ public class dbNodeRepo {
         cursor.close();          // Dont forget to close your cursor
         db.close();              //AND your Database!
         return hasObject;
-    }
-
-    public dbNode getNodeByNode(Installed_NodeModel installedNodeModel){
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT * FROM " + dbNode.TABLE
-                + " WHERE " +
-                dbNode.KEY_NODES + "=?";// It's a good practice to use parameter ?, instead of concatenate string
-
-        int iCount =0;
-        dbNode node = new dbNode();
-
-        Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(installedNodeModel.getNodesID()) } );
-
-        if (cursor.moveToFirst()) {
-            do {
-                node.node_id =cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID));
-                node.nodes = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES));
-                node.name = cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME));
-                node.localip = cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP));
-                node.fwname = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME));
-                node.fwversion = cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION));
-                node.online = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE));
-                node.icon = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON));
-                node.adding = cursor.getString(cursor.getColumnIndex(dbNode.KEY_ADDING));
-                node.signal = cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL));
-                node.uptime = cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME));
-                node.reset = cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET));
-                node.ota = cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA));
-
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-        return node;
     }
 
 

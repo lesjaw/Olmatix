@@ -62,9 +62,16 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
                 + dbNode.KEY_NICE_NAME_D + " TEXT) ";
 
+        String CREATE_TABLE_MQTT = "CREATE TABLE " + dbNode.TABLE_MQTT  + "("
+                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_TOPIC + " TEXT, "
+                + dbNode.KEY_MESSAGE + " TEXT)";
+
         db.execSQL(CREATE_TABLE_NODE);
         db.execSQL(CREATE_TABLE_NODE_INSTALLED);
         db.execSQL(CREATE_TABLE_FAVORITE);
+        db.execSQL(CREATE_TABLE_MQTT);
+
     }
 
     //FAVORITE = DASHBOARD
@@ -74,6 +81,8 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_NODE);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_FAV);
+        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_MQTT);
+
 
 
         // Create tables again

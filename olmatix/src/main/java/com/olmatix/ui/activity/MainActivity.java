@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.Geocoder;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
@@ -29,6 +31,7 @@ import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.Dashboard_Node;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.ui.fragment.Scene;
+import com.olmatix.utils.OlmatixUtils;
 
 /**
  * Created by Lesjaw on 02/12/2016.
@@ -73,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                 /*editor.putBoolean("switch_conn", true);
                 editor.apply();*/
                 imgStatus.setImageResource(R.drawable.ic_conn_green);
-                //imgStatus.startAnimation(animConn);
                 connStat.setText("Connected");
                 //connStat.startAnimation(animConn);
 
@@ -121,9 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_green);
-            //imgStatus.startAnimation(animConn);
             connStat.setText("Connected");
-            //connStat.startAnimation(animConn);
 
         } else if (!serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_red);

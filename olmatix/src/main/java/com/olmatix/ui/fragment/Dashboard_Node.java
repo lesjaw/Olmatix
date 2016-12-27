@@ -36,12 +36,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.model.InfoModel;
 import com.olmatix.utils.GridAutofitLayoutManager;
 import com.olmatix.utils.GridSpacingItemDecoration;
 import com.olmatix.utils.SpinnerListener;
@@ -57,15 +59,22 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     private RecyclerView mRecycleViewInfo;
     private FloatingActionButton mFab;
     private NodeDashboardAdapter adapter;
+    private InfoAdapter infoAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Dashboard_NodeModel dashboardNodeModel;
     public  dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
+    private static ArrayList<InfoModel> infoData ;
     private RecyclerView.LayoutManager layoutManagerInfo;
 
     Spinner mSpinner;
+    public static final int mBUTTON = 0;
+    public static final int mLOCATION = 1;
+    private int mDataTypes[] = {mBUTTON, mLOCATION};
+    private String[] ButtonInfo = {"Button 1","Button 2"};
+    private String[] LocationInfo = {"Location 1","Location 2", "Location 3"};
 
 
     @Nullable
@@ -145,8 +154,10 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getActivity(), 200 );
         mRecycleView.setLayoutManager(layoutManager);
 
-        layoutManagerInfo = new LinearLayoutManager(getActivity());
-        mRecycleViewInfo.setLayoutManager(layoutManagerInfo);
+        //layoutManagerInfo = new LinearLayoutManager(getActivity());
+        //mRecycleViewInfo.setLayoutManager(layoutManagerInfo);
+        LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        mRecycleViewInfo.setLayoutManager(horizontalLayoutManagaer);
 
         int mNoOfColumns = GridAutofitLayoutManager.DEFAULT_SPAN_COUNT;
         int spacing = 10;
@@ -169,6 +180,11 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
             }
         });
+
+        infoAdapter = new InfoAdapter(ButtonInfo, LocationInfo, mDataTypes, this);
+        mRecycleViewInfo.setAdapter(infoAdapter);
+
+
 
 
         initSwipe();

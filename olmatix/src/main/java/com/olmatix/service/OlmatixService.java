@@ -167,7 +167,17 @@ public class OlmatixService extends Service {
                 doDisconnect();
                 callCon();
             }
-        }, 5000);
+        }, 10000);
+    }
+
+    private void setFlagSub(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+             flagSub=true;
+                Log.d(TAG, "run: "+flagSub);
+            }
+        }, 25000);
     }
 
     private void callCon(){
@@ -316,11 +326,18 @@ public class OlmatixService extends Service {
         String mUserName = sharedPref.getString("user_name", "olmatix1");
         String mPassword = sharedPref.getString("password", "olmatix");
 
+        final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
+        Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
+
         final MqttConnectOptions options = new MqttConnectOptions();
         options.setUserName(mUserName);
         options.setPassword(mPassword.toCharArray());
         final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId);
-        options.setCleanSession(true);
+        if (mSwitch_conn) {
+            options.setCleanSession(false);
+        } else {
+            options.setCleanSession(true);
+        }
         String topic = "status/"+deviceId+"/$online";
         byte[] payload = "false".getBytes();
         options.setWill(topic, payload ,1,true);
@@ -374,10 +391,11 @@ public class OlmatixService extends Service {
                                 showNotification();
                                 stateoffMqtt = "true";
                                 sendMessage();
-                                doSubAll();
-                                doSubAllDetail();
-                                doAllsubDetailSensor();
-
+                                if(!mSwitch_conn) {
+                                    doSubAll();
+                                    doSubAllDetail();
+                                    doAllsubDetailSensor();
+                                }
                             }
 
                             @Override
@@ -498,9 +516,11 @@ public class OlmatixService extends Service {
             } else {
                 updateDetail();
             }
-            dbnode.setTopic(topic);
-            dbnode.setMessage(mMessage);
-            dbNodeRepo.insertDbMqtt(dbnode);
+            if (flagSub) {
+                dbnode.setTopic(topic);
+                dbnode.setMessage(mMessage);
+                dbNodeRepo.insertDbMqtt(dbnode);
+            }
         }
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {
@@ -632,6 +652,7 @@ public class OlmatixService extends Service {
         printForegroundTask();
         //checkActivityForeground();
         if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
+            if (flagSub) {
                 String state = "";
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel(Channel);
@@ -669,7 +690,7 @@ public class OlmatixService extends Service {
                 data1.clear();
                 Channel = "";
             }
-
+        }
     }
 
     protected void checkActivityForeground() {
@@ -872,7 +893,6 @@ public class OlmatixService extends Service {
         }
     }
 
-
     private void saveDatabase() {
 
                     installedNodeModel.setNodesID(NodeID);
@@ -889,7 +909,7 @@ public class OlmatixService extends Service {
                         //checkActivityForeground();
                         printForegroundTask();
                         if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
-                            //if (!flagSub) {
+                            if (flagSub) {
                                 installedNodeModel.setNodesID(NodeID);
                                 data2.addAll(dbNodeRepo.getNodeListbyNode(NodeID));
                                 int countDB = dbNodeRepo.getNodeListbyNode(NodeID).size();
@@ -914,7 +934,7 @@ public class OlmatixService extends Service {
                                             showNotificationNode();
 
                                         }
-                                   // }
+                                    }
                                 }
                             }
                             data2.clear();
@@ -1044,17 +1064,12 @@ public class OlmatixService extends Service {
                             e.printStackTrace();
                         }
                     }
-                    //Log.d(TAG, "doSubAll: 1");
-
                 }
                 data.clear();
-                //Log.d(TAG, "doSubAll: 2");
+                flagSub=false;
+                setFlagSub();
             }
-            //Log.d(TAG, "doSubAll: 3");
-
         }
-        //Log.d(TAG, "doSubAll: 4");
-
     }
 
     private void doSubAllDetail() {
@@ -1137,7 +1152,6 @@ public class OlmatixService extends Service {
         }
         data1.clear();
     }
-
 }
 
 

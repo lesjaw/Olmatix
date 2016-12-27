@@ -29,7 +29,7 @@
     <string name="about_sum">Olmatix 2.0 by lesjaw@olmatix.com</string>
     <string name="copy_right">Copyrights © %1$d</string>
     <string name="action_about">About</string>
-    <string name="switch_title">Enable connection</string>
+    <string name="switch_title">Enable Persistence</string>
 
     <string name="err_internet">No internet connection</string>
     <string name="local_service_label">Olmatix 2.0</string>

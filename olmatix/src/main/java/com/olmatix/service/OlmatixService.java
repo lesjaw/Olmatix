@@ -99,15 +99,14 @@ public class OlmatixService extends Service {
     ArrayList<Detail_NodeModel> data1;
     ArrayList<Installed_NodeModel> data2;
     String add_NodeID;
-    boolean flagAct=true;
     boolean flagSub=true;
     boolean flagNode=false;
+    boolean flagConn=true;
+    boolean connSuccess=false;
     int notifyID=0;
     String currentApp = "NULL";
     String topic;
     String topic1;
-    Long dur;
-    Long on;
 
 
     /**
@@ -141,43 +140,36 @@ public class OlmatixService extends Service {
                 sendMessage();
                 text = "Disconnected";
                 showNotification();
-                flagAct= true;
+                flagConn=false;
             }
 
             hasConnectivity = hasMmobile || hasWifi;
-            Log.d(TAG, "hasConn: " + hasConnectivity + " hasChange: " + hasChanged + " - " + (mqttClient == null ||
-                    !mqttClient.isConnected()));
+            Log.d(TAG, "hasConn: " + hasConnectivity + " hasChange: " + hasChanged + " - " +
+                    (mqttClient == null || !mqttClient.isConnected()));
+
             if (hasConnectivity && hasChanged && (mqttClient == null || !mqttClient.isConnected())) {
                 doConnect();
                 Log.d(TAG, "Connecting");
-                callDis();
+                //callDis();
 
             } else if (!hasConnectivity && mqttClient != null && mqttClient.isConnected()) {
                 doDisconnect();
                 Log.d(TAG, "Disconnecting");
             }
         }
-
     }
 
     private void callDis(){
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                doDisconnect();
-                callCon();
+                if(!flagConn) {
+                    doDisconnect();
+                    callCon();
+                    flagConn = true;
+                }
             }
-        }, 10000);
-    }
-
-    private void setFlagSub(){
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-             flagSub=true;
-                Log.d(TAG, "run: "+flagSub);
-            }
-        }, 25000);
+        }, 1000);
     }
 
     private void callCon(){
@@ -189,16 +181,24 @@ public class OlmatixService extends Service {
         }, 1000);
     }
 
+    private void setFlagSub(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                flagSub=true;
+                Log.d(TAG, "run: "+flagSub);
+            }
+        }, 25000);
+    }
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             add_NodeID = intent.getStringExtra("NodeID");
             Log.d("DEBUG", "onReceive: "+add_NodeID);
             doAddNodeSub();
-
         }
     };
-
 
     private void doDisconnect() {
         Log.d(TAG, "doDisconnect()");
@@ -206,6 +206,10 @@ public class OlmatixService extends Service {
             Connection.getClient().disconnect();
             stateoffMqtt = "false";
             sendMessage();
+            flagConn=true;
+            Log.d(TAG, "doDisconnect() done");
+
+
         } catch (MqttException e) {
             e.printStackTrace();
             Log.d(TAG, "onReceive: " + String.valueOf(e.getMessage()));
@@ -243,18 +247,7 @@ public class OlmatixService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        if (flagAct) {
-            // Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_SHORT).show();
-            Log.d("Service = ", "Starting..");
-            text = "Starting...";
-            showNotification();
-            flagAct = false;
-            doConnect();
-        }
-
         sendMessage();
-
         return START_STICKY;
     }
 
@@ -318,137 +311,147 @@ public class OlmatixService extends Service {
     }
 
     private void doConnect() {
-        //Toast.makeText(getApplicationContext(), R.string.connecting, Toast.LENGTH_SHORT).show();
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
-        String mServerPort = sharedPref.getString("server_port", "1883");
-        String mUserName = sharedPref.getString("user_name", "olmatix1");
-        String mPassword = sharedPref.getString("password", "olmatix");
+        if (mqttClient == null || !mqttClient.isConnected()) {
 
-        final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
-        Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
+            String mServerPort = sharedPref.getString("server_port", "1883");
+            String mUserName = sharedPref.getString("user_name", "olmatix1");
+            String mPassword = sharedPref.getString("password", "olmatix");
 
-        final MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName(mUserName);
-        options.setPassword(mPassword.toCharArray());
-        final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(),"tcp://"+mServerURL+":"+mServerPort,deviceId);
-        if (mSwitch_conn) {
-            options.setCleanSession(false);
-        } else {
-            options.setCleanSession(true);
-        }
-        String topic = "status/"+deviceId+"/$online";
-        byte[] payload = "false".getBytes();
-        options.setWill(topic, payload ,1,true);
-        options.setKeepAliveInterval(240000);
-        Connection.setClient(client);
+            final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
+            Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
 
-        text = "Connecting to server..";
-        showNotification();
-        Log.d(TAG, "doConnect: "+deviceId);
+            final MqttConnectOptions options = new MqttConnectOptions();
 
-        messageReceive.clear();
-        data1.clear();
-        data.clear();
-        data2.clear();
+            options.setUserName(mUserName);
+            options.setPassword(mPassword.toCharArray());
+            final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(), "tcp://" + mServerURL + ":" + mServerPort, deviceId);
 
-        try {
+            if (mSwitch_conn) {
+                options.setCleanSession(false);
+            } else {
+                options.setCleanSession(true);
+            }
+            String topic = "status/" + deviceId + "/$online";
+            byte[] payload = "false".getBytes();
+            options.setWill(topic, payload, 1, true);
+            options.setKeepAliveInterval(240000);
+            Connection.setClient(client);
 
-            IMqttToken token = client.connect(options);
-            token.setActionCallback(new IMqttActionListener() {
+            text = "Connecting to server..";
+            showNotification();
+            Log.d(TAG, "doConnect: " + deviceId);
 
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
+            try {
 
-                    text = "Connected";
-                    showNotification();
-                    stateoffMqtt = "true";
-                    sendMessage();
+                IMqttToken token = client.connect(options);
+                token.setActionCallback(new IMqttActionListener() {
 
-                    Connection.getClient().setCallback(new MqttEventCallback());
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
 
-                    try {
-                        String topic = "status/"+deviceId+"/$online";
-                        String payload = "true";
-                        byte[] encodedPayload = new byte[0];
+                        text = "Connected";
+                        showNotification();
+                        stateoffMqtt = "true";
+                        sendMessage();
+
+                        Connection.getClient().setCallback(new MqttEventCallback());
+
                         try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                        }
-                        catch (UnsupportedEncodingException | MqttException e)
-                        {
+                            String topic = "status/" + deviceId + "/$online";
+                            String payload = "true";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+
+                            Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    text = "Connected";
+                                    showNotification();
+                                    stateoffMqtt = "true";
+                                    sendMessage();
+
+                                    Log.d(TAG, "Check FlasgConn: " + flagConn);
+                                    if (flagConn) {
+                                        if (stateoffMqtt.equals("true")) {
+                                            if (!mSwitch_conn) {
+                                                doSubAll();
+                                            }
+                                        }
+                                    } else {
+                                        //Log.d(TAG, "Call Disconn: " + flagConn);
+                                        callDis();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                    //Toast.makeText(getApplicationContext(), R.string.sub_fail, Toast.LENGTH_SHORT).show();
+                                    Log.e("error", exception.toString());
+
+                                }
+                            });
+                        } catch (MqttException e) {
                             e.printStackTrace();
                         }
 
-                        Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
-                            @Override
-                            public void onSuccess(IMqttToken asyncActionToken) {
-                                text = "Connected";
-                                showNotification();
-                                stateoffMqtt = "true";
-                                sendMessage();
-                                if(!mSwitch_conn) {
-                                    doSubAll();
-                                    doSubAllDetail();
-                                    doAllsubDetailSensor();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                                //Toast.makeText(getApplicationContext(), R.string.sub_fail, Toast.LENGTH_SHORT).show();
-                                Log.e("error",exception.toString());
-
-                            }
-                        });
-                    } catch (MqttException e) {
-                        e.printStackTrace();
                     }
 
-                }
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        //Toast.makeText(getApplicationContext(), R.string.conn_fail+exception.toString(), Toast.LENGTH_SHORT).show();
+                        Log.e("mqtt", exception.toString());
+                        stateoffMqtt = "false";
+                        Log.d("Sender", "After fail: " + stateoffMqtt);
+                        sendMessage();
+                        text = "Not Connected";
+                        showNotification();
+                    }
+                });
 
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    //Toast.makeText(getApplicationContext(), R.string.conn_fail+exception.toString(), Toast.LENGTH_SHORT).show();
-                    Log.e("mqtt",exception.toString());
-                    stateoffMqtt = "false";
-                    Log.d("Sender", "After fail: " +stateoffMqtt);
-                    sendMessage();
-                    text = "Not Connected";
-                    showNotification();
-                }
-            });
+            } catch (MqttSecurityException e) {
+                e.printStackTrace();
+            } catch (MqttException e) {
+                switch (e.getReasonCode()) {
+                    case MqttException.REASON_CODE_BROKER_UNAVAILABLE:
+                        Toast.makeText(getApplicationContext(), "Server Offline", Toast.LENGTH_SHORT).show();
+                        break;
 
-        } catch (MqttSecurityException e) {
-            e.printStackTrace();
-        } catch (MqttException e) {
-            switch (e.getReasonCode()) {
-                case MqttException.REASON_CODE_BROKER_UNAVAILABLE:
-                    Toast.makeText(getApplicationContext(), "Server Offline", Toast.LENGTH_SHORT).show();
-                case MqttException.REASON_CODE_CLIENT_TIMEOUT:
-                    Toast.makeText(getApplicationContext(), "Olmatix connect timed out", Toast.LENGTH_SHORT).show();
-                case MqttException.REASON_CODE_CONNECTION_LOST:
-                    Toast.makeText(getApplicationContext(), "Connection Lost", Toast.LENGTH_SHORT).show();
-                case MqttException.REASON_CODE_SERVER_CONNECT_ERROR:
-                    Log.v(TAG, "c" + e.getMessage());
-                    Toast.makeText(getApplicationContext(), "Server connection error", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                    break;
-                case MqttException.REASON_CODE_FAILED_AUTHENTICATION:
-                    Intent i = new Intent("RAISEALLARM");
-                    i.putExtra("ALLARM", e);
-                    Log.e(TAG, "b" + e.getMessage());
-                    Toast.makeText(getApplicationContext(), "Failed wrong auth (bad user name or password", Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-                    Log.e(TAG, "a" + e.getMessage());
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    text = "Disconnected";
-                    showNotification();
+                    case MqttException.REASON_CODE_CLIENT_TIMEOUT:
+                        Toast.makeText(getApplicationContext(), "Olmatix connect timed out", Toast.LENGTH_SHORT).show();
+                        break;
+
+                    case MqttException.REASON_CODE_CONNECTION_LOST:
+                        Toast.makeText(getApplicationContext(), "Connection Lost", Toast.LENGTH_SHORT).show();
+                        break;
+
+                    case MqttException.REASON_CODE_SERVER_CONNECT_ERROR:
+                        Log.v(TAG, "c" + e.getMessage());
+                        Toast.makeText(getApplicationContext(), "Server connection error", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                        break;
+                    case MqttException.REASON_CODE_FAILED_AUTHENTICATION:
+                        Intent i = new Intent("RAISEALLARM");
+                        i.putExtra("ALLARM", e);
+                        Log.e(TAG, "b" + e.getMessage());
+                        Toast.makeText(getApplicationContext(), "Failed wrong auth (bad user name or password", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Log.e(TAG, "a" + e.getMessage());
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        text = "Disconnected";
+                        showNotification();
+                }
             }
         }
     }
@@ -1001,27 +1004,6 @@ public class OlmatixService extends Service {
         flagNode = true;
     }
 
-    private void doSubscribeIfOnline(){
-        String topic = "devices/" + NodeID + "/#";
-        int qos = 2;
-        try {
-            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-            subToken.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("Subscribe", " device = " + NodeID);
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private void doUnsubscribe(){
         String topic = "devices/"+NodeID+"/$online";
         try {
@@ -1033,7 +1015,7 @@ public class OlmatixService extends Service {
     }
 
     private void doSubAll() {
-        if (Connection.getClient().isConnected()) {
+
             int countDB = dbNodeRepo.getNodeList().size();
             Log.d("DEBUG", "Count list Node: " + countDB);
             data.addAll(dbNodeRepo.getNodeList());
@@ -1041,12 +1023,22 @@ public class OlmatixService extends Service {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID = data.get(i).getNodesID();
                     Log.d("DEBUG", "Count list: " + mNodeID);
-                    for (int a=0; a < 5 ;a++){
-                        if (a==0){topic = "devices/" + mNodeID + "/$online";}
-                        if (a==1){topic = "devices/" + mNodeID + "/$fwname";}
-                        if (a==2){topic = "devices/" + mNodeID + "/$signal";}
-                        if (a==3){topic = "devices/" + mNodeID + "/$uptime";}
-                        if (a==4){topic = "devices/" + mNodeID + "/$localip";}
+                    for (int a = 0; a < 5; a++) {
+                        if (a == 0) {
+                            topic = "devices/" + mNodeID + "/$online";
+                        }
+                        if (a == 1) {
+                            topic = "devices/" + mNodeID + "/$fwname";
+                        }
+                        if (a == 2) {
+                            topic = "devices/" + mNodeID + "/$signal";
+                        }
+                        if (a == 3) {
+                            topic = "devices/" + mNodeID + "/$uptime";
+                        }
+                        if (a == 4) {
+                            topic = "devices/" + mNodeID + "/$localip";
+                        }
                         int qos = 1;
                         try {
                             IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
@@ -1066,14 +1058,12 @@ public class OlmatixService extends Service {
                     }
                 }
                 data.clear();
-                flagSub=false;
-                setFlagSub();
+                doSubAllDetail();
             }
-        }
+
     }
 
     private void doSubAllDetail() {
-        if (Connection.getClient().isConnected()) {
             int countDB = dbNodeRepo.getNodeDetailList().size();
             Log.d("DEBUG", "Count list Detail: " + countDB);
             data1.addAll(dbNodeRepo.getNodeDetailList());
@@ -1101,14 +1091,12 @@ public class OlmatixService extends Service {
                         }
 
                     }
+                doAllsubDetailSensor();
                 }
-            }
         data1.clear();
-
     }
 
     private void doAllsubDetailSensor() {
-        if (Connection.getClient().isConnected()) {
             int countDB = dbNodeRepo.getNodeDetailList().size();
             Log.d("DEBUG", "Count list Sensor: " + countDB);
             data1.addAll(dbNodeRepo.getNodeDetailList());
@@ -1147,9 +1135,9 @@ public class OlmatixService extends Service {
 
                     }
                 }
+                flagSub=false;
+                setFlagSub();
             }
-
-        }
         data1.clear();
     }
 }

@@ -37,6 +37,11 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Detail_NodeModel;
+import com.olmatix.utils.Connection;
+
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
 
@@ -62,6 +67,8 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private Toolbar mToolbar;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
+    ArrayList<Detail_NodeModel> data1;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +77,9 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(UE_ACTION);
+
+        data1 = new ArrayList<>();
+        dbNodeRepo = new dbNodeRepo(getApplicationContext());
 
         detail_node =this;
         Intent i = getIntent();
@@ -137,7 +147,85 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         data.addAll(dbNodeRepo.getNodeDetailID(node_id));
         adapter = new NodeDetailAdapter(data,node_name, detail_node,this);
         mRecycleView.setAdapter(adapter);
+        doSubAllDetail();
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void doSubAllDetail() {
+        int countDB = dbNodeRepo.getNodeDetailList().size();
+        Log.d("DEBUG", "Count list Detail: " + countDB);
+        data1.addAll(dbNodeRepo.getNodeDetailList());
+        countDB = dbNodeRepo.getNodeDetailList().size();
+        if (countDB != 0) {
+            for (int i = 0; i < countDB; i++) {
+                final String mNodeID = data1.get(i).getNode_id();
+                final String mChannel = data1.get(i).getChannel();
+                String topic1 = "devices/" + mNodeID + "/light/" + mChannel;
+                int qos = 1;
+                try {
+                    IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                    subToken.setActionCallback(new IMqttActionListener() {
+                        @Override
+                        public void onSuccess(IMqttToken asyncActionToken) {
+                            Log.d("SubscribeButton", " device = " + mNodeID);
+                        }
+
+                        @Override
+                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        }
+                    });
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            doAllsubDetailSensor();
+        }
+        data1.clear();
+    }
+
+    private void doAllsubDetailSensor() {
+        int countDB = dbNodeRepo.getNodeDetailList().size();
+        Log.d("DEBUG", "Count list Sensor: " + countDB);
+        data1.addAll(dbNodeRepo.getNodeDetailList());
+        countDB = dbNodeRepo.getNodeDetailList().size();
+        String topic1 = "";
+        if (countDB != 0) {
+            for (int i = 0; i < countDB; i++) {
+                final String mNodeID1 = data1.get(i).getNode_id();
+                final String mSensorT = data1.get(i).getSensor();
+                Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                if (mSensorT != null&&mSensorT.equals("close")) {
+                    for (int a = 0; a < 2; a++) {
+                        if (a == 0) {
+                            topic1 = "devices/" + mNodeID1 + "/door/close";
+                        }
+                        if (a == 1) {
+                            topic1 = "devices/" + mNodeID1 + "/door/theft";
+                        }
+
+                        int qos = 1;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeSensor", " device = " + mNodeID1);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }
+        data1.clear();
     }
 
     private void setupToolbar(){

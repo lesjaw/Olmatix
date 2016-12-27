@@ -141,7 +141,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     }
 
     public static String calculateTime(long seconds) {
-        //Log.d("DEBUG", "calculateTime: " + seconds);
+
         long sec = seconds % 60;
         long minutes = seconds % 3600 / 60;
         long hours = seconds % 86400 / 3600;

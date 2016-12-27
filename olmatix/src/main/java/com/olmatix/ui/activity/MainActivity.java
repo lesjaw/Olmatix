@@ -76,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                 /*editor.putBoolean("switch_conn", true);
                 editor.apply();*/
                 imgStatus.setImageResource(R.drawable.ic_conn_green);
-                imgStatus.startAnimation(animConn);
                 connStat.setText("Connected");
                 //connStat.startAnimation(animConn);
 
@@ -124,9 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_green);
-            imgStatus.startAnimation(animConn);
             connStat.setText("Connected");
-            //connStat.startAnimation(animConn);
 
         } else if (!serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_red);

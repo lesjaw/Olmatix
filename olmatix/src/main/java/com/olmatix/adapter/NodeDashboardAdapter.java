@@ -97,9 +97,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             } else {
                 holder.imgNode.setImageResource(R.drawable.onlamp1);
             }
-            if(mFavoriteModel.getOnline().trim().equals("true")){
+            if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
-            }else {
+            } else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
 
             }
@@ -110,9 +110,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     String payload1 = "ON";
                     if (Connection.getClient().isConnected()) {
                         String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
-                        if (mFavoriteModel.getStatus().trim().equals("false")){
+                        if (mFavoriteModel.getStatus().trim().equals("false")) {
                             payload1 = "ON";
-                        }else {
+                        } else {
                             payload1 = "OFF";
                         }
                         String payload = payload1;
@@ -147,9 +147,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             }
 
-            if (mFavoriteModel.getOnline().trim().equals("true")){
+            if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
-            }else {
+            } else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
             }
 
@@ -166,9 +166,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     String payload1 = "ON";
                     if (Connection.getClient().isConnected()) {
                         String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
-                        if (mFavoriteModel.getStatus().trim().equals("false")){
+                        if (mFavoriteModel.getStatus().trim().equals("false")) {
                             payload1 = "ON";
-                        }else {
+                        } else {
                             payload1 = "OFF";
                         }
                         String payload = payload1;

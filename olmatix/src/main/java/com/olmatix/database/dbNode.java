@@ -11,6 +11,7 @@ public class dbNode {
     public static final String TABLE_NODE = "Node_Installed";
     public static final String TABLE_FAV = "Node_Favorite";
     public static final String TABLE_MQTT = "mqtt";
+    public static final String TABLE_NODE_DURATION = "Node_Duration";
 
 
 
@@ -39,6 +40,8 @@ public class dbNode {
     public static final String KEY_ONDURATION  = "onduration" ;
     public static final String KEY_TOPIC  = "topic" ;
     public static final String KEY_MESSAGE  = "message" ;
+    public static final String KEY_TIMESTAMPS_ON  = "timestamp_on" ;
+    public static final String KEY_TIMESTAMPS_OFF  = "timestamp_off" ;
 
 
 

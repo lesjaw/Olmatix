@@ -44,14 +44,12 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
-import com.olmatix.model.InfoModel;
 import com.olmatix.model.SpinnerObject;
 import com.olmatix.utils.GridAutofitLayoutManager;
 import com.olmatix.utils.GridSpacingItemDecoration;
 import com.olmatix.utils.SpinnerListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -69,7 +67,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     public  dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
-    private static ArrayList<InfoModel> infoData ;
+
     private RecyclerView.LayoutManager layoutManagerInfo;
 
     Spinner mSpinner;

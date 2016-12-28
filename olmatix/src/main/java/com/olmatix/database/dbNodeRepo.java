@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
+import com.olmatix.model.Duration_Model;
 import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.model.SpinnerObject;
 
@@ -38,12 +39,15 @@ import static com.olmatix.database.dbNode.KEY_SIGNAL;
 import static com.olmatix.database.dbNode.KEY_STATUS;
 import static com.olmatix.database.dbNode.KEY_STATUS_SENSOR;
 import static com.olmatix.database.dbNode.KEY_STATUS_THEFT;
+import static com.olmatix.database.dbNode.KEY_TIMESTAMPS_OFF;
+import static com.olmatix.database.dbNode.KEY_TIMESTAMPS_ON;
 import static com.olmatix.database.dbNode.KEY_TOPIC;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
 import static com.olmatix.database.dbNode.TABLE;
 import static com.olmatix.database.dbNode.TABLE_FAV;
 import static com.olmatix.database.dbNode.TABLE_MQTT;
 import static com.olmatix.database.dbNode.TABLE_NODE;
+import static com.olmatix.database.dbNode.TABLE_NODE_DURATION;
 
 public class dbNodeRepo {
     private dbHelper dbHelper;
@@ -569,6 +573,22 @@ public class dbNodeRepo {
         cursor.close();          // Dont forget to close your cursor
         db.close();              //AND your Database!
         return hasObject;
+    }
+
+
+    public int insertDurationNode(Duration_Model durationModel){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NODE_ID,durationModel.getNodeId());
+        values.put(KEY_CHANNEL,durationModel.getChannel());
+        values.put(KEY_STATUS,durationModel.getStatus());
+        values.put(KEY_TIMESTAMPS_ON,String.valueOf(durationModel.getTimeStampOn()));
+        values.put(KEY_TIMESTAMPS_OFF,String.valueOf(durationModel.getTimeStampOff()));
+
+        long Id = db.insert(TABLE_NODE_DURATION, null, values);
+        db.close(); // Closing database connection
+        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        return (int) Id;
     }
 
 

@@ -1,5 +1,6 @@
 package com.olmatix.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     private int mDataTypes[] = {mBUTTON, mLOCATION};
     private String[] ButtonInfo = {"Button 1","Button 2"};
     private String[] LocationInfo = {"Location 1","Location 2", "Location 3"};
+    Context mContext;
 
     public InfoAdapter(String[] locationInfo, String[] buttonInfo, int[] mDataTypes, OnStartDragListener mDragStartListener) {
         LocationInfo = locationInfo;
@@ -55,6 +57,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
                 v = LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.frag_info_button, viewGroup, false);
                 v.setMinimumWidth(viewGroup.getMeasuredWidth());
+                v.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
 
                 return new ButtonInfoHolder(v);
 
@@ -79,6 +82,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
         //final InfoModel mInfoModel = infoList.get(position);
         if (viewHolder.getItemViewType() == mBUTTON){
             final ButtonInfoHolder holder = (ButtonInfoHolder) viewHolder;
+
         } else if (viewHolder.getItemViewType() == mLOCATION) {
             final LocationInfoHolder holder = (LocationInfoHolder) viewHolder;
         }

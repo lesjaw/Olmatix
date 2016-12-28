@@ -941,8 +941,11 @@ public class OlmatixService extends Service {
                 now.setTime(new Date());
                 now.getTimeInMillis();
                 durationModel.setTimeStampOff(now.getTimeInMillis());
-                durationModel.setTimeStampOn(Long.valueOf("0"));
-                dbNodeRepo.insertDurationNode(durationModel);
+                if(durationModel.getTimeStampOn()!=null) {
+                    Log.d(TAG, "run: " + Long.valueOf(durationModel.getTimeStampOn()));
+                    durationModel.setDuration((now.getTimeInMillis() - durationModel.getTimeStampOn())/1000);
+                }
+                dbNodeRepo.updateOff(durationModel);
             }
         });
     }

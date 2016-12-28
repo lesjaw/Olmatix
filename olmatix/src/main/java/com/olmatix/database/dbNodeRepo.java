@@ -21,6 +21,7 @@ import java.util.List;
 
 import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_CHANNEL;
+import static com.olmatix.database.dbNode.KEY_DURATION;
 import static com.olmatix.database.dbNode.KEY_FWNAME;
 import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
@@ -230,8 +231,7 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getChannel())
         });
         db.close(); // Closing database connection
-        //Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
-        //        String.valueOf(detailNodeModel.getChannel()));
+
 
     }
 
@@ -576,7 +576,6 @@ public class dbNodeRepo {
         return hasObject;
     }
 
-
     public int insertDurationNode(Duration_Model durationModel){
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -595,6 +594,25 @@ public class dbNodeRepo {
         return (int) Id;
     }
 
+    public void updateOff(Duration_Model durationModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_TIMESTAMPS_OFF, durationModel.getTimeStampOff());
+        values.put(KEY_DURATION,durationModel.getDuration());
+
+        db.update(TABLE_NODE_DURATION, values, dbNode.KEY_NODE_ID + "=? AND "
+                +dbNode.KEY_CHANNEL +"=? AND "
+                +dbNode.KEY_TIMESTAMPS_OFF+"=?", new String[] {
+                String.valueOf(durationModel.getNodeId()),
+                String.valueOf(durationModel.getChannel()),
+                String.valueOf(0)
+        });
+        db.close(); // Closing database connection
+        //Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
+        //        String.valueOf(detailNodeModel.getChannel()));
+
+    }
 
 }
 

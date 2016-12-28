@@ -7,7 +7,7 @@ package com.olmatix.model;
 public class Duration_Model {
     int id;
     String nodeId, channel, status;
-    Long timeStampOn, timeStampOff;
+    Long timeStampOn, timeStampOff, duration;
 
 
     public int getId() {
@@ -56,5 +56,13 @@ public class Duration_Model {
 
     public void setTimeStampOff(Long timeStampOff) {
         this.timeStampOff = timeStampOff;
+    }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
     }
 }

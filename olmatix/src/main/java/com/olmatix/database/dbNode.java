@@ -37,11 +37,11 @@ public class dbNode {
     public static final String KEY_SENSOR       = "sensor" ;
     public static final String KEY_STATUS_SENSOR  = "status_sensor" ;
     public static final String KEY_STATUS_THEFT  = "status_theft" ;
-    public static final String KEY_ONDURATION  = "onduration" ;
     public static final String KEY_TOPIC  = "topic" ;
     public static final String KEY_MESSAGE  = "message" ;
     public static final String KEY_TIMESTAMPS_ON  = "timestamp_on" ;
     public static final String KEY_TIMESTAMPS_OFF  = "timestamp_off" ;
+    public static final String KEY_DURATION  = "duration" ;
 
 
 

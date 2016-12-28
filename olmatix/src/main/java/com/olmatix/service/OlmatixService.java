@@ -607,7 +607,6 @@ public class OlmatixService extends Service {
                 messageReceive.clear();
                 message_topic.clear();
                 data1.clear();
-                Channel = "";
             }
         }
     }
@@ -899,7 +898,7 @@ public class OlmatixService extends Service {
             } else if (mMessage.equals("false")) {
                 detailNodeModel.setStatus(mMessage);
 
-                saveOnTime();
+                saveOffTime();
             }
 
             dbNodeRepo.update_detail(detailNodeModel);
@@ -910,12 +909,11 @@ public class OlmatixService extends Service {
     }
 
     private void saveOnTime() {
-        new Handler().postDelayed(new Runnable() {
+        new Handler().post(new Runnable() {
 
             @Override
             public void run() {
-
-                if (mMessage.equals("true")) {
+                Log.d(TAG, "run ON: "+Channel);
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel(Channel);
                     durationModel.setStatus(mMessage);
@@ -923,23 +921,30 @@ public class OlmatixService extends Service {
                     now.setTime(new Date());
                     now.getTimeInMillis();
                     durationModel.setTimeStampOn(now.getTimeInMillis());
-                    dbNodeRepo.insertDurationNode(durationModel);
+                    durationModel.setTimeStampOff(Long.valueOf("0"));
 
-                } else {
-
-                    Log.d(TAG, "run: "+NodeID);
-
-                    durationModel.setNodeId(NodeID);
-                    durationModel.setChannel(Channel);
-                    durationModel.setStatus(mMessage);
-                    Calendar now = Calendar.getInstance();
-                    now.setTime(new Date());
-                    now.getTimeInMillis();
-                    durationModel.setTimeStampOff(now.getTimeInMillis());
-                    dbNodeRepo.insertDurationNode(durationModel);
-                }
+                dbNodeRepo.insertDurationNode(durationModel);
             }
-        }, 1000);
+        });
+    }
+
+    private void saveOffTime() {
+        new Handler().post(new Runnable() {
+
+            @Override
+            public void run() {
+                Log.d(TAG, "run OFF: "+Channel);
+                durationModel.setNodeId(NodeID);
+                durationModel.setChannel(Channel);
+                durationModel.setStatus(mMessage);
+                Calendar now = Calendar.getInstance();
+                now.setTime(new Date());
+                now.getTimeInMillis();
+                durationModel.setTimeStampOff(now.getTimeInMillis());
+                durationModel.setTimeStampOn(Long.valueOf("0"));
+                dbNodeRepo.insertDurationNode(durationModel);
+            }
+        });
     }
 
     private void doAddNodeSub() {

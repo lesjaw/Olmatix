@@ -4,19 +4,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Dashboard_NodeModel;
-import com.olmatix.model.InfoModel;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by Rahman on 12/27/2016.
@@ -61,6 +54,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
                 v = LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.frag_info_button, viewGroup, false);
+                v.setMinimumWidth(viewGroup.getMeasuredWidth());
 
                 return new ButtonInfoHolder(v);
 

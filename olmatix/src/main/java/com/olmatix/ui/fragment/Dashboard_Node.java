@@ -154,8 +154,6 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getActivity(), 200 );
         mRecycleView.setLayoutManager(layoutManager);
 
-        //layoutManagerInfo = new LinearLayoutManager(getActivity());
-        //mRecycleViewInfo.setLayoutManager(layoutManagerInfo);
         LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecycleViewInfo.setLayoutManager(horizontalLayoutManagaer);
 

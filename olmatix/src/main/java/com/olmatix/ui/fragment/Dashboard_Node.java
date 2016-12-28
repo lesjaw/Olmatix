@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -44,11 +45,13 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.InfoModel;
+import com.olmatix.model.SpinnerObject;
 import com.olmatix.utils.GridAutofitLayoutManager;
 import com.olmatix.utils.GridSpacingItemDecoration;
 import com.olmatix.utils.SpinnerListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -106,9 +109,12 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
             @Override
             public void onClick(View v) {
                 mSpinner = new Spinner(getContext());
-                List<String> lables = dbNodeRepo.getAllLabels();
+                String[] labelData;
 
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
+                List<SpinnerObject> lables = dbNodeRepo.getAllLabels();
+
+
+                ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<SpinnerObject>(getActivity(),
                         android.R.layout.simple_spinner_item,lables);
                 dataAdapter
                         .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -123,10 +129,13 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
                             public void onClick(DialogInterface dialog, int which) {
                                 mSpinner.setOnItemSelectedListener(new SpinnerListener());
 
-                                Toast.makeText(getContext(),"You have add : " +String.valueOf(mSpinner.getSelectedItem()),Toast.LENGTH_SHORT).show();
-                                String NiceName= String.valueOf(mSpinner.getSelectedItem());
-                                Log.d("DEBUG", "onClick: "+NiceName);
-                                dashboardNodeModel.setNice_name_d(NiceName);
+                                //Toast.makeText(getContext(),"You have add : " +String.valueOf(mSpinner.getSelectedItem()),Toast.LENGTH_SHORT).show();
+                                //String NiceName= String.valueOf(mSpinner.getSelectedItem());
+                                Log.d("DEBUG", "onItemSelected: "+ mSpinner.getSelectedItem().toString());
+                                int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
+                                System.out.println(String.valueOf(databaseId));
+                                //Log.d("DEBUG", "onClick: "+NiceName);
+                                dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                 dbNodeRepo.insertFavNode(dashboardNodeModel);
                                 setRefresh();
 

@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.model.SpinnerObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ import static com.olmatix.database.dbNode.KEY_CHANNEL;
 import static com.olmatix.database.dbNode.KEY_FWNAME;
 import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
+import static com.olmatix.database.dbNode.KEY_ID;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
 import static com.olmatix.database.dbNode.KEY_MESSAGE;
 import static com.olmatix.database.dbNode.KEY_NAME;
@@ -306,8 +308,8 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-    public List<String> getAllLabels(){
-        List<String> labels = new ArrayList<String>();
+    public List<SpinnerObject> getAllLabels(){
+        List<SpinnerObject> labels = new ArrayList<SpinnerObject>();
 
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_NODE;
@@ -316,10 +318,14 @@ public class dbNodeRepo {
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
+
+
         if (cursor.moveToFirst()) {
             do {
-                //labels.add(cursor.getString(1)+" | "+ cursor.getString(3));
-                labels.add(cursor.getString(3));
+                //labels.add(cursor.getString(0)+","+ cursor.getString(3));
+                labels.add ( new SpinnerObject ( cursor.getInt(0) , cursor.getString(3) ) );
+                //labels.add(cursor.getString(1));
+                //labels.add(cursor.getString(3));
 
             } while (cursor.moveToNext());
         }
@@ -442,7 +448,7 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery =  "SELECT * FROM "+TABLE_FAV +
                 " favorite_node INNER JOIN "+TABLE_NODE +
-                " detail_node ON favorite_node."+KEY_NICE_NAME_D+" = detail_node."+KEY_NICE_NAME_D+
+                " detail_node ON favorite_node."+KEY_NICE_NAME_D+" = detail_node."+KEY_ID+
                 " INNER JOIN "+TABLE +
                 " installed_node ON installed_node."+KEY_NODE_ID+" = detail_node."+KEY_NODE_ID;
 

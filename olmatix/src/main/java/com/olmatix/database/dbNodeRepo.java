@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
@@ -577,8 +578,11 @@ public class dbNodeRepo {
 
 
     public int insertDurationNode(Duration_Model durationModel){
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+
         ContentValues values = new ContentValues();
+
         values.put(KEY_NODE_ID,durationModel.getNodeId());
         values.put(KEY_CHANNEL,durationModel.getChannel());
         values.put(KEY_STATUS,durationModel.getStatus());
@@ -587,7 +591,7 @@ public class dbNodeRepo {
 
         long Id = db.insert(TABLE_NODE_DURATION, null, values);
         db.close(); // Closing database connection
-        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        Log.d("DEBUG", "insertDur: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
     }
 

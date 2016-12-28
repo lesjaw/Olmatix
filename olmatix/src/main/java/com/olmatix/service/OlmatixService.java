@@ -183,6 +183,7 @@ public class OlmatixService extends Service {
         dbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new Installed_NodeModel();
         detailNodeModel = new Detail_NodeModel();
+        durationModel = new Duration_Model();
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -893,25 +894,12 @@ public class OlmatixService extends Service {
             if (mMessage.equals("true")) {
                 detailNodeModel.setStatus(mMessage);
 
-                durationModel.setNodeId(NodeID);
-                durationModel.setChannel(Channel);
-                durationModel.setStatus(mMessage);
-                Calendar now = Calendar.getInstance();
-                now.setTime(new Date());
-                now.getTimeInMillis();
-                durationModel.setTimeStampOn(now.getTimeInMillis());
-                dbNodeRepo.insertDurationNode(durationModel);
+                saveOnTime();
 
             } else if (mMessage.equals("false")) {
                 detailNodeModel.setStatus(mMessage);
-                durationModel.setNodeId(NodeID);
-                durationModel.setChannel(Channel);
-                durationModel.setStatus(mMessage);
-                Calendar now = Calendar.getInstance();
-                now.setTime(new Date());
-                now.getTimeInMillis();
-                durationModel.setTimeStampOff(now.getTimeInMillis());
-                dbNodeRepo.insertDurationNode(durationModel);
+
+                saveOnTime();
             }
 
             dbNodeRepo.update_detail(detailNodeModel);
@@ -919,6 +907,39 @@ public class OlmatixService extends Service {
             sendMessageDetail();
             data1.clear();
         }
+    }
+
+    private void saveOnTime() {
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+
+                if (mMessage.equals("true")) {
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel(Channel);
+                    durationModel.setStatus(mMessage);
+                    Calendar now = Calendar.getInstance();
+                    now.setTime(new Date());
+                    now.getTimeInMillis();
+                    durationModel.setTimeStampOn(now.getTimeInMillis());
+                    dbNodeRepo.insertDurationNode(durationModel);
+
+                } else {
+
+                    Log.d(TAG, "run: "+NodeID);
+
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel(Channel);
+                    durationModel.setStatus(mMessage);
+                    Calendar now = Calendar.getInstance();
+                    now.setTime(new Date());
+                    now.getTimeInMillis();
+                    durationModel.setTimeStampOff(now.getTimeInMillis());
+                    dbNodeRepo.insertDurationNode(durationModel);
+                }
+            }
+        }, 1000);
     }
 
     private void doAddNodeSub() {
@@ -1079,12 +1100,6 @@ public class OlmatixService extends Service {
         }
         data1.clear();
     }
-
-    /**
-     * Class for clients to access.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with
-     * IPC.
-     */
 
     class OlmatixBroadcastReceiver extends BroadcastReceiver {
 

@@ -294,6 +294,7 @@ public class Dashboard_Node extends Fragment implements
     };
 
     private void updatelist (){
+
         adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());

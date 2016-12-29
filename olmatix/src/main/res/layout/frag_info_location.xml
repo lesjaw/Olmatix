@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="0dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
 
     <android.support.v7.widget.CardView
         android:id="@+id/cv"
@@ -12,7 +12,6 @@
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="2dp"
         card_view:cardUseCompatPadding="true">
-
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -23,9 +22,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/icon_node"
-                android:text="Your Location"
-                android:textSize="19sp"
-                android:textStyle="bold"
+                android:text="Your Home Location is ..."
+                android:textSize="15sp"
+                android:textStyle="bold|italic"
                 android:padding="5sp"/>
 
             <ImageView
@@ -35,18 +34,31 @@
                 android:src="@drawable/ic_location_black"
                 android:layout_below="@+id/id_name"
                 android:padding="0sp"
-                android:layout_marginTop="5sp"/>
+                android:layout_marginLeft="20sp"
+                android:layout_marginTop="5sp" />
 
             <TextView
                 android:id="@+id/location"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/logo"
                 android:text="Location Holder"
                 android:textSize="15sp"
                 android:layout_below="@id/id_name"
                 android:padding="5sp"
+                style="@style/autoscroll"/>
+
+            <TextView
+                android:id="@+id/distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/logo"
+                android:text="Distance from home : "
+                android:textSize="15sp"
+                android:layout_below="@id/location"
+                android:paddingLeft="5sp"
                 />
+
 
         </RelativeLayout>
 

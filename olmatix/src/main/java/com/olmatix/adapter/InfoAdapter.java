@@ -35,17 +35,20 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     List<Duration_Model> nodeList;
     Context context;
     String loc = null;
+    String distance;
 
-    public InfoAdapter(ArrayList<Duration_Model>NodeList, int[] mDataTypes,Context context, OnStartDragListener mDragStartListener) {
-        this.context=context;
+    public InfoAdapter(ArrayList<Duration_Model> NodeList, String distance, int[] mDataTypes, Context context, OnStartDragListener mDragStartListener) {
+        this.context = context;
         this.nodeList = NodeList;
         this.mDataSetTypes = mDataTypes;
         this.mDragStartListener = mDragStartListener;
+        this.distance = distance;
     }
 
     @Override
     public int getItemViewType(int viewType) {
-        return mDataSetTypes[viewType];    }
+        return mDataSetTypes[viewType];
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -55,7 +58,8 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
             v = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.frag_info_button, viewGroup, false);
             v.setMinimumWidth(viewGroup.getMeasuredWidth());
-            v.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+            v.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
+                    RecyclerView.LayoutParams.WRAP_CONTENT));
 
             return new ButtonInfoHolder(v);
 
@@ -66,7 +70,8 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
             v = LayoutInflater.from(viewGroup.getContext())
                     .inflate(R.layout.frag_info_location, viewGroup, false);
             v.setMinimumWidth(viewGroup.getMeasuredWidth());
-            v.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+            v.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
+                    RecyclerView.LayoutParams.WRAP_CONTENT));
 
             return new LocationInfoHolder(v);
         }
@@ -77,7 +82,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
-        if (viewHolder.getItemViewType() == mBUTTON){
+        if (viewHolder.getItemViewType() == mBUTTON) {
             final ButtonInfoHolder holder = (ButtonInfoHolder) viewHolder;
             //holder.node_name.setText(mDurationModel.getNodeId());
 
@@ -94,13 +99,13 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
                 if (list != null && list.size() > 0) {
                     Address address = list.get(0);
                     loc = address.getLocality();
-                    Log.d("DEBUG", "resetMesg: " + loc);
+                    //Log.d("DEBUG", "Location: " + loc);
                 }
             } catch (IOException e) {
                 Log.e("DEBUG", "LOCATION ERR:" + e.getMessage());
             }
-            holder.location.setText("Home : "+loc +" | "+String.valueOf((Double) mLat)+" : "+String.valueOf((Double) mLong));
-
+            holder.location.setText(loc + " | " + String.valueOf((Double) mLat) + " : " + String.valueOf((Double) mLong));
+            holder.distance.setText("You are " +distance +" from home");
         }
 
     }
@@ -149,6 +154,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
         public LocationInfoHolder(View view) {
             super(view);
             location = (TextView) view.findViewById(R.id.location);
+            distance = (TextView) view.findViewById(R.id.distance);
 
         }
     }

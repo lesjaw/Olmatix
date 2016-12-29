@@ -424,11 +424,9 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
 
-        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener()
-        {
+        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-            {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0 ||dy<0 && mFab.isShown())
                 {
                     mFab.hide();
@@ -436,13 +434,10 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             }
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
-            {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE)
-                {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     mFab.show();
                 }
-
                 super.onScrollStateChanged(recyclerView, newState);
             }
         });    }

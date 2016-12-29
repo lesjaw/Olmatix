@@ -916,7 +916,7 @@ public class OlmatixService extends Service {
 
             @Override
             public void run() {
-                Log.d(TAG, "run ON: "+Channel);
+                //Log.d(TAG, "run ON: "+Channel);
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel(Channel);
                     durationModel.setStatus(mMessage);
@@ -936,7 +936,7 @@ public class OlmatixService extends Service {
 
             @Override
             public void run() {
-                Log.d(TAG, "run OFF: "+Channel);
+                //Log.d(TAG, "run OFF: "+Channel);
                 durationModel.setNodeId(NodeID);
                 durationModel.setChannel(Channel);
                 durationModel.setStatus(mMessage);

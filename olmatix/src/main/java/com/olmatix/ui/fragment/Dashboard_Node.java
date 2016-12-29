@@ -4,21 +4,31 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -39,22 +49,29 @@ import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
+import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.SpinnerObject;
+import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.utils.GridAutofitLayoutManager;
 import com.olmatix.utils.GridSpacingItemDecoration;
+import com.olmatix.utils.OlmatixUtils;
 import com.olmatix.utils.SpinnerListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.olmatix.adapter.InfoAdapter.mBUTTON;
 import static com.olmatix.adapter.InfoAdapter.mLOCATION;
 
 
-public class Dashboard_Node extends Fragment implements  OnStartDragListener {
+public class Dashboard_Node extends Fragment implements
+        OnStartDragListener,
+        LocationListener {
 
     private View mView;
     private RecyclerView mRecycleView;
@@ -71,8 +88,14 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     Spinner mSpinner;
     private int mDatasetTypes[] = {mLOCATION, mBUTTON}; //view types
     Context dashboardnode;
+    private LocationManager locationManager;
 
-
+    private Geocoder geocoder;
+    private String mProvider;
+    private LocationManager mLocateMgr;
+    private Location mLocation;
+    private Context mContext;
+    private String Distance;
 
     @Nullable
     @Override
@@ -90,10 +113,15 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         dbNodeRepo = new dbNodeRepo(getActivity());
         dashboardNodeModel= new Dashboard_NodeModel();
 
-        dashboardnode=getContext();
+        dashboardnode=getActivity();
+
+        mContext = getActivity();
+
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         setupView();
         onClickListener();
+
     }
 
     private void onClickListener() {
@@ -182,7 +210,11 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
             }
         });
 
-        infoAdapter = new InfoAdapter(dbNodeRepo.getNodeDurationList(), mDatasetTypes,dashboardnode, this);
+        initLocationProvider();
+
+        //Distance = (int) res[0] + unit;
+
+        infoAdapter = new InfoAdapter(dbNodeRepo.getNodeDurationList(), Distance, mDatasetTypes,dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
 
         initSwipe();
@@ -231,6 +263,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     @Override
     public void onStart() {
         super.onStart();
+
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -389,4 +422,149 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         }
     }
 
+    private void initLocationProvider() {
+
+
+        PreferenceHelper mPrefHelper = new PreferenceHelper(getContext());
+
+        mProvider = locationManager.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
+
+        boolean enabled = (mProvider != null && locationManager.isProviderEnabled(mProvider) &&mPrefHelper.getHomeLatitude() != 0);
+        if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED)) {
+            if (enabled) {
+                locationManager.requestLocationUpdates(mProvider, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                        OlmatixUtils.POSITION_UPDATE_MIN_DIST, (LocationListener) this);
+                Location location = locationManager.getLastKnownLocation(mProvider);
+                // Initialize the location fields
+                if (location != null) {
+                    onLocationChanged(location);
+                }
+            } else if (mPrefHelper.getHomeLatitude() != 0) {
+
+            } else {
+
+            }
+        } else//permesso mancante
+        {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    OlmatixUtils.OLMATIX_PERMISSIONS_ACCESS_COARSE_LOCATION);
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case OlmatixUtils.OLMATIX_PERMISSIONS_ACCESS_COARSE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mProvider = mLocateMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
+                    Log.w("DEBUG", "MY_PERMISSIONS_ACCESS_COARSE_LOCATION permission granted");
+
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Log.wtf("DEBUG", "boh. permesso negato su risposta permesso");
+                        return;
+                    }
+                    mLocateMgr.requestLocationUpdates(mProvider, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                            OlmatixUtils.POSITION_UPDATE_MIN_DIST, (LocationListener) this);
+                    mLocation = mLocateMgr.getLastKnownLocation(mProvider);
+
+                    Log.d("DEBUG", "LastKnown: "+mLocation);
+                    // Initialize the location fields
+                    if (mLocation != null) {
+                        onLocationChanged(mLocation);
+                    }
+
+                }
+                return;
+            }
+        }
+    }
+
+    public void onLocationChanged(Location mLocation) {
+        final double lat = (mLocation.getLatitude());
+        final double lng = (mLocation.getLongitude());
+
+        if (lat!=0 && lng!=0) {
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String adString = "";
+                    String loc = null;
+                    final Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+
+                    try {
+                        List<Address> list;
+                        list = geocoder.getFromLocation(lat, lng, 1);
+                        if (list != null && list.size() > 0) {
+                            Address address = list.get(0);
+                            loc = address.getLocality();
+                            if (address.getAddressLine(0) != null)
+                                adString = ", " + address.getAddressLine(0);
+                        }
+
+                    } catch (final IOException e) {
+                        ((MainActivity) mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.e("DEBUG", "Geocoder ERROR", e);
+                            }
+                        });
+                        loc = OlmatixUtils.gpsDecimalFormat.format(lat) + " : " + OlmatixUtils.gpsDecimalFormat.format(lng);
+                    }
+                    Log.d("DEBUG", "Current Location : " + loc);
+
+                    final float[] res = new float[3];
+                    final PreferenceHelper mPrefHelper = new PreferenceHelper(mContext);
+                    Location.distanceBetween(lat, lng, mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), res);
+                    if (mPrefHelper.getHomeLatitude() != 0) {
+                        ((MainActivity) mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                String unit = " m";
+                                if (res[0] > 2000) {// usa chilometri
+                                    unit = " km";
+                                    res[0] = res[0] / 1000;
+                                }
+                                Log.d("DEBUG", "Distance: " + (int) res[0] + unit);
+                                Distance = (int) res[0] + unit;
+                                resetAdapter();
+                            }
+                        });
+                    }
+                }
+
+            }).start();
+        }
+        Log.d("DEBUG", "Distance OnCreate: " + Distance);
+
+    }
+
+    public void resetAdapter(){
+        infoAdapter = new InfoAdapter(dbNodeRepo.getNodeDurationList(), Distance, mDatasetTypes,dashboardnode, this);
+        mRecycleViewInfo.setAdapter(infoAdapter);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }

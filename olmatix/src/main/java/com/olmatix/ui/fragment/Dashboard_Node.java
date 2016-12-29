@@ -73,7 +73,7 @@ public class Dashboard_Node extends Fragment implements
     private RecyclerView mRecycleView;
     private RecyclerView mRecycleViewInfo;
     private FloatingActionButton mFab;
-    private NodeDashboardAdapter adapter;
+    NodeDashboardAdapter adapter;
     private InfoAdapter infoAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
@@ -209,7 +209,7 @@ public class Dashboard_Node extends Fragment implements
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
 
-        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),dashboardnode,this);
+        adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

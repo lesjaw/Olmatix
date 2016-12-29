@@ -275,7 +275,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         //mRecycleView.setAdapter(adapter);
         if(adapter != null) {
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
-
         }
         assert adapter != null;
         //adapter.setClickListener(this);

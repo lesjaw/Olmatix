@@ -11,12 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -44,6 +39,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
@@ -82,7 +78,7 @@ public class Dashboard_Node extends Fragment implements
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Dashboard_NodeModel dashboardNodeModel;
-    public  dbNodeRepo dbNodeRepo;
+    public  static dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
     Spinner mSpinner;
@@ -90,7 +86,6 @@ public class Dashboard_Node extends Fragment implements
     Context dashboardnode;
     private LocationManager locationManager;
 
-    private Geocoder geocoder;
     private String mProvider;
     private LocationManager mLocateMgr;
     private Location mLocation;
@@ -122,6 +117,22 @@ public class Dashboard_Node extends Fragment implements
         setupView();
         onClickListener();
 
+        mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),mRecycleView, new ClickListener() {
+
+
+            @Override
+            public void onClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                adapter.removeItem(position);
+                Toast.makeText(getActivity(),"Successfully Deleted",Toast.LENGTH_LONG).show();
+                setRefresh();
+
+            }
+        }));
     }
 
     private void onClickListener() {
@@ -217,8 +228,6 @@ public class Dashboard_Node extends Fragment implements
         infoAdapter = new InfoAdapter(dbNodeRepo.getNodeDurationList(), Distance, mDatasetTypes,dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
 
-        initSwipe();
-
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
@@ -279,6 +288,8 @@ public class Dashboard_Node extends Fragment implements
                 updatelist();
                 Log.d("receiver", "Notifydashboard : " + message);
             }
+            updatelist();
+
         }
     };
 
@@ -290,7 +301,7 @@ public class Dashboard_Node extends Fragment implements
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
         assert adapter != null;
-        setRefresh();
+        //setRefresh();
     }
 
     @Override
@@ -315,61 +326,6 @@ public class Dashboard_Node extends Fragment implements
 
     }
 
-    private void initSwipe(){
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                final int position = viewHolder.getAdapterPosition();
-
-                if (direction == ItemTouchHelper.LEFT){
-                    adapter.notifyDataSetChanged();
-                    ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-                    mItemTouchHelper = new ItemTouchHelper(callback);
-                    mItemTouchHelper.attachToRecyclerView(mRecycleView);
-
-                }else{
-
-                }
-            }
-
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-
-                Bitmap icon;
-                if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-
-                    View itemView = viewHolder.itemView;
-                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
-                    float width = height / 3;
-
-                    if(dX > 0){
-                        p.setColor(Color.parseColor("#388E3C"));
-                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
-                        c.drawRect(background,p);
-                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_edit_white);
-                        RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);
-                    } else {
-                       /* p.setColor(Color.parseColor("#D32F2F"));
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(),(float) itemView.getRight(), (float) itemView.getBottom());
-                        c.drawRect(background,p);
-                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white);
-                        RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);*/
-                    }
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-        };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(mRecycleView);
-    }
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
@@ -379,10 +335,10 @@ public class Dashboard_Node extends Fragment implements
 
     class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
 
-        private Installed_Node.ClickListener clicklistener;
+        private Dashboard_Node.ClickListener clicklistener;
         private GestureDetector gestureDetector;
 
-        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final Installed_Node.ClickListener clicklistener){
+        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final Dashboard_Node.ClickListener clicklistener){
 
             this.clicklistener=clicklistener;
             gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
@@ -400,6 +356,8 @@ public class Dashboard_Node extends Fragment implements
                 }
             });
         }
+
+
 
         @Override
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
@@ -468,7 +426,7 @@ public class Dashboard_Node extends Fragment implements
 
                     if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                             && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        Log.wtf("DEBUG", "boh. permesso negato su risposta permesso");
+                        Log.wtf("DEBUG", "Need permission");
                         return;
                     }
                     mLocateMgr.requestLocationUpdates(mProvider, OlmatixUtils.POSITION_UPDATE_INTERVAL,
@@ -560,7 +518,6 @@ public class Dashboard_Node extends Fragment implements
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
     @Override

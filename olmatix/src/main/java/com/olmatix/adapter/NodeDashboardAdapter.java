@@ -2,6 +2,7 @@ package com.olmatix.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.ui.fragment.Dashboard_Node;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -37,8 +39,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     Context context;
 
 
-    public NodeDashboardAdapter(ArrayList<Dashboard_NodeModel> data, Context dashboardnode, OnStartDragListener dragStartListener) {
-        this.nodeList = data;
+    public NodeDashboardAdapter(ArrayList<Dashboard_NodeModel> nodeList, Context dashboardnode, OnStartDragListener dragStartListener) {
+        this.nodeList = nodeList;
         mDragStartListener = dragStartListener;
         this.context = dashboardnode;
 
@@ -63,12 +65,23 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         return nodeList.size();
     }
 
+    public void removeItem(int position) {
+
+        int mNodeID = nodeList.get(position).getId();
+        Log.d("DEBUG", "removeItem: "+mNodeID);
+        Dashboard_Node.dbNodeRepo.deleteFav(nodeList.get(position).getId());
+        nodeList.remove(position);
+
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, nodeList.size());
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
         View v;
 
-        animConn = AnimationUtils.loadAnimation(context, R.anim.blink);
+        animConn = AnimationUtils.loadAnimation(context, R.anim.blinkfast);
 
         switch (viewType) {
             case 0:
@@ -97,11 +110,19 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             final ButtonHolder holder = (ButtonHolder) viewHolder;
 
+            /*new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    holder.imgSending.setVisibility(View.GONE);
+                }
+            }, 1000);*/
+
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
 
             if (mFavoriteModel.getStatus().trim().equals("false")) {
                 holder.imgNode.setImageResource(R.drawable.offlamp1);
                 holder.imgSending.setVisibility(View.GONE);
+
 
             } else {
                 holder.imgNode.setImageResource(R.drawable.onlamp1);
@@ -175,7 +196,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             holder.imgNodesBut.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String payload1 = "ON";
+                    String payload1;
                     if (Connection.getClient().isConnected()) {
                         String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
                         if (mFavoriteModel.getStatus().trim().equals("false")) {
@@ -212,6 +233,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public void onItemDismiss(int position) {
 
     }
+
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View v) {

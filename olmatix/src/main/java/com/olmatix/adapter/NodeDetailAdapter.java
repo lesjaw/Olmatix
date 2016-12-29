@@ -36,8 +36,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     List<Detail_NodeModel> nodeList;
     Context context;
     String fw_name;
-    CharSequence textNode;
-    CharSequence titleNode;
 
     public NodeDetailAdapter(List<Detail_NodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
 
@@ -47,7 +45,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         this.context = context;
 
     }
-
 
     @Override
     public int getItemCount() {
@@ -76,7 +73,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-        //final int pos = position;
+
         final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
         if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
 
@@ -89,11 +86,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-                titleNode = mInstalledNodeModel.getNice_name_d();
             } else
                 holder.node_name.setText(mInstalledNodeModel.getName());
-            titleNode = mInstalledNodeModel.getName();
-
 
             holder.upTime.setText("Uptime: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
 
@@ -106,8 +100,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.status.setTextColor(ContextCompat.getColor(context, R.color.green));
                 holder.btn_on.setEnabled(false);
                 holder.btn_off.setEnabled(true);
-
-
 
             } else {
                 holder.imgNode.setImageResource(R.mipmap.offlamp);

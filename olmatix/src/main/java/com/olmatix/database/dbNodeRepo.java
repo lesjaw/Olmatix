@@ -141,6 +141,15 @@ public class dbNodeRepo {
         db.close(); // Closing database connection
     }
 
+    public void deleteFav(int node_Id) {
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        // It's a good practice to use parameter ?, instead of concatenate string
+        db.delete(TABLE_FAV, dbNode.KEY_ID + "= ?", new String[] {
+                String.valueOf(node_Id) });
+
+        db.close(); // Closing database connection
+    }
     public void update(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -463,6 +472,7 @@ public class dbNodeRepo {
         if (cursor.moveToFirst()) {
             do {
                 Dashboard_NodeModel node = new Dashboard_NodeModel();
+                node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
                 node.setNice_name_d( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setSensor( cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));

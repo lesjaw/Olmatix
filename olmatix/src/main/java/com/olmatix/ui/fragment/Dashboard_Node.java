@@ -199,7 +199,7 @@ public class Dashboard_Node extends Fragment implements
         mRecycleViewInfo.setLayoutManager(horizontalLayoutManagaer);
 
         int mNoOfColumns = GridAutofitLayoutManager.DEFAULT_SPAN_COUNT;
-        int spacing = 12;
+        int spacing = 10;
         boolean includeEdge = true;
         mRecycleView.addItemDecoration(new GridSpacingItemDecoration(mNoOfColumns, spacing, includeEdge));
 
@@ -301,7 +301,6 @@ public class Dashboard_Node extends Fragment implements
         if(adapter != null){
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
-        assert adapter != null;
         //setRefresh();
     }
 

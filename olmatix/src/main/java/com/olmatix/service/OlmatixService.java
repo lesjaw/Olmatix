@@ -266,6 +266,9 @@ public class OlmatixService extends Service {
             String mUserName = sharedPref.getString("user_name", "olmatix1");
             String mPassword = sharedPref.getString("password", "olmatix");
 
+            String mLocation = sharedPref.getString("setLocation", "olmatix");
+            Log.d("DEBUG", "Location Now: " + mLocation);
+
             final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
             Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
 

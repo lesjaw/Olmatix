@@ -32,10 +32,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
@@ -52,6 +50,9 @@ import com.olmatix.utils.SpinnerListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.olmatix.adapter.InfoAdapter.mBUTTON;
+import static com.olmatix.adapter.InfoAdapter.mLOCATION;
+
 
 public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
@@ -67,15 +68,10 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
     public  dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
-
-    private RecyclerView.LayoutManager layoutManagerInfo;
-
     Spinner mSpinner;
-    public static final int mBUTTON = 0;
-    public static final int mLOCATION = 1;
-    private int mDataTypes[] = {mBUTTON, mLOCATION};
-    private String[] ButtonInfo = {"Button 1","Button 2"};
-    private String[] LocationInfo = {"Location 1","Location 2", "Location 3"};
+    private int mDatasetTypes[] = {mLOCATION, mBUTTON}; //view types
+    Context dashboardnode;
+
 
 
     @Nullable
@@ -94,6 +90,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
         dbNodeRepo = new dbNodeRepo(getActivity());
         dashboardNodeModel= new Dashboard_NodeModel();
 
+        dashboardnode=getContext();
+
         setupView();
         onClickListener();
     }
@@ -111,7 +109,6 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
                 List<SpinnerObject> lables = dbNodeRepo.getAllLabels();
 
-
                 ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<SpinnerObject>(getActivity(),
                         android.R.layout.simple_spinner_item,lables);
                 dataAdapter
@@ -127,12 +124,10 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
                             public void onClick(DialogInterface dialog, int which) {
                                 mSpinner.setOnItemSelectedListener(new SpinnerListener());
 
-                                //Toast.makeText(getContext(),"You have add : " +String.valueOf(mSpinner.getSelectedItem()),Toast.LENGTH_SHORT).show();
-                                //String NiceName= String.valueOf(mSpinner.getSelectedItem());
                                 Log.d("DEBUG", "onItemSelected: "+ mSpinner.getSelectedItem().toString());
                                 int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
                                 System.out.println(String.valueOf(databaseId));
-                                //Log.d("DEBUG", "onClick: "+NiceName);
+
                                 dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                 dbNodeRepo.insertFavNode(dashboardNodeModel);
                                 setRefresh();
@@ -174,6 +169,7 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
+
         adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),this);
         mRecycleView.setAdapter(adapter);
 
@@ -186,11 +182,8 @@ public class Dashboard_Node extends Fragment implements  OnStartDragListener {
             }
         });
 
-        infoAdapter = new InfoAdapter(ButtonInfo, LocationInfo, mDataTypes, this);
+        infoAdapter = new InfoAdapter(dbNodeRepo.getNodeDurationList(), mDatasetTypes,dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
-
-
-
 
         initSwipe();
 

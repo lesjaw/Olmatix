@@ -614,5 +614,34 @@ public class dbNodeRepo {
 
     }
 
+    public ArrayList<Duration_Model> getNodeDurationList() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE_DURATION;
+
+        ArrayList<Duration_Model> nodeList = new ArrayList<Duration_Model>();
+
+        Cursor cursor = db.rawQuery(selectString,null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Duration_Model node = new Duration_Model();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNodeId( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setTimeStampOn( cursor.getLong(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_ON)));
+                node.setDuration( cursor.getLong(cursor.getColumnIndex(dbNode.KEY_DURATION)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
 }
 

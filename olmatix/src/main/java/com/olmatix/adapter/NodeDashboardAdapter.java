@@ -63,15 +63,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
         switch (viewType) {
             case 0:
-
                 v = LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.frag_dash_button, viewGroup, false);
 
                 return new ButtonHolder(v);
 
-
             case 1:
-
                 v = LayoutInflater.from(viewGroup.getContext())
                         .inflate(R.layout.frag_dash_status, viewGroup, false);
 

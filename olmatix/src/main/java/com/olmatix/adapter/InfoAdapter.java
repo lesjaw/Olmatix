@@ -1,7 +1,10 @@
 package com.olmatix.adapter;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +13,14 @@ import android.widget.TextView;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
+import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.Duration_Model;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Rahman on 12/27/2016.
@@ -21,77 +31,83 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     private final OnStartDragListener mDragStartListener;
     public static final int mBUTTON = 0;
     public static final int mLOCATION = 1;
-    private int mDataTypes[] = {mBUTTON, mLOCATION};
-    private String[] ButtonInfo = {"Button 1","Button 2"};
-    private String[] LocationInfo = {"Location 1","Location 2", "Location 3"};
-    Context mContext;
+    private int[] mDataSetTypes;
+    List<Duration_Model> nodeList;
+    Context context;
+    String loc = null;
 
-    public InfoAdapter(String[] locationInfo, String[] buttonInfo, int[] mDataTypes, OnStartDragListener mDragStartListener) {
-        LocationInfo = locationInfo;
-        ButtonInfo = buttonInfo;
-        this.mDataTypes = mDataTypes;
+    public InfoAdapter(ArrayList<Duration_Model>NodeList, int[] mDataTypes,Context context, OnStartDragListener mDragStartListener) {
+        this.context=context;
+        this.nodeList = NodeList;
+        this.mDataSetTypes = mDataTypes;
         this.mDragStartListener = mDragStartListener;
     }
 
     @Override
-    public int getItemViewType(int position) {
-        int viewType = 0;
-        if (viewType == mBUTTON) {
-            viewType = 0;
-
-        } else if (viewType == mLOCATION) {
-            viewType = 1;
-        }
-
-        return viewType;
-    }
+    public int getItemViewType(int viewType) {
+        return mDataSetTypes[viewType];    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-
         View v;
 
-        switch (viewType) {
-            case 0:
+        if (viewType == mBUTTON) {
+            v = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.frag_info_button, viewGroup, false);
+            v.setMinimumWidth(viewGroup.getMeasuredWidth());
+            v.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
 
-                v = LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.frag_info_button, viewGroup, false);
-                v.setMinimumWidth(viewGroup.getMeasuredWidth());
-                v.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+            return new ButtonInfoHolder(v);
 
-                return new ButtonInfoHolder(v);
+        }
 
+        if (viewType == mLOCATION) {
 
-            case 1:
+            v = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.frag_info_location, viewGroup, false);
+            v.setMinimumWidth(viewGroup.getMeasuredWidth());
+            v.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
 
-                v = LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.frag_info_location, viewGroup, false);
-
-                return new LocationInfoHolder(v);
-            default:
+            return new LocationInfoHolder(v);
         }
 
         return null;
     }
 
-
-
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
-        //final InfoModel mInfoModel = infoList.get(position);
         if (viewHolder.getItemViewType() == mBUTTON){
             final ButtonInfoHolder holder = (ButtonInfoHolder) viewHolder;
+            //holder.node_name.setText(mDurationModel.getNodeId());
 
         } else if (viewHolder.getItemViewType() == mLOCATION) {
             final LocationInfoHolder holder = (LocationInfoHolder) viewHolder;
+            //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+            PreferenceHelper mPrefHelper = new PreferenceHelper(context.getApplicationContext());
+            double mLat = mPrefHelper.getHomeLatitude();
+            double mLong = mPrefHelper.getHomeLongitude();
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            List<Address> list;
+            try {
+                list = geocoder.getFromLocation(mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), 1);
+                if (list != null && list.size() > 0) {
+                    Address address = list.get(0);
+                    loc = address.getLocality();
+                    Log.d("DEBUG", "resetMesg: " + loc);
+                }
+            } catch (IOException e) {
+                Log.e("DEBUG", "LOCATION ERR:" + e.getMessage());
+            }
+            holder.location.setText("Home : "+loc +" | "+String.valueOf((Double) mLat)+" : "+String.valueOf((Double) mLong));
+
         }
 
     }
 
     @Override
     public int getItemCount() {
-        return mDataTypes.length;
+        return mDataSetTypes.length;
     }
 
     @Override
@@ -127,16 +143,12 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     }
 
     public class LocationInfoHolder extends ViewHolder {
-        public TextView node_names, status;
-        public ImageView imgNodes, imgOnline;
-        public ImageView imgNodesBut;
+        public TextView location, distance;
+        public ImageView imgNodes;
 
         public LocationInfoHolder(View view) {
             super(view);
-            imgNodes = (ImageView) view.findViewById(R.id.icon_node);
-            imgNodesBut = (ImageView) view.findViewById(R.id.icon_node_button);
-            node_names = (TextView) view.findViewById(R.id.node_name);
-            imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
+            location = (TextView) view.findViewById(R.id.location);
 
         }
     }

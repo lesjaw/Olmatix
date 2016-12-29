@@ -104,7 +104,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
             } catch (IOException e) {
                 Log.e("DEBUG", "LOCATION ERR:" + e.getMessage());
             }
-            holder.location.setText(loc + " | " + String.valueOf((Double) mLat) + " : " + String.valueOf((Double) mLong));
+            holder.location.setText("at "+loc + " | " + String.valueOf((Double) mLat) + " : " + String.valueOf((Double) mLong));
             holder.distance.setText("You are " +distance +" from home");
         }
 

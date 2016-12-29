@@ -1,9 +1,12 @@
 package com.olmatix.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,10 +33,14 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     private final OnStartDragListener mDragStartListener;
     List<Dashboard_NodeModel> nodeList;
+    private Animation animConn;
+    Context context;
 
-    public NodeDashboardAdapter(ArrayList<Dashboard_NodeModel> data, OnStartDragListener dragStartListener) {
+
+    public NodeDashboardAdapter(ArrayList<Dashboard_NodeModel> data, Context dashboardnode, OnStartDragListener dragStartListener) {
         this.nodeList = data;
         mDragStartListener = dragStartListener;
+        this.context = dashboardnode;
 
     }
 
@@ -60,6 +67,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
         View v;
+
+        animConn = AnimationUtils.loadAnimation(context, R.anim.blink);
 
         switch (viewType) {
             case 0:
@@ -89,10 +98,15 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             final ButtonHolder holder = (ButtonHolder) viewHolder;
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
+
             if (mFavoriteModel.getStatus().trim().equals("false")) {
                 holder.imgNode.setImageResource(R.drawable.offlamp1);
+                holder.imgSending.setVisibility(View.GONE);
+
             } else {
                 holder.imgNode.setImageResource(R.drawable.onlamp1);
+                holder.imgSending.setVisibility(View.GONE);
+
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
@@ -120,7 +134,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-
+                            holder.imgSending.setVisibility(View.VISIBLE);
+                            holder.imgSending.startAnimation(animConn);
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
@@ -176,8 +191,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                             message.setQos(1);
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
-
-
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
                         }
@@ -208,7 +221,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     public class ButtonHolder extends ViewHolder {
         public TextView node_name, status;
-        public ImageView imgOnline;
+        public ImageView imgOnline, imgSending;
         public ImageButton imgNode;
 
         public ButtonHolder(View view) {
@@ -216,6 +229,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             imgNode = (ImageButton) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
+            imgSending = (ImageView) view.findViewById(R.id.icon_sending);
+
 
         }
     }

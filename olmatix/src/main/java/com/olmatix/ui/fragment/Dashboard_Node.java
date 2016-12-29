@@ -198,7 +198,7 @@ public class Dashboard_Node extends Fragment implements
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
 
-        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),this);
+        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),dashboardnode,this);
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -250,7 +250,7 @@ public class Dashboard_Node extends Fragment implements
     private void setRefresh() {
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
-        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(),this);
+        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(), dashboardnode, this);
         mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }

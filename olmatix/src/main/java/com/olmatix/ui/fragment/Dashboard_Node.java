@@ -199,7 +199,7 @@ public class Dashboard_Node extends Fragment implements
         mRecycleViewInfo.setLayoutManager(horizontalLayoutManagaer);
 
         int mNoOfColumns = GridAutofitLayoutManager.DEFAULT_SPAN_COUNT;
-        int spacing = 10;
+        int spacing = 12;
         boolean includeEdge = true;
         mRecycleView.addItemDecoration(new GridSpacingItemDecoration(mNoOfColumns, spacing, includeEdge));
 

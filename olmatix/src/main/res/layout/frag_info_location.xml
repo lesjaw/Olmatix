@@ -33,7 +33,8 @@
                 android:id="@+id/logo"
                 android:src="@drawable/ic_location_black"
                 android:layout_below="@+id/id_name"
-                android:padding="0sp"
+                android:paddingTop="10sp"
+                android:paddingRight="5sp"
                 android:layout_marginLeft="20sp"
                 android:layout_marginTop="5sp" />
 

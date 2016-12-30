@@ -24,7 +24,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -224,7 +223,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(nodeList, fromPosition, toPosition);
+        //Collections.swap(nodeList, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }
@@ -233,7 +232,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public void onItemDismiss(int position) {
 
     }
-
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

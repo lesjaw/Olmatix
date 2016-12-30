@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -94,7 +93,7 @@ public class OlmatixService extends Service {
     private Thread thread;
     private ConnectivityManager mConnMan;
     private String deviceId;
-    private String stateoffMqtt;
+    private String stateoffMqtt="false";
     private Installed_NodeModel installedNodeModel;
     private Detail_NodeModel detailNodeModel;
     private Duration_Model durationModel;
@@ -109,6 +108,7 @@ public class OlmatixService extends Service {
     private String NodeIDSensor;
     private String TopicID;
     private String mChange = "";
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -237,14 +237,6 @@ public class OlmatixService extends Service {
         manager.notify(notifyID, builder.build());
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        Log.d(TAG, "onConfigurationChanged()");
-        //android.os.Debug.waitForDebugger();
-        super.onConfigurationChanged(newConfig);
-
-    }
-
     private void setClientID() {
         // Context mContext;
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -258,7 +250,7 @@ public class OlmatixService extends Service {
 
     private void doConnect() {
 
-        if (mqttClient == null || !mqttClient.isConnected()) {
+        if (stateoffMqtt!=null || !stateoffMqtt.equals("true")) {
 
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
@@ -945,7 +937,7 @@ public class OlmatixService extends Service {
                 now.getTimeInMillis();
                 durationModel.setTimeStampOff(now.getTimeInMillis());
                 if(durationModel.getTimeStampOn()!=null) {
-                    Log.d(TAG, "run: " + Long.valueOf(durationModel.getTimeStampOn()));
+                    //Log.d(TAG, "run: " + Long.valueOf(durationModel.getTimeStampOn()));
                     durationModel.setDuration((now.getTimeInMillis() - durationModel.getTimeStampOn())/1000);
                 }
                 dbNodeRepo.updateOff(durationModel);

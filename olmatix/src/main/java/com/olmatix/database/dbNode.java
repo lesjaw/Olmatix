@@ -12,6 +12,8 @@ public class dbNode {
     public static final String TABLE_FAV = "Node_Favorite";
     public static final String TABLE_MQTT = "mqtt";
     public static final String TABLE_NODE_DURATION = "Node_Duration";
+    public static final String TABLE_SCENE = "scene";
+    public static final String TABLE_SCENE_DETAIL = "scene_detail";
 
 
 
@@ -42,6 +44,9 @@ public class dbNode {
     public static final String KEY_TIMESTAMPS_ON  = "timestamp_on" ;
     public static final String KEY_TIMESTAMPS_OFF  = "timestamp_off" ;
     public static final String KEY_DURATION  = "duration" ;
+    public static final String KEY_SCENE_NAME  = "scene_name" ;
+    public static final String KEY_SCENE_DETAIL_ID  = "scene_detailID" ;
+    public static final String KEY_SCENE_TYPE  = "scene_type" ;
 
 
 

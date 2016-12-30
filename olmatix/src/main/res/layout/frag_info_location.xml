@@ -8,7 +8,7 @@
     <android.support.v7.widget.CardView
         android:id="@+id/cv"
         android:layout_width="match_parent"
-        android:layout_height="110sp"
+        android:layout_height="match_parent"
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="2dp"
         card_view:cardUseCompatPadding="true">
@@ -21,22 +21,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/icon_node"
+                android:layout_toRightOf="@+id/logo"
                 android:text="Your Home Location is ..."
                 android:textSize="15sp"
                 android:textStyle="bold|italic"
-                android:padding="5sp"/>
+                android:layout_marginTop="4sp"/>
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/logo"
                 android:src="@drawable/ic_location_black"
-                android:layout_below="@+id/id_name"
-                android:paddingTop="10sp"
-                android:paddingRight="5sp"
-                android:layout_marginLeft="20sp"
-                android:layout_marginTop="5sp" />
+                android:paddingTop="0sp"
+                android:paddingRight="2sp"
+                android:layout_marginLeft="0sp"
+                android:layout_marginTop="4sp" />
 
             <TextView
                 android:id="@+id/location"
@@ -45,21 +44,44 @@
                 android:layout_toRightOf="@+id/logo"
                 android:text="Location Holder"
                 android:textSize="15sp"
+                android:textColor="@color/white"
                 android:layout_below="@id/id_name"
-                android:padding="5sp"
+                android:paddingLeft="5sp"
+                android:paddingTop="2sp"
+                android:paddingBottom="2sp"
+                android:layout_marginLeft="30sp"
+                android:background="@color/black"
                 style="@style/autoscroll"/>
 
             <TextView
                 android:id="@+id/distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/logo"
                 android:text="Distance from home : "
                 android:textSize="15sp"
                 android:layout_below="@id/location"
                 android:paddingLeft="5sp"
+                android:paddingTop="2sp"
+                android:paddingBottom="2sp"
+                android:paddingRight="4sp"
+                android:layout_marginTop="5sp"
+                android:background="@color/grey"
+                style="@style/autoscroll"
                 />
 
+            <View
+                android:id="@+id/FavLine"
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="@color/colorPrimary"
+                android:layout_marginTop="2sp"/>
+            <View
+                android:id="@+id/FavLine1"
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_alignParentBottom="true"
+                android:background="@color/colorPrimary"
+                android:layout_marginBottom="2sp"/>
 
         </RelativeLayout>
 

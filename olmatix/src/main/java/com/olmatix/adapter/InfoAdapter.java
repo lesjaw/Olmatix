@@ -93,19 +93,22 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
             double mLat = mPrefHelper.getHomeLatitude();
             double mLong = mPrefHelper.getHomeLongitude();
             Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            String adString = "";
+
             List<Address> list;
             try {
                 list = geocoder.getFromLocation(mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), 1);
                 if (list != null && list.size() > 0) {
                     Address address = list.get(0);
                     loc = address.getLocality();
-                    //Log.d("DEBUG", "Location: " + loc);
+                    if (address.getAddressLine(0) != null)
+                        adString = ", " + address.getAddressLine(0);
                 }
             } catch (IOException e) {
                 Log.e("DEBUG", "LOCATION ERR:" + e.getMessage());
             }
-            holder.location.setText("at "+loc + " | " + String.valueOf((Double) mLat) + " : " + String.valueOf((Double) mLong));
-            holder.distance.setText("You are " +distance +" from home");
+            holder.location.setText("at "+loc+adString + " | " + String.valueOf((Double) mLat) + " : " + String.valueOf((Double) mLong));
+            holder.distance.setText("you are at " +distance +" from home");
         }
 
     }

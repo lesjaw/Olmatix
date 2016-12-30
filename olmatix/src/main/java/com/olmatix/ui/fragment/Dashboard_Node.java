@@ -91,6 +91,8 @@ public class Dashboard_Node extends Fragment implements
     private Location mLocation;
     private Context mContext;
     private String Distance;
+    String adString = "";
+    String loc = null;
 
     @Nullable
     @Override
@@ -208,7 +210,6 @@ public class Dashboard_Node extends Fragment implements
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
-
         adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
 
@@ -220,8 +221,6 @@ public class Dashboard_Node extends Fragment implements
 
             }
         });
-
-        initLocationProvider();
 
         //Distance = (int) res[0] + unit;
 
@@ -259,7 +258,7 @@ public class Dashboard_Node extends Fragment implements
     private void setRefresh() {
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
-        adapter = new NodeDashboardAdapter(dbNodeRepo.getNodeDetailDash(), dashboardnode, this);
+        adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }
@@ -272,6 +271,8 @@ public class Dashboard_Node extends Fragment implements
     @Override
     public void onStart() {
         super.onStart();
+        initLocationProvider();
+
 
     }
 
@@ -454,8 +455,7 @@ public class Dashboard_Node extends Fragment implements
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    String adString = "";
-                    String loc = null;
+
                     final Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
 
                     try {
@@ -464,6 +464,7 @@ public class Dashboard_Node extends Fragment implements
                         if (list != null && list.size() > 0) {
                             Address address = list.get(0);
                             loc = address.getLocality();
+
                             if (address.getAddressLine(0) != null)
                                 adString = ", " + address.getAddressLine(0);
                         }
@@ -493,7 +494,7 @@ public class Dashboard_Node extends Fragment implements
                                     res[0] = res[0] / 1000;
                                 }
                                 Log.d("DEBUG", "Distance: " + (int) res[0] + unit);
-                                Distance = (int) res[0] + unit;
+                                Distance = loc +adString+", it's "+ (int) res[0] + unit ;
                                 resetAdapter();
                             }
                         });

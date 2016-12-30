@@ -73,6 +73,17 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_TIMESTAMPS_OFF + " TEXT, "
                 + dbNode.KEY_DURATION + " TEXT) ";
 
+        String CREATE_TABLE_SCENE = "CREATE TABLE " + dbNode.TABLE_SCENE  + "("
+                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_SCENE_NAME + " TEXT, "
+                + dbNode.KEY_SCENE_DETAIL_ID + " TEXT,"
+                + dbNode.KEY_SCENE_TYPE + " TEXT) ";
+
+        String CREATE_TABLE_SCENE_DETAIL = "CREATE TABLE " + dbNode.TABLE_SCENE_DETAIL  + "("
+                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_SCENE_NAME + " TEXT, "
+                + dbNode.KEY_SCENE_DETAIL_ID + " TEXT,"
+                + dbNode.KEY_SCENE_TYPE + " TEXT) ";
 
 
 
@@ -81,6 +92,9 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_FAVORITE);
         db.execSQL(CREATE_TABLE_MQTT);
         db.execSQL(CREATE_TABLE_NODE_DURATION);
+        db.execSQL(CREATE_TABLE_SCENE);
+        db.execSQL(CREATE_TABLE_SCENE_DETAIL);
+
 
     }
 
@@ -93,8 +107,8 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_FAV);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_MQTT);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_NODE_DURATION);
-
-
+        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_SCENE);
+        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_SCENE_DETAIL);
 
         // Create tables again
         onCreate(db);

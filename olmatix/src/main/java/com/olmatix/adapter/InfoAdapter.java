@@ -109,6 +109,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
             }
             holder.location.setText("at "+loc+adString + " | " + String.valueOf((Double) mLat) + " : " + String.valueOf((Double) mLong));
             holder.distance.setText("you are at " +distance +" from home");
+            holder.location.setSelected(true);
         }
 
     }

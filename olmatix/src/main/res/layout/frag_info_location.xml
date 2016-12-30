@@ -21,22 +21,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/icon_node"
+                android:layout_toRightOf="@+id/logo"
                 android:text="Your Home Location is ..."
                 android:textSize="15sp"
                 android:textStyle="bold|italic"
-                android:padding="0sp"/>
+                android:layout_marginTop="4sp"/>
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/logo"
                 android:src="@drawable/ic_location_black"
-                android:layout_below="@+id/id_name"
-                android:paddingTop="10sp"
-                android:paddingRight="5sp"
-                android:layout_marginLeft="20sp"
-                android:layout_marginTop="5sp" />
+                android:paddingTop="0sp"
+                android:paddingRight="2sp"
+                android:layout_marginLeft="0sp"
+                android:layout_marginTop="4sp" />
 
             <TextView
                 android:id="@+id/location"
@@ -50,6 +49,7 @@
                 android:paddingLeft="5sp"
                 android:paddingTop="2sp"
                 android:paddingBottom="2sp"
+                android:layout_marginLeft="30sp"
                 android:background="@color/black"
                 style="@style/autoscroll"/>
 
@@ -57,11 +57,16 @@
                 android:id="@+id/distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/logo"
                 android:text="Distance from home : "
                 android:textSize="15sp"
                 android:layout_below="@id/location"
                 android:paddingLeft="5sp"
+                android:paddingTop="2sp"
+                android:paddingBottom="2sp"
+                android:paddingRight="4sp"
+                android:layout_marginTop="5sp"
+                android:background="@color/grey"
+                style="@style/autoscroll"
                 />
 
             <View

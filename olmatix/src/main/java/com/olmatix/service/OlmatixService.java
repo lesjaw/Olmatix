@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -109,6 +108,7 @@ public class OlmatixService extends Service {
     private String NodeIDSensor;
     private String TopicID;
     private String mChange = "";
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -237,13 +237,13 @@ public class OlmatixService extends Service {
         manager.notify(notifyID, builder.build());
     }
 
-    @Override
+    /*@Override
     public void onConfigurationChanged(Configuration newConfig) {
         Log.d(TAG, "onConfigurationChanged()");
         //android.os.Debug.waitForDebugger();
         super.onConfigurationChanged(newConfig);
 
-    }
+    }*/
 
     private void setClientID() {
         // Context mContext;

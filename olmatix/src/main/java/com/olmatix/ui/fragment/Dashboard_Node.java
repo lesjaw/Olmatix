@@ -121,7 +121,6 @@ public class Dashboard_Node extends Fragment implements
 
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),mRecycleView, new ClickListener() {
 
-
             @Override
             public void onClick(View view, int position) {
 
@@ -132,7 +131,6 @@ public class Dashboard_Node extends Fragment implements
                 adapter.removeItem(position);
                 Toast.makeText(getActivity(),"Successfully Deleted",Toast.LENGTH_LONG).show();
                 setRefresh();
-
             }
         }));
     }
@@ -494,7 +492,7 @@ public class Dashboard_Node extends Fragment implements
                                     res[0] = res[0] / 1000;
                                 }
                                 Log.d("DEBUG", "Distance: " + (int) res[0] + unit);
-                                Distance = loc +adString+", it's "+ (int) res[0] + unit ;
+                                Distance = loc +", it's "+ (int) res[0] + unit ;
                                 resetAdapter();
                             }
                         });

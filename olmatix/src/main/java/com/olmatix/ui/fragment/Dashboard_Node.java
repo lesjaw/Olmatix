@@ -270,8 +270,6 @@ public class Dashboard_Node extends Fragment implements
     public void onStart() {
         super.onStart();
         initLocationProvider();
-
-
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

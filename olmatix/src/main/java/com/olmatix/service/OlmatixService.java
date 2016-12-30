@@ -93,7 +93,7 @@ public class OlmatixService extends Service {
     private Thread thread;
     private ConnectivityManager mConnMan;
     private String deviceId;
-    private String stateoffMqtt;
+    private String stateoffMqtt="false";
     private Installed_NodeModel installedNodeModel;
     private Detail_NodeModel detailNodeModel;
     private Duration_Model durationModel;
@@ -237,14 +237,6 @@ public class OlmatixService extends Service {
         manager.notify(notifyID, builder.build());
     }
 
-    /*@Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        Log.d(TAG, "onConfigurationChanged()");
-        //android.os.Debug.waitForDebugger();
-        super.onConfigurationChanged(newConfig);
-
-    }*/
-
     private void setClientID() {
         // Context mContext;
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -258,7 +250,7 @@ public class OlmatixService extends Service {
 
     private void doConnect() {
 
-        if (mqttClient == null || !mqttClient.isConnected()) {
+        if (stateoffMqtt!=null || !stateoffMqtt.equals("true")) {
 
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
@@ -945,7 +937,7 @@ public class OlmatixService extends Service {
                 now.getTimeInMillis();
                 durationModel.setTimeStampOff(now.getTimeInMillis());
                 if(durationModel.getTimeStampOn()!=null) {
-                    Log.d(TAG, "run: " + Long.valueOf(durationModel.getTimeStampOn()));
+                    //Log.d(TAG, "run: " + Long.valueOf(durationModel.getTimeStampOn()));
                     durationModel.setDuration((now.getTimeInMillis() - durationModel.getTimeStampOn())/1000);
                 }
                 dbNodeRepo.updateOff(durationModel);

@@ -8,7 +8,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
@@ -145,11 +144,12 @@ public class dbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
-        db.delete(TABLE_FAV, dbNode.KEY_ID + "= ?", new String[] {
+        db.delete(TABLE_FAV, dbNode.KEY_NICE_NAME_D + "= ?", new String[] {
                 String.valueOf(node_Id) });
 
         db.close(); // Closing database connection
     }
+
     public void update(Installed_NodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -600,7 +600,7 @@ public class dbNodeRepo {
 
         long Id = db.insert(TABLE_NODE_DURATION, null, values);
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDur: " + String.valueOf(KEY_NODE_ID));
+        //Log.d("DEBUG", "insertDur: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
     }
 

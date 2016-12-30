@@ -1,9 +1,11 @@
 package com.olmatix.utils;
 
 import android.location.Criteria;
+import android.text.format.DateFormat;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created              : Rahman on 12/16/2016.
@@ -85,6 +87,13 @@ public class OlmatixUtils {
         criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
         return criteria;
+    }
+
+    public static String getDate(long time) {
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(time);
+        String date = DateFormat.format("dd-MM-yyyy", cal).toString();
+        return date;
     }
 
 }

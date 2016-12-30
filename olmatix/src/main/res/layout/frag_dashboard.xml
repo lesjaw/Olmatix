@@ -22,25 +22,26 @@
             android:layout_height="match_parent"
             android:padding="0sp">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv1"
-            android:layout_width="match_parent"
-            android:layout_height="110sp"
-            android:layout_marginTop="0sp"
-            android:paddingLeft="0sp"
-            android:paddingRight="0dp"
-            android:paddingTop="0sp"
-            />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv1"
+                android:layout_width="match_parent"
+                android:layout_height="150sp"
+                android:layout_margin="5dp"/>
 
-        <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="0sp"
-        android:paddingRight="0dp"
-        android:paddingTop="0sp"
-        android:layout_below="@+id/rv1"
-        />
+            <View
+                android:id="@+id/view_dash"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="#787878"
+                android:layout_margin="5dp"
+                android:layout_below="@+id/rv1"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/view_dash"
+                android:layout_margin="5dp"/>
         </RelativeLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>

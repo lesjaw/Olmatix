@@ -600,7 +600,7 @@ public class dbNodeRepo {
 
         long Id = db.insert(TABLE_NODE_DURATION, null, values);
         db.close(); // Closing database connection
-        Log.d("DEBUG", "insertDur: " + String.valueOf(KEY_NODE_ID));
+        //Log.d("DEBUG", "insertDur: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
     }
 
@@ -638,6 +638,7 @@ public class dbNodeRepo {
             do {
                 Duration_Model node = new Duration_Model();
                 //ArrayList<String> node = new ArrayList<>();
+                node.setNodeId( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ID)));
                 node.setNodeId( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));

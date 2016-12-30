@@ -17,6 +17,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    repositories {
+        maven {
+            url 'https://jitpack.io'
+        }
+    }
 }
 
 dependencies {
@@ -29,7 +35,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'info.hoang8f:fbutton:1.0.5'
     compile('org.eclipse.paho:org.eclipse.paho.android.service:1.0.2') {
-       exclude module: 'support-v4'
+        exclude module: 'support-v4'
     }
-    compile 'com.numetriclabz.numandroidcharts:numandroidcharts:1.0.18'
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
+    compile 'com.azoft.carousellayoutmanager:carousel:1.2.0'
 }

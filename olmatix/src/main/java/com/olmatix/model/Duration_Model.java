@@ -9,6 +9,17 @@ public class Duration_Model {
     String nodeId, channel, status;
     Long timeStampOn, timeStampOff, duration;
 
+    public Duration_Model() {
+    }
+
+    public Duration_Model(int id, String nodeId, String channel, String status, Long timeStampOn, Long timeStampOff) {
+        this.id = id;
+        this.nodeId = nodeId;
+        this.channel = channel;
+        this.status = status;
+        this.timeStampOn = timeStampOn;
+        this.timeStampOff = timeStampOff;
+    }
 
     public int getId() {
         return id;

@@ -15,10 +15,8 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Duration_Model;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,14 +30,12 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     public static final int mBUTTON = 0;
     public static final int mLOCATION = 1;
     private int[] mDataSetTypes;
-    List<Duration_Model> nodeList;
     Context context;
     String loc = null;
     String distance;
 
-    public InfoAdapter(ArrayList<Duration_Model> NodeList, String distance, int[] mDataTypes, Context context, OnStartDragListener mDragStartListener) {
+    public InfoAdapter( String distance, int[] mDataTypes, Context context, OnStartDragListener mDragStartListener) {
         this.context = context;
-        this.nodeList = NodeList;
         this.mDataSetTypes = mDataTypes;
         this.mDragStartListener = mDragStartListener;
         this.distance = distance;

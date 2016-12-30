@@ -249,8 +249,9 @@ public class OlmatixService extends Service {
     }
 
     private void doConnect() {
+        Log.d(TAG, "Check Stateof MQTT: " + stateoffMqtt);
 
-        if (stateoffMqtt!=null || !stateoffMqtt.equals("true")) {
+        if (!stateoffMqtt.equals("true")) {
 
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");

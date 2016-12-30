@@ -197,6 +197,41 @@ public class OlmatixService extends Service {
         return START_STICKY;
     }
 
+    private void unSubIfnotForeground() {
+
+        printForegroundTask();
+        Log.d("Unsubscribe", " uptime and signal");
+
+        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
+            int countDB = dbNodeRepo.getNodeList().size();
+            Log.d("DEBUG", "Count list Node: " + countDB);
+            data.addAll(dbNodeRepo.getNodeList());
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    final String mNodeID1 = data.get(i).getNodesID();
+                    Log.d("DEBUG", "Count list: " + mNodeID1);
+                    for (int a = 0; a < 2; a++) {
+                        if (a == 0) {
+                            topic = "devices/" + mNodeID1 + "/$signal";
+                        }
+                        if (a == 1) {
+                            topic = "devices/" + mNodeID1 + "/$uptime";
+                        }
+
+                        try {
+                            Connection.getClient().unsubscribe(topic);
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    Log.d("Unsubscribe", " device = " + mNodeID1);
+                }
+            }
+            data.clear();
+        }
+    }
+
     private void showNotification() {
         // In this sample, we'll use the same text for the ticker and the expanded notification
         //text = getText(R.string.local_service_started);
@@ -1101,8 +1136,8 @@ public class OlmatixService extends Service {
             }
             flagSub = false;
             setFlagSub();
+            data1.clear();
         }
-        data1.clear();
     }
 
     class OlmatixBroadcastReceiver extends BroadcastReceiver {
@@ -1193,6 +1228,7 @@ public class OlmatixService extends Service {
 
         }
     }
+
 }
 
 

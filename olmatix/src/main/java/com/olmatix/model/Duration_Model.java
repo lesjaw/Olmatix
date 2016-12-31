@@ -6,19 +6,21 @@ package com.olmatix.model;
 
 public class Duration_Model {
     int id;
-    String nodeId, channel, status;
+    String nodeId, channel, status, niceName;
     Long timeStampOn, timeStampOff, duration;
 
     public Duration_Model() {
     }
 
-    public Duration_Model(int id, String nodeId, String channel, String status, Long timeStampOn, Long timeStampOff) {
+    public Duration_Model(int id, String nodeId, String channel, String status, String niceName, Long timeStampOn, Long timeStampOff, Long duration) {
         this.id = id;
         this.nodeId = nodeId;
         this.channel = channel;
         this.status = status;
+        this.niceName = niceName;
         this.timeStampOn = timeStampOn;
         this.timeStampOff = timeStampOff;
+        this.duration = duration;
     }
 
     public int getId() {
@@ -51,6 +53,14 @@ public class Duration_Model {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getNiceName() {
+        return niceName;
+    }
+
+    public void setNiceName(String niceName) {
+        this.niceName = niceName;
     }
 
     public Long getTimeStampOn() {

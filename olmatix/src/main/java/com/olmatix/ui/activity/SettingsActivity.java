@@ -188,7 +188,7 @@ public class SettingsActivity extends SettingsFragment {
                     try {
                         mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
                         Location mLocation = mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        if (mLocation == null){
+                        if (mLocation != null){
                             mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         }
                         mPrefHelper = new PreferenceHelper(getActivity().getApplicationContext());

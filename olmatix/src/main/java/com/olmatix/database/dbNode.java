@@ -14,6 +14,7 @@ public class dbNode {
     public static final String TABLE_NODE_DURATION = "Node_Duration";
     public static final String TABLE_SCENE = "scene";
     public static final String TABLE_SCENE_DETAIL = "scene_detail";
+    public static final String  TABLE_INFO          = "info_data";
 
 
 
@@ -47,6 +48,8 @@ public class dbNode {
     public static final String KEY_SCENE_NAME  = "scene_name" ;
     public static final String KEY_SCENE_DETAIL_ID  = "scene_detailID" ;
     public static final String KEY_SCENE_TYPE  = "scene_type" ;
+    public static final String KEY_INFO_TYPE  = "info_type" ;
+
 
 
 

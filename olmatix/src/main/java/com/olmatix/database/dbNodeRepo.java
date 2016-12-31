@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
@@ -638,12 +639,49 @@ public class dbNodeRepo {
             do {
                 Duration_Model node = new Duration_Model();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setNodeId( cursor.getString(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setId( cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
                 node.setNodeId( cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setChannel( cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
                 node.setStatus( cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
                 node.setTimeStampOn( cursor.getLong(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_ON)));
                 node.setDuration( cursor.getLong(cursor.getColumnIndex(dbNode.KEY_DURATION)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+    // ChartDatabase
+
+    public ArrayList<Duration_Model> getChartDurationList() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selectString = "SELECT  duration_node."+KEY_NODE_ID +
+                ", strftime( '%d/%m', duration_node."+ KEY_TIMESTAMPS_ON +"/ 1000, 'unixepoch') AS act_time, " +
+                " detail_node." + KEY_NICE_NAME_D + ", SUM(duration_node." +KEY_DURATION + " / 60 / 60) AS duration "+
+                " FROM " + dbNode.TABLE_NODE_DURATION +" duration_node INNER JOIN " +  TABLE_NODE +
+                " detail_node ON  duration_node." + KEY_NODE_ID +" = detail_node." + KEY_NODE_ID +
+                " GROUP BY act_time, duration_node."+KEY_NODE_ID ;
+
+        Log.d("DEBUG", "getChartDurationList: " + selectString);
+
+
+        ArrayList<Duration_Model> nodeList = new ArrayList<Duration_Model>();
+
+        Cursor cursor = db.rawQuery(selectString,null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Duration_Model node = new Duration_Model();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNodeId( cursor.getString(0));
+                node.setTimeStampOn( cursor.getLong(1));
+                node.setNiceName(cursor.getString(2));
+                node.setDuration( cursor.getLong(3));
 
                 nodeList.add(node);
 

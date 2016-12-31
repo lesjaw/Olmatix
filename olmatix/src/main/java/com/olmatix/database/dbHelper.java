@@ -85,6 +85,12 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_SCENE_DETAIL_ID + " TEXT,"
                 + dbNode.KEY_SCENE_TYPE + " TEXT) ";
 
+        String CREATE_TABLE_INFO = "CREATE TABLE " + dbNode.TABLE_INFO  + "("
+                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_INFO_TYPE + " TEXT, "
+                + dbNode.KEY_SCENE_DETAIL_ID + " TEXT,"
+                + dbNode.KEY_SCENE_TYPE + " TEXT) ";
+
 
 
         db.execSQL(CREATE_TABLE_NODE);

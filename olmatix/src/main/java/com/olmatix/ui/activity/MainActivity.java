@@ -125,7 +125,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
 
+    }
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         imgStatus = (ImageView) findViewById(R.id.conn_state);

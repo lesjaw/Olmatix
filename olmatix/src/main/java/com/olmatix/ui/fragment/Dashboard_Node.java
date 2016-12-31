@@ -222,7 +222,7 @@ public class Dashboard_Node extends Fragment implements
 
         //Distance = (int) res[0] + unit;
 
-        infoAdapter = new InfoAdapter(Distance, mDatasetTypes,dashboardnode, this);
+        infoAdapter = new InfoAdapter(dbNodeRepo.getNodeDurationList(), Distance, mDatasetTypes,dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
@@ -504,7 +504,7 @@ public class Dashboard_Node extends Fragment implements
     }
 
     public void resetAdapter(){
-        infoAdapter = new InfoAdapter(Distance, mDatasetTypes,dashboardnode, this);
+        infoAdapter = new InfoAdapter(dbNodeRepo.getNodeDurationList(), Distance, mDatasetTypes,dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
     }
 

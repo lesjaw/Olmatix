@@ -137,8 +137,6 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
             rightAxis.setEnabled(false);
 
 
-
-
             Log.d("DEBUG", "onBindViewHolder: " +z);
             set1 = new LineDataSet(yVals, getNodeIdData(z));
             set1.setFillAlpha(110);
@@ -300,7 +298,6 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
     public class ButtonInfoHolder extends ViewHolder {
         public LineChart mChart;
-
 
         public ButtonInfoHolder(View view) {
             super(view);

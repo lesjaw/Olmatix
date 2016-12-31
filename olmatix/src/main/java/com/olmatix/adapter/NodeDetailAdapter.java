@@ -83,9 +83,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-                holder.duration.setText("ON time : "+OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
-                Log.d("DEBUG", "onBindViewHolder: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getDuration())));
-
+            if(mInstalledNodeModel.getDuration()!=null) {
+                holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
+                Log.d("DEBUG", "onBindViewHolder: " + OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getDuration())));
+            }
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
             } else

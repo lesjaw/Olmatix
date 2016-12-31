@@ -18,14 +18,6 @@
             android:layout_width="100sp"
             android:layout_height="100sp">
 
-            <ImageButton
-                android:id="@+id/icon_node"
-                android:layout_width="80sp"
-                android:layout_height="80sp"
-                android:layout_alignParentTop="true"
-                android:layout_centerInParent="true"
-                android:src="@drawable/offlamp1"
-                android:theme="@style/AppTheme.Button"/>
 
             <ImageView
                 android:layout_width="20sp"
@@ -36,8 +28,6 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_check_red"
                 android:layout_centerInParent="true"
-                android:layout_marginBottom="30sp"
-                android:foregroundGravity="top"
                 />
 
             <ImageView
@@ -49,9 +39,17 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_publish_green"
                 android:layout_centerInParent="true"
-                android:layout_marginBottom="30sp"
-                android:foregroundGravity="top"
                 android:visibility="visible"/>
+
+            <ImageButton
+                android:id="@+id/icon_node"
+                android:layout_width="70sp"
+                android:layout_height="70sp"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/offlamp1"
+                android:theme="@style/AppTheme.Button"/>
+
 
             <TextView
                 android:id="@+id/node_name"

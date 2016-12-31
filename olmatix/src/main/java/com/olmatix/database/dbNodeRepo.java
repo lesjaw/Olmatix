@@ -488,7 +488,6 @@ public class dbNodeRepo {
         }
         cursor.close();
         db.close();
-        Log.d("DEBUG", "getNodeDetailDash: "+selectQuery);
 
         return nodeList;
 

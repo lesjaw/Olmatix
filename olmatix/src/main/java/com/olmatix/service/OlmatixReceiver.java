@@ -9,7 +9,7 @@ import android.util.Log;
  * Created by Lesjaw on 30/12/2016.
  */
 
-public class OmatixReceiver extends BroadcastReceiver {
+public class OlmatixReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

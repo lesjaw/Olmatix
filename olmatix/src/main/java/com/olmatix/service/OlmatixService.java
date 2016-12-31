@@ -743,6 +743,15 @@ public class OlmatixService extends Service {
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
 
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel("0");
+                    durationModel.setStatus("false");
+                    durationModel.setTimeStampOn((long) 0);
+                    //durationModel.setTimeStampOff((long) 0);
+                    durationModel.setDuration((long) 0);
+
+                    dbNodeRepo.insertDurationNode(durationModel);
+
                     topic1 = "devices/" + NodeID + "/light/0";
                     int qos = 2;
                     try {
@@ -780,6 +789,16 @@ public class OlmatixService extends Service {
 
                         dbNodeRepo.insertInstalledNode(detailNodeModel);
 
+                        durationModel.setNodeId(NodeID);
+                        durationModel.setChannel(String.valueOf(i));
+                        durationModel.setStatus("false");
+                        durationModel.setTimeStampOn((long) 0);
+                        //durationModel.setTimeStampOff((long) 0);
+                        durationModel.setDuration((long) 0);
+
+                        dbNodeRepo.insertDurationNode(durationModel);
+
+
                         topic1 = "devices/" + NodeID + "/light/" + i;
                         int qos = 2;
                         try {
@@ -814,6 +833,15 @@ public class OlmatixService extends Service {
                     detailNodeModel.setNice_name_d(NodeID);
 
                     dbNodeRepo.insertInstalledNode(detailNodeModel);
+
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel("0");
+                    durationModel.setTimeStampOn((long) 0);
+                    durationModel.setTimeStampOff((long) 0);
+                    durationModel.setDuration((long) 0);
+
+                    dbNodeRepo.insertDurationNode(durationModel);
+
 
                     for (int a = 0; a < 3; a++) {
                         if (a == 0) {

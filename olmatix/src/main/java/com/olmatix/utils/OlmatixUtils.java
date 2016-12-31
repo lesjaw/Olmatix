@@ -50,7 +50,7 @@ public class OlmatixUtils {
     }
 
     public static String getDuration(long typicalOnDurationMsec) {
-        long secondi = typicalOnDurationMsec / 1000;
+        long secondi = typicalOnDurationMsec;
         if (secondi < 60)
             return "" + secondi + " sec.";
         long diffMinutes = secondi / 60;

@@ -58,7 +58,7 @@
         </service>
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
-        <receiver android:name="com.olmatix.service.OmatixReceiver">
+        <receiver android:name="com.olmatix.service.OlmatixReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

@@ -116,7 +116,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         data.clear();
-        data.addAll(dbNodeRepo.getNodeDetailID(node_id));
+        data.addAll(dbNodeRepo.getNodeDetailAll(node_id));
         adapter = new NodeDetailAdapter(data,node_name, detail_node,this);
         mRecycleView.setAdapter(adapter);
 
@@ -259,7 +259,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private void updatelist (){
         adapter.notifyDataSetChanged();
         data.clear();
-        data.addAll(dbNodeRepo.getNodeDetailID(node_id));
+        data.addAll(dbNodeRepo.getNodeDetailAll(node_id));
         if(adapter != null)
         {
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());

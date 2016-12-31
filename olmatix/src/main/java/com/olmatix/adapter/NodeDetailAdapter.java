@@ -75,6 +75,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
 
         final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
+
         if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
 
             //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
@@ -82,14 +83,16 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
             holder.imgNode.setImageResource(R.drawable.olmatixlogo);
-            //holder.duration.setText("ON time : "+OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
+                holder.duration.setText("ON time : "+OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
+                Log.d("DEBUG", "onBindViewHolder: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getDuration())));
 
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
             } else
                 holder.node_name.setText(mInstalledNodeModel.getName());
 
-            holder.upTime.setText("Uptime: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
+
+            //holder.upTime.setText("Uptime: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
 
             holder.status.setText(mInstalledNodeModel.getStatus());
 

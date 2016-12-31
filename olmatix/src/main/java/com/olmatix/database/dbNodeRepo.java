@@ -488,7 +488,10 @@ public class dbNodeRepo {
         }
         cursor.close();
         db.close();
+        Log.d("DEBUG", "getNodeDetailDash: "+selectQuery);
+
         return nodeList;
+
     }
 
     public ArrayList<Detail_NodeModel> getNodeDetailID(String node_id) {
@@ -598,6 +601,8 @@ public class dbNodeRepo {
         values.put(KEY_STATUS,durationModel.getStatus());
         values.put(KEY_TIMESTAMPS_ON,String.valueOf(durationModel.getTimeStampOn()));
         values.put(KEY_TIMESTAMPS_OFF,String.valueOf(durationModel.getTimeStampOff()));
+        values.put(KEY_DURATION,String.valueOf(durationModel.getDuration()));
+
 
         long Id = db.insert(TABLE_NODE_DURATION, null, values);
         db.close(); // Closing database connection
@@ -692,5 +697,44 @@ public class dbNodeRepo {
         return nodeList;
     }
 
+    public ArrayList<Detail_NodeModel> getNodeDetailAll(String node_id) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT node_installed."+KEY_NODE_ID + ", node_installed."+KEY_CHANNEL +
+                ", node_installed."+KEY_NICE_NAME_D +", node_installed."+KEY_STATUS+
+                ", node_installed."+KEY_STATUS_SENSOR + ", node_installed."+KEY_STATUS_THEFT + ", node_installed."+KEY_SENSOR +
+                ", SUM(duration_node."+KEY_DURATION +") as totaldur"+
+                " FROM node_installed " + TABLE_NODE + " INNER JOIN " + TABLE_NODE_DURATION +
+                " duration_node ON node_installed." + KEY_NODE_ID + " = duration_node." + KEY_NODE_ID +
+                " AND node_installed."+KEY_CHANNEL + " = duration_node."+KEY_CHANNEL +" WHERE duration_node."+KEY_NODE_ID + "=?" +
+                " GROUP BY node_installed."+KEY_NICE_NAME_D;
+
+
+        //Log.d("DEBUG", "getNodeDetailAll: "+selectQuery);
+
+        ArrayList<Detail_NodeModel> nodeList = new ArrayList<Detail_NodeModel>();
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(node_id)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Detail_NodeModel node = new Detail_NodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNode_id(cursor.getString(0));
+                node.setChannel(cursor.getString(1));
+                node.setNice_name_d(cursor.getString(2));
+                node.setStatus(cursor.getString(3));
+                node.setStatus_sensor(cursor.getString(4));
+                node.setStatus_theft(cursor.getString(5));
+                node.setSensor(cursor.getString(6));
+                node.setDuration(cursor.getString(7));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
 }
 

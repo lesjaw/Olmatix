@@ -17,7 +17,7 @@ public class Detail_NodeModel {
     private String status_sensor;
     private String fwName;
     private String status_theft;
-
+    private String duration;
 
     public int getId() {
         return id;
@@ -107,4 +107,11 @@ public class Detail_NodeModel {
         this.status_theft = status_theft;
     }
 
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
 }

@@ -91,8 +91,6 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_SCENE_DETAIL_ID + " TEXT,"
                 + dbNode.KEY_SCENE_TYPE + " TEXT) ";
 
-
-
         db.execSQL(CREATE_TABLE_NODE);
         db.execSQL(CREATE_TABLE_NODE_INSTALLED);
         db.execSQL(CREATE_TABLE_FAVORITE);
@@ -100,6 +98,7 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_NODE_DURATION);
         db.execSQL(CREATE_TABLE_SCENE);
         db.execSQL(CREATE_TABLE_SCENE_DETAIL);
+        db.execSQL(CREATE_TABLE_INFO);
 
 
     }
@@ -115,6 +114,7 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_NODE_DURATION);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_SCENE);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_SCENE_DETAIL);
+        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_INFO);
 
         // Create tables again
         onCreate(db);

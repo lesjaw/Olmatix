@@ -183,7 +183,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
 
-            holder.upTime.setText("Uptime : "+ OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
@@ -194,7 +193,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.sensorStatus.setText("Door Open!");
                 holder.imgSensor.setImageResource(R.drawable.door_open);
             }
-
 
             if (mInstalledNodeModel.getStatus().equals("true")) {
                 holder.imgNode.setImageResource(R.mipmap.armed);
@@ -327,6 +325,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);
             imgSensor = (ImageView) view.findViewById(R.id.door);
+
 
         }
     }

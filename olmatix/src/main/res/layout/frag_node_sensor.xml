@@ -76,20 +76,9 @@
                 android:paddingLeft="5sp"
                 android:layout_toRightOf="@+id/statuslabel"
                 android:layout_below="@+id/sensorstatus"
-                android:text="ON"
+                android:text="NOT ARMED"
                 android:background="@drawable/border"
                 />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/fw_name"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/btn_off"
-                android:textSize="10sp"
-                android:text="fw Name"
-                />
-
 
             <Button
                 android:id="@+id/btn_off"
@@ -127,7 +116,15 @@
                 android:paddingTop="0sp"
                 />
 
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/fw_name"
+                android:textSize="10sp"
+                android:text="fw Name"
+                android:layout_below="@+id/btn_off"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
 
         </RelativeLayout>

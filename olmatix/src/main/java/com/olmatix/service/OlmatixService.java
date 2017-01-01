@@ -747,7 +747,6 @@ public class OlmatixService extends Service {
                     durationModel.setChannel("0");
                     durationModel.setStatus("false");
                     durationModel.setTimeStampOn((long) 0);
-                    //durationModel.setTimeStampOff((long) 0);
                     durationModel.setDuration((long) 0);
 
                     dbNodeRepo.insertDurationNode(durationModel);

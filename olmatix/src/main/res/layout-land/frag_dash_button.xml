@@ -25,6 +25,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerInParent="true"
                 android:src="@drawable/offlamp1"
+                android:stateListAnimator="@null"
                 android:theme="@style/AppTheme.Button"/>
 
             <ImageView

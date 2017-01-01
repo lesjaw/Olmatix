@@ -86,8 +86,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
         mView = inflater.inflate(R.layout.frag_installed_node, container, false);
         return mView;
-
-
     }
 
     @Override
@@ -363,23 +361,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                                 inputResult = mEditText.getText().toString();
                                 sendMessage();
 
-                                /*String topic = "devices/" + inputResult + "/$online";
-                                int qos = 2;
-                                try {
-                                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                                    subToken.setActionCallback(new IMqttActionListener() {
-                                        @Override
-                                        public void onSuccess(IMqttToken asyncActionToken) {
-
-                                        }
-
-                                        @Override
-                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                                        }
-                                    });
-                                } catch (MqttException e) {
-                                    e.printStackTrace();
-                                }*/
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -439,7 +420,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 }
                 super.onScrollStateChanged(recyclerView, newState);
             }
-        });    }
+        });
+    }
 
     private void setRefresh() {
         data.clear();

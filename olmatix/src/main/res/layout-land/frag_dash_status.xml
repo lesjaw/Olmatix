@@ -23,6 +23,7 @@
                 android:layout_centerInParent="true"
                 android:padding="0sp"
                 android:src="@drawable/offsec"
+                android:stateListAnimator="@null"
                 android:theme="@style/AppTheme.Button"/>
 
             <ImageView

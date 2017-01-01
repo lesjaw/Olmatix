@@ -89,7 +89,7 @@ public class Dashboard_Node extends Fragment implements
     private String mProvider;
     private LocationManager mLocateMgr;
     private Location mLocation;
-    private Context mContext;
+    //private Context mContext;
     private String Distance;
     String adString = "";
     String loc = null;
@@ -112,7 +112,7 @@ public class Dashboard_Node extends Fragment implements
 
         dashboardnode=getActivity();
 
-        mContext = getActivity();
+        //mContext = getActivity();
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -163,7 +163,7 @@ public class Dashboard_Node extends Fragment implements
                             public void onClick(DialogInterface dialog, int which) {
                                 mSpinner.setOnItemSelectedListener(new SpinnerListener());
 
-                                Log.d("DEBUG", "onItemSelected: "+ mSpinner.getSelectedItem().toString());
+                                //Log.d("DEBUG", "onItemSelected: "+ mSpinner.getSelectedItem().toString());
                                 int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
                                 System.out.println(String.valueOf(databaseId));
 
@@ -220,8 +220,6 @@ public class Dashboard_Node extends Fragment implements
             }
         });
 
-        //Distance = (int) res[0] + unit;
-
         infoAdapter = new InfoAdapter( Distance, mDatasetTypes,dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
 
@@ -261,9 +259,9 @@ public class Dashboard_Node extends Fragment implements
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
-    public static interface ClickListener{
-        public void onClick(View view,int position);
-        public void onLongClick(View view,int position);
+    public interface ClickListener{
+        void onClick(View view,int position);
+        void onLongClick(View view,int position);
     }
 
     @Override
@@ -466,7 +464,7 @@ public class Dashboard_Node extends Fragment implements
                         }
 
                     } catch (final IOException e) {
-                        ((MainActivity) mContext).runOnUiThread(new Runnable() {
+                        ((MainActivity) dashboardnode).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 Log.e("DEBUG", "Geocoder ERROR", e);
@@ -477,10 +475,10 @@ public class Dashboard_Node extends Fragment implements
                     Log.d("DEBUG", "Current Location : " + loc);
 
                     final float[] res = new float[3];
-                    final PreferenceHelper mPrefHelper = new PreferenceHelper(mContext);
+                    final PreferenceHelper mPrefHelper = new PreferenceHelper(dashboardnode);
                     Location.distanceBetween(lat, lng, mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), res);
                     if (mPrefHelper.getHomeLatitude() != 0) {
-                        ((MainActivity) mContext).runOnUiThread(new Runnable() {
+                        ((MainActivity) dashboardnode).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
 

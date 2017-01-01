@@ -14,6 +14,7 @@ import com.olmatix.model.Dashboard_NodeModel;
 import com.olmatix.model.Detail_NodeModel;
 import com.olmatix.model.Duration_Model;
 import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.model.Scene_Model;
 import com.olmatix.model.SpinnerObject;
 
 import java.util.ArrayList;
@@ -36,6 +37,8 @@ import static com.olmatix.database.dbNode.KEY_NODE_ID;
 import static com.olmatix.database.dbNode.KEY_ONLINE;
 import static com.olmatix.database.dbNode.KEY_OTA;
 import static com.olmatix.database.dbNode.KEY_RESET;
+import static com.olmatix.database.dbNode.KEY_SCENE_NAME;
+import static com.olmatix.database.dbNode.KEY_SCENE_TYPE;
 import static com.olmatix.database.dbNode.KEY_SENSOR;
 import static com.olmatix.database.dbNode.KEY_SIGNAL;
 import static com.olmatix.database.dbNode.KEY_STATUS;
@@ -50,6 +53,7 @@ import static com.olmatix.database.dbNode.TABLE_FAV;
 import static com.olmatix.database.dbNode.TABLE_MQTT;
 import static com.olmatix.database.dbNode.TABLE_NODE;
 import static com.olmatix.database.dbNode.TABLE_NODE_DURATION;
+import static com.olmatix.database.dbNode.TABLE_SCENE;
 
 public class dbNodeRepo {
     private dbHelper dbHelper;
@@ -89,6 +93,18 @@ public class dbNodeRepo {
         values.put(KEY_MESSAGE, dbNode.getMessage());
 
         long Id = db.insert(TABLE_MQTT, null, values);
+        db.close(); // Closing database connection
+        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        return (int) Id;
+    }
+
+    public int insertDbScene(Scene_Model sceneModel){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_SCENE_NAME, sceneModel.getSceneName());
+        values.put(KEY_SCENE_TYPE, sceneModel.getSceneType());
+
+        long Id = db.insert(TABLE_SCENE, null, values);
         db.close(); // Closing database connection
         //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;

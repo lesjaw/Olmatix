@@ -24,11 +24,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.olmatix.adapter.NodeAdapter;
 import com.olmatix.adapter.SceneAdapter;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.Scene_Model;
+
+import java.util.ArrayList;
 
 import static com.olmatix.lesjaw.olmatix.R.id.fab;
 
@@ -44,6 +47,9 @@ public class Scene extends Fragment implements OnStartDragListener {
     private ItemTouchHelper mItemTouchHelper;
     private SceneAdapter adapter;
     private Paint p = new Paint();
+    private static ArrayList<Scene_Model> data;
+    private Scene_Model sceneModel;
+    public  static dbNodeRepo dbNodeRepo;
 
 
 
@@ -58,6 +64,9 @@ public class Scene extends Fragment implements OnStartDragListener {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        dbNodeRepo = new dbNodeRepo(getActivity());
+        sceneModel = new Scene_Model();
 
         setupView();
 
@@ -146,6 +155,9 @@ public class Scene extends Fragment implements OnStartDragListener {
                         .setMessage("Please type your scene name")
                         .setView(mEditText)
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+
+                            String inputResult = mEditText.getText().toString();
+
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

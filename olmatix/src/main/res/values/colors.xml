@@ -13,5 +13,9 @@
     <color name="red">#F44336</color>
     <color name="green">#00ff00</color>
     <color name="grey">#A9A9A9</color>
+    <color name ="indigo">#303f9f</color>
+    <color name = "light_blue">#03a9f4</color>
+    <color name = "pink">#FF4081</color>
+    <color name="bg_button">#03a9f4</color>
 
 </resources>

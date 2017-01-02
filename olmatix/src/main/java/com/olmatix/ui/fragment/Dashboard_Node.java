@@ -70,31 +70,47 @@ public class Dashboard_Node extends Fragment implements
         OnStartDragListener,
         LocationListener {
 
+    public static dbNodeRepo dbNodeRepo;
+    private static ArrayList<Dashboard_NodeModel> data;
+    NodeDashboardAdapter adapter;
+    Spinner mSpinner;
+    Context dashboardnode;
+    String adString = "";
+    String loc = null;
     private View mView;
     private RecyclerView mRecycleView;
     private RecyclerView mRecycleViewInfo;
     private FloatingActionButton mFab;
-    NodeDashboardAdapter adapter;
     private InfoAdapter infoAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Dashboard_NodeModel dashboardNodeModel;
     private Installed_NodeModel installedNodeModel;
-    public  static dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
-    private static ArrayList<Dashboard_NodeModel> data;
-    Spinner mSpinner;
     private int mDatasetTypes[] = {mLOCATION, mBUTTON}; //view types
-    Context dashboardnode;
     private LocationManager locationManager;
-
     private String mProvider;
     private LocationManager mLocateMgr;
     private Location mLocation;
     //private Context mContext;
     private String Distance;
-    String adString = "";
-    String loc = null;
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("NotifyChangeDetail");
+            String msg = intent.getStringExtra("MQTT State");
+            if (message == null) {
+                message = "1";
+            }
+            if (message.equals("2")) {
+                updatelist();
+                Log.d("receiver", "Notifydashboard : " + message);
+            }
+            updatelist();
+
+        }
+    };
 
     @Nullable
     @Override
@@ -104,7 +120,6 @@ public class Dashboard_Node extends Fragment implements
         return mView;
     }
 
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -112,9 +127,9 @@ public class Dashboard_Node extends Fragment implements
         data = new ArrayList<>();
 
         dbNodeRepo = new dbNodeRepo(getActivity());
-        dashboardNodeModel= new Dashboard_NodeModel();
+        dashboardNodeModel = new Dashboard_NodeModel();
 
-        dashboardnode=getActivity();
+        dashboardnode = getActivity();
 
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -122,7 +137,7 @@ public class Dashboard_Node extends Fragment implements
         setupView();
         onClickListener();
 
-        mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),mRecycleView, new ClickListener() {
+        mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecycleView, new ClickListener() {
 
             @Override
             public void onClick(View view, int position) {
@@ -132,7 +147,7 @@ public class Dashboard_Node extends Fragment implements
             @Override
             public void onLongClick(View view, int position) {
                 adapter.removeItem(position);
-                Toast.makeText(getActivity(),"Successfully Deleted",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Successfully Deleted", Toast.LENGTH_LONG).show();
                 setRefresh();
             }
         }));
@@ -152,9 +167,8 @@ public class Dashboard_Node extends Fragment implements
                 List<SpinnerObject> lables = dbNodeRepo.getAllLabels();
 
                 ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<SpinnerObject>(getActivity(),
-                        android.R.layout.simple_spinner_item,lables);
-                dataAdapter
-                        .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        android.R.layout.simple_spinner_item, lables);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 mSpinner.setAdapter(dataAdapter);
 
                 new AlertDialog.Builder(getContext())
@@ -167,8 +181,7 @@ public class Dashboard_Node extends Fragment implements
                                 mSpinner.setOnItemSelectedListener(new SpinnerListener());
 
                                 //Log.d("DEBUG", "onItemSelected: "+ mSpinner.getSelectedItem().toString());
-                                int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
-                                System.out.println(String.valueOf(databaseId));
+                                int databaseId = Integer.parseInt(String.valueOf(((SpinnerObject) mSpinner.getSelectedItem()).getId()));
 
                                 dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                 dbNodeRepo.insertFavNode(dashboardNodeModel);
@@ -185,17 +198,17 @@ public class Dashboard_Node extends Fragment implements
     }
 
     private void setupView() {
-        mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
-        mRecycleViewInfo    = (RecyclerView) mView.findViewById(R.id.rv1);
+        mRecycleView = (RecyclerView) mView.findViewById(R.id.rv);
+        mRecycleViewInfo = (RecyclerView) mView.findViewById(R.id.rv1);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
 
-        mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
+        mFab = (FloatingActionButton) mView.findViewById(R.id.fab);
 
         mRecycleView.setHasFixedSize(true);
         mRecycleViewInfo.setHasFixedSize(true);
 
-        GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getActivity(), 200 );
+        GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getActivity(), 200);
         mRecycleView.setLayoutManager(layoutManager);
 
         LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
@@ -211,7 +224,7 @@ public class Dashboard_Node extends Fragment implements
 
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
-        adapter = new NodeDashboardAdapter(data,dashboardnode,this);
+        adapter = new NodeDashboardAdapter(data, dashboardnode, this);
         mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -223,29 +236,24 @@ public class Dashboard_Node extends Fragment implements
             }
         });
 
-        infoAdapter = new InfoAdapter( Distance, mDatasetTypes,dashboardnode, this);
+        infoAdapter = new InfoAdapter(Distance, mDatasetTypes, dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
-        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener()
-        {
+        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
-            {
-                if (dy > 0 ||dy<0 && mFab.isShown())
-                {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0 || dy < 0 && mFab.isShown()) {
                     mFab.hide();
                 }
             }
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
-            {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE)
-                {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     mFab.show();
                 }
 
@@ -257,17 +265,10 @@ public class Dashboard_Node extends Fragment implements
     private void setRefresh() {
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
-        adapter = new NodeDashboardAdapter(data,dashboardnode,this);
+        adapter = new NodeDashboardAdapter(data, dashboardnode, this);
         mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }
-
-    public interface ClickListener{
-        void onClick(View view,int position);
-        void onLongClick(View view,int position);
-    }
-
-
 
     @Override
     public void onStart() {
@@ -275,30 +276,12 @@ public class Dashboard_Node extends Fragment implements
         initLocationProvider();
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            String message = intent.getStringExtra("NotifyChangeDetail");
-            String msg = intent.getStringExtra("MQTT State");
-            if (message==null){
-                message = "1";
-            }
-            if (message.equals("2")){
-                updatelist();
-                Log.d("receiver", "Notifydashboard : " + message);
-            }
-            updatelist();
-
-        }
-    };
-
-    private void updatelist (){
+    private void updatelist() {
 
         adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeDetailDash());
-        if(adapter != null){
+        if (adapter != null) {
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
         //setRefresh();
@@ -326,58 +309,10 @@ public class Dashboard_Node extends Fragment implements
 
     }
 
-
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
 
-    }
-
-    class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
-
-        private Dashboard_Node.ClickListener clicklistener;
-        private GestureDetector gestureDetector;
-
-        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final Dashboard_Node.ClickListener clicklistener){
-
-            this.clicklistener=clicklistener;
-            gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    View child=recycleView.findChildViewUnder(e.getX(),e.getY());
-                    if(child!=null && clicklistener!=null){
-                        clicklistener.onLongClick(child,recycleView.getChildAdapterPosition(child));
-                    }
-                }
-            });
-        }
-
-
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View child=rv.findChildViewUnder(e.getX(),e.getY());
-            if(child!=null && clicklistener!=null && gestureDetector.onTouchEvent(e)){
-                clicklistener.onClick(child,rv.getChildAdapterPosition(child));
-            }
-
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-        }
     }
 
     private void initLocationProvider() {
@@ -387,7 +322,7 @@ public class Dashboard_Node extends Fragment implements
 
         mProvider = locationManager.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
 
-        boolean enabled = (mProvider != null && locationManager.isProviderEnabled(mProvider) &&mPrefHelper.getHomeLatitude() != 0);
+        boolean enabled = (mProvider != null && locationManager.isProviderEnabled(mProvider) && mPrefHelper.getHomeLatitude() != 0);
         if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -433,7 +368,7 @@ public class Dashboard_Node extends Fragment implements
                             OlmatixUtils.POSITION_UPDATE_MIN_DIST, (LocationListener) this);
                     mLocation = mLocateMgr.getLastKnownLocation(mProvider);
 
-                    Log.d("DEBUG", "LastKnown: "+mLocation);
+                    Log.d("DEBUG", "LastKnown: " + mLocation);
                     // Initialize the location fields
                     if (mLocation != null) {
                         onLocationChanged(mLocation);
@@ -449,7 +384,7 @@ public class Dashboard_Node extends Fragment implements
         final double lat = (mLocation.getLatitude());
         final double lng = (mLocation.getLongitude());
 
-        if (lat!=0 && lng!=0) {
+        if (lat != 0 && lng != 0) {
 
             new Thread(new Runnable() {
                 @Override
@@ -493,7 +428,7 @@ public class Dashboard_Node extends Fragment implements
                                     res[0] = res[0] / 1000;
                                 }
                                 Log.d("DEBUG", "Distance: " + (int) res[0] + unit);
-                                Distance = loc +", it's "+ (int) res[0] + unit ;
+                                Distance = loc + ", it's " + (int) res[0] + unit;
                                 resetAdapter();
                             }
                         });
@@ -506,8 +441,8 @@ public class Dashboard_Node extends Fragment implements
 
     }
 
-    public void resetAdapter(){
-        infoAdapter = new InfoAdapter( Distance, mDatasetTypes,dashboardnode, this);
+    public void resetAdapter() {
+        infoAdapter = new InfoAdapter(Distance, mDatasetTypes, dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
     }
 
@@ -523,5 +458,57 @@ public class Dashboard_Node extends Fragment implements
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    public interface ClickListener {
+        void onClick(View view, int position);
+
+        void onLongClick(View view, int position);
+    }
+
+    class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+
+        private Dashboard_Node.ClickListener clicklistener;
+        private GestureDetector gestureDetector;
+
+        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final Dashboard_Node.ClickListener clicklistener) {
+
+            this.clicklistener = clicklistener;
+            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    View child = recycleView.findChildViewUnder(e.getX(), e.getY());
+                    if (child != null && clicklistener != null) {
+                        clicklistener.onLongClick(child, recycleView.getChildAdapterPosition(child));
+                    }
+                }
+            });
+        }
+
+
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            View child = rv.findChildViewUnder(e.getX(), e.getY());
+            if (child != null && clicklistener != null && gestureDetector.onTouchEvent(e)) {
+                clicklistener.onClick(child, rv.getChildAdapterPosition(child));
+            }
+
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
     }
 }

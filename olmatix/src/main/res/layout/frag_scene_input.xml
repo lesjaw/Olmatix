@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/frame_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/scene_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name Scene"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/scene_what"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/scene_name"
+                android:text="@string/scene_label"
+                android:textSize="20sp" />
+
+            <com.jaredrummler.materialspinner.MaterialSpinner
+                android:id="@+id/spin_what"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/scene_what" />
+
+            <TextView
+                android:id="@+id/scene_do"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/spin_what"
+                android:text="@string/scene_do"
+                android:textSize="20sp"/>
+
+            <LinearLayout
+                android:id="@+id/sceneSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:layout_below="@id/scene_do"
+                android:layout_marginTop="10sp">
+
+                <com.jaredrummler.materialspinner.MaterialSpinner
+                    android:id="@+id/spin_node"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/scene_what"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="0.80" />
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/swich_node"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/spin_node"
+                    android:theme="@style/OlmatixSwitch" />
+
+                <ImageButton
+                    android:id="@+id/img_add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_below="@id/swich_node"
+                    android:layout_marginTop="-8sp"
+                    android:layout_weight="0.05"
+                    android:padding="0sp"
+                    android:src="@android:drawable/ic_input_add"
+                    style="@style/Widget.AppCompat.ImageButton"/>
+
+
+            </LinearLayout>
+
+            <ListView android:id="@+id/listScene"
+                android:layout_width="wrap_content"
+                android:layout_height="300dp"
+                android:layout_below="@id/sceneSelector"
+                android:layout_marginBottom="10dp"/>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_marginBottom="40dp"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btnBack"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:background="@drawable/bg_button_rounded"
+                    android:text="@string/back"
+                    android:textColor="@color/white"/>
+
+                <Button
+                    android:id="@+id/btnSubmit"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/bg_button_rounded"
+                    android:text="@string/next"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+
+
+    </FrameLayout>
+</RelativeLayout>

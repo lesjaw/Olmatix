@@ -2,6 +2,7 @@ package com.olmatix.ui.fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,7 +12,9 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.BundleCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -159,10 +162,21 @@ public class Scene extends Fragment implements OnStartDragListener {
                             public void onClick(DialogInterface dialog, int which) {
 
 
-                                String inputResult = mEditText.getText().toString();
-                                sceneModel.setSceneName(inputResult);
+                                    String inputResult = mEditText.getText().toString();
 
-                                //dbNodeRepo.insertDbScene(sceneModel);
+                                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                                    SceneInput mSceneinput = new SceneInput();
+
+                                    Bundle args = new Bundle();
+                                    args.putString("sceneName", inputResult);
+                                    mSceneinput.setArguments(args);
+
+                                    ft.replace(R.id.frame_container, mSceneinput);
+                                    ft.commit();
+                                    mFab.hide();
+
+
+
 
 
                             }

@@ -152,6 +152,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     }
 
     private void doSubAllDetail() {
+        data1.clear();
         int countDB = dbNodeRepo.getNodeDetailList().size();
         Log.d("DEBUG", "Count list Detail: " + countDB);
         data1.addAll(dbNodeRepo.getNodeDetailList());
@@ -185,6 +186,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     }
 
     private void doAllsubDetailSensor() {
+        data1.clear();
         int countDB = dbNodeRepo.getNodeDetailList().size();
         Log.d("DEBUG", "Count list Sensor: " + countDB);
         data1.addAll(dbNodeRepo.getNodeDetailList());

@@ -86,7 +86,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     @Override
     public void onBindViewHolder(final OlmatixHolder holder, int position) {
 
-
         final Installed_NodeModel mInstalledNodeModel = nodeList.get(position);
 
         if(mInstalledNodeModel.getOnline() != null) {

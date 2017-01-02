@@ -286,7 +286,7 @@ public class Dashboard_Node extends Fragment implements
             }
             if (message.equals("2")){
                 updatelist();
-                Log.d("receiver", "Notifydashboard : " + message);
+                //Log.d("receiver", "Notifydashboard : " + message);
             }
             updatelist();
 

@@ -1066,7 +1066,7 @@ public class OlmatixService extends Service {
                     if (a == 4) {
                         topic = "devices/" + mNodeID + "/$localip";
                     }
-                    int qos = 1;
+                    int qos = 2;
                     try {
                         IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
                         subToken.setActionCallback(new IMqttActionListener() {
@@ -1100,7 +1100,7 @@ public class OlmatixService extends Service {
                 final String mNodeID = data1.get(i).getNode_id();
                 final String mChannel = data1.get(i).getChannel();
                 topic1 = "devices/" + mNodeID + "/light/" + mChannel;
-                int qos = 1;
+                int qos = 2;
                 try {
                     IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
                     subToken.setActionCallback(new IMqttActionListener() {
@@ -1142,7 +1142,7 @@ public class OlmatixService extends Service {
                             topic1 = "devices/" + mNodeID1 + "/door/theft";
                         }
 
-                        int qos = 1;
+                        int qos = 2;
                         try {
                             IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
                             subToken.setActionCallback(new IMqttActionListener() {

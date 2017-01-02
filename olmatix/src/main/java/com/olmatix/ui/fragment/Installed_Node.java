@@ -361,6 +361,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                                 inputResult = mEditText.getText().toString();
                                 sendMessage();
 
+
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {

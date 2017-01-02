@@ -6,8 +6,8 @@ package com.olmatix.model;
 
 public class Scene_Model {
 
-    int id, sceneType;
-    String sceneName;
+    private int id, sceneType;
+    private String sceneName;
 
     public int getId() {
         return id;

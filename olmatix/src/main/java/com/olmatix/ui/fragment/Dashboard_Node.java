@@ -49,6 +49,7 @@ import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.model.Installed_NodeModel;
 import com.olmatix.model.SpinnerObject;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.utils.GridAutofitLayoutManager;
@@ -78,6 +79,7 @@ public class Dashboard_Node extends Fragment implements
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private Dashboard_NodeModel dashboardNodeModel;
+    private Installed_NodeModel installedNodeModel;
     public  static dbNodeRepo dbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<Dashboard_NodeModel> data;
@@ -102,17 +104,18 @@ public class Dashboard_Node extends Fragment implements
         return mView;
     }
 
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         data = new ArrayList<>();
+
         dbNodeRepo = new dbNodeRepo(getActivity());
         dashboardNodeModel= new Dashboard_NodeModel();
 
         dashboardnode=getActivity();
 
-        //mContext = getActivity();
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -263,6 +266,8 @@ public class Dashboard_Node extends Fragment implements
         void onClick(View view,int position);
         void onLongClick(View view,int position);
     }
+
+
 
     @Override
     public void onStart() {

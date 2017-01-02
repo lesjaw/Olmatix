@@ -146,6 +146,7 @@ public class OlmatixService extends Service {
             public void run() {
                 flagSub = true;
                 Log.d(TAG, "run: " + flagSub);
+                unSubIfnotForeground();
             }
         }, 25000);
     }

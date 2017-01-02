@@ -90,9 +90,9 @@ public class Scene extends Fragment implements OnStartDragListener {
 
     }
 
-    public static interface ClickListener{
-        public void onClick(View view,int position);
-        public void onLongClick(View view,int position);
+    public interface ClickListener{
+         void onClick(View view,int position);
+         void onLongClick(View view,int position);
     }
 
     class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
@@ -155,19 +155,23 @@ public class Scene extends Fragment implements OnStartDragListener {
                         .setMessage("Please type your scene name")
                         .setView(mEditText)
                         .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
-
-                            String inputResult = mEditText.getText().toString();
-
-
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                                            }
+
+
+                                String inputResult = mEditText.getText().toString();
+                                sceneModel.setSceneName(inputResult);
+
+                                //dbNodeRepo.insertDbScene(sceneModel);
+
+
+                            }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                     }
                 }).show();
-
             }
+
         };
     }
 

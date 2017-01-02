@@ -108,8 +108,6 @@ public class OlmatixService extends Service {
     private String NodeIDSensor;
     private String TopicID;
     private String mChange = "";
-    OlmatixAlarmReceiver alarm = new OlmatixAlarmReceiver();
-
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -183,8 +181,6 @@ public class OlmatixService extends Service {
         data1 = new ArrayList<>();
         data2 = new ArrayList<>();
 
-        alarm.setAlarm(this);
-
 
         dbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new Installed_NodeModel();
@@ -194,7 +190,6 @@ public class OlmatixService extends Service {
         showNotification();
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter("addNode"));
-
     }
 
     @Override
@@ -1177,8 +1172,6 @@ public class OlmatixService extends Service {
             boolean hasConnectivity = false;
             boolean hasChanged = false;
 
-            //OlmatixAlarmReceiver.completeWakefulIntent(intent);
-
             NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
             if (nInfo != null) {
                 if (nInfo.getType() == ConnectivityManager.TYPE_WIFI) {
@@ -1260,6 +1253,7 @@ public class OlmatixService extends Service {
 
         }
     }
+
 
 }
 

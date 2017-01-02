@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -100,6 +101,14 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         setupView();
         onClickListener();
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doSubAll();
+            }
+        }, 1000);
+
+
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
                 mRecycleView, new ClickListener() {
             @Override
@@ -123,18 +132,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                                         + " led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",
                                 Toast.LENGTH_LONG).show();
                     }
-                /*ImageView picture=(ImageView)view.findViewById(R.id.state_conn);
-                picture.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(getActivity(), "Single Click on Image :"+position,
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });*/
-                //} else {
-                   // Toast.makeText(getActivity(),"Server disconnected, check your internet connection",
-                   //         Toast.LENGTH_LONG).show();
-                //}
             }
             @Override
             public void onLongClick(View view, final int position) {
@@ -259,7 +256,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             }else if (mChange.equals("2")) {
                 if (adapter != null)
                     updatelist();
-                Log.d("receiver", "NotifyChangeNode : " + mChange);
+                //Log.d("receiver", "NotifyChangeNode : " + mChange);
             }
         }
     };
@@ -279,9 +276,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     }
 
+
+
     private void doSubAll(){
 
-    int countDB = dbNodeRepo.getNodeList().size();
+        int countDB = dbNodeRepo.getNodeList().size();
         Log.d("DEBUG", "Count list: "+countDB);
         data.addAll(dbNodeRepo.getNodeList());
         for (int i = 0; i < countDB; i++) {
@@ -321,19 +320,10 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     @Override
     public void onResume() {
-            /*Intent i = new Intent(getActivity(), OlmatixService.class);
-            getActivity().startService(i);*/
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
-
             Log.d("Receiver ", "Installed_Node = Starting..");
-/*
-        if(Connection.getClient().isConnected()){
-            stateMqtt=true;
-        } else {stateMqtt=false;}
-*/
-
-        Log.d("DEBUG", "Server: "+stateMqtt);
+            Log.d("DEBUG", "Server: "+stateMqtt);
 
         super.onResume();
     }
@@ -394,7 +384,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             public void onRefresh() {
                 mSwipeRefreshLayout.setRefreshing(true);
                 setRefresh();
-
             }
         });
 
@@ -422,6 +411,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                 super.onScrollStateChanged(recyclerView, newState);
             }
         });
+
     }
 
     private void setRefresh() {

@@ -181,6 +181,7 @@ public class OlmatixService extends Service {
         data1 = new ArrayList<>();
         data2 = new ArrayList<>();
 
+
         dbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new Installed_NodeModel();
         detailNodeModel = new Detail_NodeModel();
@@ -189,7 +190,6 @@ public class OlmatixService extends Service {
         showNotification();
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter("addNode"));
-
     }
 
     @Override
@@ -295,11 +295,8 @@ public class OlmatixService extends Service {
             String mUserName = sharedPref.getString("user_name", "olmatix1");
             String mPassword = sharedPref.getString("password", "olmatix");
 
-            String mLocation = sharedPref.getString("setLocation", "olmatix");
-            Log.d("DEBUG", "Location Now: " + mLocation);
-
             final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
-            Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
+            //Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
 
             final MqttConnectOptions options = new MqttConnectOptions();
 
@@ -315,7 +312,7 @@ public class OlmatixService extends Service {
             String topic = "status/" + deviceId + "/$online";
             byte[] payload = "false".getBytes();
             options.setWill(topic, payload, 1, true);
-            options.setKeepAliveInterval(240000);
+            options.setKeepAliveInterval(300);
             Connection.setClient(client);
 
             text = "Connecting to server..";
@@ -1066,7 +1063,7 @@ public class OlmatixService extends Service {
                     if (a == 4) {
                         topic = "devices/" + mNodeID + "/$localip";
                     }
-                    int qos = 1;
+                    int qos = 2;
                     try {
                         IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
                         subToken.setActionCallback(new IMqttActionListener() {
@@ -1100,7 +1097,7 @@ public class OlmatixService extends Service {
                 final String mNodeID = data1.get(i).getNode_id();
                 final String mChannel = data1.get(i).getChannel();
                 topic1 = "devices/" + mNodeID + "/light/" + mChannel;
-                int qos = 1;
+                int qos = 2;
                 try {
                     IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
                     subToken.setActionCallback(new IMqttActionListener() {
@@ -1142,7 +1139,7 @@ public class OlmatixService extends Service {
                             topic1 = "devices/" + mNodeID1 + "/door/theft";
                         }
 
-                        int qos = 1;
+                        int qos = 2;
                         try {
                             IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
                             subToken.setActionCallback(new IMqttActionListener() {
@@ -1256,6 +1253,7 @@ public class OlmatixService extends Service {
 
         }
     }
+
 
 }
 

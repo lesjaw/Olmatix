@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Get current screen orientation
-        //enableFullScreen(true);
         if (flagReceiver == 0) {
             Intent i = new Intent(this, OlmatixService.class);
             startService(i);
@@ -111,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         setupTabs();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
-        Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
+        //Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
 
         if (serverconnected) {
             imgStatus.setImageResource(R.drawable.ic_conn_green);

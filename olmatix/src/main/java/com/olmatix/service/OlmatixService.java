@@ -108,6 +108,8 @@ public class OlmatixService extends Service {
     private String NodeIDSensor;
     private String TopicID;
     private String mChange = "";
+    OlmatixAlarmReceiver alarm = new OlmatixAlarmReceiver();
+
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -180,6 +182,9 @@ public class OlmatixService extends Service {
         data = new ArrayList<>();
         data1 = new ArrayList<>();
         data2 = new ArrayList<>();
+
+        alarm.setAlarm(this);
+
 
         dbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new Installed_NodeModel();
@@ -295,11 +300,8 @@ public class OlmatixService extends Service {
             String mUserName = sharedPref.getString("user_name", "olmatix1");
             String mPassword = sharedPref.getString("password", "olmatix");
 
-            String mLocation = sharedPref.getString("setLocation", "olmatix");
-            Log.d("DEBUG", "Location Now: " + mLocation);
-
             final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
-            Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
+            //Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
 
             final MqttConnectOptions options = new MqttConnectOptions();
 
@@ -315,7 +317,7 @@ public class OlmatixService extends Service {
             String topic = "status/" + deviceId + "/$online";
             byte[] payload = "false".getBytes();
             options.setWill(topic, payload, 1, true);
-            options.setKeepAliveInterval(240000);
+            options.setKeepAliveInterval(300);
             Connection.setClient(client);
 
             text = "Connecting to server..";
@@ -1174,6 +1176,8 @@ public class OlmatixService extends Service {
         public void onReceive(Context context, Intent intent) {
             boolean hasConnectivity = false;
             boolean hasChanged = false;
+
+            //OlmatixAlarmReceiver.completeWakefulIntent(intent);
 
             NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
             if (nInfo != null) {

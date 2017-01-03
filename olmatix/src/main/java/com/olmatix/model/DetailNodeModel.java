@@ -4,20 +4,11 @@ package com.olmatix.model;
  * Created by android on 12/9/2016.
  */
 
-public class Detail_NodeModel {
+public class DetailNodeModel {
 
     private  int id;
-    private String node_id;
-    private String channel;
-    private String status;
-    private String nice_name_d;
-    private String uptime;
-    private String name;
-    private String sensor;
-    private String status_sensor;
-    private String fwName;
-    private String status_theft;
-    private String duration;
+    private String node_id,channel, status, nice_name_d,uptime, name, sensor, status_sensor, fwName, status_theft, duration;
+
 
     public int getId() {
         return id;

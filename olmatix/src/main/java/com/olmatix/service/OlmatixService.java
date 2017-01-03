@@ -26,12 +26,12 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.olmatix.database.dbNode;
-import com.olmatix.database.dbNodeRepo;
+import com.olmatix.database.DbNode;
+import com.olmatix.database.DbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Detail_NodeModel;
-import com.olmatix.model.Duration_Model;
-import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.model.DetailNodeModel;
+import com.olmatix.model.DurationModel;
+import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.ui.fragment.Detail_Node;
 import com.olmatix.utils.Connection;
@@ -68,19 +68,19 @@ import java.util.TreeMap;
 public class OlmatixService extends Service {
 
     public final static String MY_ACTION = "MY_ACTION";
-    public static dbNodeRepo dbNodeRepo;
+    public static DbNodeRepo mDbNodeRepo;
     private static String TAG = OlmatixService.class.getSimpleName();
     private static boolean hasWifi = false;
     private static boolean hasMmobile = false;
-    private static ArrayList<Installed_NodeModel> data;
+    private static ArrayList<InstalledNodeModel> data;
     public volatile MqttAsyncClient mqttClient;
     HashMap<String, String> messageReceive = new HashMap<>();
     HashMap<String, String> message_topic = new HashMap<>();
     CharSequence text;
     CharSequence textNode;
     CharSequence titleNode;
-    ArrayList<Detail_NodeModel> data1;
-    ArrayList<Installed_NodeModel> data2;
+    ArrayList<DetailNodeModel> data1;
+    ArrayList<InstalledNodeModel> data2;
     String add_NodeID;
     boolean flagSub = true;
     boolean flagNode = false;
@@ -94,10 +94,10 @@ public class OlmatixService extends Service {
     private ConnectivityManager mConnMan;
     private String deviceId;
     private String stateoffMqtt="false";
-    private Installed_NodeModel installedNodeModel;
-    private Detail_NodeModel detailNodeModel;
-    private Duration_Model durationModel;
-    private dbNode dbnode;
+    private InstalledNodeModel installedNodeModel;
+    private DetailNodeModel detailNodeModel;
+    private DurationModel durationModel;
+    private DbNode dbnode;
     private String NodeID, Channel;
     private String mMessage;
     private NotificationManager mNM;
@@ -182,10 +182,10 @@ public class OlmatixService extends Service {
         data2 = new ArrayList<>();
 
 
-        dbNodeRepo = new dbNodeRepo(getApplicationContext());
-        installedNodeModel = new Installed_NodeModel();
-        detailNodeModel = new Detail_NodeModel();
-        durationModel = new Duration_Model();
+        mDbNodeRepo = new DbNodeRepo(getApplicationContext());
+        installedNodeModel = new InstalledNodeModel();
+        detailNodeModel = new DetailNodeModel();
+        durationModel = new DurationModel();
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -204,9 +204,9 @@ public class OlmatixService extends Service {
         Log.d("Unsubscribe", " uptime and signal");
 
         if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
-            int countDB = dbNodeRepo.getNodeList().size();
+            int countDB = mDbNodeRepo.getNodeList().size();
             Log.d("DEBUG", "Count list Node: " + countDB);
-            data.addAll(dbNodeRepo.getNodeList());
+            data.addAll(mDbNodeRepo.getNodeList());
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID1 = data.get(i).getNodesID();
@@ -497,7 +497,7 @@ public class OlmatixService extends Service {
 
     private void saveFirst() {
 
-        if (dbNodeRepo.getNodeList().isEmpty()) {
+        if (mDbNodeRepo.getNodeList().isEmpty()) {
             installedNodeModel.setNodesID(NodeID);
             installedNodeModel.setNodes(messageReceive.get("online"));
             Calendar now = Calendar.getInstance();
@@ -505,13 +505,13 @@ public class OlmatixService extends Service {
             now.getTimeInMillis();
             installedNodeModel.setAdding(now.getTimeInMillis());
 
-            dbNodeRepo.insertDb(installedNodeModel);
+            mDbNodeRepo.insertDb(installedNodeModel);
             Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_SHORT).show();
             Log.d("saveFirst", "Add Node success, ");
             doSub();
         } else {
             installedNodeModel.setNodesID(NodeID);
-            if (dbNodeRepo.hasObject(installedNodeModel)) {
+            if (mDbNodeRepo.hasObject(installedNodeModel)) {
                 Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID + ", its exist, we are updating Node status", Toast.LENGTH_SHORT).show();
                 Log.d("saveFirst", "You already have this Node, DB = " + NodeID + ", Exist, we are updating Node status");
                 saveDatabase();
@@ -524,7 +524,7 @@ public class OlmatixService extends Service {
                 now.getTimeInMillis();
                 installedNodeModel.setAdding(now.getTimeInMillis());
 
-                dbNodeRepo.insertDb(installedNodeModel);
+                mDbNodeRepo.insertDb(installedNodeModel);
                 Toast.makeText(getApplicationContext(), "Successfully Add Node", Toast.LENGTH_SHORT).show();
                 Log.d("saveFirst", "Add Node success, ");
                 doSub();
@@ -604,8 +604,8 @@ public class OlmatixService extends Service {
                 String state = "";
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel(Channel);
-                data1.addAll(dbNodeRepo.getNodeDetail(NodeID, Channel));
-                int countDB = dbNodeRepo.getNodeDetail(NodeID, Channel).size();
+                data1.addAll(mDbNodeRepo.getNodeDetail(NodeID, Channel));
+                int countDB = mDbNodeRepo.getNodeDetail(NodeID, Channel).size();
                 if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         if (data1.get(i).getNice_name_d() != null) {
@@ -679,7 +679,7 @@ public class OlmatixService extends Service {
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_sensor(mMessage);
 
-            dbNodeRepo.update_detailSensor(detailNodeModel);
+            mDbNodeRepo.update_detailSensor(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
         }
@@ -691,11 +691,11 @@ public class OlmatixService extends Service {
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_theft(mMessage);
 
-            dbNodeRepo.update_detailSensor(detailNodeModel);
+            mDbNodeRepo.update_detailSensor(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
-            data1.addAll(dbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
-            int countDB = dbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
+            data1.addAll(mDbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
+            int countDB = mDbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     if (data1.get(i).getNice_name_d() != null) {
@@ -730,7 +730,7 @@ public class OlmatixService extends Service {
             if (installedNodeModel.getFwName().equals("smartfitting")) {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
-                if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();
                 } else {
                     detailNodeModel.setNode_id(NodeID);
@@ -739,7 +739,7 @@ public class OlmatixService extends Service {
                     detailNodeModel.setNice_name_d(NodeID);
                     detailNodeModel.setSensor("light");
 
-                    dbNodeRepo.insertInstalledNode(detailNodeModel);
+                    mDbNodeRepo.insertInstalledNode(detailNodeModel);
 
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel("0");
@@ -747,7 +747,7 @@ public class OlmatixService extends Service {
                     durationModel.setTimeStampOn((long) 0);
                     durationModel.setDuration((long) 0);
 
-                    dbNodeRepo.insertDurationNode(durationModel);
+                    mDbNodeRepo.insertDurationNode(durationModel);
 
                     topic1 = "devices/" + NodeID + "/light/0";
                     int qos = 2;
@@ -772,7 +772,7 @@ public class OlmatixService extends Service {
             } else if (installedNodeModel.getFwName().equals("smartadapter4ch")) {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
-                if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
                     saveDatabase_Detail();
                 } else {
                     for (int i = 0; i < 4; i++) {
@@ -784,7 +784,7 @@ public class OlmatixService extends Service {
                         detailNodeModel.setNice_name_d(NodeID + " Ch " + String.valueOf(i + 1));
                         detailNodeModel.setSensor("light");
 
-                        dbNodeRepo.insertInstalledNode(detailNodeModel);
+                        mDbNodeRepo.insertInstalledNode(detailNodeModel);
 
                         durationModel.setNodeId(NodeID);
                         durationModel.setChannel(String.valueOf(i));
@@ -793,7 +793,7 @@ public class OlmatixService extends Service {
                         //durationModel.setTimeStampOff((long) 0);
                         durationModel.setDuration((long) 0);
 
-                        dbNodeRepo.insertDurationNode(durationModel);
+                        mDbNodeRepo.insertDurationNode(durationModel);
 
 
                         topic1 = "devices/" + NodeID + "/light/" + i;
@@ -819,7 +819,7 @@ public class OlmatixService extends Service {
             } else if (installedNodeModel.getFwName().equals("smartsensordoor")) {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
-                if (dbNodeRepo.hasDetailObject(detailNodeModel)) {
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
                 } else {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel("0");
@@ -829,7 +829,7 @@ public class OlmatixService extends Service {
                     detailNodeModel.setStatus_theft("false");
                     detailNodeModel.setNice_name_d(NodeID);
 
-                    dbNodeRepo.insertInstalledNode(detailNodeModel);
+                    mDbNodeRepo.insertInstalledNode(detailNodeModel);
 
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel("0");
@@ -837,7 +837,7 @@ public class OlmatixService extends Service {
                     durationModel.setTimeStampOff((long) 0);
                     durationModel.setDuration((long) 0);
 
-                    dbNodeRepo.insertDurationNode(durationModel);
+                    mDbNodeRepo.insertDurationNode(durationModel);
 
 
                     for (int a = 0; a < 3; a++) {
@@ -891,8 +891,8 @@ public class OlmatixService extends Service {
             if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
                 if (flagSub) {
                     installedNodeModel.setNodesID(NodeID);
-                    data2.addAll(dbNodeRepo.getNodeListbyNode(NodeID));
-                    int countDB = dbNodeRepo.getNodeListbyNode(NodeID).size();
+                    data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
+                    int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
                     if (countDB != 0) {
                         for (int i = 0; i < countDB; i++) {
                             if (data2.get(i).getNice_name_n() != null) {
@@ -933,7 +933,7 @@ public class OlmatixService extends Service {
         now.getTimeInMillis();
         installedNodeModel.setAdding(now.getTimeInMillis());
 
-        dbNodeRepo.update(installedNodeModel);
+        mDbNodeRepo.update(installedNodeModel);
         messageReceive.clear();
         data.clear();
         mChange = "2";
@@ -957,7 +957,7 @@ public class OlmatixService extends Service {
                 saveOffTime();
             }
 
-            dbNodeRepo.update_detail(detailNodeModel);
+            mDbNodeRepo.update_detail(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
             data1.clear();
@@ -979,7 +979,7 @@ public class OlmatixService extends Service {
                     durationModel.setTimeStampOn(now.getTimeInMillis());
                     durationModel.setTimeStampOff(Long.valueOf("0"));
 
-                dbNodeRepo.insertDurationNode(durationModel);
+                mDbNodeRepo.insertDurationNode(durationModel);
             }
         });
     }
@@ -1001,7 +1001,7 @@ public class OlmatixService extends Service {
                     //Log.d(TAG, "run: " + Long.valueOf(durationModel.getTimeStampOn()));
                     durationModel.setDuration((now.getTimeInMillis() - durationModel.getTimeStampOn())/1000);
                 }
-                dbNodeRepo.updateOff(durationModel);
+                mDbNodeRepo.updateOff(durationModel);
             }
         });
     }
@@ -1040,9 +1040,9 @@ public class OlmatixService extends Service {
 
     private void doSubAll() {
 
-        int countDB = dbNodeRepo.getNodeList().size();
+        int countDB = mDbNodeRepo.getNodeList().size();
         Log.d("DEBUG", "Count list Node: " + countDB);
-        data.addAll(dbNodeRepo.getNodeList());
+        data.addAll(mDbNodeRepo.getNodeList());
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
                 final String mNodeID = data.get(i).getNodesID();
@@ -1088,10 +1088,10 @@ public class OlmatixService extends Service {
     }
 
     private void doSubAllDetail() {
-        int countDB = dbNodeRepo.getNodeDetailList().size();
+        int countDB = mDbNodeRepo.getNodeDetailList().size();
         Log.d("DEBUG", "Count list Detail: " + countDB);
-        data1.addAll(dbNodeRepo.getNodeDetailList());
-        countDB = dbNodeRepo.getNodeDetailList().size();
+        data1.addAll(mDbNodeRepo.getNodeDetailList());
+        countDB = mDbNodeRepo.getNodeDetailList().size();
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
                 final String mNodeID = data1.get(i).getNode_id();
@@ -1121,10 +1121,10 @@ public class OlmatixService extends Service {
     }
 
     private void doAllsubDetailSensor() {
-        int countDB = dbNodeRepo.getNodeDetailList().size();
+        int countDB = mDbNodeRepo.getNodeDetailList().size();
         Log.d("DEBUG", "Count list Sensor: " + countDB);
-        data1.addAll(dbNodeRepo.getNodeDetailList());
-        countDB = dbNodeRepo.getNodeDetailList().size();
+        data1.addAll(mDbNodeRepo.getNodeDetailList());
+        countDB = mDbNodeRepo.getNodeDetailList().size();
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
                 final String mNodeID1 = data1.get(i).getNode_id();
@@ -1244,7 +1244,7 @@ public class OlmatixService extends Service {
             if (flagSub) {
                 dbnode.setTopic(topic);
                 dbnode.setMessage(mMessage);
-                dbNodeRepo.insertDbMqtt(dbnode);
+                mDbNodeRepo.insertDbMqtt(dbnode);
             }
         }
 

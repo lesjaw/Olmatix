@@ -4,7 +4,7 @@ package com.olmatix.database;
  * Created by Lesjaw on 05/12/2016.
  */
 
-public class dbNode {
+public class DbNode {
 
     // Labels table name
     public static final String TABLE = "Node";
@@ -46,9 +46,14 @@ public class dbNode {
     public static final String KEY_TIMESTAMPS_OFF  = "timestamp_off" ;
     public static final String KEY_DURATION  = "duration" ;
     public static final String KEY_SCENE_NAME  = "scene_name" ;
-    public static final String KEY_SCENE_DETAIL_ID  = "scene_detailID" ;
+    public static final String KEY_SCENE_ID  = "sceneid" ;
     public static final String KEY_SCENE_TYPE  = "scene_type" ;
     public static final String KEY_INFO_TYPE  = "info_type" ;
+    public static final String KEY_SCHEDULE     = "schedule";
+    public static final String KEY_ARRIVE     = "arrive";
+    public static final String KEY_LEAVE     = "leave";
+    public static final String KEY_PATH     = "path";
+    public static final String KEY_COMMAND     = "command";
 
 
 
@@ -57,9 +62,6 @@ public class dbNode {
     public int id;
     public String topic;
     public String message;
-    public String name;
-    public String icon;
-    public String uptime;
 
     public String getTopic() {
         return topic;

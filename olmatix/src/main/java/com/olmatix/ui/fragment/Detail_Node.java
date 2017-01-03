@@ -32,11 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.NodeDetailAdapter;
-import com.olmatix.database.dbNodeRepo;
+import com.olmatix.database.DbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Detail_NodeModel;
+import com.olmatix.model.DetailNodeModel;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -51,23 +51,23 @@ import java.util.ArrayList;
 
 public class Detail_Node extends AppCompatActivity implements OnStartDragListener {
 
-    dbNodeRepo dbNodeRepo;
+    DbNodeRepo mDbNodeRepo;
     String node_id,node_name;
     private RecyclerView mRecycleView;
     private RecyclerView.LayoutManager layoutManager;
     NodeDetailAdapter adapter;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
-    private Detail_NodeModel detailNodeModel;
+    private DetailNodeModel detailNodeModel;
     private Paint p = new Paint();
     private TextView label_node;
     private String nicename;
     Detail_Node detail_node;
-    private static ArrayList<Detail_NodeModel> data;
+    private static ArrayList<DetailNodeModel> data;
     private Toolbar mToolbar;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
-    ArrayList<Detail_NodeModel> data1;
+    ArrayList<DetailNodeModel> data1;
 
 
     @Override
@@ -79,7 +79,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         mIntentFilter.addAction(UE_ACTION);
 
         data1 = new ArrayList<>();
-        dbNodeRepo = new dbNodeRepo(getApplicationContext());
+        mDbNodeRepo = new DbNodeRepo(getApplicationContext());
 
         detail_node =this;
         Intent i = getIntent();
@@ -87,8 +87,8 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         node_name = i.getStringExtra("node_name");
         nicename = i.getStringExtra("nice_name");
         data = new ArrayList<>();
-        dbNodeRepo =new dbNodeRepo(getApplicationContext());
-        detailNodeModel = new Detail_NodeModel();
+        mDbNodeRepo =new DbNodeRepo(getApplicationContext());
+        detailNodeModel = new DetailNodeModel();
         setupView();
         setupToolbar();
     }
@@ -116,7 +116,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         data.clear();
-        data.addAll(dbNodeRepo.getNodeDetailAll(node_id));
+        data.addAll(mDbNodeRepo.getNodeDetailAll(node_id));
         adapter = new NodeDetailAdapter(data,node_name, detail_node,this);
         mRecycleView.setAdapter(adapter);
 
@@ -144,7 +144,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     }
     private void setRefresh() {
         data.clear();
-        data.addAll(dbNodeRepo.getNodeDetailID(node_id));
+        data.addAll(mDbNodeRepo.getNodeDetailID(node_id));
         adapter = new NodeDetailAdapter(data,node_name, detail_node,this);
         mRecycleView.setAdapter(adapter);
         doSubAllDetail();
@@ -153,10 +153,10 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
     private void doSubAllDetail() {
         data1.clear();
-        int countDB = dbNodeRepo.getNodeDetailList().size();
+        int countDB = mDbNodeRepo.getNodeDetailList().size();
         Log.d("DEBUG", "Count list Detail: " + countDB);
-        data1.addAll(dbNodeRepo.getNodeDetailList());
-        countDB = dbNodeRepo.getNodeDetailList().size();
+        data1.addAll(mDbNodeRepo.getNodeDetailList());
+        countDB = mDbNodeRepo.getNodeDetailList().size();
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
                 final String mNodeID = data1.get(i).getNode_id();
@@ -187,10 +187,10 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
     private void doAllsubDetailSensor() {
         data1.clear();
-        int countDB = dbNodeRepo.getNodeDetailList().size();
+        int countDB = mDbNodeRepo.getNodeDetailList().size();
         Log.d("DEBUG", "Count list Sensor: " + countDB);
-        data1.addAll(dbNodeRepo.getNodeDetailList());
-        countDB = dbNodeRepo.getNodeDetailList().size();
+        data1.addAll(mDbNodeRepo.getNodeDetailList());
+        countDB = mDbNodeRepo.getNodeDetailList().size();
         String topic1 = "";
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
@@ -261,7 +261,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private void updatelist (){
         adapter.notifyDataSetChanged();
         data.clear();
-        data.addAll(dbNodeRepo.getNodeDetailAll(node_id));
+        data.addAll(mDbNodeRepo.getNodeDetailAll(node_id));
         if(adapter != null)
         {
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
@@ -310,7 +310,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
                             detailNodeModel.setNode_id(data.get(position).getNode_id());
                             detailNodeModel.setChannel(data.get(position).getChannel());
                             detailNodeModel.setNice_name_d(nice_name);
-                            dbNodeRepo.update_detail_NiceName(detailNodeModel);
+                            mDbNodeRepo.update_detail_NiceName(detailNodeModel);
                             Toast.makeText(getApplicationContext(),"Renaming button success",Toast.LENGTH_LONG).show();
                             setRefresh();
 

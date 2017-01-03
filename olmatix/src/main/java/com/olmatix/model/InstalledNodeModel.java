@@ -8,7 +8,7 @@ package com.olmatix.model;
  * Project Name         : Olmatix.
  * Copyright            : Copyright @ 2016 Indogamers.
  */
-public class Installed_NodeModel {
+public class InstalledNodeModel {
     private int id;
     private String node_id;
     private String nodes;
@@ -25,12 +25,12 @@ public class Installed_NodeModel {
     private String ota;
     private Long adding;
 
-    public Installed_NodeModel() {
+    public InstalledNodeModel() {
     }
 
-    public Installed_NodeModel(String node_id, String nodes, String name, String nice_name_n, String localip, String fwName,
-                               String fwVersion, String icon, Long adding, String online, String signal, String uptime,
-                               String reset, String ota) {
+    public InstalledNodeModel(String node_id, String nodes, String name, String nice_name_n, String localip, String fwName,
+                              String fwVersion, String icon, Long adding, String online, String signal, String uptime,
+                              String reset, String ota) {
 
         this.node_id = node_id;
         this.nodes = nodes;

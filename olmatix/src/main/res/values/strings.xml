@@ -70,5 +70,9 @@
     <string name="opt_Thold">Distance From Home</string>
     <string name="opt_homepos_err">Error getting current position</string>
     <string name="opt_homepos_set">Home position set</string>
+    <string name="scene_label">Base on what?..</string>
+    <string name="scene_do">What do you want to do?...</string>
+    <string name="back">Back</string>
+    <string name="next">Submit</string>
 
 </resources>

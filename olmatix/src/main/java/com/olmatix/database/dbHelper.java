@@ -8,16 +8,13 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class dbHelper extends SQLiteOpenHelper {
-    //version number to upgrade database version
-    //each time if you Add, Edit table, you need to change the
-    //version number.
-    private static final int DATABASE_VERSION = 12;
+public class DbHelper extends SQLiteOpenHelper {
+    private static final int DATABASE_VERSION = 15;
 
     // Database Name
     private static final String DATABASE_NAME = "olmatix";
 
-    public dbHelper(Context context ) {
+    public DbHelper(Context context ) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -27,68 +24,71 @@ public class dbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         //All necessary tables you like to create will create here
 
-        String CREATE_TABLE_NODE = "CREATE TABLE " + dbNode.TABLE  + "("
-                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_NODE_ID + " TEXT, "
-                + dbNode.KEY_NODES + " TEXT, "
-                + dbNode.KEY_NAME + " TEXT, "
-                + dbNode.KEY_NICE_NAME_N + " TEXT, " //this name will be from user input
-                + dbNode.KEY_LOCALIP + " TEXT, "
-                + dbNode.KEY_FWNAME + " TEXT, "
-                + dbNode.KEY_FWVERSION + " TEXT, "
-                + dbNode.KEY_ONLINE + " TEXT, "
-                + dbNode.KEY_ICON + " TEXT, "
-                + dbNode.KEY_SIGNAL + " TEXT, "
-                + dbNode.KEY_UPTIME + " TEXT, "
-                + dbNode.KEY_RESET + " TEXT, "
-                + dbNode.KEY_OTA + " TEXT, "
-                + dbNode.KEY_ADDING + " LONG )";
+        String CREATE_TABLE_NODE = "CREATE TABLE " + DbNode.TABLE  + "("
+                + DbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + DbNode.KEY_NODE_ID + " TEXT, "
+                + DbNode.KEY_NODES + " TEXT, "
+                + DbNode.KEY_NAME + " TEXT, "
+                + DbNode.KEY_NICE_NAME_N + " TEXT, "
+                + DbNode.KEY_LOCALIP + " TEXT, "
+                + DbNode.KEY_FWNAME + " TEXT, "
+                + DbNode.KEY_FWVERSION + " TEXT, "
+                + DbNode.KEY_ONLINE + " TEXT, "
+                + DbNode.KEY_ICON + " TEXT, "
+                + DbNode.KEY_SIGNAL + " TEXT, "
+                + DbNode.KEY_UPTIME + " TEXT, "
+                + DbNode.KEY_RESET + " TEXT, "
+                + DbNode.KEY_OTA + " TEXT, "
+                + DbNode.KEY_ADDING + " LONG )";
 
 
-        String CREATE_TABLE_NODE_INSTALLED = "CREATE TABLE " + dbNode.TABLE_NODE  + "("
-                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_NODE_ID + " TEXT, "
-                + dbNode.KEY_CHANNEL + " TEXT, "
-                + dbNode.KEY_NICE_NAME_D + " TEXT, "
-                + dbNode.KEY_STATUS + " TEXT, "
-                + dbNode.KEY_STATUS_SENSOR + " TEXT, "
-                + dbNode.KEY_STATUS_THEFT + " TEXT, "
-                + dbNode.KEY_SENSOR + " TEXT )";
+        String CREATE_TABLE_NODE_INSTALLED = "CREATE TABLE " + DbNode.TABLE_NODE  + "("
+                + DbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + DbNode.KEY_NODE_ID + " TEXT, "
+                + DbNode.KEY_CHANNEL + " TEXT, "
+                + DbNode.KEY_NICE_NAME_D + " TEXT, "
+                + DbNode.KEY_STATUS + " TEXT, "
+                + DbNode.KEY_STATUS_SENSOR + " TEXT, "
+                + DbNode.KEY_STATUS_THEFT + " TEXT, "
+                + DbNode.KEY_SENSOR + " TEXT )";
 
-        String CREATE_TABLE_FAVORITE = "CREATE TABLE " + dbNode.TABLE_FAV  + "("
-                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_NICE_NAME_D + " TEXT) ";
+        String CREATE_TABLE_FAVORITE = "CREATE TABLE " + DbNode.TABLE_FAV  + "("
+                + DbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + DbNode.KEY_NICE_NAME_D + " TEXT) ";
 
-        String CREATE_TABLE_MQTT = "CREATE TABLE " + dbNode.TABLE_MQTT  + "("
-                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_TOPIC + " TEXT, "
-                + dbNode.KEY_MESSAGE + " TEXT)";
+        String CREATE_TABLE_MQTT = "CREATE TABLE " + DbNode.TABLE_MQTT  + "("
+                + DbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + DbNode.KEY_TOPIC + " TEXT, "
+                + DbNode.KEY_MESSAGE + " TEXT)";
 
-        String CREATE_TABLE_NODE_DURATION = "CREATE TABLE " + dbNode.TABLE_NODE_DURATION  + "("
-                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_NODE_ID + " TEXT, "
-                + dbNode.KEY_CHANNEL + " TEXT, "
-                + dbNode.KEY_STATUS + " TEXT, "
-                + dbNode.KEY_TIMESTAMPS_ON + " TEXT, "
-                + dbNode.KEY_TIMESTAMPS_OFF + " TEXT, "
-                + dbNode.KEY_DURATION + " TEXT) ";
+        String CREATE_TABLE_NODE_DURATION = "CREATE TABLE " + DbNode.TABLE_NODE_DURATION  + "("
+                + DbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + DbNode.KEY_NODE_ID + " TEXT, "
+                + DbNode.KEY_CHANNEL + " TEXT, "
+                + DbNode.KEY_STATUS + " TEXT, "
+                + DbNode.KEY_TIMESTAMPS_ON + " TEXT, "
+                + DbNode.KEY_TIMESTAMPS_OFF + " TEXT, "
+                + DbNode.KEY_DURATION + " TEXT) ";
 
-        String CREATE_TABLE_SCENE = "CREATE TABLE " + dbNode.TABLE_SCENE  + "("
-                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_SCENE_NAME + " TEXT, "
-                + dbNode.KEY_SCENE_TYPE + " TEXT) ";
+        String CREATE_TABLE_SCENE = "CREATE TABLE " + DbNode.TABLE_SCENE  + "("
+                + DbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + DbNode.KEY_SCENE_NAME + " TEXT, "
+                + DbNode.KEY_SCENE_TYPE + " TEXT, "
+                + DbNode.KEY_SCHEDULE + " TEXT, "
+                + DbNode.KEY_ARRIVE + " TEXT, "
+                + DbNode.KEY_LEAVE + " TEXT) ";
 
-        String CREATE_TABLE_SCENE_DETAIL = "CREATE TABLE " + dbNode.TABLE_SCENE_DETAIL  + "("
-                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_SCENE_NAME + " TEXT, "
-                + dbNode.KEY_SCENE_DETAIL_ID + " TEXT,"
-                + dbNode.KEY_SCENE_TYPE + " TEXT) ";
+        String CREATE_TABLE_SCENE_DETAIL = "CREATE TABLE " + DbNode.TABLE_SCENE_DETAIL  + "("
+                + DbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + DbNode.KEY_SCENE_ID + " TEXT,"
+                + DbNode.KEY_PATH + " TEXT,"
+                + DbNode.KEY_COMMAND + " TEXT) ";
 
-        String CREATE_TABLE_INFO = "CREATE TABLE " + dbNode.TABLE_INFO  + "("
-                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_INFO_TYPE + " TEXT, "
-                + dbNode.KEY_SCENE_DETAIL_ID + " TEXT,"
-                + dbNode.KEY_SCENE_TYPE + " TEXT) ";
+        String CREATE_TABLE_INFO = "CREATE TABLE " + DbNode.TABLE_INFO  + "("
+                + DbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + DbNode.KEY_INFO_TYPE + " TEXT, "
+                + DbNode.KEY_SCENE_ID + " TEXT,"
+                + DbNode.KEY_SCENE_TYPE + " TEXT) ";
 
         db.execSQL(CREATE_TABLE_NODE);
         db.execSQL(CREATE_TABLE_NODE_INSTALLED);
@@ -106,14 +106,14 @@ public class dbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed, all data will be gone!!!
-        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_NODE);
-        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_FAV);
-        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_MQTT);
-        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_NODE_DURATION);
-        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_SCENE);
-        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_SCENE_DETAIL);
-        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_INFO);
+        db.execSQL("DROP TABLE IF EXISTS " + DbNode.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + DbNode.TABLE_NODE);
+        db.execSQL("DROP TABLE IF EXISTS " + DbNode.TABLE_FAV);
+        db.execSQL("DROP TABLE IF EXISTS " + DbNode.TABLE_MQTT);
+        db.execSQL("DROP TABLE IF EXISTS " + DbNode.TABLE_NODE_DURATION);
+        db.execSQL("DROP TABLE IF EXISTS " + DbNode.TABLE_SCENE);
+        db.execSQL("DROP TABLE IF EXISTS " + DbNode.TABLE_SCENE_DETAIL);
+        db.execSQL("DROP TABLE IF EXISTS " + DbNode.TABLE_INFO);
 
         // Create tables again
         onCreate(db);

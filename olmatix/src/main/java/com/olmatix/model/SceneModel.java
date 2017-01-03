@@ -4,10 +4,10 @@ package com.olmatix.model;
  * Created by Lesjaw on 01/01/2017.
  */
 
-public class Scene_Model {
+public class SceneModel {
 
     private int id, sceneType;
-    private String sceneName;
+    private String sceneName, schedule, arrived, leave;
 
     public int getId() {
         return id;
@@ -31,5 +31,29 @@ public class Scene_Model {
 
     public void setSceneName(String sceneName) {
         this.sceneName = sceneName;
+    }
+
+    public String getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(String schedule) {
+        this.schedule = schedule;
+    }
+
+    public String getArrived() {
+        return arrived;
+    }
+
+    public void setArrived(String arrived) {
+        this.arrived = arrived;
+    }
+
+    public String getLeave() {
+        return leave;
+    }
+
+    public void setLeave(String leave) {
+        this.leave = leave;
     }
 }

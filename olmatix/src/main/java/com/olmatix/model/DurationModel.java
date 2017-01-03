@@ -4,15 +4,15 @@ package com.olmatix.model;
  * Created by Rahman on 12/28/2016.
  */
 
-public class Duration_Model {
+public class DurationModel {
     int id;
     String nodeId, channel, status, niceName;
     Long timeStampOn, timeStampOff, duration;
 
-    public Duration_Model() {
+    public DurationModel() {
     }
 
-    public Duration_Model(int id, String nodeId, String channel, String status, String niceName, Long timeStampOn, Long timeStampOff, Long duration) {
+    public DurationModel(int id, String nodeId, String channel, String status, String niceName, Long timeStampOn, Long timeStampOff, Long duration) {
         this.id = id;
         this.nodeId = nodeId;
         this.channel = channel;

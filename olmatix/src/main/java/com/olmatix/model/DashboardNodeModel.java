@@ -4,7 +4,7 @@ package com.olmatix.model;
  * Created by Lesjaw on 17/12/2016.
  */
 
-public class Dashboard_NodeModel {
+public class DashboardNodeModel {
 
     private  int id;
     private String nice_name_d;

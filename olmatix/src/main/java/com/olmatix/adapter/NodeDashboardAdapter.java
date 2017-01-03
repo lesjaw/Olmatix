@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Dashboard_NodeModel;
+import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.ui.fragment.Dashboard_Node;
 import com.olmatix.utils.Connection;
 
@@ -33,12 +33,12 @@ import java.util.List;
 public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdapter.ViewHolder> implements ItemTouchHelperAdapter {
 
     private final OnStartDragListener mDragStartListener;
-    List<Dashboard_NodeModel> nodeList;
+    List<DashboardNodeModel> nodeList;
     private Animation animConn;
     Context context;
 
 
-    public NodeDashboardAdapter(ArrayList<Dashboard_NodeModel> nodeList, Context dashboardnode, OnStartDragListener dragStartListener) {
+    public NodeDashboardAdapter(ArrayList<DashboardNodeModel> nodeList, Context dashboardnode, OnStartDragListener dragStartListener) {
         this.nodeList = nodeList;
         mDragStartListener = dragStartListener;
         this.context = dashboardnode;
@@ -68,7 +68,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
         int mNodeID = nodeList.get(position).getId();
         Log.d("DEBUG", "removeItem: "+mNodeID);
-        Dashboard_Node.dbNodeRepo.deleteFav(nodeList.get(position).getId());
+        Dashboard_Node.mDbNodeRepo.deleteFav(nodeList.get(position).getId());
         nodeList.remove(position);
 
         notifyItemRemoved(position);
@@ -103,7 +103,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
 
-        final Dashboard_NodeModel mFavoriteModel = nodeList.get(position);
+        final DashboardNodeModel mFavoriteModel = nodeList.get(position);
 
         if ((mFavoriteModel.getSensor().trim()).equals("light")) {
 

@@ -12,6 +12,14 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/olmatixlogo"
@@ -53,6 +61,7 @@
             android:name="com.olmatix.ui.activity.AboutActivity"
             android:label="@string/pref_about">
         </activity>
+
 
         <service android:name="com.olmatix.service.OlmatixService">
         </service>

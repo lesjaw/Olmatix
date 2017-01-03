@@ -43,13 +43,13 @@ import android.widget.Toast;
 
 import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
-import com.olmatix.database.dbNodeRepo;
+import com.olmatix.database.DbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Dashboard_NodeModel;
-import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.model.DashboardNodeModel;
+import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.model.SpinnerObject;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.utils.GridAutofitLayoutManager;
@@ -78,11 +78,11 @@ public class Dashboard_Node extends Fragment implements
     private InfoAdapter infoAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
-    private Dashboard_NodeModel dashboardNodeModel;
-    private Installed_NodeModel installedNodeModel;
-    public  static dbNodeRepo dbNodeRepo;
+    private DashboardNodeModel dashboardNodeModel;
+    private InstalledNodeModel installedNodeModel;
+    public  static DbNodeRepo mDbNodeRepo;
     private Paint p = new Paint();
-    private static ArrayList<Dashboard_NodeModel> data;
+    private static ArrayList<DashboardNodeModel> data;
     Spinner mSpinner;
     private int mDatasetTypes[] = {mLOCATION, mBUTTON}; //view types
     Context dashboardnode;
@@ -111,10 +111,9 @@ public class Dashboard_Node extends Fragment implements
 
         data = new ArrayList<>();
 
-        dbNodeRepo = new dbNodeRepo(getActivity());
-        dashboardNodeModel= new Dashboard_NodeModel();
+        mDbNodeRepo = new DbNodeRepo(getActivity());
+        dashboardNodeModel= new DashboardNodeModel();
         dashboardnode=getActivity();
-
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         setupView();
@@ -147,7 +146,7 @@ public class Dashboard_Node extends Fragment implements
                 mSpinner = new Spinner(getContext());
                 String[] labelData;
 
-                List<SpinnerObject> lables = dbNodeRepo.getAllLabels();
+                List<SpinnerObject> lables = mDbNodeRepo.getAllLabels();
 
                 ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<SpinnerObject>(getActivity(),
                         android.R.layout.simple_spinner_item,lables);
@@ -169,7 +168,7 @@ public class Dashboard_Node extends Fragment implements
                                 System.out.println(String.valueOf(databaseId));
 
                                 dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
-                                dbNodeRepo.insertFavNode(dashboardNodeModel);
+                                mDbNodeRepo.insertFavNode(dashboardNodeModel);
                                 setRefresh();
 
                             }
@@ -199,8 +198,8 @@ public class Dashboard_Node extends Fragment implements
         LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecycleViewInfo.setLayoutManager(horizontalLayoutManagaer);
 
-        int mNoOfColumns = GridAutofitLayoutManager.DEFAULT_SPAN_COUNT;
-        int spacing = 10;
+        int mNoOfColumns = 3;
+        int spacing = 10; // 50px
         boolean includeEdge = true;
         mRecycleView.addItemDecoration(new GridSpacingItemDecoration(mNoOfColumns, spacing, includeEdge));
 
@@ -208,7 +207,7 @@ public class Dashboard_Node extends Fragment implements
         mRecycleViewInfo.setItemAnimator(new DefaultItemAnimator());
 
         data.clear();
-        data.addAll(dbNodeRepo.getNodeDetailDash());
+        data.addAll(mDbNodeRepo.getNodeDetailDash());
         adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
 
@@ -240,8 +239,7 @@ public class Dashboard_Node extends Fragment implements
             }
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
-            {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE)
                 {
                     mFab.show();
@@ -254,7 +252,7 @@ public class Dashboard_Node extends Fragment implements
 
     private void setRefresh() {
         data.clear();
-        data.addAll(dbNodeRepo.getNodeDetailDash());
+        data.addAll(mDbNodeRepo.getNodeDetailDash());
         adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
@@ -293,7 +291,7 @@ public class Dashboard_Node extends Fragment implements
 
         adapter.notifyDataSetChanged();
         data.clear();
-        data.addAll(dbNodeRepo.getNodeDetailDash());
+        data.addAll(mDbNodeRepo.getNodeDetailDash());
         if(adapter != null){
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }

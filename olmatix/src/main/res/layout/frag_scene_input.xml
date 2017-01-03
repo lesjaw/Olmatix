@@ -143,16 +143,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center|center_horizontal"
-                    android:text="Actons"
+                    android:text="Actions"
                     android:textColor="@color/black"
                     android:layout_weight="1"/>
             </LinearLayout>
-            <ListViewCompat
+            <ListView
                 android:id="@+id/listScene"
                 android:layout_width="wrap_content"
-                android:layout_height="250dp"
+                android:layout_height="220dp"
                 android:layout_below="@id/headerLayout"
-                android:layout_marginBottom="10dp"/>
+                android:layout_marginBottom="10dp"
+                android:alwaysDrawnWithCache="true"
+                android:dividerHeight="1dp"
+                android:horizontalSpacing="3dp"
+                android:scrollingCache="true"
+                android:smoothScrollbar="true"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="3dp"/>
 
 
 

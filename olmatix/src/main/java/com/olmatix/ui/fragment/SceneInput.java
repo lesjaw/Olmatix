@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +45,7 @@ public class SceneInput extends Fragment {
     private SceneModel mSceneModel;
     private Context mContext;
     private DetailNodeModel mDetailNodeModel;
-    private ListViewCompat mListView;
+    private ListView mListView;
 
     public SceneInput() {
     }
@@ -76,7 +77,7 @@ public class SceneInput extends Fragment {
         mImgAdd = (ImageButton) mView.findViewById(R.id.img_add);
         mSubmitBtn = (Button) mView.findViewById(R.id.btnSubmit);
         mBackBtn = (Button) mView.findViewById(R.id.btnBack);
-        mListView= (ListViewCompat) mView.findViewById(R.id.listScene);
+        mListView= (ListView) mView.findViewById(R.id.listScene);
     }
 
     private void setupValData() {

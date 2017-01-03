@@ -251,12 +251,10 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
             }
             if (message.equals("2")){
                 updatelist();
-                Log.d("receiver", "NotifyChangeDetail : " + message);
+                //Log.d("receiver", "NotifyChangeDetail : " + message);
             }
         }
     };
-
-
 
     private void updatelist (){
         adapter.notifyDataSetChanged();

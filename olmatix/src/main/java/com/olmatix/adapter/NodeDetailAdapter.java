@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Detail_NodeModel;
+import com.olmatix.model.DetailNodeModel;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
@@ -33,11 +33,11 @@ import java.util.List;
 public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.ViewHolder> implements ItemTouchHelperAdapter {
 
     private final OnStartDragListener mDragStartListener;
-    List<Detail_NodeModel> nodeList;
+    List<DetailNodeModel> nodeList;
     Context context;
     String fw_name;
 
-    public NodeDetailAdapter(List<Detail_NodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
+    public NodeDetailAdapter(List<DetailNodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
 
         this.nodeList = nodeList;
         this.fw_name = fw_name;
@@ -74,7 +74,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
 
-        final Detail_NodeModel mInstalledNodeModel = nodeList.get(position);
+        final DetailNodeModel mInstalledNodeModel = nodeList.get(position);
 
         if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
 

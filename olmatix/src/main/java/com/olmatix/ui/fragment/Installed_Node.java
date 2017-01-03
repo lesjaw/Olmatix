@@ -39,11 +39,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.NodeAdapter;
-import com.olmatix.database.dbNodeRepo;
+import com.olmatix.database.DbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -63,17 +63,17 @@ import static com.olmatix.lesjaw.olmatix.R.id.fab;
 public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     private View mView;
-    private List<Installed_NodeModel> nodeList = new ArrayList<>();
+    private List<InstalledNodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
     private Timer autoUpdate;
     private NodeAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private static ArrayList<Installed_NodeModel> data;
+    private static ArrayList<InstalledNodeModel> data;
     private Paint p = new Paint();
     private ItemTouchHelper mItemTouchHelper;
-    public static dbNodeRepo dbNodeRepo;
-    private Installed_NodeModel installedNodeModel;
+    public static DbNodeRepo mDbNodeRepo;
+    private InstalledNodeModel installedNodeModel;
     private String inputResult;
     Boolean stateMqtt=false;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -96,8 +96,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         installed_node=getContext();
 
         data = new ArrayList<>();
-        dbNodeRepo = new dbNodeRepo(getActivity());
-        installedNodeModel = new Installed_NodeModel();
+        mDbNodeRepo = new DbNodeRepo(getActivity());
+        installedNodeModel = new InstalledNodeModel();
         setupView();
         onClickListener();
 
@@ -265,7 +265,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     private void updatelist (){
         adapter.notifyDataSetChanged();
         data.clear();
-        data.addAll(dbNodeRepo.getNodeList());
+        data.addAll(mDbNodeRepo.getNodeList());
         //adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
         //mRecycleView.setAdapter(adapter);
         if(adapter != null) {
@@ -280,9 +280,9 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
     private void doSubAll(){
 
-        int countDB = dbNodeRepo.getNodeList().size();
+        int countDB = mDbNodeRepo.getNodeList().size();
         Log.d("DEBUG", "Count list: "+countDB);
-        data.addAll(dbNodeRepo.getNodeList());
+        data.addAll(mDbNodeRepo.getNodeList());
         for (int i = 0; i < countDB; i++) {
             final String mNodeID = data.get(i).getNodesID();
             Log.d("DEBUG", "Count list: "+mNodeID);
@@ -375,7 +375,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
         data.clear();
-        data.addAll(dbNodeRepo.getNodeList());
+        data.addAll(mDbNodeRepo.getNodeList());
         adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
 
@@ -417,7 +417,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     private void setRefresh() {
         data.clear();
         doSubAll();
-        data.addAll(dbNodeRepo.getNodeList());
+        data.addAll(mDbNodeRepo.getNodeList());
         adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
@@ -481,7 +481,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                             String nice_name = input.getText().toString();
                             installedNodeModel.setNodesID(data.get(position).getNodesID());
                             installedNodeModel.setNice_name_n(nice_name);
-                            dbNodeRepo.updateNameNice(installedNodeModel);
+                            mDbNodeRepo.updateNameNice(installedNodeModel);
                             Toast.makeText(getActivity(),"Renaming Node success",Toast.LENGTH_LONG).show();
                             setRefresh();
 

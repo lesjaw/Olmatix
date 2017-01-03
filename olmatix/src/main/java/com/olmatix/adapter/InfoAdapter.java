@@ -20,12 +20,12 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.olmatix.database.dbNodeRepo;
+import com.olmatix.database.DbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Duration_Model;
+import com.olmatix.model.DurationModel;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -43,8 +43,8 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     private final OnStartDragListener mDragStartListener;
     public static final int mBUTTON = 0;
     public static final int mLOCATION = 1;
-    private static dbNodeRepo dbNodeRepo;
-    private static ArrayList<Duration_Model> data ;
+    private static DbNodeRepo DbNodeRepo;
+    private static ArrayList<DurationModel> data ;
     private int[] mDataSetTypes;
     Context context;
     String loc = null;
@@ -208,10 +208,10 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     }
 
     private String getNodeIdData( String z) {
-        dbNodeRepo = new dbNodeRepo(context);
-        int countDb = dbNodeRepo.getChartDurationList().size();
+        DbNodeRepo = new DbNodeRepo(context);
+        int countDb = DbNodeRepo.getChartDurationList().size();
         data = new ArrayList<>();
-        data.addAll(dbNodeRepo.getChartDurationList());
+        data.addAll(DbNodeRepo.getChartDurationList());
         for (int k = 0; k < data.size(); k++) {
             z = data.get(k).getNiceName();
             Log.d("DEBUG", "nodeIdData 1: " +  data.get(k).getNiceName());
@@ -223,11 +223,11 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
     private ArrayList<Entry> setYAxisValues() {
         ArrayList<Entry> yVals1 = null;
-        dbNodeRepo = new dbNodeRepo(context);
-        int countDb = dbNodeRepo.getChartDurationList().size();
+        DbNodeRepo = new DbNodeRepo(context);
+        int countDb = DbNodeRepo.getChartDurationList().size();
         Log.d("DEBUG", "setYAxis: " +  countDb);
         data = new ArrayList<>();
-        data.addAll(dbNodeRepo.getChartDurationList());
+        data.addAll(DbNodeRepo.getChartDurationList());
         Long[] mDuration = new Long[data.size()];
         for (int i = 0; i < data.size(); i++) {
 
@@ -245,10 +245,10 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
     private ArrayList<String> setXAxisValues(){
         ArrayList<String> xVals = null;
-        dbNodeRepo = new dbNodeRepo(context);
-        int countDb = dbNodeRepo.getChartDurationList().size();
+        DbNodeRepo = new DbNodeRepo(context);
+        int countDb = DbNodeRepo.getChartDurationList().size();
         data = new ArrayList<>();
-        data.addAll(dbNodeRepo.getChartDurationList());
+        data.addAll(DbNodeRepo.getChartDurationList());
         Long[] mTimeOn = new Long[data.size()];
         for (int i = 0; i < data.size(); i++) {
 

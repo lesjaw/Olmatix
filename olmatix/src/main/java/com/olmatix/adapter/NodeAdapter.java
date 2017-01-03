@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.fragment.Installed_Node;
 import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
@@ -34,7 +34,7 @@ import java.util.List;
 public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter
 {
 
-    List<Installed_NodeModel> nodeList;
+    List<InstalledNodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
     private ClickListener clicklistener = null;
     Context context;
@@ -68,7 +68,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         }
     }
 
-    public NodeAdapter(List<Installed_NodeModel> nodeList, Context context, OnStartDragListener dragStartListener) {
+    public NodeAdapter(List<InstalledNodeModel> nodeList, Context context, OnStartDragListener dragStartListener) {
         this.nodeList = nodeList;
         mDragStartListener = dragStartListener;
         this.context = context;
@@ -86,7 +86,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     @Override
     public void onBindViewHolder(final OlmatixHolder holder, int position) {
 
-        final Installed_NodeModel mInstalledNodeModel = nodeList.get(position);
+        final InstalledNodeModel mInstalledNodeModel = nodeList.get(position);
 
         if(mInstalledNodeModel.getOnline() != null) {
             if (mInstalledNodeModel.getOnline().equals("true")) {
@@ -189,7 +189,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             Log.d("DEBUG", "removeItem: " +a +" / "+mNodeID);
         }
 
-        Installed_Node.dbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
+        Installed_Node.mDbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
         nodeList.remove(position);
 
         notifyItemRemoved(position);

@@ -6,23 +6,30 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.olmatix.adapter.SceneSummaryAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
+import com.olmatix.model.SceneDetailModel;
 import com.olmatix.model.SceneModel;
 import com.olmatix.model.SpinnerObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,7 +38,9 @@ import java.util.List;
 
 public class SceneInput extends Fragment {
     private static final String[] MSCENE = {"Select Scene", "Scheduled Time", "Home Arrived", "Home Leave", "Base On Sensor", "Nothing"};
-    private static ArrayList<SceneModel> data;
+    private static ArrayList<SceneModel> dataScene;
+    private static ArrayList<SceneDetailModel> dataDetailScene;
+    private static ArrayList<DetailNodeModel> dataNode;
     private View mView;
     private Bundle mBundle;
     private TextView mTextName;
@@ -44,7 +53,17 @@ public class SceneInput extends Fragment {
     private SceneModel mSceneModel;
     private Context mContext;
     private DetailNodeModel mDetailNodeModel;
+    private SceneDetailModel mSceneDetailModel;
     private ListView mListView;
+    private Boolean isChecked = false;
+
+    static int hour, min;
+
+    java.sql.Time timeValue;
+    SimpleDateFormat mFormat;
+    Calendar mCal;
+    int year, month, day;
+    SimpleDateFormat mFormatter;
 
     public SceneInput() {
     }
@@ -73,6 +92,7 @@ public class SceneInput extends Fragment {
         mSpinWhat.setItems(MSCENE);
         mSpinNode = (MaterialSpinner) mView.findViewById(R.id.spin_node);
         mSwitchNode = (SwitchCompat) mView.findViewById(R.id.swich_node);
+        mSwitchNode.setChecked(false);
         mImgAdd = (ImageButton) mView.findViewById(R.id.img_add);
         mSubmitBtn = (Button) mView.findViewById(R.id.btnSubmit);
         mBackBtn = (Button) mView.findViewById(R.id.btnBack);
@@ -83,6 +103,8 @@ public class SceneInput extends Fragment {
         mBundle = getArguments();
         mBundle.getString("sceneName", sceneNamed);
         mTextName.setText(mBundle.getString("sceneName", sceneNamed));
+        sceneNamed = mBundle.getString("sceneName", sceneNamed);
+        Log.d("DEBUG", "setupValData: "+ sceneNamed);
     }
 
     private void setupClickListener() {
@@ -91,6 +113,8 @@ public class SceneInput extends Fragment {
         mBackBtn.setOnClickListener(BackBtnClickListener());
         mImgAdd.setOnClickListener(ImgAddClickListener());
     }
+
+
 
     private View.OnClickListener ImgAddClickListener() {
         return new View.OnClickListener() {
@@ -105,11 +129,15 @@ public class SceneInput extends Fragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validationData() == true) {
-                    setSceneData();
-                    onBackAction();
 
-                }
+                //setSceneData();
+                //fillDataScene();
+                reloadScene();
+                onBackAction();
+                /*if (validationData() == true) {
+
+
+                }*/
 
 
             }
@@ -130,12 +158,42 @@ public class SceneInput extends Fragment {
         };
     }
 
+    private void fillDataScene(){
+        //sceneNamed =
+        int sceneDbCount = mDbNodeRepo.getSceneList(sceneNamed).size();
+        Log.d("DEBUG", "INSERT SCENE " + sceneNamed);
+        dataScene = new ArrayList<>();
+        mSceneModel.setSceneName(sceneNamed);
+        dataScene.addAll(mDbNodeRepo.getSceneList(sceneNamed));
+        if (sceneDbCount !=0){
+            Log.d("DEBUG", "INSERT SCENE " + sceneDbCount);
+
+            for (int w = 0; w < dataScene.size(); w++){
+                int mSceneId = dataScene.get(w).getId();
+                Log.d("DEBUG", "VAL SCENE: " + mSceneId);
+                mSceneDetailModel.setSceneid(mSceneId);
+            }
+        }
+        for (int i = 0; i < mSpinNode.length(); i++) {
+            String mPath = String.valueOf(mSpinNode.getSelectedIndex());
+            mSceneDetailModel.setPath(mPath);
+        }
+        if (isChecked == true){
+            mSceneDetailModel.setCommand("ON");
+        } else {
+            mSceneDetailModel.setCommand("OFF");
+        }
+
+        mDbNodeRepo.insertSceneDetail(mSceneDetailModel);
+
+    }
+
+
     private void setupDatabaseRepo() {
         mDbNodeRepo = new dbNodeRepo(getActivity());
         mSceneModel = new SceneModel();
         mDetailNodeModel = new DetailNodeModel();
-
-        mContext = getActivity();
+        mSceneDetailModel =  new SceneDetailModel();
     }
 
 
@@ -167,6 +225,14 @@ public class SceneInput extends Fragment {
             return false;
         }
 
+        dataDetailScene = mDbNodeRepo.getAllScene();
+        if(dataDetailScene != null){
+            if(dataDetailScene.size() == 0){
+                Toast.makeText(getActivity(), "Ups, Sorry your scene list is empty.", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+
 
 
 
@@ -185,20 +251,56 @@ public class SceneInput extends Fragment {
     private void setSceneData() {
         mBundle = getArguments();
         for (int i = 0; i < mSpinWhat.length(); i++) {
+            if(mSpinWhat.length() == 1 ){
+                //loadDateTimePicker();
+            }
+            
             if (mSceneModel.getSceneType() == 0) {
                 mSceneModel.setSceneType(mSpinWhat.getSelectedIndex());
-            }
+                
+            } 
 
         }
+
         mSceneModel.setSceneName(mBundle.getString("sceneName", sceneNamed));
         mDbNodeRepo.insertDbScene(mSceneModel);
     }
 
+    public void reloadScene(){
+        Thread thread = new Thread(null, loadScene);
+        thread.start();
+        //setupClickListener();
+
+    }
+
+    private Runnable loadScene = new Runnable() {
+
+        @Override
+        public void run() {
+            try {
+                setSceneData();
+                dataScene = mDbNodeRepo.getSceneList(sceneNamed);
+                Log.d("DEBUG", "DATA SCENE COUNT=" + String.valueOf(dataScene.size()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            getActivity().runOnUiThread(insertSceneDetail);
+        }
+
+    };
 
 
+    private Runnable insertSceneDetail = new Runnable() {
 
+        @Override
+        public void run() {
+            fillDataScene();
+           /* warisAdapter = new WarisAdapter(activity, warisList);
+            listView_DataWaris.setAdapter(warisAdapter);
+            warisAdapter.notifyDataSetChanged();
+            listView_DataWaris.requestFocus();*/
+        }
 
-
-
+    };
 
 }

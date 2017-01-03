@@ -7,7 +7,7 @@ package com.olmatix.model;
 public class SceneDetailModel {
 
     private int id, sceneid;
-    private String path, command, sceneType, nodeId, niceName;
+    private String path, command, sceneType, nodeId, niceName, channel;
 
     public int getId() {
         return id;
@@ -63,5 +63,13 @@ public class SceneDetailModel {
 
     public void setNiceName(String niceName) {
         this.niceName = niceName;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 }

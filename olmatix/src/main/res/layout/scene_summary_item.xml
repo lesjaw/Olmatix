@@ -5,7 +5,7 @@
     android:orientation="horizontal" >
 
         <TextView
-            android:id="@+id/scene_id"
+            android:id="@+id/txId"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
@@ -16,7 +16,7 @@
             android:layout_weight="1"/>
 
         <TextView
-            android:id="@+id/scene_name"
+            android:id="@+id/typicalName"
             android:layout_width="64dp"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
@@ -26,14 +26,6 @@
             android:textColor="@color/black"
             android:layout_weight="1"/>
 
-        <TextView
-            android:id="@+id/scene_job"
-            android:layout_width="60dp"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical|center_horizontal"
-            android:text="Scene Job"
-            android:textColor="@color/black"
-            android:layout_weight="1"/>
         <TextView
             android:id="@+id/scene_command"
             android:layout_width="60dp"

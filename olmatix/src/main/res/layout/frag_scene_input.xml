@@ -100,41 +100,32 @@
                 android:layout_marginBottom="10dp">
 
                 <TextView
-                    android:id="@+id/lbl_scene_id"
+                    android:id="@+id/lblId"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentLeft="true"
-                    android:layout_toLeftOf="@+id/txGen"
                     android:gravity="center|center_vertical"
-                    android:text="Scene ID"
+                    android:text="#"
                     android:textColor="@color/black"
                     android:layout_weight="1"/>
 
                 <TextView
-                    android:id="@+id/lbl_sceneName"
+                    android:id="@+id/lbl_typicalName"
                     android:layout_width="64dp"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:gravity="center|center_horizontal"
-                    android:text="Name"
+                    android:text="Typical Name"
                     android:textColor="@color/black"
                     android:layout_weight="1"/>
 
-                <TextView
-                    android:id="@+id/lbl_scene_job"
-                    android:layout_width="60dp"
-                    android:layout_height="match_parent"
-                    android:gravity="center|center_horizontal"
-                    android:text="Job"
-                    android:textColor="@color/black"
-                    android:layout_weight="1"/>
                 <TextView
                     android:id="@+id/lbl_scene_command"
                     android:layout_width="60dp"
                     android:layout_height="match_parent"
                     android:gravity="center|center_horizontal"
-                    android:text=" Command"
+                    android:text="Command"
                     android:textColor="@color/black"
                     android:layout_weight="1"/>
 

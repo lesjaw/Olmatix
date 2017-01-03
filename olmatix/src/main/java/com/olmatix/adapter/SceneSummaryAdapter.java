@@ -2,6 +2,7 @@ package com.olmatix.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.SceneDetailModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Rahman on 1/3/2017.
@@ -27,8 +29,9 @@ public class SceneSummaryAdapter extends BaseAdapter {
     SceneDetailModel mSceneDetail;
     private static dbNodeRepo DbNodeRepo;
     private static ArrayList<DetailNodeModel> data ;
-    private TextView sceneId, sceneName, sceneJobs,sceneCmd;
+    private TextView mId, mTypicalName, sceneCmd;
     private ImageButton imgActions;
+    private Boolean mRemove = false;
 
     public SceneSummaryAdapter(Activity mContext, ArrayList<SceneDetailModel> mSceneDetailData) {
         this.mContext = mContext;
@@ -56,44 +59,41 @@ public class SceneSummaryAdapter extends BaseAdapter {
         View mView = convertView;
         if(convertView == null)
             mView = mInflater.inflate(R.layout.scene_summary_item, null);
-        sceneId = (TextView) mView.findViewById(R.id.scene_id);
-        sceneName = (TextView) mView.findViewById(R.id.scene_name);
-        sceneJobs = (TextView) mView.findViewById(R.id.scene_job);
-        sceneCmd = (TextView) mView.findViewById(R.id.scene_command);
-        imgActions = (ImageButton) mView.findViewById(R.id.imgActions);
+        mId             = (TextView) mView.findViewById(R.id.txId);
+        mTypicalName    = (TextView) mView.findViewById(R.id.typicalName);
+        sceneCmd        = (TextView) mView.findViewById(R.id.scene_command);
+        imgActions      = (ImageButton) mView.findViewById(R.id.imgActions);
+        imgActions.setTag(position);
 
         mSceneDetail= mSceneDetailData.get(position);
-
         for (int i=0; i > mSceneDetailData.size(); i++){
-            sceneId.setText(i);
+            mId.setText(i);
         }
 
-        DbNodeRepo = new dbNodeRepo(mContext);
-        int countDb = DbNodeRepo.getNodeDetailList().size();
-        data = new ArrayList<>();
-        data.addAll(DbNodeRepo.getNodeDetailList());
-       /* for (int k = 0; k < data.size(); k++) {
-            z = data.get(k).getNiceName();
-            Log.d("DEBUG", "nodeIdData 1: " +  data.get(k).getNiceName());
+        mTypicalName.setText(mSceneDetail.getNiceName());
+        sceneCmd.setText(mSceneDetail.getCommand());
 
-        }
-        if (mSceneDetail.getSceneid() == )
-        sceneName.setText(mSceneDetail.getSceneid());
-        textView_TanggalLahir.setText(mSceneDetail.getTanggal_lahir());
+        imgActions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        if(waris.getJenis_kelamin().equals("1")){
-            this.textView_JenisKelamin.setText("Pria");
-        } else if(waris.getJenis_kelamin().equals("2")){
-            this.textView_JenisKelamin.setText("Wanita");
-        }else{
-            this.textView_JenisKelamin.setText("");
-        }
+                Log.d("DEBUG", "onClick: " + mSceneDetailData.size());
 
-        this.textView_Hubungan.setText(waris.getHubungan());
-
-*/
-
+                v.setVisibility(View.GONE);
+                notifyDataSetChanged();
+                int positionToRemove = (int)v.getTag(); //get the position of the view to delete stored in the tag
+                removeItem(positionToRemove); //remove the item
+            }
+        });
 
         return mView;
+    }
+
+    private void removeItem(int position) {
+
+        ArrayList<SceneDetailModel> remScene = new ArrayList<>();
+        remScene.remove(position);
+        notifyDataSetChanged();
+
     }
 }

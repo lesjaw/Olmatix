@@ -114,6 +114,7 @@ public class DashboardNode extends Fragment implements
         mDbNodeRepo = new dbNodeRepo(getActivity());
         dashboardNodeModel= new DashboardNodeModel();
         dashboardnode=getActivity();
+        mDbNodeRepo.getAllScene();
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         setupView();

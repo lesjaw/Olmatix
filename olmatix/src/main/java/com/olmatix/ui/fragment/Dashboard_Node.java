@@ -265,8 +265,6 @@ public class Dashboard_Node extends Fragment implements
         void onLongClick(View view,int position);
     }
 
-
-
     @Override
     public void onStart() {
         super.onStart();

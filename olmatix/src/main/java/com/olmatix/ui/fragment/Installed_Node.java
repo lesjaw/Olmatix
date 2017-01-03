@@ -4,6 +4,7 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +16,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -80,6 +82,8 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     String nice_name;
     String fwName;
     Context installed_node;
+    private ProgressDialog nDialog;
+    private Handler handler;
 
     @Nullable
     @Override
@@ -101,20 +105,11 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         setupView();
         onClickListener();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                doSubAll();
-            }
-        }, 1000);
-
-
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
                 mRecycleView, new ClickListener() {
             @Override
             public void onClick(View view, final int position) {
-                /*if (stateMqtt) {
-                    Log.d("DEBUG", "onClick: "+stateMqtt);*/
+
                     fwName = data.get(position).getFwName();
                     nice_name = data.get(position).getNice_name_n();
 
@@ -190,6 +185,50 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         }));
     }
 
+    private void load(){
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected void onPreExecute() {
+                nDialog = new ProgressDialog(getContext());
+                nDialog.setTitle("Refreshing");
+                nDialog.setMessage("Loading Nodes, Please wait..");
+                nDialog.setIndeterminate(false);
+                nDialog.setCancelable(false);
+                nDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                nDialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... arg0) {
+                try {
+                    doSubAll();
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                    nDialog.dismiss();
+                    setAdapter();
+
+            }
+
+        };
+        task.execute((Void[])null);
+    }
+
+    private void setAdapter(){
+        data.clear();
+        data.addAll(dbNodeRepo.getNodeList());
+        adapter = new NodeAdapter(data,installed_node,this);
+        mRecycleView.setAdapter(adapter);
+
+    }
     private void refreshHeader() {
         autoUpdate = new Timer();
         autoUpdate.schedule(new TimerTask() {
@@ -252,11 +291,9 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
             }
             if (mChange.equals("1")){
                 updatelist();
-                //Log.d("receiver", "NotifyAdd : " + mChange);
             }else if (mChange.equals("2")) {
                 if (adapter != null)
                     updatelist();
-                //Log.d("receiver", "NotifyChangeNode : " + mChange);
             }
         }
     };
@@ -266,26 +303,20 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         adapter.notifyDataSetChanged();
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
-        //adapter = new NodeAdapter(dbNodeRepo.getNodeList(),this);
-        //mRecycleView.setAdapter(adapter);
+
         if(adapter != null) {
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
         assert adapter != null;
-        //adapter.setClickListener(this);
 
     }
-
-
 
     private void doSubAll(){
 
         int countDB = dbNodeRepo.getNodeList().size();
-        Log.d("DEBUG", "Count list: "+countDB);
         data.addAll(dbNodeRepo.getNodeList());
         for (int i = 0; i < countDB; i++) {
             final String mNodeID = data.get(i).getNodesID();
-            Log.d("DEBUG", "Count list: "+mNodeID);
             for (int a=0; a < 4 ;a++) {
                 String topic="";
                 if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
@@ -298,7 +329,6 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                     subToken.setActionCallback(new IMqttActionListener() {
                         @Override
                         public void onSuccess(IMqttToken asyncActionToken) {
-                            Log.d("Subscribe", " device = " + mNodeID);
                         }
 
                         @Override
@@ -374,10 +404,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-        data.clear();
-        data.addAll(dbNodeRepo.getNodeList());
-        adapter = new NodeAdapter(data,installed_node,this);
-        mRecycleView.setAdapter(adapter);
+        load();
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -415,11 +442,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     }
 
     private void setRefresh() {
-        data.clear();
-        doSubAll();
-        data.addAll(dbNodeRepo.getNodeList());
-        adapter = new NodeAdapter(data,installed_node,this);
-        mRecycleView.setAdapter(adapter);
+        load();
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

@@ -43,7 +43,7 @@ import android.widget.Toast;
 
 import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
-import com.olmatix.database.DbNodeRepo;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
@@ -66,7 +66,7 @@ import static com.olmatix.adapter.InfoAdapter.mBUTTON;
 import static com.olmatix.adapter.InfoAdapter.mLOCATION;
 
 
-public class Dashboard_Node extends Fragment implements
+public class DashboardNode extends Fragment implements
         OnStartDragListener,
         LocationListener {
 
@@ -80,7 +80,7 @@ public class Dashboard_Node extends Fragment implements
     private ItemTouchHelper mItemTouchHelper;
     private DashboardNodeModel dashboardNodeModel;
     private InstalledNodeModel installedNodeModel;
-    public  static DbNodeRepo mDbNodeRepo;
+    public  static dbNodeRepo mDbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<DashboardNodeModel> data;
     Spinner mSpinner;
@@ -111,7 +111,7 @@ public class Dashboard_Node extends Fragment implements
 
         data = new ArrayList<>();
 
-        mDbNodeRepo = new DbNodeRepo(getActivity());
+        mDbNodeRepo = new dbNodeRepo(getActivity());
         dashboardNodeModel= new DashboardNodeModel();
         dashboardnode=getActivity();
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -329,10 +329,10 @@ public class Dashboard_Node extends Fragment implements
 
     class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
 
-        private Dashboard_Node.ClickListener clicklistener;
+        private DashboardNode.ClickListener clicklistener;
         private GestureDetector gestureDetector;
 
-        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final Dashboard_Node.ClickListener clicklistener){
+        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final DashboardNode.ClickListener clicklistener){
 
             this.clicklistener=clicklistener;
             gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){

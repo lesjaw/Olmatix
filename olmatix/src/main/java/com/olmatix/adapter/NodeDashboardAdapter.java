@@ -16,7 +16,7 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
-import com.olmatix.ui.fragment.Dashboard_Node;
+import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -68,7 +68,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
         int mNodeID = nodeList.get(position).getId();
         Log.d("DEBUG", "removeItem: "+mNodeID);
-        Dashboard_Node.mDbNodeRepo.deleteFav(nodeList.get(position).getId());
+        DashboardNode.mDbNodeRepo.deleteFav(nodeList.get(position).getId());
         nodeList.remove(position);
 
         notifyItemRemoved(position);

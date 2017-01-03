@@ -32,7 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.adapter.NodeDetailAdapter;
-import com.olmatix.database.DbNodeRepo;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
@@ -49,9 +49,9 @@ import java.util.ArrayList;
  * Created by android on 12/13/2016.
  */
 
-public class Detail_Node extends AppCompatActivity implements OnStartDragListener {
+public class DetailNode extends AppCompatActivity implements OnStartDragListener {
 
-    DbNodeRepo mDbNodeRepo;
+    dbNodeRepo mDbNodeRepo;
     String node_id,node_name;
     private RecyclerView mRecycleView;
     private RecyclerView.LayoutManager layoutManager;
@@ -62,7 +62,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
     private Paint p = new Paint();
     private TextView label_node;
     private String nicename;
-    Detail_Node detail_node;
+    DetailNode detail_node;
     private static ArrayList<DetailNodeModel> data;
     private Toolbar mToolbar;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
@@ -79,7 +79,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         mIntentFilter.addAction(UE_ACTION);
 
         data1 = new ArrayList<>();
-        mDbNodeRepo = new DbNodeRepo(getApplicationContext());
+        mDbNodeRepo = new dbNodeRepo(getApplicationContext());
 
         detail_node =this;
         Intent i = getIntent();
@@ -87,7 +87,7 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
         node_name = i.getStringExtra("node_name");
         nicename = i.getStringExtra("nice_name");
         data = new ArrayList<>();
-        mDbNodeRepo =new DbNodeRepo(getApplicationContext());
+        mDbNodeRepo =new dbNodeRepo(getApplicationContext());
         detailNodeModel = new DetailNodeModel();
         setupView();
         setupToolbar();
@@ -292,10 +292,10 @@ public class Detail_Node extends AppCompatActivity implements OnStartDragListene
 
                     adapter.notifyDataSetChanged();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Detail_Node.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(DetailNode.this);
                     builder.setTitle("Rename Node detail");
 
-                    final EditText input = new EditText(Detail_Node.this);
+                    final EditText input = new EditText(DetailNode.this);
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
                     if (data.get(position).getNice_name_d()!=null) {

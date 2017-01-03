@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.ListViewCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.olmatix.database.DbNodeRepo;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.SceneModel;
@@ -41,7 +40,7 @@ public class SceneInput extends Fragment {
     private ImageButton mImgAdd;
     private String sceneNamed;
     private Button mSubmitBtn, mBackBtn;
-    private DbNodeRepo mDbNodeRepo;
+    private dbNodeRepo mDbNodeRepo;
     private SceneModel mSceneModel;
     private Context mContext;
     private DetailNodeModel mDetailNodeModel;
@@ -132,7 +131,7 @@ public class SceneInput extends Fragment {
     }
 
     private void setupDatabaseRepo() {
-        mDbNodeRepo = new DbNodeRepo(getActivity());
+        mDbNodeRepo = new dbNodeRepo(getActivity());
         mSceneModel = new SceneModel();
         mDetailNodeModel = new DetailNodeModel();
 

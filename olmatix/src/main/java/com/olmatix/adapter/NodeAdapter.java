@@ -19,7 +19,7 @@ import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.InstalledNodeModel;
-import com.olmatix.ui.fragment.Installed_Node;
+import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
@@ -189,7 +189,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             Log.d("DEBUG", "removeItem: " +a +" / "+mNodeID);
         }
 
-        Installed_Node.mDbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
+        InstalledNode.dbNodeRepo.deleteNode(nodeList.get(position).getNodesID());
         nodeList.remove(position);
 
         notifyItemRemoved(position);

@@ -4,7 +4,7 @@ package com.olmatix.database;
  * Created by Lesjaw on 05/12/2016.
  */
 
-public class DbNode {
+public class dbNode {
 
     // Labels table name
     public static final String TABLE = "Node";

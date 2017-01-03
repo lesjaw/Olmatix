@@ -26,14 +26,14 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.olmatix.database.DbNode;
-import com.olmatix.database.DbNodeRepo;
+import com.olmatix.database.dbNode;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.DurationModel;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.MainActivity;
-import com.olmatix.ui.fragment.Detail_Node;
+import com.olmatix.ui.fragment.DetailNode;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -68,7 +68,7 @@ import java.util.TreeMap;
 public class OlmatixService extends Service {
 
     public final static String MY_ACTION = "MY_ACTION";
-    public static DbNodeRepo mDbNodeRepo;
+    public static dbNodeRepo mDbNodeRepo;
     private static String TAG = OlmatixService.class.getSimpleName();
     private static boolean hasWifi = false;
     private static boolean hasMmobile = false;
@@ -97,7 +97,7 @@ public class OlmatixService extends Service {
     private InstalledNodeModel installedNodeModel;
     private DetailNodeModel detailNodeModel;
     private DurationModel durationModel;
-    private DbNode dbnode;
+    private dbNode dbnode;
     private String NodeID, Channel;
     private String mMessage;
     private NotificationManager mNM;
@@ -182,7 +182,7 @@ public class OlmatixService extends Service {
         data2 = new ArrayList<>();
 
 
-        mDbNodeRepo = new DbNodeRepo(getApplicationContext());
+        mDbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new InstalledNodeModel();
         detailNodeModel = new DetailNodeModel();
         durationModel = new DurationModel();
@@ -643,7 +643,7 @@ public class OlmatixService extends Service {
     protected void checkActivityForeground() {
         //Log.d(TAG, "start checking for Activity in foreground");
         Intent intent = new Intent();
-        intent.setAction(Detail_Node.UE_ACTION);
+        intent.setAction(DetailNode.UE_ACTION);
         sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
 
             @Override

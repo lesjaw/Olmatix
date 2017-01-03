@@ -45,7 +45,7 @@ import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.Installed_NodeModel;
+import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -62,20 +62,20 @@ import java.util.TimerTask;
 import static com.olmatix.lesjaw.olmatix.R.id.fab;
 
 
-public class Installed_Node extends Fragment implements  OnStartDragListener {
+public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     private View mView;
-    private List<Installed_NodeModel> nodeList = new ArrayList<>();
+    private List<InstalledNodeModel> nodeList = new ArrayList<>();
     private RecyclerView mRecycleView;
     private FloatingActionButton mFab;
     private Timer autoUpdate;
     private NodeAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private static ArrayList<Installed_NodeModel> data;
+    private static ArrayList<InstalledNodeModel> data;
     private Paint p = new Paint();
     private ItemTouchHelper mItemTouchHelper;
     public static dbNodeRepo dbNodeRepo;
-    private Installed_NodeModel installedNodeModel;
+    private InstalledNodeModel installedNodeModel;
     private String inputResult;
     Boolean stateMqtt=false;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -101,7 +101,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
 
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
-        installedNodeModel = new Installed_NodeModel();
+        installedNodeModel = new InstalledNodeModel();
         setupView();
         onClickListener();
 
@@ -116,11 +116,10 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
                     String state = data.get(position).getOnline();
                     if (state.equals("true")) {
 
-                        Intent i = new Intent(getActivity(), Detail_Node.class);
+                        Intent i = new Intent(getActivity(), DetailNode.class);
                         i.putExtra("node_id", data.get(position).getNodesID());
                         i.putExtra("node_name", fwName);
                         i.putExtra("nice_name", nice_name);
-
                         startActivity(i);
                     } else {
                         Toast.makeText(getActivity(), nice_name + " is OFFLINE!, please check it, if the " + nice_name
@@ -352,7 +351,7 @@ public class Installed_Node extends Fragment implements  OnStartDragListener {
     public void onResume() {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
-            Log.d("Receiver ", "Installed_Node = Starting..");
+            Log.d("Receiver ", "InstalledNode = Starting..");
             Log.d("DEBUG", "Server: "+stateMqtt);
 
         super.onResume();

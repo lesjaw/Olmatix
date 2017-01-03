@@ -20,7 +20,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.olmatix.database.DbNodeRepo;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.PreferenceHelper;
@@ -43,7 +43,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     private final OnStartDragListener mDragStartListener;
     public static final int mBUTTON = 0;
     public static final int mLOCATION = 1;
-    private static DbNodeRepo DbNodeRepo;
+    private static dbNodeRepo DbNodeRepo;
     private static ArrayList<DurationModel> data ;
     private int[] mDataSetTypes;
     Context context;
@@ -208,7 +208,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     }
 
     private String getNodeIdData( String z) {
-        DbNodeRepo = new DbNodeRepo(context);
+        DbNodeRepo = new dbNodeRepo(context);
         int countDb = DbNodeRepo.getChartDurationList().size();
         data = new ArrayList<>();
         data.addAll(DbNodeRepo.getChartDurationList());
@@ -223,7 +223,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
     private ArrayList<Entry> setYAxisValues() {
         ArrayList<Entry> yVals1 = null;
-        DbNodeRepo = new DbNodeRepo(context);
+        DbNodeRepo = new dbNodeRepo(context);
         int countDb = DbNodeRepo.getChartDurationList().size();
         Log.d("DEBUG", "setYAxis: " +  countDb);
         data = new ArrayList<>();
@@ -245,7 +245,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
     private ArrayList<String> setXAxisValues(){
         ArrayList<String> xVals = null;
-        DbNodeRepo = new DbNodeRepo(context);
+        DbNodeRepo = new dbNodeRepo(context);
         int countDb = DbNodeRepo.getChartDurationList().size();
         data = new ArrayList<>();
         data.addAll(DbNodeRepo.getChartDurationList());

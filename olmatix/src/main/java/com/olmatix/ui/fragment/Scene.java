@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.olmatix.adapter.SceneAdapter;
-import com.olmatix.database.DbNodeRepo;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
@@ -41,7 +41,7 @@ import static com.olmatix.lesjaw.olmatix.R.id.fab;
  */
 public class Scene extends Fragment implements OnStartDragListener {
 
-    public static DbNodeRepo mDbNodeRepo;
+    public static dbNodeRepo mDbNodeRepo;
     private static ArrayList<SceneModel> data;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private View mView;
@@ -64,7 +64,7 @@ public class Scene extends Fragment implements OnStartDragListener {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mDbNodeRepo = new DbNodeRepo(getActivity());
+        mDbNodeRepo = new dbNodeRepo(getActivity());
         sceneModel = new SceneModel();
 
         setupView();

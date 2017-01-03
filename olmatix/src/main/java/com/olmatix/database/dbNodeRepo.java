@@ -21,54 +21,54 @@ import com.olmatix.model.SpinnerObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.olmatix.database.DbNode.KEY_ADDING;
-import static com.olmatix.database.DbNode.KEY_ARRIVE;
-import static com.olmatix.database.DbNode.KEY_CHANNEL;
-import static com.olmatix.database.DbNode.KEY_COMMAND;
-import static com.olmatix.database.DbNode.KEY_DURATION;
-import static com.olmatix.database.DbNode.KEY_FWNAME;
-import static com.olmatix.database.DbNode.KEY_FWVERSION;
-import static com.olmatix.database.DbNode.KEY_ICON;
-import static com.olmatix.database.DbNode.KEY_ID;
-import static com.olmatix.database.DbNode.KEY_LEAVE;
-import static com.olmatix.database.DbNode.KEY_LOCALIP;
-import static com.olmatix.database.DbNode.KEY_MESSAGE;
-import static com.olmatix.database.DbNode.KEY_NAME;
-import static com.olmatix.database.DbNode.KEY_NICE_NAME_D;
-import static com.olmatix.database.DbNode.KEY_NICE_NAME_N;
-import static com.olmatix.database.DbNode.KEY_NODES;
-import static com.olmatix.database.DbNode.KEY_NODE_ID;
-import static com.olmatix.database.DbNode.KEY_ONLINE;
-import static com.olmatix.database.DbNode.KEY_OTA;
-import static com.olmatix.database.DbNode.KEY_PATH;
-import static com.olmatix.database.DbNode.KEY_RESET;
-import static com.olmatix.database.DbNode.KEY_SCENE_ID;
-import static com.olmatix.database.DbNode.KEY_SCENE_NAME;
-import static com.olmatix.database.DbNode.KEY_SCENE_TYPE;
-import static com.olmatix.database.DbNode.KEY_SCHEDULE;
-import static com.olmatix.database.DbNode.KEY_SENSOR;
-import static com.olmatix.database.DbNode.KEY_SIGNAL;
-import static com.olmatix.database.DbNode.KEY_STATUS;
-import static com.olmatix.database.DbNode.KEY_STATUS_SENSOR;
-import static com.olmatix.database.DbNode.KEY_STATUS_THEFT;
-import static com.olmatix.database.DbNode.KEY_TIMESTAMPS_OFF;
-import static com.olmatix.database.DbNode.KEY_TIMESTAMPS_ON;
-import static com.olmatix.database.DbNode.KEY_TOPIC;
-import static com.olmatix.database.DbNode.KEY_UPTIME;
-import static com.olmatix.database.DbNode.TABLE;
-import static com.olmatix.database.DbNode.TABLE_FAV;
-import static com.olmatix.database.DbNode.TABLE_MQTT;
-import static com.olmatix.database.DbNode.TABLE_NODE;
-import static com.olmatix.database.DbNode.TABLE_NODE_DURATION;
-import static com.olmatix.database.DbNode.TABLE_SCENE;
-import static com.olmatix.database.DbNode.TABLE_SCENE_DETAIL;
+import static com.olmatix.database.dbNode.KEY_ADDING;
+import static com.olmatix.database.dbNode.KEY_ARRIVE;
+import static com.olmatix.database.dbNode.KEY_CHANNEL;
+import static com.olmatix.database.dbNode.KEY_COMMAND;
+import static com.olmatix.database.dbNode.KEY_DURATION;
+import static com.olmatix.database.dbNode.KEY_FWNAME;
+import static com.olmatix.database.dbNode.KEY_FWVERSION;
+import static com.olmatix.database.dbNode.KEY_ICON;
+import static com.olmatix.database.dbNode.KEY_ID;
+import static com.olmatix.database.dbNode.KEY_LEAVE;
+import static com.olmatix.database.dbNode.KEY_LOCALIP;
+import static com.olmatix.database.dbNode.KEY_MESSAGE;
+import static com.olmatix.database.dbNode.KEY_NAME;
+import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
+import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
+import static com.olmatix.database.dbNode.KEY_NODES;
+import static com.olmatix.database.dbNode.KEY_NODE_ID;
+import static com.olmatix.database.dbNode.KEY_ONLINE;
+import static com.olmatix.database.dbNode.KEY_OTA;
+import static com.olmatix.database.dbNode.KEY_PATH;
+import static com.olmatix.database.dbNode.KEY_RESET;
+import static com.olmatix.database.dbNode.KEY_SCENE_ID;
+import static com.olmatix.database.dbNode.KEY_SCENE_NAME;
+import static com.olmatix.database.dbNode.KEY_SCENE_TYPE;
+import static com.olmatix.database.dbNode.KEY_SCHEDULE;
+import static com.olmatix.database.dbNode.KEY_SENSOR;
+import static com.olmatix.database.dbNode.KEY_SIGNAL;
+import static com.olmatix.database.dbNode.KEY_STATUS;
+import static com.olmatix.database.dbNode.KEY_STATUS_SENSOR;
+import static com.olmatix.database.dbNode.KEY_STATUS_THEFT;
+import static com.olmatix.database.dbNode.KEY_TIMESTAMPS_OFF;
+import static com.olmatix.database.dbNode.KEY_TIMESTAMPS_ON;
+import static com.olmatix.database.dbNode.KEY_TOPIC;
+import static com.olmatix.database.dbNode.KEY_UPTIME;
+import static com.olmatix.database.dbNode.TABLE;
+import static com.olmatix.database.dbNode.TABLE_FAV;
+import static com.olmatix.database.dbNode.TABLE_MQTT;
+import static com.olmatix.database.dbNode.TABLE_NODE;
+import static com.olmatix.database.dbNode.TABLE_NODE_DURATION;
+import static com.olmatix.database.dbNode.TABLE_SCENE;
+import static com.olmatix.database.dbNode.TABLE_SCENE_DETAIL;
 
-public class DbNodeRepo {
-    private DbHelper dbHelper;
+public class dbNodeRepo {
+    private com.olmatix.database.dbHelper dbHelper;
 
 
-    public DbNodeRepo(Context context) {
-        dbHelper = new DbHelper(context);
+    public dbNodeRepo(Context context) {
+        dbHelper = new dbHelper(context);
     }
 
     public int insertDb(InstalledNodeModel installedNodeModel) {
@@ -95,7 +95,7 @@ public class DbNodeRepo {
         return (int) Id;
     }
 
-    public int insertDbMqtt(DbNode DbNode) {
+    public int insertDbMqtt(dbNode DbNode) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_TOPIC, DbNode.getTopic());
@@ -172,12 +172,12 @@ public class DbNodeRepo {
     public ArrayList<SceneDetailModel> getAllScene() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery = "SELECT "+ TABLE_SCENE_DETAIL + ".*, "+TABLE_NODE+"."
-                +DbNode.KEY_NODE_ID +","+TABLE_NODE+"."
-                +DbNode.KEY_NICE_NAME_D +","+TABLE_SCENE+"."+DbNode.KEY_SCENE_NAME+" FROM " + TABLE_SCENE_DETAIL
+                + dbNode.KEY_NODE_ID +","+TABLE_NODE+"."
+                + dbNode.KEY_NICE_NAME_D +","+TABLE_SCENE+"."+ dbNode.KEY_SCENE_NAME+" FROM " + TABLE_SCENE_DETAIL
                 +" JOIN " + TABLE_NODE
-                +" ON " + TABLE_SCENE_DETAIL+"."+DbNode.KEY_PATH +" = "+ TABLE_NODE+"." +DbNode.KEY_NODE_ID
+                +" ON " + TABLE_SCENE_DETAIL+"."+ dbNode.KEY_PATH +" = "+ TABLE_NODE+"." + dbNode.KEY_NODE_ID
                 +" JOIN " + TABLE_SCENE
-                +" ON " + TABLE_SCENE_DETAIL+"."+DbNode.KEY_SCENE_ID +" = "+ TABLE_SCENE+"." +DbNode.KEY_SCENE_TYPE;
+                +" ON " + TABLE_SCENE_DETAIL+"."+ dbNode.KEY_SCENE_ID +" = "+ TABLE_SCENE+"." + dbNode.KEY_SCENE_TYPE;
         Log.d("DEBUG", "getAllScene: " + selectQuery);
 
         ArrayList<SceneDetailModel> nodeList = new ArrayList<SceneDetailModel>();
@@ -187,12 +187,12 @@ public class DbNodeRepo {
             do {
                 SceneDetailModel node = new SceneDetailModel();
 
-                node.setSceneid(cursor.getInt(cursor.getColumnIndex(DbNode.KEY_SCENE_ID)));
-                node.setPath(cursor.getString(cursor.getColumnIndex(DbNode.KEY_PATH)));
-                node.setCommand(cursor.getString(cursor.getColumnIndex(DbNode.KEY_COMMAND)));
-                node.setNodeId(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setNiceName(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NICE_NAME_D)));
-                node.setSceneType(cursor.getString(cursor.getColumnIndex(DbNode.KEY_SCENE_TYPE)));
+                node.setSceneid(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_ID)));
+                node.setPath(cursor.getString(cursor.getColumnIndex(dbNode.KEY_PATH)));
+                node.setCommand(cursor.getString(cursor.getColumnIndex(dbNode.KEY_COMMAND)));
+                node.setNodeId(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNiceName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSceneType(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());
@@ -207,10 +207,10 @@ public class DbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
-        db.delete(TABLE, DbNode.KEY_NODE_ID + "= ?", new String[]{
+        db.delete(TABLE, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
-        db.delete(TABLE_NODE, DbNode.KEY_NODE_ID + "= ?", new String[]{
+        db.delete(TABLE_NODE, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
         db.close(); // Closing database connection
@@ -220,7 +220,7 @@ public class DbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
-        db.delete(TABLE_FAV, DbNode.KEY_NICE_NAME_D + "= ?", new String[]{
+        db.delete(TABLE_FAV, dbNode.KEY_NICE_NAME_D + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
         db.close(); // Closing database connection
@@ -272,7 +272,7 @@ public class DbNodeRepo {
         if (installedNodeModel.getOta() != null) {
             values.put(KEY_OTA, installedNodeModel.getOta());
         }
-        db.update(TABLE, values, DbNode.KEY_NODE_ID + "= ?", new String[]{
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(installedNodeModel.getNodesID())
         });
         db.close();
@@ -289,7 +289,7 @@ public class DbNodeRepo {
             values.put(KEY_NICE_NAME_N, installedNodeModel.getNice_name_n());
         }
 
-        db.update(TABLE, values, DbNode.KEY_NODE_ID + "= ?", new String[]{
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(installedNodeModel.getNodesID())
         });
         db.close(); // Closing database connection
@@ -310,7 +310,7 @@ public class DbNodeRepo {
             //Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
         }
 
-        db.update(TABLE_NODE, values, DbNode.KEY_NODE_ID + "=? AND " + DbNode.KEY_CHANNEL + "=?", new String[]{
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
                 String.valueOf(detailNodeModel.getNode_id()),
                 String.valueOf(detailNodeModel.getChannel())
         });
@@ -328,7 +328,7 @@ public class DbNodeRepo {
         if (detailNodeModel.getNice_name_d() != null) {
             values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
         }
-        db.update(TABLE_NODE, values, DbNode.KEY_NODE_ID + "=? AND " + DbNode.KEY_CHANNEL + "=?", new String[]{
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
                 String.valueOf(detailNodeModel.getNode_id()),
                 String.valueOf(detailNodeModel.getChannel())
         });
@@ -351,7 +351,7 @@ public class DbNodeRepo {
             //Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
         }
 
-        db.update(TABLE_NODE, values, DbNode.KEY_NODE_ID + "=? AND " + DbNode.KEY_CHANNEL + "=?", new String[]{
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
                 String.valueOf(detailNodeModel.getNode_id()),
                 String.valueOf(detailNodeModel.getChannel())
         });
@@ -373,20 +373,20 @@ public class DbNodeRepo {
             do {
                 InstalledNodeModel node = new InstalledNodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setNodesID(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setNodes(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODES)));
-                node.setName(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NAME)));
-                node.setNice_name_n(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NICE_NAME_N)));
-                node.setLocalip(cursor.getString(cursor.getColumnIndex(DbNode.KEY_LOCALIP)));
-                node.setFwName(cursor.getString(cursor.getColumnIndex(DbNode.KEY_FWNAME)));
-                node.setFwVersion(cursor.getString(cursor.getColumnIndex(DbNode.KEY_FWVERSION)));
-                node.setOnline(cursor.getString(cursor.getColumnIndex(DbNode.KEY_ONLINE)));
-                node.setIcon(cursor.getString(cursor.getColumnIndex(DbNode.KEY_ICON)));
-                node.setAdding(cursor.getLong(cursor.getColumnIndex(DbNode.KEY_ADDING)));
-                node.setSignal(cursor.getString(cursor.getColumnIndex(DbNode.KEY_SIGNAL)));
-                node.setUptime(cursor.getString(cursor.getColumnIndex(DbNode.KEY_UPTIME)));
-                node.setReset(cursor.getString(cursor.getColumnIndex(DbNode.KEY_RESET)));
-                node.setOta(cursor.getString(cursor.getColumnIndex(DbNode.KEY_OTA)));
+                node.setNodesID(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNodes(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
+                node.setName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setNice_name_n(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_N)));
+                node.setLocalip(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
+                node.setFwName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
+                node.setFwVersion(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
+                node.setOnline(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.setIcon(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
+                node.setAdding(cursor.getLong(cursor.getColumnIndex(dbNode.KEY_ADDING)));
+                node.setSignal(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
+                node.setUptime(cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setReset(cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));
+                node.setOta(cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());
@@ -429,7 +429,7 @@ public class DbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String selectString = "SELECT * FROM " + DbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =? AND " + KEY_CHANNEL + " =?";
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =? AND " + KEY_CHANNEL + " =?";
 
         // Add the String you are searching by here.
         // Put it in an array to avoid an unrecognized token error
@@ -444,13 +444,13 @@ public class DbNodeRepo {
             do {
                 DetailNodeModel node = new DetailNodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setNode_id(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setChannel(cursor.getString(cursor.getColumnIndex(DbNode.KEY_CHANNEL)));
-                node.setStatus(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS)));
-                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NICE_NAME_D)));
-                node.setSensor(cursor.getString(cursor.getColumnIndex(DbNode.KEY_SENSOR)));
-                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS_SENSOR)));
-                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS_THEFT)));
+                node.setNode_id(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
 
                 nodeList.add(node);
 
@@ -465,7 +465,7 @@ public class DbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String selectString = "SELECT * FROM " + DbNode.TABLE_NODE;
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE;
 
         // Add the String you are searching by here.
         // Put it in an array to avoid an unrecognized token error
@@ -478,13 +478,13 @@ public class DbNodeRepo {
             do {
                 DetailNodeModel node = new DetailNodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setNode_id(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setChannel(cursor.getString(cursor.getColumnIndex(DbNode.KEY_CHANNEL)));
-                node.setStatus(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS)));
-                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NICE_NAME_D)));
-                node.setSensor(cursor.getString(cursor.getColumnIndex(DbNode.KEY_SENSOR)));
-                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS_SENSOR)));
-                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS_THEFT)));
+                node.setNode_id(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
 
                 nodeList.add(node);
 
@@ -509,20 +509,20 @@ public class DbNodeRepo {
             do {
                 InstalledNodeModel node = new InstalledNodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setNodesID(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setNodes(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODES)));
-                node.setName(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NAME)));
-                node.setNice_name_n(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NICE_NAME_N)));
-                node.setLocalip(cursor.getString(cursor.getColumnIndex(DbNode.KEY_LOCALIP)));
-                node.setFwName(cursor.getString(cursor.getColumnIndex(DbNode.KEY_FWNAME)));
-                node.setFwVersion(cursor.getString(cursor.getColumnIndex(DbNode.KEY_FWVERSION)));
-                node.setOnline(cursor.getString(cursor.getColumnIndex(DbNode.KEY_ONLINE)));
-                node.setIcon(cursor.getString(cursor.getColumnIndex(DbNode.KEY_ICON)));
-                node.setAdding(cursor.getLong(cursor.getColumnIndex(DbNode.KEY_ADDING)));
-                node.setSignal(cursor.getString(cursor.getColumnIndex(DbNode.KEY_SIGNAL)));
-                node.setUptime(cursor.getString(cursor.getColumnIndex(DbNode.KEY_UPTIME)));
-                node.setReset(cursor.getString(cursor.getColumnIndex(DbNode.KEY_RESET)));
-                node.setOta(cursor.getString(cursor.getColumnIndex(DbNode.KEY_OTA)));
+                node.setNodesID(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNodes(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
+                node.setName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setNice_name_n(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_N)));
+                node.setLocalip(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
+                node.setFwName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
+                node.setFwVersion(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
+                node.setOnline(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.setIcon(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
+                node.setAdding(cursor.getLong(cursor.getColumnIndex(dbNode.KEY_ADDING)));
+                node.setSignal(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
+                node.setUptime(cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setReset(cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));
+                node.setOta(cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());
@@ -547,15 +547,15 @@ public class DbNodeRepo {
         if (cursor.moveToFirst()) {
             do {
                 DashboardNodeModel node = new DashboardNodeModel();
-                node.setId(cursor.getInt(cursor.getColumnIndex(DbNode.KEY_ID)));
-                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NICE_NAME_D)));
-                node.setSensor(cursor.getString(cursor.getColumnIndex(DbNode.KEY_SENSOR)));
-                node.setStatus(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS)));
-                node.setChannel(cursor.getString(cursor.getColumnIndex(DbNode.KEY_CHANNEL)));
-                node.setNodeid(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS_SENSOR)));
-                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS_THEFT)));
-                node.setOnline(cursor.getString(cursor.getColumnIndex(DbNode.KEY_ONLINE)));
+                node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setNodeid(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
+                node.setOnline(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());
@@ -581,16 +581,16 @@ public class DbNodeRepo {
             do {
                 DetailNodeModel node = new DetailNodeModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setFwName(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setNode_id(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setChannel(cursor.getString(cursor.getColumnIndex(DbNode.KEY_CHANNEL)));
-                node.setStatus(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS)));
-                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NICE_NAME_D)));
-                node.setName(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NAME)));
-                node.setUptime(cursor.getString(cursor.getColumnIndex(DbNode.KEY_UPTIME)));
-                node.setSensor(cursor.getString(cursor.getColumnIndex(DbNode.KEY_SENSOR)));
-                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS_SENSOR)));
-                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS_THEFT)));
+                node.setFwName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNode_id(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setUptime(cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
 
                 nodeList.add(node);
 
@@ -603,7 +603,7 @@ public class DbNodeRepo {
 
     public boolean hasObject(InstalledNodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String selectString = "SELECT * FROM " + DbNode.TABLE + " WHERE " + KEY_NODE_ID + " =?";
+        String selectString = "SELECT * FROM " + dbNode.TABLE + " WHERE " + KEY_NODE_ID + " =?";
 
         // Add the String you are searching by here.
         // Put it in an array to avoid an unrecognized token error
@@ -633,7 +633,7 @@ public class DbNodeRepo {
 
     public boolean hasDetailObject(DetailNodeModel detailNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String selectString = "SELECT * FROM " + DbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =? AND " + KEY_CHANNEL + " =?";
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =? AND " + KEY_CHANNEL + " =?";
 
         // Add the String you are searching by here.
         // Put it in an array to avoid an unrecognized token error
@@ -690,9 +690,9 @@ public class DbNodeRepo {
         values.put(KEY_TIMESTAMPS_OFF, durationModel.getTimeStampOff());
         values.put(KEY_DURATION, durationModel.getDuration());
 
-        db.update(TABLE_NODE_DURATION, values, DbNode.KEY_NODE_ID + "=? AND "
-                + DbNode.KEY_CHANNEL + "=? AND "
-                + DbNode.KEY_TIMESTAMPS_OFF + "=?", new String[]{
+        db.update(TABLE_NODE_DURATION, values, dbNode.KEY_NODE_ID + "=? AND "
+                + dbNode.KEY_CHANNEL + "=? AND "
+                + dbNode.KEY_TIMESTAMPS_OFF + "=?", new String[]{
                 String.valueOf(durationModel.getNodeId()),
                 String.valueOf(durationModel.getChannel()),
                 String.valueOf(0)
@@ -707,7 +707,7 @@ public class DbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String selectString = "SELECT * FROM " + DbNode.TABLE_NODE_DURATION;
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE_DURATION;
 
         ArrayList<DurationModel> nodeList = new ArrayList<DurationModel>();
 
@@ -717,12 +717,12 @@ public class DbNodeRepo {
             do {
                 DurationModel node = new DurationModel();
                 //ArrayList<String> node = new ArrayList<>();
-                node.setId(cursor.getInt(cursor.getColumnIndex(DbNode.KEY_ID)));
-                node.setNodeId(cursor.getString(cursor.getColumnIndex(DbNode.KEY_NODE_ID)));
-                node.setChannel(cursor.getString(cursor.getColumnIndex(DbNode.KEY_CHANNEL)));
-                node.setStatus(cursor.getString(cursor.getColumnIndex(DbNode.KEY_STATUS)));
-                node.setTimeStampOn(cursor.getLong(cursor.getColumnIndex(DbNode.KEY_TIMESTAMPS_ON)));
-                node.setDuration(cursor.getLong(cursor.getColumnIndex(DbNode.KEY_DURATION)));
+                node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setNodeId(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setTimeStampOn(cursor.getLong(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_ON)));
+                node.setDuration(cursor.getLong(cursor.getColumnIndex(dbNode.KEY_DURATION)));
 
                 nodeList.add(node);
 
@@ -741,7 +741,7 @@ public class DbNodeRepo {
         String selectString = "SELECT  duration_node." + KEY_NODE_ID +
                 ", strftime( '%d/%m', duration_node." + KEY_TIMESTAMPS_ON + "/ 1000, 'unixepoch') AS act_time, " +
                 " detail_node." + KEY_NICE_NAME_D + ", SUM(duration_node." + KEY_DURATION + " / 60 / 60) AS duration " +
-                " FROM " + DbNode.TABLE_NODE_DURATION + " duration_node INNER JOIN " + TABLE_NODE +
+                " FROM " + dbNode.TABLE_NODE_DURATION + " duration_node INNER JOIN " + TABLE_NODE +
                 " detail_node ON  duration_node." + KEY_NODE_ID + " = detail_node." + KEY_NODE_ID +
                 " GROUP BY act_time, duration_node." + KEY_NODE_ID;
 

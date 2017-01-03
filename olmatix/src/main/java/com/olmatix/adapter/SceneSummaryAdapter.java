@@ -2,7 +2,6 @@ package com.olmatix.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.olmatix.database.DbNodeRepo;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
-import com.olmatix.model.DurationModel;
 import com.olmatix.model.SceneDetailModel;
 
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ public class SceneSummaryAdapter extends BaseAdapter {
     ArrayList<SceneDetailModel> mSceneDetailData;
     private static LayoutInflater mInflater=null;
     SceneDetailModel mSceneDetail;
-    private static DbNodeRepo DbNodeRepo;
+    private static dbNodeRepo DbNodeRepo;
     private static ArrayList<DetailNodeModel> data ;
     private TextView sceneId, sceneName, sceneJobs,sceneCmd;
     private ImageButton imgActions;
@@ -70,7 +68,7 @@ public class SceneSummaryAdapter extends BaseAdapter {
             sceneId.setText(i);
         }
 
-        DbNodeRepo = new DbNodeRepo(mContext);
+        DbNodeRepo = new dbNodeRepo(mContext);
         int countDb = DbNodeRepo.getNodeDetailList().size();
         data = new ArrayList<>();
         data.addAll(DbNodeRepo.getNodeDetailList());

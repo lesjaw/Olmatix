@@ -45,7 +45,7 @@
         </activity>
 
         <activity
-            android:name="com.olmatix.ui.fragment.Detail_Node"
+            android:name="com.olmatix.ui.fragment.DetailNode"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
 

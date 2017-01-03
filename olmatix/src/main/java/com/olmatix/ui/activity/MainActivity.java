@@ -25,8 +25,8 @@ import android.widget.Toast;
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.service.OlmatixService;
-import com.olmatix.ui.fragment.Dashboard_Node;
-import com.olmatix.ui.fragment.Installed_Node;
+import com.olmatix.ui.fragment.DashboardNode;
+import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.ui.fragment.Scene;
 
 /**
@@ -158,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
 
-        mOlmatixAdapter.addFrag(new Dashboard_Node(), "Dashboard");
+        mOlmatixAdapter.addFrag(new DashboardNode(), "Dashboard");
         mOlmatixAdapter.addFrag(new Scene(), "Scenes");
-        mOlmatixAdapter.addFrag(new Installed_Node(), "Nodes");
+        mOlmatixAdapter.addFrag(new InstalledNode(), "Nodes");
         viewPager.setAdapter(mOlmatixAdapter);
     }
 

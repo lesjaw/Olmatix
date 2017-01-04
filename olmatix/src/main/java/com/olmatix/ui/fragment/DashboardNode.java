@@ -173,8 +173,8 @@ public class DashboardNode extends Fragment implements
 
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    }
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                            }
                 }).show();
 
             }

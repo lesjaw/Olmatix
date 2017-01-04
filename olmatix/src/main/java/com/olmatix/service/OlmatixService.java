@@ -6,6 +6,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
@@ -13,14 +14,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -48,6 +54,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -108,6 +115,9 @@ public class OlmatixService extends Service {
     private String NodeIDSensor;
     private String TopicID;
     private String mChange = "";
+    final static String GROUP_KEY_NOTIF = "group_key_notif";
+    private ArrayList<String> notifications;
+
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -148,7 +158,7 @@ public class OlmatixService extends Service {
                 Log.d(TAG, "run: " + flagSub);
                 unSubIfnotForeground();
             }
-        }, 25000);
+        }, 10000);
     }
 
     private void doDisconnect() {
@@ -177,9 +187,11 @@ public class OlmatixService extends Service {
         mConnMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
+
         data = new ArrayList<>();
         data1 = new ArrayList<>();
         data2 = new ArrayList<>();
+        notifications = new ArrayList<>();
 
 
         mDbNodeRepo = new dbNodeRepo(getApplicationContext());
@@ -234,10 +246,7 @@ public class OlmatixService extends Service {
     }
 
     private void showNotification() {
-        // In this sample, we'll use the same text for the ticker and the expanded notification
-        //text = getText(R.string.local_service_started);
 
-        // The PendingIntent to launch our activity if the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class), 0);
 
@@ -257,20 +266,48 @@ public class OlmatixService extends Service {
     }
 
     private void showNotificationNode() {
-        NotificationCompat.Builder builder =
-                (NotificationCompat.Builder) new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.olmatixsmall)
-                        .setContentTitle(titleNode)
-                        .setContentText(textNode);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.olmatixlogo);
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
+        int numMessages =0;
 
-        // Add as notification
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(notifyID, builder.build());
+        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
+
+        notifications.add(String.valueOf(titleNode) + " : "+String.valueOf(textNode)+ " at " +timeformat.format(System.currentTimeMillis()));
+        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setContentTitle("New Olmatix status");
+        mBuilder.setContentText("You've received new status.");
+        mBuilder.setTicker("Olmatix status Alert!");
+        mBuilder.setAutoCancel(true);
+        mBuilder.setWhen(System.currentTimeMillis());
+        //mBuilder.setNumber(++numMessages);
+        //mBuilder.setGroup(GROUP_KEY_NOTIF);
+        //mBuilder.setGroupSummary(true);
+        mBuilder.setSound(defaultSoundUri);
+        mBuilder.setSmallIcon(R.drawable.olmatixsmall);
+
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+        inboxStyle.setBigContentTitle("Olmatix status");
+        for (int i=0; i < notifications.size(); i++) {
+            inboxStyle.addLine(notifications.get(i));
+        }
+        mBuilder.setStyle(inboxStyle);
+
+   /* Creates an explicit intent for an Activity in your app */
+        Intent resultIntent = new Intent(this, MainActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity.class);
+
+   /* Adds the Intent that starts the Activity to the top of the stack */
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(notifyID,mBuilder.build());
     }
 
     private void setClientID() {
@@ -629,7 +666,8 @@ public class OlmatixService extends Service {
                         // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
                         titleNode = mNiceName;
                         textNode = state;
-                        notifyID = notid;
+                        //notifyID = notid;
+                        notifyID = 0;
                         showNotificationNode();
                     }
                 }

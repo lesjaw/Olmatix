@@ -214,7 +214,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             protected void onPostExecute(Void result) {
                     nDialog.dismiss();
                     setAdapter();
-
+                mFab.show();
             }
 
         };
@@ -250,6 +250,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     @Override
     public void onStart() {
         super.onStart();
+        mFab.hide();
+
         refreshHeader();
     }
 
@@ -562,8 +564,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     }
 
     public interface ClickListener{
-        public void onClick(View view,int position);
-        public void onLongClick(View view,int position);
+        void onClick(View view,int position);
+        void onLongClick(View view,int position);
     }
 
     class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{

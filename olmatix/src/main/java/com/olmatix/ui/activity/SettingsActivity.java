@@ -191,13 +191,25 @@ public class SettingsActivity extends SettingsFragment {
                         if (mLocation != null){
                             mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         }
-                        mPrefHelper = new PreferenceHelper(getActivity().getApplicationContext());
-                        mPrefHelper.setHomeLatitude(mLocation.getLatitude());
-                        mPrefHelper.setHomeLongitude(mLocation.getLongitude());
-                        mPrefHelper.initializePrefs();
-                        resetMesg(setLocation);
 
-                        Toast.makeText(getActivity(), getString(R.string.opt_homepos_set), Toast.LENGTH_SHORT).show();
+//                        Log.d("DEBUG", "location mpref: " + mLocation.getLatitude() + " "+mLocation.getLongitude() );
+                        mPrefHelper = new PreferenceHelper(getActivity());
+
+                        if (mLocation!=null){
+                            mPrefHelper.setHomeLatitude(mLocation.getLatitude());
+                            mPrefHelper.setHomeLongitude(mLocation.getLongitude());
+                            mPrefHelper.initializePrefs();
+                            resetMesg(setLocation);
+
+                            Toast.makeText(getActivity(), getString(R.string.opt_homepos_set), Toast.LENGTH_SHORT).show();
+                        } else {
+                            mPrefHelper.setHomeLatitude(0);
+                            mPrefHelper.setHomeLongitude(0);
+                            Toast.makeText(getActivity(), getString(R.string.opt_homepos_set_false), Toast.LENGTH_SHORT).show();
+
+                        }
+
+
 
                     } catch (SecurityException ex) {
                         Log.d("DEBUG", "Permission Denied: " + ex );

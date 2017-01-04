@@ -7,14 +7,14 @@ import org.eclipse.paho.android.service.MqttAndroidClient;
  */
 
 public class Connection {
-    private static MqttAndroidClient client;
+    private static MqttAndroidClient mqttClient;
 
     public static void setClient(MqttAndroidClient cl){
-        client = cl;
+        mqttClient = cl;
 
     }
     public static MqttAndroidClient getClient(){
-        return client;
+        return mqttClient;
     }
 
 

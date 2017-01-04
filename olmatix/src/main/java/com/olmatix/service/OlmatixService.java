@@ -80,7 +80,7 @@ public class OlmatixService extends Service {
     private static boolean hasWifi = false;
     private static boolean hasMmobile = false;
     private static ArrayList<InstalledNodeModel> data;
-    public volatile MqttAsyncClient mqttClient;
+    public volatile MqttAndroidClient mqttClient;
     HashMap<String, String> messageReceive = new HashMap<>();
     HashMap<String, String> message_topic = new HashMap<>();
     CharSequence text;
@@ -128,6 +128,52 @@ public class OlmatixService extends Service {
         }
     };
 
+
+    class OlmatixBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean hasConnectivity = false;
+            boolean hasChanged = false;
+
+            NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
+            if (nInfo != null) {
+                if (nInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                    hasChanged = true;
+                    hasWifi = nInfo.isConnected();
+                } else if (nInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                    hasChanged = true;
+                    hasMmobile = nInfo.isConnected();
+                }
+            } else {
+                //Not Connected info
+                String msg = getString(R.string.err_internet);
+                Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+                toast.show();
+                stateoffMqtt = "false";
+                sendMessage();
+                text = "Disconnected";
+                showNotification();
+                flagConn = false;
+            }
+
+            hasConnectivity = hasMmobile || hasWifi;
+            doConnect();
+            Log.d(TAG, "hasConn: " + hasConnectivity + " hasChange: " + hasChanged + " - " +
+                    (mqttClient == null || !mqttClient.isConnected()));
+
+            if (hasConnectivity && hasChanged && (Connection.getClient() != null || Connection.getClient().isConnected())) {
+                flagConn=false;
+                callDis();
+                Log.d(TAG, "Call Disconnect first");
+
+            } else if (!hasConnectivity) {
+                doDisconnect();
+                Log.d(TAG, "Disconnecting");
+            }
+        }
+    }
+
     private void callDis() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -135,8 +181,8 @@ public class OlmatixService extends Service {
                 if (!flagConn) {
                     doDisconnect();
                     callCon();
-                    flagConn = true;
                 }
+                callCon();
             }
         }, 1000);
     }
@@ -145,7 +191,9 @@ public class OlmatixService extends Service {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                doConnect();
+                if (flagConn) {
+                    doConnect();
+                }
             }
         }, 1000);
     }
@@ -162,18 +210,20 @@ public class OlmatixService extends Service {
     }
 
     private void doDisconnect() {
-        Log.d(TAG, "doDisconnect()");
-        try {
-            Connection.getClient().disconnect();
-            stateoffMqtt = "false";
-            sendMessage();
-            flagConn = true;
-            Log.d(TAG, "doDisconnect() done");
+        Log.d(TAG, "doDisconnect()"+flagConn);
+        if (!flagConn) {
+            try {
+                    mqttClient.disconnect();
+                    stateoffMqtt = "false";
+                    sendMessage();
+                    flagConn = true;
+                    Log.d(TAG, "doDisconnect() done");
 
 
-        } catch (MqttException e) {
-            e.printStackTrace();
-            Log.d(TAG, "onReceive: " + String.valueOf(e.getMessage()));
+            } catch (MqttException e) {
+                e.printStackTrace();
+                Log.d(TAG, "onReceive: " + String.valueOf(e.getMessage()));
+            }
         }
     }
 
@@ -187,12 +237,12 @@ public class OlmatixService extends Service {
         mConnMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-
         data = new ArrayList<>();
         data1 = new ArrayList<>();
         data2 = new ArrayList<>();
         notifications = new ArrayList<>();
 
+        Connection.setClient(mqttClient);
 
         mDbNodeRepo = new dbNodeRepo(getApplicationContext());
         installedNodeModel = new InstalledNodeModel();
@@ -207,6 +257,8 @@ public class OlmatixService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         sendMessage();
+        flagConn = true;
+
         return START_STICKY;
     }
 
@@ -325,6 +377,7 @@ public class OlmatixService extends Service {
         Log.d(TAG, "Check Stateof MQTT: " + stateoffMqtt);
 
         if (!stateoffMqtt.equals("true")) {
+            stateoffMqtt = "true";
 
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
@@ -333,13 +386,12 @@ public class OlmatixService extends Service {
             String mPassword = sharedPref.getString("password", "olmatix");
 
             final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
-            //Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_conn);
 
             final MqttConnectOptions options = new MqttConnectOptions();
 
             options.setUserName(mUserName);
             options.setPassword(mPassword.toCharArray());
-            final MqttAndroidClient client = new MqttAndroidClient(getApplicationContext(), "tcp://" + mServerURL + ":" + mServerPort, deviceId);
+            mqttClient = new MqttAndroidClient(getApplicationContext(), "tcp://" + mServerURL + ":" + mServerPort, deviceId);
 
             if (mSwitch_conn) {
                 options.setCleanSession(false);
@@ -350,7 +402,7 @@ public class OlmatixService extends Service {
             byte[] payload = "false".getBytes();
             options.setWill(topic, payload, 1, true);
             options.setKeepAliveInterval(300);
-            Connection.setClient(client);
+            Connection.setClient(mqttClient);
 
             text = "Connecting to server..";
             showNotification();
@@ -358,7 +410,7 @@ public class OlmatixService extends Service {
 
             try {
 
-                IMqttToken token = client.connect(options);
+                IMqttToken token = mqttClient.connect(options);
                 token.setActionCallback(new IMqttActionListener() {
 
                     @Override
@@ -369,7 +421,7 @@ public class OlmatixService extends Service {
                         stateoffMqtt = "true";
                         sendMessage();
 
-                        Connection.getClient().setCallback(new MqttEventCallback());
+                        mqttClient.setCallback(new MqttEventCallback());
 
                         try {
                             String topic = "status/" + deviceId + "/$online";
@@ -1203,49 +1255,7 @@ public class OlmatixService extends Service {
         }
     }
 
-    class OlmatixBroadcastReceiver extends BroadcastReceiver {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean hasConnectivity = false;
-            boolean hasChanged = false;
-
-            NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
-            if (nInfo != null) {
-                if (nInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-                    hasChanged = true;
-                    hasWifi = nInfo.isConnected();
-                } else if (nInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
-                    hasChanged = true;
-                    hasMmobile = nInfo.isConnected();
-                }
-            } else {
-                //Not Connected info
-                String msg = getString(R.string.err_internet);
-                Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
-                toast.show();
-                stateoffMqtt = "false";
-                sendMessage();
-                text = "Disconnected";
-                showNotification();
-                flagConn = false;
-            }
-
-            hasConnectivity = hasMmobile || hasWifi;
-            Log.d(TAG, "hasConn: " + hasConnectivity + " hasChange: " + hasChanged + " - " +
-                    (mqttClient == null || !mqttClient.isConnected()));
-
-            if (hasConnectivity && hasChanged && (mqttClient == null || !mqttClient.isConnected())) {
-                doConnect();
-                Log.d(TAG, "Connecting");
-                //callDis();
-
-            } else if (!hasConnectivity && mqttClient != null && mqttClient.isConnected()) {
-                doDisconnect();
-                Log.d(TAG, "Disconnecting");
-            }
-        }
-    }
 
     public class OlmatixBinder extends Binder {
         public OlmatixService getService() {
@@ -1257,7 +1267,6 @@ public class OlmatixService extends Service {
 
         @Override
         public void connectionLost(Throwable cause) {
-
         }
 
         @Override

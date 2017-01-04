@@ -558,7 +558,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        mItemTouchHelper.startDrag(viewHolder);
+        //mItemTouchHelper.startDrag(viewHolder);
     }
 
     public interface ClickListener{

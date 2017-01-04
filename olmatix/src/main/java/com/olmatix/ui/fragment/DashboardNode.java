@@ -49,7 +49,6 @@ import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
-import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.model.SpinnerObject;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.utils.GridAutofitLayoutManager;
@@ -75,11 +74,10 @@ public class DashboardNode extends Fragment implements
     private RecyclerView mRecycleViewInfo;
     private FloatingActionButton mFab;
     NodeDashboardAdapter adapter;
-    private InfoAdapter infoAdapter;
+    InfoAdapter infoAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private DashboardNodeModel dashboardNodeModel;
-    private InstalledNodeModel installedNodeModel;
     public  static dbNodeRepo mDbNodeRepo;
     private Paint p = new Paint();
     private static ArrayList<DashboardNodeModel> data;
@@ -93,6 +91,7 @@ public class DashboardNode extends Fragment implements
     private Location mLocation;
     //private Context mContext;
     private String Distance;
+    private String dist;
     String adString = "";
     String loc = null;
 
@@ -212,6 +211,11 @@ public class DashboardNode extends Fragment implements
         adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
 
+        dist = "";
+        dist = Distance;
+        infoAdapter = new InfoAdapter(dist, mDatasetTypes,dashboardnode, this);
+        mRecycleViewInfo.setAdapter(infoAdapter);
+
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -221,8 +225,6 @@ public class DashboardNode extends Fragment implements
             }
         });
 
-        infoAdapter = new InfoAdapter( Distance, mDatasetTypes,dashboardnode, this);
-        mRecycleViewInfo.setAdapter(infoAdapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
@@ -256,8 +258,12 @@ public class DashboardNode extends Fragment implements
         data.addAll(mDbNodeRepo.getNodeDetailDash());
         adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
-        infoAdapter = new InfoAdapter( Distance, mDatasetTypes,dashboardnode, this);
-        mRecycleView.setAdapter(adapter);
+
+        dist="";
+        dist = Distance;
+        infoAdapter = new InfoAdapter(dist, mDatasetTypes,dashboardnode, this);
+        mRecycleViewInfo.setAdapter(infoAdapter);
+
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
@@ -298,8 +304,6 @@ public class DashboardNode extends Fragment implements
         if(adapter != null){
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
-
-        resetAdapter();
     }
 
     @Override
@@ -327,7 +331,7 @@ public class DashboardNode extends Fragment implements
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        mItemTouchHelper.startDrag(viewHolder);
+        //mItemTouchHelper.startDrag(viewHolder);
 
     }
 
@@ -505,13 +509,20 @@ public class DashboardNode extends Fragment implements
     }
 
     public void resetAdapter(){
-        infoAdapter.notifyDataSetChanged();
 
+        /*infoAdapter.notifyDataSetChanged();
+        dist="";
+        dist = Distance;
+        Log.d("DEBUG", "resetAdapter: "+ dist);
         if(infoAdapter != null) {
             infoAdapter.notifyItemRangeChanged(0, infoAdapter.getItemCount());
         }
-        assert infoAdapter != null;
+        assert infoAdapter != null;*/
+        infoAdapter.notifyDistance(Distance);
+
+
     }
+
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {

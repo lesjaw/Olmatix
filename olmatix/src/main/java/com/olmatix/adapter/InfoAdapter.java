@@ -290,6 +290,11 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
     }
 
+    public void notifyDistance(String Dist) {
+        this.distance = Dist;
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View v) {
             super(v);

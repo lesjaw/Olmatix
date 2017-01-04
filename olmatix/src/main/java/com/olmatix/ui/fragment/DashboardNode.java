@@ -256,6 +256,8 @@ public class DashboardNode extends Fragment implements
         data.addAll(mDbNodeRepo.getNodeDetailDash());
         adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
+        infoAdapter = new InfoAdapter( Distance, mDatasetTypes,dashboardnode, this);
+        mRecycleView.setAdapter(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
@@ -296,7 +298,8 @@ public class DashboardNode extends Fragment implements
         if(adapter != null){
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
-        //setRefresh();
+
+        resetAdapter();
     }
 
     @Override
@@ -483,7 +486,7 @@ public class DashboardNode extends Fragment implements
                             public void run() {
 
                                 String unit = " m";
-                                if (res[0] > 2000) {// usa chilometri
+                                if (res[0] > 2000) {// uuse km
                                     unit = " km";
                                     res[0] = res[0] / 1000;
                                 }
@@ -502,8 +505,12 @@ public class DashboardNode extends Fragment implements
     }
 
     public void resetAdapter(){
-        infoAdapter = new InfoAdapter( Distance, mDatasetTypes,dashboardnode, this);
-        mRecycleViewInfo.setAdapter(infoAdapter);
+        infoAdapter.notifyDataSetChanged();
+
+        if(infoAdapter != null) {
+            infoAdapter.notifyItemRangeChanged(0, infoAdapter.getItemCount());
+        }
+        assert infoAdapter != null;
     }
 
     @Override

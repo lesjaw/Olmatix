@@ -281,7 +281,6 @@ public class Scene extends Fragment implements OnStartDragListener {
 
     public interface ClickListener {
         void onClick(View view, int position);
-
         void onLongClick(View view, int position);
     }
 

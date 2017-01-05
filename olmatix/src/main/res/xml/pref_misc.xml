@@ -23,6 +23,20 @@
             olmatix:unitsLeft=""
             olmatix:unitsRight="m." />
 
+        <CheckBoxPreference
+            android:title="@string/switch_loc"
+            android:key="switch_loc"
+            android:defaultValue="true">
+        </CheckBoxPreference>
+
+        <CheckBoxPreference
+            android:title="@string/switch_notif"
+            android:key="switch_notif"
+            android:defaultValue="true">
+        </CheckBoxPreference>
+
+
+
 
     </PreferenceCategory>
 

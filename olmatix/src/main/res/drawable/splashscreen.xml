@@ -5,7 +5,7 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/olmatixsmall"
+            android:src="@drawable/olmatixmed"
             />
     </item>
 

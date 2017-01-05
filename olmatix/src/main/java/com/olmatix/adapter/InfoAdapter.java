@@ -202,10 +202,10 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
                 if (distance==null) {
                     holder.distance.setText("you are at unknown from home, waiting update");
                 } else {
-                    holder.location.setSelected(true);
                     holder.distance.setText("you are at " + distance + " from home");
                 }
             }
+            holder.location.setSelected(true);
         }
     }
 

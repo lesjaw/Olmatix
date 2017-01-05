@@ -2,11 +2,11 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
+    <CheckBoxPreference
         android:title="@string/switch_title"
         android:key="switch_conn"
         android:defaultValue="false">
-    </SwitchPreference>
+    </CheckBoxPreference>
 
     <PreferenceCategory
         android:title="@string/pref_domain">

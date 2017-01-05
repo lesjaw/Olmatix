@@ -78,5 +78,7 @@
     <string name="cancel">Cancel</string>
     <string name="opt_homepos_set_false">Can\'t find location</string>
     <string name="local_service_label_loc">Olmatix location update</string>
+    <string name="switch_loc">Enable location notification?</string>
+    <string name="switch_notif">Enable status notification?</string>
 
 </resources>

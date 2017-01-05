@@ -10,11 +10,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.widget.Toast;
@@ -146,7 +146,7 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("user_name"));
             bindPreferenceSummaryToValue(findPreference("password"));
 
-            SwitchPreference pref = (SwitchPreference) findPreference("switch_conn");
+            CheckBoxPreference pref = (CheckBoxPreference) findPreference("switch_conn");
         }
     }
 
@@ -168,7 +168,6 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("setLocation"));
 
             initLocationPref();
-            //resetMesg(setLocation);
         }
 
 
@@ -187,10 +186,12 @@ public class SettingsActivity extends SettingsFragment {
                     final PreferenceHelper mPrefHelper;
                     try {
                         mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
-                        Location mLocation = mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        Location mLocation = mLocationMgr.getLastKnownLocation(mProvider);
                         if (mLocation == null){
+                            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        }  else if (mLocation == null) {
                             mLocation= mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        }  else {
+                        } else {
                             mLocation= mLocationMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                         }
 
@@ -223,8 +224,6 @@ public class SettingsActivity extends SettingsFragment {
             };
 
         }
-
-
 
         private void resetMesg(Preference setLocation) {
             final PreferenceHelper mPrefHelper = new PreferenceHelper(getActivity().getApplicationContext());

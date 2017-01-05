@@ -141,6 +141,8 @@ public class OlmatixService extends Service {
     String loc = null;
     Intent intent;
     int counter = 0;
+    double lat;
+    double lng;
 
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -307,6 +309,23 @@ public class OlmatixService extends Service {
             }
         }
 
+        LocationManager mLocationMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        String mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
+
+        Location mLocation = mLocationMgr.getLastKnownLocation(mProvider);
+        if (mLocation == null){
+            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }  else if (mLocation == null) {
+            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        } else {
+            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        }
+
+        lat = mLocation.getLatitude();
+        lng = mLocation.getLongitude();
+        locationDistance();
+
+
         return START_STICKY;
     }
 
@@ -385,7 +404,7 @@ public class OlmatixService extends Service {
         //mBuilder.setGroup(GROUP_KEY_NOTIF);
         //mBuilder.setGroupSummary(true);
         mBuilder.setSound(defaultSoundUri);
-        mBuilder.setSmallIcon(R.drawable.olmatixsmall);
+        mBuilder.setSmallIcon(R.drawable.ic_lightbulb);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
@@ -731,50 +750,55 @@ public class OlmatixService extends Service {
 
     private void toastAndNotif() {
 
-        int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
-        int ch = Integer.parseInt(Channel.replaceAll("[\\D]", ""));
-        int notid = id + ch;
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final Boolean mSwitch_NotifStatus = sharedPref.getBoolean("switch_notif", true);
+        if (mSwitch_NotifStatus) {
 
-        printForegroundTask();
-        //checkActivityForeground();
-        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
-            if (flagSub) {
-                String state = "";
-                detailNodeModel.setNode_id(NodeID);
-                detailNodeModel.setChannel(Channel);
-                data1.addAll(mDbNodeRepo.getNodeDetail(NodeID, Channel));
-                int countDB = mDbNodeRepo.getNodeDetail(NodeID, Channel).size();
-                if (countDB != 0) {
-                    for (int i = 0; i < countDB; i++) {
-                        if (data1.get(i).getNice_name_d() != null) {
-                            mNiceName = data1.get(i).getNice_name_d();
-                        } else {
-                            mNiceName = data1.get(i).getName();
+            int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
+            int ch = Integer.parseInt(Channel.replaceAll("[\\D]", ""));
+            int notid = id + ch;
+
+            printForegroundTask();
+            //checkActivityForeground();
+            if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
+                if (flagSub) {
+                    String state = "";
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel(Channel);
+                    data1.addAll(mDbNodeRepo.getNodeDetail(NodeID, Channel));
+                    int countDB = mDbNodeRepo.getNodeDetail(NodeID, Channel).size();
+                    if (countDB != 0) {
+                        for (int i = 0; i < countDB; i++) {
+                            if (data1.get(i).getNice_name_d() != null) {
+                                mNiceName = data1.get(i).getNice_name_d();
+                            } else {
+                                mNiceName = data1.get(i).getName();
+                            }
+                            state = data1.get(i).getStatus();
                         }
-                        state = data1.get(i).getStatus();
                     }
-                }
 
-                if (state.equals("true") || state.equals("ON")) {
-                    state = "ON";
-                }
-                if (state.equals("false") || state.equals("OFF")) {
-                    state = "OFF";
-                }
-
-                if (mNiceName != null) {
-                    if (!state.equals("")) {
-                        // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
-                        titleNode = mNiceName;
-                        textNode = state;
-                        //notifyID = notid;
-                        notifyID = 0;
-                        showNotificationNode();
+                    if (state.equals("true") || state.equals("ON")) {
+                        state = "ON";
                     }
+                    if (state.equals("false") || state.equals("OFF")) {
+                        state = "OFF";
+                    }
+
+                    if (mNiceName != null) {
+                        if (!state.equals("")) {
+                            // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
+                            titleNode = mNiceName;
+                            textNode = state;
+                            //notifyID = notid;
+                            notifyID = 0;
+                            showNotificationNode();
+                        }
+                    }
+                    messageReceive.clear();
+                    message_topic.clear();
+                    data1.clear();
                 }
-                messageReceive.clear();
-                message_topic.clear();
-                data1.clear();
             }
         }
     }
@@ -1353,69 +1377,14 @@ public class OlmatixService extends Service {
     public class MyLocationListener implements LocationListener {
 
         public void onLocationChanged(final Location mLocation) {
-
             Log.i("*****************", "Location changed");
             if(isBetterLocation(mLocation, previousBestLocation)) {
 
-                final double lat = (mLocation.getLatitude());
-                final double lng = (mLocation.getLongitude());
-
-                if (lat!=0 && lng!=0) {
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            final Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-
-                            try {
-                                List<Address> list;
-                                list = geocoder.getFromLocation(lat, lng, 1);
-                                if (list != null && list.size() > 0) {
-                                    Address address = list.get(0);
-                                    loc = address.getLocality();
-
-                                    if (address.getAddressLine(0) != null)
-                                        adString = ", " + address.getAddressLine(0);
-
-                                }
-
-                            } catch (final IOException e) {
-                                ((MainActivity) getApplicationContext()).runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Log.e("DEBUG", "Geocoder ERROR", e);
-                                    }
-                                });
-                                loc = OlmatixUtils.gpsDecimalFormat.format(lat) + " : " + OlmatixUtils.gpsDecimalFormat.format(lng);
-                            }
-
-                            final float[] res = new float[3];
-                            final PreferenceHelper mPrefHelper = new PreferenceHelper(getApplicationContext());
-                            Location.distanceBetween(lat, lng, mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), res);
-                            if (mPrefHelper.getHomeLatitude() != 0) {
-
-                                        String unit = " m";
-                                        if (res[0] > 2000) {// uuse km
-                                            unit = " km";
-                                            res[0] = res[0] / 1000;
-
-                                        }
-                                        Distance = loc +", it's "+ (int) res[0] + unit ;
-                                Log.d("DEBUG", "Distance SERVICE 1: " + Distance);
-                                titleNode = "Current Location is ";
-                                textNode = Distance + " from home";
-                                notifyID = 5;
-                                showNotificationLoc();
-                                sendMessageDetail();
-
-                            }
-                                }
-                    }).start();
-
-                }
-              
+                lat = (mLocation.getLatitude());
+                lng = (mLocation.getLongitude());
+                locationDistance();
             }
+
         }
 
         public void onProviderDisabled(String provider)
@@ -1436,6 +1405,70 @@ public class OlmatixService extends Service {
         }
 
     }
+
+    public void locationDistance(){
+
+            if (lat!=0 && lng!=0) {
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        final Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+                        try {
+                            List<Address> list;
+                            list = geocoder.getFromLocation(lat, lng, 1);
+                            if (list != null && list.size() > 0) {
+                                Address address = list.get(0);
+                                loc = address.getLocality();
+
+                                if (address.getAddressLine(0) != null)
+                                    adString = ", " + address.getAddressLine(0);
+
+                            }
+
+                        } catch (final IOException e) {
+                            ((MainActivity) getApplicationContext()).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.e("DEBUG", "Geocoder ERROR", e);
+                                }
+                            });
+                            loc = OlmatixUtils.gpsDecimalFormat.format(lat) + " : " + OlmatixUtils.gpsDecimalFormat.format(lng);
+                        }
+
+                        final float[] res = new float[3];
+                        final PreferenceHelper mPrefHelper = new PreferenceHelper(getApplicationContext());
+                        Location.distanceBetween(lat, lng, mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), res);
+                        if (mPrefHelper.getHomeLatitude() != 0) {
+
+                            String unit = " m";
+                            if (res[0] > 2000) {// uuse km
+                                unit = " km";
+                                res[0] = res[0] / 1000;
+
+                            }
+                            Distance = loc +", it's "+ (int) res[0] + unit ;
+                            Log.d("DEBUG", "Distance SERVICE 1: " + Distance);
+                            titleNode = "Current Location is ";
+                            textNode = Distance + " from home";
+                            notifyID = 5;
+                            sendMessageDetail();
+                            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                            final Boolean mSwitch_Notif = sharedPref.getBoolean("switch_loc", true);
+                            if (mSwitch_Notif){
+                                showNotificationLoc();
+                            }
+
+                        }
+                    }
+                }).start();
+
+            }
+
+    }
+
 
     protected boolean isBetterLocation(Location location, Location currentBestLocation) {
         if (currentBestLocation == null) {
@@ -1496,7 +1529,7 @@ public class OlmatixService extends Service {
 
         // Set the info for the views that show in the notification panel.
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.olmatixlogo)  // the status icon
+                .setSmallIcon(R.drawable.ic_location_red)  // the status icon
                 .setTicker(textNode)  // the status text
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentTitle(getText(R.string.local_service_label_loc))  // the label of the entry

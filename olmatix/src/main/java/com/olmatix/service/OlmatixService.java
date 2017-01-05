@@ -1429,7 +1429,7 @@ public class OlmatixService extends Service {
                             }
 
                         } catch (final IOException e) {
-                            ((MainActivity) getApplicationContext()).runOnUiThread(new Runnable() {
+                            new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     Log.e("DEBUG", "Geocoder ERROR", e);

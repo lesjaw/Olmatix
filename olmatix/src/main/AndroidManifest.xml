@@ -66,13 +66,13 @@
         </activity>
 
 
-        <service android:name="com.olmatix.service.OlmatixService">
-        </service>
+        <service android:name="com.olmatix.service.OlmatixService"/>
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
         <receiver android:name="com.olmatix.service.OlmatixReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="com.olmatix.lesjaw.olmatix.ProximityAlert" />
             </intent-filter>
         </receiver>
 

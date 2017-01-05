@@ -143,6 +143,8 @@ public class OlmatixService extends Service {
     int counter = 0;
     double lat;
     double lng;
+    private String proximityIntentAction = new String("com.olmatix.lesjaw.olmatix.ProximityAlert");
+
 
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -325,6 +327,19 @@ public class OlmatixService extends Service {
         lng = mLocation.getLongitude();
         locationDistance();
 
+        Intent i = new Intent(proximityIntentAction);
+        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
+
+        final PreferenceHelper mPrefHelper = new PreferenceHelper(this.getApplicationContext());
+
+        double homeLat = mPrefHelper.getHomeLatitude();
+        double homelng = mPrefHelper.getHomeLongitude();
+        long thres = mPrefHelper.getHomeThresholdDistance();
+        Log.d("DEBUG", "proximity: " + homeLat +" | "+homelng+":"+thres);
+        mLocationMgr.addProximityAlert(homeLat, homelng, thres, -1, pi);
+
+        IntentFilter filter = new IntentFilter(proximityIntentAction);
+        registerReceiver(new OlmatixReceiver(), filter);
 
         return START_STICKY;
     }

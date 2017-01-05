@@ -225,7 +225,7 @@ public class dbNodeRepo {
                 +" ON " + TABLE_SCENE_DETAIL+"."+ dbNode.KEY_PATH +" = "+ TABLE_NODE+"." + dbNode.KEY_NODE_ID
                 +" JOIN " + TABLE_SCENE
                 +" ON " + TABLE_SCENE_DETAIL+"."+ dbNode.KEY_SCENE_ID +" = "+ TABLE_SCENE+"." + dbNode.KEY_SCENE_TYPE;
-        Log.d("DEBUG", "getAllScene: " + selectQuery);
+        //Log.d("DEBUG", "getAllScene: " + selectQuery);
 
         ArrayList<SceneDetailModel> nodeList = new ArrayList<SceneDetailModel>();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -793,7 +793,7 @@ public class dbNodeRepo {
                 " detail_node ON  duration_node." + KEY_NODE_ID + " = detail_node." + KEY_NODE_ID +
                 " GROUP BY act_time, duration_node." + KEY_NODE_ID;
 
-        Log.d("DEBUG", "getChartDurationList: " + selectString);
+        //Log.d("DEBUG", "getChartDurationList: " + selectString);
 
 
         ArrayList<DurationModel> nodeList = new ArrayList<DurationModel>();

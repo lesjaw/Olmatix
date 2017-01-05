@@ -175,7 +175,6 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
         } else if (viewHolder.getItemViewType() == mLOCATION) {
             final LocationInfoHolder holder = (LocationInfoHolder) viewHolder;
-            //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
             PreferenceHelper mPrefHelper = new PreferenceHelper(context.getApplicationContext());
             double mLat = mPrefHelper.getHomeLatitude();
             double mLong = mPrefHelper.getHomeLongitude();
@@ -208,7 +207,6 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
                 }
             }
         }
-
     }
 
     private String getNodeIdData( String z) {

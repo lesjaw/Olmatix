@@ -131,7 +131,7 @@ public class OlmatixService extends Service {
     private ArrayList<String> notifications;
 
     public static final String BROADCAST_ACTION = "Hello World";
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
+    private static final int TWO_MINUTES = 1000 * 60 * 5;
     public LocationManager locationManager;
     public MyLocationListener listener;
     public Location previousBestLocation = null;
@@ -300,9 +300,11 @@ public class OlmatixService extends Service {
 
         if (nInfo != null) {
             if (nInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, listener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                        OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
             } else if (nInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, listener);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                        OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
             }
         }
 
@@ -1353,16 +1355,13 @@ public class OlmatixService extends Service {
 
         public void onLocationChanged(final Location mLocation) {
 
-
             Log.i("*****************", "Location changed");
             if(isBetterLocation(mLocation, previousBestLocation)) {
 
                 final double lat = (mLocation.getLatitude());
                 final double lng = (mLocation.getLongitude());
-                Log.d(TAG, "onLocationChanged 1: "+lat +" : "+lng);
 
                 if (lat!=0 && lng!=0) {
-                    Log.d(TAG, "onLocationChanged 2: "+lat +" : "+lng);
 
                     new Thread(new Runnable() {
                         @Override
@@ -1379,7 +1378,6 @@ public class OlmatixService extends Service {
 
                                     if (address.getAddressLine(0) != null)
                                         adString = ", " + address.getAddressLine(0);
-                                    Log.d(TAG, "onLocationChanged 3: "+adString);
 
                                 }
 
@@ -1392,7 +1390,6 @@ public class OlmatixService extends Service {
                                 });
                                 loc = OlmatixUtils.gpsDecimalFormat.format(lat) + " : " + OlmatixUtils.gpsDecimalFormat.format(lng);
                             }
-                            Log.d("DEBUG", "Current Location : " + loc);
 
                             final float[] res = new float[3];
                             final PreferenceHelper mPrefHelper = new PreferenceHelper(getApplicationContext());
@@ -1405,7 +1402,6 @@ public class OlmatixService extends Service {
                                             res[0] = res[0] / 1000;
 
                                         }
-                                        Log.d("DEBUG", "Distance SERVICE 1: " + (int) res[0] + unit);
                                         Distance = loc +", it's "+ (int) res[0] + unit ;
                                     }
                                 }

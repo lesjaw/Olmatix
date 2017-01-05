@@ -139,7 +139,6 @@ public class OlmatixService extends Service {
     private String dist;
     String adString = "";
     String loc = null;
-
     Intent intent;
     int counter = 0;
 
@@ -1403,22 +1402,19 @@ public class OlmatixService extends Service {
 
                                         }
                                         Distance = loc +", it's "+ (int) res[0] + unit ;
-                                    }
+                                Log.d("DEBUG", "Distance SERVICE 1: " + Distance);
+                                titleNode = "Current Location is ";
+                                textNode = Distance + " from home";
+                                notifyID = 5;
+                                showNotificationLoc();
+                                sendMessageDetail();
+
+                            }
                                 }
                     }).start();
 
                 }
-                Log.d("DEBUG", "Distance SERVICE 2: " + Distance);
-                if (String.valueOf(Distance).trim().equals(null)) {
-
-                } else {
-                    titleNode = "Current Location is ";
-                    textNode = Distance + " from home";
-                    notifyID = 5;
-                    showNotificationLoc();
-                    sendMessageDetail();
-
-                }
+              
             }
         }
 

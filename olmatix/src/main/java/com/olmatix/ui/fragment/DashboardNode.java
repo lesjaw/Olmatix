@@ -494,7 +494,7 @@ public class DashboardNode extends Fragment implements
                                     unit = " km";
                                     res[0] = res[0] / 1000;
                                 }
-                                Log.d("DEBUG", "Distance: " + (int) res[0] + unit);
+                                //Log.d("DEBUG", "Distance: " + (int) res[0] + unit);
                                 Distance = loc +", it's "+ (int) res[0] + unit ;
                                 resetAdapter();
                             }
@@ -504,7 +504,7 @@ public class DashboardNode extends Fragment implements
 
             }).start();
         }
-        Log.d("DEBUG", "Distance OnCreate: " + Distance);
+       // Log.d("DEBUG", "Distance OnCreate: " + Distance);
 
     }
 

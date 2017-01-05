@@ -21,6 +21,7 @@ android {
     repositories {
         maven {
             url 'https://jitpack.io'
+            'https://dl.bintray.com/rvalerio/maven'
         }
     }
 }
@@ -35,6 +36,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.0.1'
     compile 'info.hoang8f:fbutton:1.0.5'
     compile 'com.getbase:floatingactionbutton:1.9.1'
+    compile 'com.rvalerio:fgchecker:1.0.1'
     compile('org.eclipse.paho:org.eclipse.paho.android.service:1.0.2') {
         exclude module: 'support-v4'
     }

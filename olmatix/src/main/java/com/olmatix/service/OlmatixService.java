@@ -1,5 +1,6 @@
 package com.olmatix.service;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Notification;
@@ -14,8 +15,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -23,9 +28,11 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
@@ -34,6 +41,7 @@ import android.widget.Toast;
 
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
+import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.DurationModel;
@@ -41,6 +49,7 @@ import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.ui.fragment.DetailNode;
 import com.olmatix.utils.Connection;
+import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -53,6 +62,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,6 +70,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -86,6 +97,7 @@ public class OlmatixService extends Service {
     CharSequence text;
     CharSequence textNode;
     CharSequence titleNode;
+    String[] textLoc;
     ArrayList<DetailNodeModel> data1;
     ArrayList<InstalledNodeModel> data2;
     String add_NodeID;
@@ -100,7 +112,7 @@ public class OlmatixService extends Service {
     private Thread thread;
     private ConnectivityManager mConnMan;
     private String deviceId;
-    private String stateoffMqtt="false";
+    private String stateoffMqtt = "false";
     private InstalledNodeModel installedNodeModel;
     private DetailNodeModel detailNodeModel;
     private DurationModel durationModel;
@@ -117,6 +129,19 @@ public class OlmatixService extends Service {
     private String mChange = "";
     final static String GROUP_KEY_NOTIF = "group_key_notif";
     private ArrayList<String> notifications;
+
+    public static final String BROADCAST_ACTION = "Hello World";
+    private static final int TWO_MINUTES = 1000 * 60 * 2;
+    public LocationManager locationManager;
+    public MyLocationListener listener;
+    public Location previousBestLocation = null;
+    private String Distance;
+    private String dist;
+    String adString = "";
+    String loc = null;
+
+    Intent intent;
+    int counter = 0;
 
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -163,7 +188,7 @@ public class OlmatixService extends Service {
                     (mqttClient == null || !mqttClient.isConnected()));
 
             if (hasConnectivity && hasChanged && (Connection.getClient() != null || Connection.getClient().isConnected())) {
-                flagConn=false;
+                flagConn = false;
                 callDis();
                 Log.d(TAG, "Call Disconnect first");
 
@@ -210,14 +235,14 @@ public class OlmatixService extends Service {
     }
 
     private void doDisconnect() {
-        Log.d(TAG, "doDisconnect()"+flagConn);
+        Log.d(TAG, "doDisconnect()" + flagConn);
         if (!flagConn) {
             try {
-                    mqttClient.disconnect();
-                    stateoffMqtt = "false";
-                    sendMessage();
-                    flagConn = true;
-                    Log.d(TAG, "doDisconnect() done");
+                mqttClient.disconnect();
+                stateoffMqtt = "false";
+                sendMessage();
+                flagConn = true;
+                Log.d(TAG, "doDisconnect() done");
 
 
             } catch (MqttException e) {
@@ -258,6 +283,28 @@ public class OlmatixService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         sendMessage();
         flagConn = true;
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        listener = new MyLocationListener();
+        if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+
+        NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
+
+        if (nInfo != null) {
+            if (nInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, listener);
+            } else if (nInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, listener);
+            }
+        }
 
         return START_STICKY;
     }
@@ -303,24 +350,24 @@ public class OlmatixService extends Service {
                 new Intent(this, MainActivity.class), 0);
 
         // Set the info for the views that show in the notification panel.
-        Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.olmatixlogo)  // the status icon
+        NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.olmatixsmall)  // the status icon
                 .setTicker(text)  // the status text
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
                 .setContentText(text)  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .setOngoing(true)
+                //.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .build();
 
         // Send the notification.
-        mNM.notify(NOTIFICATION, notification);
+        mNM.notify(NOTIFICATION, mBuilder.build());
     }
 
     private void showNotificationNode() {
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.olmatixlogo);
 
-        int numMessages =0;
+        //int numMessages =0;
 
         SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
 
@@ -1299,6 +1346,179 @@ public class OlmatixService extends Service {
         public void deliveryComplete(IMqttDeliveryToken token) {
 
         }
+    }
+
+    public class MyLocationListener implements LocationListener {
+
+        public void onLocationChanged(final Location mLocation) {
+
+
+            Log.i("*****************", "Location changed");
+            if(isBetterLocation(mLocation, previousBestLocation)) {
+
+                //intent.putExtra("Latitude", loc.getLatitude());
+                //intent.putExtra("Longitude", loc.getLongitude());
+                //intent.putExtra("Provider", loc.getProvider());
+                //sendBroadcast(intent);
+
+
+                final double lat = (mLocation.getLatitude());
+                final double lng = (mLocation.getLongitude());
+                Log.d(TAG, "onLocationChanged 1: "+lat +" : "+lng);
+
+                if (lat!=0 && lng!=0) {
+                    Log.d(TAG, "onLocationChanged 2: "+lat +" : "+lng);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            final Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+                            try {
+                                List<Address> list;
+                                list = geocoder.getFromLocation(lat, lng, 1);
+                                if (list != null && list.size() > 0) {
+                                    Address address = list.get(0);
+                                    loc = address.getLocality();
+
+                                    if (address.getAddressLine(0) != null)
+                                        adString = ", " + address.getAddressLine(0);
+                                    Log.d(TAG, "onLocationChanged 3: "+adString);
+
+                                }
+
+                            } catch (final IOException e) {
+                                ((MainActivity) getApplicationContext()).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Log.e("DEBUG", "Geocoder ERROR", e);
+                                    }
+                                });
+                                loc = OlmatixUtils.gpsDecimalFormat.format(lat) + " : " + OlmatixUtils.gpsDecimalFormat.format(lng);
+                            }
+                            Log.d("DEBUG", "Current Location : " + loc);
+
+                            final float[] res = new float[3];
+                            final PreferenceHelper mPrefHelper = new PreferenceHelper(getApplicationContext());
+                            Location.distanceBetween(lat, lng, mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), res);
+                            if (mPrefHelper.getHomeLatitude() != 0) {
+
+                                        String unit = " m";
+                                        if (res[0] > 2000) {// uuse km
+                                            unit = " km";
+                                            res[0] = res[0] / 1000;
+
+                                        }
+                                        Log.d("DEBUG", "Distance SERVICE 1: " + (int) res[0] + unit);
+                                        Distance = loc +", it's "+ (int) res[0] + unit ;
+                                    }
+                                }
+                    }).start();
+
+                }
+                Log.d("DEBUG", "Distance SERVICE 2: " + Distance);
+                if (String.valueOf(Distance).trim().equals(null)) {
+
+                } else {
+                    titleNode = "Current Location is ";
+                    textNode = Distance + " from home";
+                    notifyID = 5;
+                    showNotificationLoc();
+
+                }
+            }
+        }
+
+        public void onProviderDisabled(String provider)
+        {
+            Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
+        }
+
+
+        public void onProviderEnabled(String provider)
+        {
+            Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+        }
+
+
+        public void onStatusChanged(String provider, int status, Bundle extras)
+        {
+
+        }
+
+    }
+
+    protected boolean isBetterLocation(Location location, Location currentBestLocation) {
+        if (currentBestLocation == null) {
+            // A new location is always better than no location
+            return true;
+        }
+
+        // Check whether the new location fix is newer or older
+        long timeDelta = location.getTime() - currentBestLocation.getTime();
+        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+        boolean isNewer = timeDelta > 0;
+
+        // If it's been more than two minutes since the current location, use the new location
+        // because the user has likely moved
+        if (isSignificantlyNewer) {
+            return true;
+            // If the new location is more than two minutes older, it must be worse
+        } else if (isSignificantlyOlder) {
+            return false;
+        }
+
+        // Check whether the new location fix is more or less accurate
+        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+        boolean isLessAccurate = accuracyDelta > 0;
+        boolean isMoreAccurate = accuracyDelta < 0;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+        // Check if the old and new location are from the same provider
+        boolean isFromSameProvider = isSameProvider(location.getProvider(),
+                currentBestLocation.getProvider());
+
+        // Determine location quality using a combination of timeliness and accuracy
+        if (isMoreAccurate) {
+            return true;
+        } else if (isNewer && !isLessAccurate) {
+            return true;
+        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+            return true;
+        }
+        return false;
+    }
+
+
+
+    /** Checks whether two providers are the same */
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+            return provider2 == null;
+        }
+        return provider1.equals(provider2);
+    }
+
+    private  void showNotificationLoc(){
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+
+        // Set the info for the views that show in the notification panel.
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.olmatixlogo)  // the status icon
+                .setTicker(textNode)  // the status text
+                .setWhen(System.currentTimeMillis())  // the time stamp
+                .setContentTitle(getText(R.string.local_service_label_loc))  // the label of the entry
+                .setContentText(textNode)  // the contents of the entry
+                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
+                .setAutoCancel(true)
+                .build();
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(5, notification);
     }
 
 

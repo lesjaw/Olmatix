@@ -187,12 +187,14 @@ public class SettingsActivity extends SettingsFragment {
                     final PreferenceHelper mPrefHelper;
                     try {
                         mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
-                        Location mLocation = mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        if (mLocation != null){
-                            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        Location mLocation = mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (mLocation == null){
+                            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        }  else {
+                            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                         }
 
-//                        Log.d("DEBUG", "location mpref: " + mLocation.getLatitude() + " "+mLocation.getLongitude() );
+                        Log.d("DEBUG", "location mpref: " + mLocation.getLatitude() + " "+mLocation.getLongitude() );
                         mPrefHelper = new PreferenceHelper(getActivity());
 
                         if (mLocation!=null){
@@ -208,8 +210,6 @@ public class SettingsActivity extends SettingsFragment {
                             Toast.makeText(getActivity(), getString(R.string.opt_homepos_set_false), Toast.LENGTH_SHORT).show();
 
                         }
-
-
 
                     } catch (SecurityException ex) {
                         Log.d("DEBUG", "Permission Denied: " + ex );

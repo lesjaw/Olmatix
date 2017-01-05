@@ -76,5 +76,7 @@
     <string name="next">Submit</string>
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
+    <string name="opt_homepos_set_false">Can\'t find location</string>
+    <string name="local_service_label_loc">Olmatix location update</string>
 
 </resources>

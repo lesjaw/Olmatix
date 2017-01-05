@@ -578,6 +578,7 @@ public class OlmatixService extends Service {
         Intent intent = new Intent("MQTTStatusDetail");
         intent.putExtra("ServerConn", stateoffMqtt);
         intent.putExtra("NotifyChangeDetail", mChange);
+        intent.putExtra("distance", Distance);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -1356,12 +1357,6 @@ public class OlmatixService extends Service {
             Log.i("*****************", "Location changed");
             if(isBetterLocation(mLocation, previousBestLocation)) {
 
-                //intent.putExtra("Latitude", loc.getLatitude());
-                //intent.putExtra("Longitude", loc.getLongitude());
-                //intent.putExtra("Provider", loc.getProvider());
-                //sendBroadcast(intent);
-
-
                 final double lat = (mLocation.getLatitude());
                 final double lng = (mLocation.getLongitude());
                 Log.d(TAG, "onLocationChanged 1: "+lat +" : "+lng);
@@ -1425,6 +1420,7 @@ public class OlmatixService extends Service {
                     textNode = Distance + " from home";
                     notifyID = 5;
                     showNotificationLoc();
+                    sendMessageDetail();
 
                 }
             }

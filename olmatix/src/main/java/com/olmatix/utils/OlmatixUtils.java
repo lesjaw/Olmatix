@@ -1,7 +1,10 @@
 package com.olmatix.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.location.Criteria;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -94,6 +97,16 @@ public class OlmatixUtils {
         cal.setTimeInMillis(time);
         String date = DateFormat.format("dd-MM-yyyy", cal).toString();
         return date;
+    }
+
+    public static int dpToPx(final float dp) {
+        return Math.round(dp * (Resources.getSystem().getDisplayMetrics().xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+    public static int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int noOfColumns = (int) (dpWidth / 100);
+        return noOfColumns;
     }
 
 }

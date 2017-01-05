@@ -4,30 +4,23 @@ package com.olmatix.ui.fragment;
  * Created by Lesjaw on 05/12/2016.
  */
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Paint;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -45,29 +38,23 @@ import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
-import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.model.SpinnerObject;
-import com.olmatix.ui.activity.MainActivity;
-import com.olmatix.utils.GridAutofitLayoutManager;
-import com.olmatix.utils.GridSpacingItemDecoration;
+import com.olmatix.utils.GridSpacesItemDecoration;
 import com.olmatix.utils.OlmatixUtils;
 import com.olmatix.utils.SpinnerListener;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static com.olmatix.adapter.InfoAdapter.mBUTTON;
 import static com.olmatix.adapter.InfoAdapter.mLOCATION;
 
 
 public class DashboardNode extends Fragment implements
-        OnStartDragListener,
-        LocationListener {
+        OnStartDragListener{
 
     private View mView;
     private RecyclerView mRecycleView;
@@ -192,16 +179,30 @@ public class DashboardNode extends Fragment implements
         mRecycleView.setHasFixedSize(true);
         mRecycleViewInfo.setHasFixedSize(true);
 
-        GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getActivity(), 200 );
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+
+        Log.d("DEBUG", "setupView: "+screenWidth);
+
+        int resScreen;
+        if (screenWidth>720){
+            resScreen = 400;
+        } else {
+            resScreen = 200;
+        }
+
+        int mNoOfColumns = OlmatixUtils.calculateNoOfColumns(getContext());
+
+        //GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getActivity(), resScreen );
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), mNoOfColumns);
+
         mRecycleView.setLayoutManager(layoutManager);
+        mRecycleView.addItemDecoration(new GridSpacesItemDecoration(OlmatixUtils.dpToPx(2),true));
+
 
         LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecycleViewInfo.setLayoutManager(horizontalLayoutManagaer);
 
-        int mNoOfColumns = 3;
-        int spacing = 10; // 50px
-        boolean includeEdge = true;
-        mRecycleView.addItemDecoration(new GridSpacingItemDecoration(mNoOfColumns, spacing, includeEdge));
 
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         mRecycleViewInfo.setItemAnimator(new DefaultItemAnimator());
@@ -253,6 +254,7 @@ public class DashboardNode extends Fragment implements
         });
     }
 
+
     private void setRefresh() {
         data.clear();
         data.addAll(mDbNodeRepo.getNodeDetailDash());
@@ -275,7 +277,6 @@ public class DashboardNode extends Fragment implements
     @Override
     public void onStart() {
         super.onStart();
-        initLocationProvider();
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -283,7 +284,7 @@ public class DashboardNode extends Fragment implements
         public void onReceive(Context context, Intent intent) {
 
             String message = intent.getStringExtra("NotifyChangeDetail");
-            String msg = intent.getStringExtra("MQTT State");
+            String DistService = intent.getStringExtra("distance");
             if (message==null){
                 message = "1";
             }
@@ -292,6 +293,15 @@ public class DashboardNode extends Fragment implements
                 //Log.d("receiver", "Notifydashboard : " + message);
             }
             updatelist();
+            if (!String.valueOf(DistService).trim().equals(null)){
+                Distance = DistService;
+                resetAdapter();
+
+            } else {
+                Distance = "Unknown";
+                resetAdapter();
+
+            }
 
         }
     };
@@ -327,7 +337,6 @@ public class DashboardNode extends Fragment implements
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
 
     }
-
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
@@ -382,159 +391,11 @@ public class DashboardNode extends Fragment implements
         }
     }
 
-    private void initLocationProvider() {
-
-
-        PreferenceHelper mPrefHelper = new PreferenceHelper(getContext());
-
-        mProvider = locationManager.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
-
-        boolean enabled = (mProvider != null && locationManager.isProviderEnabled(mProvider) &&mPrefHelper.getHomeLatitude() != 0);
-        if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED)) {
-            if (enabled) {
-                locationManager.requestLocationUpdates(mProvider, OlmatixUtils.POSITION_UPDATE_INTERVAL,
-                        OlmatixUtils.POSITION_UPDATE_MIN_DIST, (LocationListener) this);
-                Location location = locationManager.getLastKnownLocation(mProvider);
-                // Initialize the location fields
-                if (location != null) {
-                    onLocationChanged(location);
-                }
-            } else if (mPrefHelper.getHomeLatitude() != 0) {
-
-            } else {
-
-            }
-        } else//permesso mancante
-        {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    OlmatixUtils.OLMATIX_PERMISSIONS_ACCESS_COARSE_LOCATION);
-
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case OlmatixUtils.OLMATIX_PERMISSIONS_ACCESS_COARSE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mProvider = mLocateMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
-                    Log.w("DEBUG", "MY_PERMISSIONS_ACCESS_COARSE_LOCATION permission granted");
-
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                            && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        Log.wtf("DEBUG", "Need permission");
-                        return;
-                    }
-                    mLocateMgr.requestLocationUpdates(mProvider, OlmatixUtils.POSITION_UPDATE_INTERVAL,
-                            OlmatixUtils.POSITION_UPDATE_MIN_DIST, (LocationListener) this);
-                    mLocation = mLocateMgr.getLastKnownLocation(mProvider);
-
-                    Log.d("DEBUG", "LastKnown: "+mLocation);
-                    // Initialize the location fields
-                    if (mLocation != null) {
-                        onLocationChanged(mLocation);
-                    }
-
-                }
-                return;
-            }
-        }
-    }
-
-    public void onLocationChanged(Location mLocation) {
-        final double lat = (mLocation.getLatitude());
-        final double lng = (mLocation.getLongitude());
-
-        if (lat!=0 && lng!=0) {
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    final Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
-
-                    try {
-                        List<Address> list;
-                        list = geocoder.getFromLocation(lat, lng, 1);
-                        if (list != null && list.size() > 0) {
-                            Address address = list.get(0);
-                            loc = address.getLocality();
-
-                            if (address.getAddressLine(0) != null)
-                                adString = ", " + address.getAddressLine(0);
-                        }
-
-                    } catch (final IOException e) {
-                        ((MainActivity) dashboardnode).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.e("DEBUG", "Geocoder ERROR", e);
-                            }
-                        });
-                        loc = OlmatixUtils.gpsDecimalFormat.format(lat) + " : " + OlmatixUtils.gpsDecimalFormat.format(lng);
-                    }
-                    Log.d("DEBUG", "Current Location : " + loc);
-
-                    final float[] res = new float[3];
-                    final PreferenceHelper mPrefHelper = new PreferenceHelper(dashboardnode);
-                    Location.distanceBetween(lat, lng, mPrefHelper.getHomeLatitude(), mPrefHelper.getHomeLongitude(), res);
-                    if (mPrefHelper.getHomeLatitude() != 0) {
-                        ((MainActivity) dashboardnode).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                String unit = " m";
-                                if (res[0] > 2000) {// uuse km
-                                    unit = " km";
-                                    res[0] = res[0] / 1000;
-                                }
-                                //Log.d("DEBUG", "Distance: " + (int) res[0] + unit);
-                                Distance = loc +", it's "+ (int) res[0] + unit ;
-                                resetAdapter();
-                            }
-                        });
-                    }
-                }
-
-            }).start();
-        }
-       // Log.d("DEBUG", "Distance OnCreate: " + Distance);
-
-    }
 
     public void resetAdapter(){
 
-        /*infoAdapter.notifyDataSetChanged();
-        dist="";
-        dist = Distance;
-        Log.d("DEBUG", "resetAdapter: "+ dist);
-        if(infoAdapter != null) {
-            infoAdapter.notifyItemRangeChanged(0, infoAdapter.getItemCount());
-        }
-        assert infoAdapter != null;*/
         infoAdapter.notifyDistance(Distance);
 
-
     }
 
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 }

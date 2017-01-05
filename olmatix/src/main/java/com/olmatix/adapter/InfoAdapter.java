@@ -200,8 +200,12 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
                 holder.distance.setText("No location found");
             } else {
                 holder.location.setText("at " + loc + adString + " | " + String.valueOf((Double) mLat) + " : " + String.valueOf((Double) mLong));
-                holder.distance.setText("you are at " + distance + " from home");
-                holder.location.setSelected(true);
+                if (distance==null) {
+                    holder.distance.setText("you are at unknown from home, waiting update");
+                } else {
+                    holder.location.setSelected(true);
+                    holder.distance.setText("you are at " + distance + " from home");
+                }
             }
         }
 

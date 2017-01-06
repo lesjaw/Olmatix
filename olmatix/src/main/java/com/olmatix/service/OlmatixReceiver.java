@@ -39,7 +39,7 @@ public class OlmatixReceiver extends BroadcastReceiver {
              if (state) {
                  // Call the Notification Service or anything else that you would like to do here
                  //Toast.makeText(context, "You arrive at home..", Toast.LENGTH_LONG).show();
-                 textNode = "You are entering home radius..";
+                 textNode = "You are entering home radius location..";
                  homestat = 0;
 
              } else {

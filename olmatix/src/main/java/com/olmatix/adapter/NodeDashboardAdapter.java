@@ -11,6 +11,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -161,6 +162,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                             e.printStackTrace();
                         }
                     } else {
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_LONG).show();
+                        try {
+                            Connection.getClient().connect();
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
@@ -215,6 +222,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                             e.printStackTrace();
                         }
                     } else {
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_LONG).show();
+                        try {
+                            Connection.getClient().connect();
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationManager;
@@ -31,6 +32,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -171,7 +173,7 @@ public class DashboardNode extends Fragment implements
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
         mRecycleViewInfo    = (RecyclerView) mView.findViewById(R.id.rv1);
-
+        View mViewDash1 = (View) mView.findViewById(R.id.view_dash);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
 
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
@@ -216,6 +218,23 @@ public class DashboardNode extends Fragment implements
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mRecycleViewInfo.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            p.addRule(RelativeLayout.BELOW, R.id.view_dash1);
+            mRecycleView.setLayoutParams(p);
+            mViewDash1.setVisibility(View.GONE);
+
+        }
+        else {
+            mRecycleViewInfo.setVisibility(View.VISIBLE);
+
+        }
+
         mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener()
         {
             @Override
@@ -238,7 +257,6 @@ public class DashboardNode extends Fragment implements
             }
         });
     }
-
 
     private void setRefresh() {
         data.clear();

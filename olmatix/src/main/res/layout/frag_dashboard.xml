@@ -22,6 +22,14 @@
             android:layout_height="match_parent"
             android:padding="0sp">
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#787878"
+                android:layout_margin="5dp"
+                android:visibility="gone"
+                android:id="@+id/view_dash1" />
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv1"
                 android:layout_width="match_parent"

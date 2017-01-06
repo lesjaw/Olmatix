@@ -267,6 +267,8 @@ public class OlmatixService extends Service {
         showNotification();
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter("addNode"));
+
+        notifications.clear();
     }
 
     @Override

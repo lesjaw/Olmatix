@@ -197,7 +197,7 @@ public class OlmatixService extends Service {
                 }
                 callCon();
             }
-        }, 1000);
+        }, 3000);
     }
 
     private void callCon() {
@@ -221,7 +221,7 @@ public class OlmatixService extends Service {
                 unSubIfnotForeground();
 
             }
-        }, 10000);
+        }, 20000);
     }
 
     private void doDisconnect() {
@@ -769,7 +769,7 @@ public class OlmatixService extends Service {
             //Log.d("DEBUG", "toastAndNotif: "+currentApp);
             checkActivityForeground();
             if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
-                //Log.d("DEBUG", "toastAndNotif: "+flagOnForeground);
+                Log.d("DEBUG", "toastAndNotif: "+flagOnForeground);
 
                 if (!flagOnForeground) {
                     String state = "";
@@ -1397,13 +1397,13 @@ public class OlmatixService extends Service {
 
         public void onProviderDisabled(String provider)
         {
-            Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
+            //Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
         }
 
 
         public void onProviderEnabled(String provider)
         {
-            Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+            //Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
         }
 
 

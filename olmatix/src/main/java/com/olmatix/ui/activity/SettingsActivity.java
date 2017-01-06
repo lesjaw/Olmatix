@@ -58,13 +58,8 @@ public class SettingsActivity extends SettingsFragment {
 
             SharedPreferences sharedPref = preference.getSharedPreferences();
             boolean mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
-
-           /* if (mSwitch_Conn) {
-                Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
-            }
-            if (!mSwitch_Conn){
-                Log.d("DEBUG", "SwitchConnPreff: "+ mSwitch_Conn);
-            }*/
+            boolean mswitch_loc = sharedPref.getBoolean("switch_loc", true);
+            boolean mswitch_notif = sharedPref.getBoolean("switch_notif", true);
 
             return true;
         }
@@ -87,6 +82,8 @@ public class SettingsActivity extends SettingsFragment {
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+
+
     }
 
     @Override
@@ -172,9 +169,10 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("user_name"));
             bindPreferenceSummaryToValue(findPreference("password"));
 
-            CheckBoxPreference pref = (CheckBoxPreference) findPreference("switch_conn");
+            CheckBoxPreference mSLoc = (CheckBoxPreference) findPreference("switch_conn");
             final Preference setConnection = findPreference("switch_conn");
             setConnection.setOnPreferenceClickListener(NetworkClickListener());
+
 
         }
 
@@ -325,11 +323,12 @@ public class SettingsActivity extends SettingsFragment {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class MiscPreferenceFragment extends PreferenceFragment {
-        private SharedPreferences pref;
         private LocationManager mLocationMgr;
         private String mProvider;
         private Preference setLocation;
         String loc = null;
+        private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
+        private CheckBoxPreference pref,pref1;
 
 
         @Override
@@ -339,8 +338,53 @@ public class SettingsActivity extends SettingsFragment {
             setHasOptionsMenu(true);
 
             bindPreferenceSummaryToValue(findPreference("setLocation"));
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            final Boolean mswitch_loc = sharedPref.getBoolean("switch_loc", true);
+            final Boolean mswitch_notif = sharedPref.getBoolean("switch_notif", true);
+
+            pref = (CheckBoxPreference) findPreference("switch_loc");
+            pref1 = (CheckBoxPreference) findPreference("switch_notif");
+
+
+            if (!mswitch_loc) {
+                pref.setTitle(R.string.switch_loc);
+            } else if (mswitch_loc) {
+                pref.setTitle(R.string.switch_locDisable);
+            }
+
+            if (!mswitch_notif) {
+                pref1.setTitle(R.string.switch_notif);
+            } else if (mswitch_notif){
+                pref1.setTitle(R.string.switch_notifDisable);
+            }
 
             initLocationPref();
+
+            //-- preference change listener
+            prefListener = new SharedPreferences.OnSharedPreferenceChangeListener(){
+                public void onSharedPreferenceChanged(SharedPreferences prefs, String key){
+                    if (key.equals("switch_loc")){
+                        Log.d("DEBUG", "onSharedPreferenceChanged: "+mswitch_loc);
+
+                        if (mswitch_loc) {
+                            pref.setTitle(R.string.switch_loc);
+                        } else if (!mswitch_loc) {
+                            pref.setTitle(R.string.switch_locDisable);
+                        }
+                    }
+
+                    if (key.equals("switch_notif")){
+                        Log.d("DEBUG", "onSharedPreferenceChanged: "+mswitch_notif);
+
+                        if (mswitch_notif) {
+                            pref1.setTitle(R.string.switch_notif);
+                        } else if (!mswitch_notif){
+                            pref1.setTitle(R.string.switch_notifDisable);
+                        }
+                    }
+                }
+            };
+            sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
         }
 
 

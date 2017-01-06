@@ -83,5 +83,7 @@
     <string name="opt_loc_notif">Location will update if you move</string>
     <string name="opt_loc_notif1">Notify me if device status change</string>
     <string name="switch_sum">Persistence connection to server</string>
+    <string name="switch_locDisable">Disable location notification</string>
+    <string name="switch_notifDisable">Disable status notification</string>
 
 </resources>

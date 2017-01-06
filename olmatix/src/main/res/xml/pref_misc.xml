@@ -26,13 +26,15 @@
         <CheckBoxPreference
             android:title="@string/switch_loc"
             android:key="switch_loc"
-            android:defaultValue="true">
+            android:defaultValue="true"
+            android:summary="@string/opt_loc_notif">
         </CheckBoxPreference>
 
         <CheckBoxPreference
             android:title="@string/switch_notif"
             android:key="switch_notif"
-            android:defaultValue="true">
+            android:defaultValue="true"
+            android:summary="@string/opt_loc_notif1">
         </CheckBoxPreference>
 
 

@@ -19,12 +19,21 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.DetailNodeModel;
+import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.fragment.SettingsFragment;
+import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -130,11 +139,28 @@ public class SettingsActivity extends SettingsFragment {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class NetworkPreferenceFragment extends PreferenceFragment {
+        public static dbNodeRepo mDbNodeRepo;
+        private static ArrayList<InstalledNodeModel> data;
+        ArrayList<DetailNodeModel> data1;
+
+        String topic;
+        private InstalledNodeModel installedNodeModel;
+        private DetailNodeModel detailNodeModel;
+
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_network);
             setHasOptionsMenu(true);
+
+            data = new ArrayList<>();
+            data1 = new ArrayList<>();
+
+            mDbNodeRepo = new dbNodeRepo(getActivity());
+            installedNodeModel = new InstalledNodeModel();
+            detailNodeModel = new DetailNodeModel();
+
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
@@ -147,7 +173,154 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("password"));
 
             CheckBoxPreference pref = (CheckBoxPreference) findPreference("switch_conn");
+            final Preference setConnection = findPreference("switch_conn");
+            setConnection.setOnPreferenceClickListener(NetworkClickListener());
+
         }
+
+        private Preference.OnPreferenceClickListener NetworkClickListener() {
+
+            return new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+
+                    Toast.makeText(getActivity(), "Persistence Clicked", Toast.LENGTH_LONG).show();
+
+                    doSubAll();
+
+                    return true;
+                }
+
+            };
+        }
+
+        private void doSubAll() {
+
+            int countDB = mDbNodeRepo.getNodeList().size();
+            Log.d("DEBUG", "Count list Node: " + countDB);
+            data.addAll(mDbNodeRepo.getNodeList());
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    final String mNodeID = data.get(i).getNodesID();
+                    //Log.d("DEBUG", "Count list: " + mNodeID);
+                    for (int a = 0; a < 5; a++) {
+                        if (a == 0) {
+                            topic = "devices/" + mNodeID + "/$online";
+                        }
+                        if (a == 1) {
+                            topic = "devices/" + mNodeID + "/$fwname";
+                        }
+                        if (a == 2) {
+                            topic = "devices/" + mNodeID + "/$signal";
+                        }
+                        if (a == 3) {
+                            topic = "devices/" + mNodeID + "/$uptime";
+                        }
+                        if (a == 4) {
+                            topic = "devices/" + mNodeID + "/$localip";
+                        }
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    //Log.d("SubscribeNode", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                data.clear();
+                doSubAllDetail();
+            }
+
+        }
+
+        private void doSubAllDetail() {
+
+            int countDB = mDbNodeRepo.getNodeDetailList().size();
+            Log.d("DEBUG", "Count list Detail: " + countDB);
+            data1.addAll(mDbNodeRepo.getNodeDetailList());
+            countDB = mDbNodeRepo.getNodeDetailList().size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    final String mNodeID = data1.get(i).getNode_id();
+                    final String mChannel = data1.get(i).getChannel();
+                    topic = "devices/" + mNodeID + "/light/" + mChannel;
+                    int qos = 2;
+                    try {
+                        IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                        subToken.setActionCallback(new IMqttActionListener() {
+                            @Override
+                            public void onSuccess(IMqttToken asyncActionToken) {
+                                //Log.d("SubscribeButton", " device = " + mNodeID);
+                            }
+
+                            @Override
+                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                            }
+                        });
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                doAllsubDetailSensor();
+            }
+            data.clear();
+        }
+
+        private void doAllsubDetailSensor() {
+            int countDB = mDbNodeRepo.getNodeDetailList().size();
+            Log.d("DEBUG", "Count list Sensor: " + countDB);
+            data1.addAll(mDbNodeRepo.getNodeDetailList());
+            countDB = mDbNodeRepo.getNodeDetailList().size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    final String mNodeID1 = data1.get(i).getNode_id();
+                    final String mSensorT = data1.get(i).getSensor();
+                    //Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                    if (mSensorT != null && mSensorT.equals("close")) {
+                        for (int a = 0; a < 2; a++) {
+                            if (a == 0) {
+                                topic = "devices/" + mNodeID1 + "/door/close";
+                            }
+                            if (a == 1) {
+                                topic = "devices/" + mNodeID1 + "/door/theft";
+                            }
+
+                            int qos = 2;
+                            try {
+                                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                subToken.setActionCallback(new IMqttActionListener() {
+                                    @Override
+                                    public void onSuccess(IMqttToken asyncActionToken) {
+                                        //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                    }
+
+                                    @Override
+                                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                    }
+                                });
+                            } catch (MqttException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                }
+
+                data1.clear();
+            }
+        }
+
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

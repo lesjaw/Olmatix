@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(UE_ACTION)) {
-                Log.d("Olmatix", "i'm in the foreground");
+                //Log.d("Olmatix", "i'm in the foreground");
                 this.setResultCode(Activity.RESULT_OK);
             }
         }

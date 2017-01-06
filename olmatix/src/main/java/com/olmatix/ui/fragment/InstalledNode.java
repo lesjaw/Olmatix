@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,6 +20,7 @@ import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -314,34 +316,47 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     private void doSubAll(){
 
-        int countDB = dbNodeRepo.getNodeList().size();
-        data.addAll(dbNodeRepo.getNodeList());
-        for (int i = 0; i < countDB; i++) {
-            final String mNodeID = data.get(i).getNodesID();
-            for (int a=0; a < 4 ;a++) {
-                String topic="";
-                if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
-                if (a == 1) {topic = "devices/" + mNodeID + "/$signal";}
-                if (a == 2) {topic = "devices/" + mNodeID + "/$uptime";}
-                if (a == 3) {topic = "devices/" + mNodeID + "/$localip";}
-                int qos = 2;
-                try {
-                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                    subToken.setActionCallback(new IMqttActionListener() {
-                        @Override
-                        public void onSuccess(IMqttToken asyncActionToken) {
-                        }
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
+        if (!mSwitch_conn) {
 
-                        @Override
-                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                        }
-                    });
-                } catch (MqttException e) {
-                    e.printStackTrace();
+            int countDB = dbNodeRepo.getNodeList().size();
+            data.addAll(dbNodeRepo.getNodeList());
+            for (int i = 0; i < countDB; i++) {
+                final String mNodeID = data.get(i).getNodesID();
+                for (int a = 0; a < 4; a++) {
+                    String topic = "";
+                    if (a == 0) {
+                        topic = "devices/" + mNodeID + "/$online";
+                    }
+                    if (a == 1) {
+                        topic = "devices/" + mNodeID + "/$signal";
+                    }
+                    if (a == 2) {
+                        topic = "devices/" + mNodeID + "/$uptime";
+                    }
+                    if (a == 3) {
+                        topic = "devices/" + mNodeID + "/$localip";
+                    }
+                    int qos = 2;
+                    try {
+                        IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                        subToken.setActionCallback(new IMqttActionListener() {
+                            @Override
+                            public void onSuccess(IMqttToken asyncActionToken) {
+                            }
+
+                            @Override
+                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                            }
+                        });
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+            data.clear();
         }
-        data.clear();
     }
 
     @Override

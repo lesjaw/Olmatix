@@ -94,10 +94,7 @@ public class OlmatixService extends Service {
     public volatile MqttAndroidClient mqttClient;
     HashMap<String, String> messageReceive = new HashMap<>();
     HashMap<String, String> message_topic = new HashMap<>();
-    CharSequence text;
-    CharSequence textNode;
-    CharSequence titleNode;
-    String[] textLoc;
+    CharSequence text,textNode,titleNode;
     ArrayList<DetailNodeModel> data1;
     ArrayList<InstalledNodeModel> data2;
     String add_NodeID;
@@ -106,9 +103,7 @@ public class OlmatixService extends Service {
     boolean flagConn = true;
     boolean flagOnForeground = true;
     int notifyID = 0;
-    String currentApp = "NULL";
-    String topic;
-    String topic1;
+    String currentApp = "NULL",topic,topic1;
     private Thread thread;
     private ConnectivityManager mConnMan;
     private String deviceId;
@@ -117,16 +112,10 @@ public class OlmatixService extends Service {
     private DetailNodeModel detailNodeModel;
     private DurationModel durationModel;
     private dbNode dbnode;
-    private String NodeID, Channel;
-    private String mMessage;
+    private String NodeID, Channel, mMessage;
     private NotificationManager mNM;
     private int NOTIFICATION = R.string.local_service_label;
-    private String mNodeID;
-    private String mNiceName;
-    private String mNiceNameN;
-    private String NodeIDSensor;
-    private String TopicID;
-    private String mChange = "";
+    private String mNodeID, mNiceName, mNiceNameN,NodeIDSensor,TopicID, mChange = "";
     final static String GROUP_KEY_NOTIF = "group_key_notif";
     private ArrayList<String> notifications;
     private static final int TWO_MINUTES = 1000 * 60 * 5;
@@ -134,7 +123,6 @@ public class OlmatixService extends Service {
     public MyLocationListener listener;
     public Location previousBestLocation = null;
     private String Distance;
-    private String dist;
     String adString = "";
     String loc = null;
     Intent intent;
@@ -142,6 +130,8 @@ public class OlmatixService extends Service {
     double lat;
     double lng;
     private String proximityIntentAction = new String("com.olmatix.lesjaw.olmatix.ProximityAlert");
+    private static final String MY_PREFERENCES = "my_preferences";
+
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -353,7 +343,7 @@ public class OlmatixService extends Service {
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID1 = data.get(i).getNodesID();
-                    Log.d("DEBUG", "Count list: " + mNodeID1);
+                    //Log.d("DEBUG", "Count list: " + mNodeID1);
                     for (int a = 0; a < 2; a++) {
                         if (a == 0) {
                             topic = "devices/" + mNodeID1 + "/$signal";
@@ -369,7 +359,7 @@ public class OlmatixService extends Service {
                         }
 
                     }
-                    Log.d("Unsubscribe", " device = " + mNodeID1);
+                    //Log.d("Unsubscribe", " device = " + mNodeID1);
                 }
             }
             data.clear();
@@ -774,10 +764,10 @@ public class OlmatixService extends Service {
             int notid = id + ch;
 
             printForegroundTask();
-            Log.d("DEBUG", "toastAndNotif: "+currentApp);
+            //Log.d("DEBUG", "toastAndNotif: "+currentApp);
             checkActivityForeground();
             if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
-                Log.d("DEBUG", "toastAndNotif: "+flagOnForeground);
+                //Log.d("DEBUG", "toastAndNotif: "+flagOnForeground);
 
                 if (!flagOnForeground) {
                     String state = "";
@@ -1212,7 +1202,7 @@ public class OlmatixService extends Service {
         String topic = "devices/" + NodeID + "/$online";
         try {
             Connection.getClient().unsubscribe(topic);
-            Log.d("Unsubscribe", " device = " + NodeID);
+            //Log.d("Unsubscribe", " device = " + NodeID);
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -1226,7 +1216,7 @@ public class OlmatixService extends Service {
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
                 final String mNodeID = data.get(i).getNodesID();
-                Log.d("DEBUG", "Count list: " + mNodeID);
+                //Log.d("DEBUG", "Count list: " + mNodeID);
                 for (int a = 0; a < 5; a++) {
                     if (a == 0) {
                         topic = "devices/" + mNodeID + "/$online";
@@ -1249,7 +1239,7 @@ public class OlmatixService extends Service {
                         subToken.setActionCallback(new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
-                                Log.d("SubscribeNode", " device = " + mNodeID);
+                                //Log.d("SubscribeNode", " device = " + mNodeID);
                             }
 
                             @Override
@@ -1283,7 +1273,7 @@ public class OlmatixService extends Service {
                     subToken.setActionCallback(new IMqttActionListener() {
                         @Override
                         public void onSuccess(IMqttToken asyncActionToken) {
-                            Log.d("SubscribeButton", " device = " + mNodeID);
+                            //Log.d("SubscribeButton", " device = " + mNodeID);
                         }
 
                         @Override
@@ -1309,7 +1299,7 @@ public class OlmatixService extends Service {
             for (int i = 0; i < countDB; i++) {
                 final String mNodeID1 = data1.get(i).getNode_id();
                 final String mSensorT = data1.get(i).getSensor();
-                Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                //Log.d("DEBUG", "Count list Sensor: " + mSensorT);
                 if (mSensorT != null && mSensorT.equals("close")) {
                     for (int a = 0; a < 2; a++) {
                         if (a == 0) {
@@ -1325,7 +1315,7 @@ public class OlmatixService extends Service {
                             subToken.setActionCallback(new IMqttActionListener() {
                                 @Override
                                 public void onSuccess(IMqttToken asyncActionToken) {
-                                    Log.d("SubscribeSensor", " device = " + mNodeID);
+                                    //Log.d("SubscribeSensor", " device = " + mNodeID);
                                 }
 
                                 @Override
@@ -1344,8 +1334,6 @@ public class OlmatixService extends Service {
             data1.clear();
         }
     }
-
-
 
     public class OlmatixBinder extends Binder {
         public OlmatixService getService() {
@@ -1486,7 +1474,6 @@ public class OlmatixService extends Service {
 
     }
 
-
     protected boolean isBetterLocation(Location location, Location currentBestLocation) {
         if (currentBestLocation == null) {
             // A new location is always better than no location
@@ -1528,8 +1515,6 @@ public class OlmatixService extends Service {
         }
         return false;
     }
-
-
 
     /** Checks whether two providers are the same */
     private boolean isSameProvider(String provider1, String provider2) {

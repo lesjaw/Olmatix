@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import java.io.Serializable;
-
 /**
  * Created by Rahman on 12/26/2016.
  */

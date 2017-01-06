@@ -50,7 +50,6 @@ public class OlmatixReceiver extends BroadcastReceiver {
              }
 
              if (homestat!=homestatcur) {
-                 Log.d("DEBUG", "run notif: ");
                  NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                  Intent notificationIntent = new Intent(context, MainActivity.class);
                  //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);

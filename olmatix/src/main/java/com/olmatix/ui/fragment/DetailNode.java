@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -13,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -147,7 +149,11 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
         data.addAll(mDbNodeRepo.getNodeDetailID(node_id));
         adapter = new NodeDetailAdapter(data,node_name, detail_node,this);
         mRecycleView.setAdapter(adapter);
-        doSubAllDetail();
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
+        if (!mSwitch_conn) {
+            doSubAllDetail();
+        }
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

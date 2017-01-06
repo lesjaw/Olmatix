@@ -19,12 +19,13 @@ public class OlmatixReceiver extends BroadcastReceiver {
 
     String textNode;
     int homestat;
+    int homestatcur=2;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("DEBUG", "OlmatixReceiver");
         String action = intent.getAction();
-        Log.i("DEBUG", "Broadcast received: " + action);
+        Log.i("DEBUG", "Broadcast received: " + action+" : " +homestat +" : "+homestatcur);
 
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Intent serviceIntent = new Intent(context, OlmatixService.class);
@@ -48,12 +49,14 @@ public class OlmatixReceiver extends BroadcastReceiver {
                  homestat=1;
              }
 
-             if (homestat!=homestat) {
+             if (homestat!=homestatcur) {
+                 Log.d("DEBUG", "run notif: ");
                  NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                  Intent notificationIntent = new Intent(context, MainActivity.class);
                  //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
                  Notification notification = createNotification(context, notificationIntent);
                  notificationManager.notify(5, notification);
+                 homestatcur = homestat;
              }
          }
     }

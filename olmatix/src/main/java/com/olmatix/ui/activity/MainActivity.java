@@ -1,5 +1,6 @@
 package com.olmatix.ui.activity;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView connStat;
     private Animation animConn;
     private Toolbar mToolbar;
+    public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
+    private IntentFilter mIntentFilter;
+
     public static int[] tabIcons = {
             R.drawable.ic_dashboard,
             R.drawable.ic_scene,
@@ -80,7 +84,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-
+    private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(UE_ACTION)) {
+                Log.d("Olmatix", "i'm in the foreground");
+                this.setResultCode(Activity.RESULT_OK);
+            }
+        }
+    };
 
 
     @Override
@@ -92,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(UE_ACTION);
 
         if (flagReceiver == 0) {
             Intent i = new Intent(this, OlmatixService.class);
@@ -170,18 +186,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-
         super.onStart();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterReceiver(mIntentReceiver);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        registerReceiver(mIntentReceiver, mIntentFilter);
+
     }
 
     // Override this method to do what you want when the menu is recreated

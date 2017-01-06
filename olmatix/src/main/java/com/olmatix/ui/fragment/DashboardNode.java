@@ -179,30 +179,15 @@ public class DashboardNode extends Fragment implements
         mRecycleView.setHasFixedSize(true);
         mRecycleViewInfo.setHasFixedSize(true);
 
-        int screenHeight = getResources().getDisplayMetrics().heightPixels;
-        int screenWidth = getResources().getDisplayMetrics().widthPixels;
-
-        Log.d("DEBUG", "setupView: "+screenWidth);
-
-        int resScreen;
-        if (screenWidth>720){
-            resScreen = 400;
-        } else {
-            resScreen = 200;
-        }
-
         int mNoOfColumns = OlmatixUtils.calculateNoOfColumns(getContext());
 
-        //GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getActivity(), resScreen );
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), mNoOfColumns);
 
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.addItemDecoration(new GridSpacesItemDecoration(OlmatixUtils.dpToPx(2),true));
 
-
         LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecycleViewInfo.setLayoutManager(horizontalLayoutManagaer);
-
 
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         mRecycleViewInfo.setItemAnimator(new DefaultItemAnimator());

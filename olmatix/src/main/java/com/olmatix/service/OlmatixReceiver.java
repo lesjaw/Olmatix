@@ -18,6 +18,7 @@ import com.olmatix.ui.activity.MainActivity;
 public class OlmatixReceiver extends BroadcastReceiver {
 
     String textNode;
+    int homestat;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -38,19 +39,22 @@ public class OlmatixReceiver extends BroadcastReceiver {
                  // Call the Notification Service or anything else that you would like to do here
                  //Toast.makeText(context, "You arrive at home..", Toast.LENGTH_LONG).show();
                  textNode = "You are entering home radius..";
+                 homestat = 0;
 
              } else {
                  //Other custom Notification
                  //Toast.makeText(context, "You are leaving home..", Toast.LENGTH_LONG).show();
                  textNode = "You are leaving home..";
+                 homestat=1;
              }
 
-             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-             Intent notificationIntent = new Intent(context, MainActivity.class);
-             //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-             Notification notification = createNotification(context, notificationIntent);
-
-             notificationManager.notify(5, notification);
+             if (homestat!=homestat) {
+                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                 Intent notificationIntent = new Intent(context, MainActivity.class);
+                 //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+                 Notification notification = createNotification(context, notificationIntent);
+                 notificationManager.notify(5, notification);
+             }
          }
     }
 

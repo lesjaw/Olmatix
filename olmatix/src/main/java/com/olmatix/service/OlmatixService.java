@@ -104,7 +104,7 @@ public class OlmatixService extends Service {
     boolean flagSub = true;
     boolean flagNode = false;
     boolean flagConn = true;
-    boolean connSuccess = false;
+    boolean flagOnForeground = true;
     int notifyID = 0;
     String currentApp = "NULL";
     String topic;
@@ -129,8 +129,6 @@ public class OlmatixService extends Service {
     private String mChange = "";
     final static String GROUP_KEY_NOTIF = "group_key_notif";
     private ArrayList<String> notifications;
-
-    public static final String BROADCAST_ACTION = "Hello World";
     private static final int TWO_MINUTES = 1000 * 60 * 5;
     public LocationManager locationManager;
     public MyLocationListener listener;
@@ -145,8 +143,6 @@ public class OlmatixService extends Service {
     double lng;
     private String proximityIntentAction = new String("com.olmatix.lesjaw.olmatix.ProximityAlert");
 
-
-
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -155,7 +151,6 @@ public class OlmatixService extends Service {
             doAddNodeSub();
         }
     };
-
 
     class OlmatixBroadcastReceiver extends BroadcastReceiver {
 
@@ -232,7 +227,9 @@ public class OlmatixService extends Service {
             public void run() {
                 flagSub = true;
                 Log.d(TAG, "run: " + flagSub);
+                checkActivityForeground();
                 unSubIfnotForeground();
+
             }
         }, 10000);
     }
@@ -349,7 +346,7 @@ public class OlmatixService extends Service {
         printForegroundTask();
         Log.d("Unsubscribe", " uptime and signal");
 
-        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
+        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")||!flagOnForeground) {
             int countDB = mDbNodeRepo.getNodeList().size();
             Log.d("DEBUG", "Count list Node: " + countDB);
             data.addAll(mDbNodeRepo.getNodeList());
@@ -393,6 +390,7 @@ public class OlmatixService extends Service {
                 .setContentText(text)  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .setOngoing(true)
+                .setPriority(Notification.FLAG_FOREGROUND_SERVICE)
                 //.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .build();
 
@@ -420,6 +418,7 @@ public class OlmatixService extends Service {
         //mBuilder.setGroupSummary(true);
         mBuilder.setSound(defaultSoundUri);
         mBuilder.setSmallIcon(R.drawable.ic_lightbulb);
+        mBuilder.setPriority(Notification.PRIORITY_MAX);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
@@ -442,6 +441,7 @@ public class OlmatixService extends Service {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(notifyID,mBuilder.build());
+        //notifications.clear();
     }
 
     private void setClientID() {
@@ -774,9 +774,12 @@ public class OlmatixService extends Service {
             int notid = id + ch;
 
             printForegroundTask();
-            //checkActivityForeground();
+            Log.d("DEBUG", "toastAndNotif: "+currentApp);
+            checkActivityForeground();
             if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
-                if (flagSub) {
+                Log.d("DEBUG", "toastAndNotif: "+flagOnForeground);
+
+                if (!flagOnForeground) {
                     String state = "";
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel(Channel);
@@ -841,12 +844,12 @@ public class OlmatixService extends Service {
 
     protected void activityInForeground() {
         // TODO something you want to happen when an Activity is in the foreground
-        flagSub = true;
+        flagOnForeground = true;
     }
 
     protected void noActivityInForeground() {
         // TODO something you want to happen when no Activity is in the foreground
-        flagSub = false;
+        flagOnForeground = false;
         //stopSelf(); // quit
     }
 
@@ -1063,8 +1066,7 @@ public class OlmatixService extends Service {
             addNodeDetail();
         }
         installedNodeModel.setOnline(messageReceive.get("online"));
-        if (messageReceive.containsKey("online")) {
-            //checkActivityForeground();
+        if (messageReceive.containsKey("online")) {checkActivityForeground();
             printForegroundTask();
             if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
                 if (flagSub) {

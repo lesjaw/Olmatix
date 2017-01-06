@@ -173,7 +173,7 @@ public class DashboardNode extends Fragment implements
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
         mRecycleViewInfo    = (RecyclerView) mView.findViewById(R.id.rv1);
-        View mViewDash1 = (View) mView.findViewById(R.id.view_dash);
+        View mViewDash1 = mView.findViewById(R.id.view_dash);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
 
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
@@ -221,13 +221,13 @@ public class DashboardNode extends Fragment implements
         int currentOrientation = getResources().getConfiguration().orientation;
         if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             mRecycleViewInfo.setVisibility(View.GONE);
+            mViewDash1.setVisibility(View.GONE);
 
             RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
 
             p.addRule(RelativeLayout.BELOW, R.id.view_dash1);
             mRecycleView.setLayoutParams(p);
-            mViewDash1.setVisibility(View.GONE);
 
         }
         else {

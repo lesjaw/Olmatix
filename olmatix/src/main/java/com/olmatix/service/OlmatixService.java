@@ -837,6 +837,7 @@ public class OlmatixService extends Service {
     protected void activityInForeground() {
         // TODO something you want to happen when an Activity is in the foreground
         flagOnForeground = true;
+        notifications.clear();
     }
 
     protected void noActivityInForeground() {

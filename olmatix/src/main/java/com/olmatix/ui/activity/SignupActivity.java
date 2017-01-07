@@ -32,6 +32,7 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.btn_signup) Button _signupButton;
     @InjectView(R.id.link_login) TextView _loginLink;
     String name, email, password;
+    ProgressDialog progressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,7 @@ public class SignupActivity extends AppCompatActivity {
 
         _signupButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this);
+        progressDialog = new ProgressDialog(SignupActivity.this);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
@@ -76,27 +77,29 @@ public class SignupActivity extends AppCompatActivity {
 
         // TODO: Implement your own signup logic here.
 
-        new android.os.Handler().postDelayed(
+        onSignupSuccess();
+
+        /*new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
                         // On complete call either onSignupSuccess or onSignupFailed
                         // depending on success
                         onSignupSuccess();
-                        progressDialog.dismiss();
                     }
-                }, 3000);
+                }, 3000);*/
     }
 
 
     public void onSignupSuccess() {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
+        progressDialog.dismiss();
         sendEmail();
         finish();
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getBaseContext(), "SIgn failed", Toast.LENGTH_LONG).show();
 
         _signupButton.setEnabled(true);
     }
@@ -138,9 +141,8 @@ public class SignupActivity extends AppCompatActivity {
                 .putExtra(Intent.EXTRA_EMAIL, new String[]{ "Olmatix <lesjaw@olmatix.com>" })
                 .putExtra(Intent.EXTRA_SUBJECT, "Request Auth for Login")
                 .putExtra(Intent.EXTRA_TEXT, "Your name : " + name +"\n" +" Your email : "+ email +"\n"+" Your password : "+password
-                +"\n" +"\n"+" This is your Auth Login request, we will send you a confirmation email as soon as possible.."
-                +"\n"+ " Send this email now.. thank you..")
-                ;
+                +"\n\n"+" This is your Auth Login request, we will send you a confirmation email as soon as possible.."
+                +"\n\n"+ " Send this email now.."+"\n\n"+" Thank you..");
 
         ComponentName emailApp = intent.resolveActivity(getPackageManager());
         ComponentName unsupportedAction = ComponentName.unflattenFromString("com.android.fallback/.Fallback");

@@ -1,10 +1,13 @@
 package com.olmatix.ui.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.olmatix.service.OlmatixService;
 
@@ -14,35 +17,61 @@ import com.olmatix.service.OlmatixService;
 
 public class SplashActivity extends AppCompatActivity {
 
-    int flagReceiver =0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String mUserName = sharedPref.getString("user_name", "olmatix1");
 
-        if (mUserName.equals("olmatix1")) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+        Intent i = new Intent(this, OlmatixService.class);
+        startService(i);
 
-        } else {
-            if (flagReceiver == 0);
-            {
-                Intent i = new Intent(this, OlmatixService.class);
-                i.putExtra("node_id", "true");
-                startService(i);
-                flagReceiver = 1;
-            }
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("ConnectionStatus");
+            Log.d("DEBUG", "onReceive1: "+message);
+
+                if (message!=null) {
+                    Log.d("DEBUG", "onReceive2: " + message);
+
+                    if (message.equals("NotAuth")) {
+                        Intent i = new Intent(getApplication(), LoginActivity.class);
+                        startActivity(i);
+                        Log.d("DEBUG", "onReceive2: " + message);
+                        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+                        finish();
+                    }
+                    if (message.equals("AuthOK")) {
+                        Intent i = new Intent(getApplication(), MainActivity.class);
+                        startActivity(i);
+                        Log.d("DEBUG", "onReceive2: " + message);
+                        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+                        finish();
+                    }
+                }
         }
+    };
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("MQTTStatus"));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
 
+    }
 }

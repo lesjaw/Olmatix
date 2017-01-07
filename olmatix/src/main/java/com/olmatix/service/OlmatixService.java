@@ -47,6 +47,7 @@ import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.DurationModel;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.MainActivity;
+import com.olmatix.ui.activity.SplashActivity;
 import com.olmatix.ui.fragment.DetailNode;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
@@ -115,7 +116,7 @@ public class OlmatixService extends Service {
     private String NodeID, Channel, mMessage;
     private NotificationManager mNM;
     private int NOTIFICATION = R.string.local_service_label;
-    private String mNodeID, mNiceName, mNiceNameN,NodeIDSensor,TopicID, mChange = "";
+    private String mNodeID, mNiceName, mNiceNameN,NodeIDSensor,TopicID, mChange = "",connectionResult;
     final static String GROUP_KEY_NOTIF = "group_key_notif";
     private ArrayList<String> notifications;
     private static final int TWO_MINUTES = 1000 * 60 * 5;
@@ -373,7 +374,7 @@ public class OlmatixService extends Service {
     private void showNotification() {
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), 0);
+                new Intent(this, SplashActivity.class), 0);
 
         // Set the info for the views that show in the notification panel.
         NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(this);
@@ -463,6 +464,9 @@ public class OlmatixService extends Service {
             String mUserName = sharedPref.getString("user_name", "olmatix1");
             String mPassword = sharedPref.getString("password", "olmatix");
 
+            Log.d(TAG, "login: "+mUserName +" : "+mPassword);
+
+
             final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
 
             final MqttConnectOptions options = new MqttConnectOptions();
@@ -521,6 +525,8 @@ public class OlmatixService extends Service {
                                     text = "Connected";
                                     showNotification();
                                     stateoffMqtt = "true";
+                                    connectionResult = "AuthOK";
+
                                     sendMessage();
 
                                     Log.d(TAG, "Check FlasgConn: " + flagConn);
@@ -540,68 +546,54 @@ public class OlmatixService extends Service {
                                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                                     //Toast.makeText(getApplicationContext(), R.string.sub_fail, Toast.LENGTH_SHORT).show();
                                     Log.e("error", exception.toString());
-
                                 }
                             });
                         } catch (MqttException e) {
                             e.printStackTrace();
+                            Log.d("error1", e.toString());
                         }
-
                     }
-
                     @Override
                     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                         //Toast.makeText(getApplicationContext(), R.string.conn_fail+exception.toString(), Toast.LENGTH_SHORT).show();
                         Log.e("mqtt", exception.toString());
                         stateoffMqtt = "false";
                         Log.d("Sender", "After fail: " + stateoffMqtt);
-                        sendMessage();
                         text = "Not Connected";
                         showNotification();
+                        String me = exception.toString();
+                        if (me.equals("Not authorized to connect (5)")){
+                            connectionResult = "NotAuth";
+                        }
+                        sendMessage();
+
+                        sTopService();
                     }
                 });
 
             } catch (MqttSecurityException e) {
                 e.printStackTrace();
             } catch (MqttException e) {
-                switch (e.getReasonCode()) {
-                    case MqttException.REASON_CODE_BROKER_UNAVAILABLE:
-                        Toast.makeText(getApplicationContext(), "Server Offline", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case MqttException.REASON_CODE_CLIENT_TIMEOUT:
-                        Toast.makeText(getApplicationContext(), "Olmatix connect timed out", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case MqttException.REASON_CODE_CONNECTION_LOST:
-                        Toast.makeText(getApplicationContext(), "Connection Lost", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case MqttException.REASON_CODE_SERVER_CONNECT_ERROR:
-                        Log.v(TAG, "c" + e.getMessage());
-                        Toast.makeText(getApplicationContext(), "Server connection error", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
-                        break;
-                    case MqttException.REASON_CODE_FAILED_AUTHENTICATION:
-                        Intent i = new Intent("RAISEALLARM");
-                        i.putExtra("ALLARM", e);
-                        Log.e(TAG, "b" + e.getMessage());
-                        Toast.makeText(getApplicationContext(), "Failed wrong auth (bad user name or password", Toast.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        Log.e(TAG, "a" + e.getMessage());
-                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                        text = "Disconnected";
-                        showNotification();
-                }
+                e.printStackTrace();
             }
         }
     }
 
+    private void sTopService() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stopSelf();
+
+            }
+        }, 20000);
+    }
     private void sendMessage() {
         Intent intent = new Intent("MQTTStatus");
         intent.putExtra("MQTT State", stateoffMqtt);
         intent.putExtra("NotifyChangeNode", mChange);
+        intent.putExtra("ConnectionStatus", connectionResult);
+
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -622,7 +614,8 @@ public class OlmatixService extends Service {
         // Cancel the persistent notification.
         // Tell the user we stopped.
         doDisconnect();
-        Toast.makeText(this, R.string.service_stop, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, R.string.service_stop, Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Service stop!! ");
         messageReceive.clear();
         message_topic.clear();
         data.clear();

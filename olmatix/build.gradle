@@ -37,6 +37,7 @@ dependencies {
     compile 'info.hoang8f:fbutton:1.0.5'
     compile 'com.getbase:floatingactionbutton:1.9.1'
     compile 'com.rvalerio:fgchecker:1.0.1'
+    compile 'com.jakewharton:butterknife:6.1.0'
     compile('org.eclipse.paho:org.eclipse.paho.android.service:1.0.2') {
         exclude module: 'support-v4'
     }

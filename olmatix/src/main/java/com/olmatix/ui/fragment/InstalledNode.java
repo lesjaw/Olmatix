@@ -191,11 +191,9 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             @Override
             protected void onPreExecute() {
                 nDialog = new ProgressDialog(getContext());
-                nDialog.setTitle("Refreshing");
                 nDialog.setMessage("Loading Nodes, Please wait..");
-                nDialog.setIndeterminate(false);
+                nDialog.setIndeterminate(true);
                 nDialog.setCancelable(false);
-                nDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 nDialog.show();
             }
 

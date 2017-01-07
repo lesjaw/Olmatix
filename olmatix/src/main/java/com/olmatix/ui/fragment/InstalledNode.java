@@ -32,7 +32,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -368,8 +367,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     public void onResume() {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatus"));
-            Log.d("Receiver ", "InstalledNode = Starting..");
-            Log.d("DEBUG", "Server: "+stateMqtt);
+            //Log.d("Receiver ", "InstalledNode = Starting..");
+            //Log.d("DEBUG", "Server: "+stateMqtt);
 
         super.onResume();
     }

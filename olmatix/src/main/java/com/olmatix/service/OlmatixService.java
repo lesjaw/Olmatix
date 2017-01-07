@@ -273,8 +273,10 @@ public class OlmatixService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         sendMessage();
         flagConn = true;
+
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         listener = new MyLocationListener();
@@ -452,6 +454,8 @@ public class OlmatixService extends Service {
 
         if (!stateoffMqtt.equals("true")) {
             stateoffMqtt = "true";
+            flagOnForeground=true;
+            setFlagSub();
 
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");

@@ -2,6 +2,7 @@ package com.olmatix.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +20,8 @@ public class OlmatixReceiver extends BroadcastReceiver {
 
     String textNode;
     int homestat;
-    int homestatcur=2;
+    int homestatcur;
+    OlmatixAlarmReceiver alarm;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -30,6 +32,7 @@ public class OlmatixReceiver extends BroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Intent serviceIntent = new Intent(context, OlmatixService.class);
             context.startService(serviceIntent);
+
         }
          if (intent.getAction().equals("com.olmatix.lesjaw.olmatix.ProximityAlert")) {
              String k = LocationManager.KEY_PROXIMITY_ENTERING;
@@ -52,26 +55,24 @@ public class OlmatixReceiver extends BroadcastReceiver {
              if (homestat!=homestatcur) {
                  NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                  Intent notificationIntent = new Intent(context, MainActivity.class);
-                 //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-                 Notification notification = createNotification(context, notificationIntent);
-                 notificationManager.notify(5, notification);
+                 PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
                  homestatcur = homestat;
+                 Log.d("DEBUG", "onReceive: "+homestatcur +" ; "+homestat);
+
+                 Notification notification = new Notification.Builder(context)
+                         .setSmallIcon(R.drawable.ic_location_red)  // the status icon
+                         .setTicker(textNode)  // the status text
+                         .setWhen(System.currentTimeMillis())  // the time stamp
+                         .setContentTitle("Olmatix location Alert!")  // the label of the entry
+                         .setContentText(textNode)  // the contents of the entry
+                         .setContentIntent(pendingIntent)  // The intent to send when the entry is clicked
+                         .setAutoCancel(true)
+                         .build();
+
+                 notificationManager.notify(5, notification);
+
              }
          }
-    }
-
-    private Notification createNotification(Context context, Intent intent) {
-        Notification notification = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_location_red)  // the status icon
-                .setTicker(textNode)  // the status text
-                .setWhen(System.currentTimeMillis())  // the time stamp
-                .setContentTitle("Olmatix location Alert!")  // the label of the entry
-                .setContentText(textNode)  // the contents of the entry
-                //.setContentIntent(intent)  // The intent to send when the entry is clicked
-                .setAutoCancel(true)
-                .build();
-
-        return notification;
     }
 
 

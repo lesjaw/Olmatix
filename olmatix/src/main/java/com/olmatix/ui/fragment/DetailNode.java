@@ -407,7 +407,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
                     mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
-            Log.d("Receiver ", "Detail_Node = Starting..");
+            //Log.d("Receiver ", "Detail_Node = Starting..");
 
         registerReceiver(mIntentReceiver, mIntentFilter);
     }

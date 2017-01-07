@@ -25,7 +25,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -324,7 +323,7 @@ public class DashboardNode extends Fragment implements
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
-        Log.d("Receiver ", "Dashboard = Starting..");
+        //Log.d("Receiver ", "Dashboard = Starting..");
     }
 
     @Override

@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.service.OlmatixAlarmReceiver;
 import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.ui.fragment.InstalledNode;
@@ -105,6 +106,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        OlmatixAlarmReceiver alarm = new OlmatixAlarmReceiver();
+            alarm.setAlarm(getApplication());
+            Log.d("DEBUG", "Alarm set ");
+
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(UE_ACTION);

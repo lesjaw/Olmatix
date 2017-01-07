@@ -33,12 +33,14 @@
             android:layout_marginBottom="8dp"
             android:layout_below="@+id/logo"
             android:paddingRight="20sp"
-            android:paddingLeft="20sp">
+            android:paddingLeft="20sp"
+            >
             <EditText android:id="@+id/input_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                android:hint="Email" />
+                android:hint="Email"
+                />
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
@@ -58,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:hint="Password"/>
+                android:hint="Password" />
         </android.support.design.widget.TextInputLayout>
 
 

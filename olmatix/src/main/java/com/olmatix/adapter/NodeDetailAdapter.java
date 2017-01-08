@@ -3,12 +3,15 @@ package com.olmatix.adapter;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +26,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -115,6 +119,13 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
 
             }
+            holder.imgNode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showAlertDialog();
+                }
+            });
+
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -325,11 +336,36 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);
             imgSensor = (ImageView) view.findViewById(R.id.door);
-
-
         }
     }
+    private void showAlertDialog() {
+        // Prepare grid view
+        GridView gridView = new GridView(context);
+        ImageView imageView = new ImageView(context);
+        ArrayList<Integer> mList = new ArrayList<>();
 
+        mList.add(R.drawable.offlamp1);
+        mList.add(R.drawable.onlamp1);
+        mList.add(R.drawable.steckeroff);
+        mList.add(R.drawable.steckeroff);
+
+
+        gridView.setAdapter(new iconPickerAdapter (context, R.layout.icon_picker, mList));
+        gridView.setNumColumns(4);
+        gridView.setHorizontalSpacing(0);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // do something here
+            }
+        });
+
+        // Set grid view to alertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(gridView);
+        builder.setTitle("Pick Icon");
+        builder.show();
+    }
 
 }
 

@@ -144,6 +144,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
             label_node.setText(node_name);
         }
     }
+
     private void setRefresh() {
         data.clear();
         data.addAll(mDbNodeRepo.getNodeDetailID(node_id));

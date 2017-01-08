@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 
+import com.olmatix.utils.Connection;
+
 /**
  * Created by Lesjaw on 07/01/2017.
  */
@@ -25,8 +27,8 @@ public class OlmatixAlarmService extends IntentService {
         Intent i = new Intent(getApplication(), OlmatixService.class);
         startService(i);
         Log.d("DEBUG", "Starting Service: ");
-        //callConn();
-
+        boolean conn = Connection.getClient().isConnected();
+        Log.d("DEBUG", "onHandleIntent: "+conn);
         OlmatixAlarmReceiver.completeWakefulIntent(intent);
         // END_INCLUDE(service_onhandle)
     }

@@ -68,6 +68,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -132,6 +133,9 @@ public class OlmatixService extends Service {
     double lng;
     private String proximityIntentAction = new String("com.olmatix.lesjaw.olmatix.ProximityAlert");
     private static final String MY_PREFERENCES = "my_preferences";
+    IntentFilter filter;
+    int numMessages=0;
+
 
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -330,7 +334,7 @@ public class OlmatixService extends Service {
         Log.d("DEBUG", "proximity: " + homeLat +" | "+homelng+":"+thres);
         mLocationMgr.addProximityAlert(homeLat, homelng, thres, -1, pi);
 
-        IntentFilter filter = new IntentFilter(proximityIntentAction);
+        filter = new IntentFilter(proximityIntentAction);
         registerReceiver(new OlmatixReceiver(), filter);
 
         return START_STICKY;
@@ -395,20 +399,20 @@ public class OlmatixService extends Service {
 
     private void showNotificationNode() {
 
-        //int numMessages =0;
+        numMessages++;
 
         SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
 
-        notifications.add(String.valueOf(titleNode) + " : "+String.valueOf(textNode)+ " at " +timeformat.format(System.currentTimeMillis()));
+        notifications.add(numMessages +". "+String.valueOf(titleNode) + " : "+String.valueOf(textNode)+ " at " +timeformat.format(System.currentTimeMillis()));
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setContentTitle("New Olmatix status");
         mBuilder.setContentText("You've received new status.");
-        mBuilder.setTicker("Olmatix status Alert!");
+        mBuilder.setTicker("Olmatix status alert!");
         mBuilder.setAutoCancel(true);
         mBuilder.setWhen(System.currentTimeMillis());
-        //mBuilder.setNumber(++numMessages);
+        mBuilder.setNumber(numMessages);
         //mBuilder.setGroup(GROUP_KEY_NOTIF);
         //mBuilder.setGroupSummary(true);
         mBuilder.setSound(defaultSoundUri);
@@ -416,11 +420,12 @@ public class OlmatixService extends Service {
         mBuilder.setPriority(Notification.PRIORITY_MAX);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
         inboxStyle.setBigContentTitle("Olmatix status");
+        Collections.sort(notifications,Collections.reverseOrder());
         for (int i=0; i < notifications.size(); i++) {
             inboxStyle.addLine(notifications.get(i));
         }
+
         mBuilder.setStyle(inboxStyle);
 
    /* Creates an explicit intent for an Activity in your app */
@@ -436,7 +441,6 @@ public class OlmatixService extends Service {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(notifyID,mBuilder.build());
-        //notifications.clear();
     }
 
     private void setClientID() {
@@ -564,6 +568,8 @@ public class OlmatixService extends Service {
                         String me = exception.toString();
                         if (me.equals("Not authorized to connect (5)")){
                             connectionResult = "NotAuth";
+                            text = "Not Connected - Bad login";
+
                         }
                         sendMessage();
 
@@ -584,14 +590,21 @@ public class OlmatixService extends Service {
             @Override
             public void run() {
                 stopSelf();
-
             }
         }, 20000);
     }
+
     private void sendMessage() {
         Intent intent = new Intent("MQTTStatus");
         intent.putExtra("MQTT State", stateoffMqtt);
         intent.putExtra("NotifyChangeNode", mChange);
+        intent.putExtra("ConnectionStatus", connectionResult);
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendMessageAuth() {
+        Intent intent = new Intent("MQTTStatus");
         intent.putExtra("ConnectionStatus", connectionResult);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);

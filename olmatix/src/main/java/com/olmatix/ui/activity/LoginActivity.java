@@ -121,8 +121,6 @@ public class LoginActivity extends AppCompatActivity {
                     if (progressDialog!=null) {
                         progressDialog.dismiss();
                         onLoginFailed();
-                        Toast.makeText(getBaseContext(), "Wait.. or try again!", Toast.LENGTH_SHORT).show();
-
                     }
 
                 }
@@ -161,8 +159,6 @@ public class LoginActivity extends AppCompatActivity {
         _loginButton.setEnabled(false);
 
         Toast.makeText(getBaseContext(), "Login sucess..", Toast.LENGTH_SHORT).show();
-
-
         Intent i = new Intent(getApplication(), MainActivity.class);
         startActivity(i);
 
@@ -170,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getBaseContext(), "Wait.. or try again!", Toast.LENGTH_SHORT).show();
 
         _loginButton.setEnabled(true);
     }

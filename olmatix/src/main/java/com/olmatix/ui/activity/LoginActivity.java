@@ -98,14 +98,6 @@ public class LoginActivity extends AppCompatActivity {
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);
 
-        /*new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        // onLoginFailed();
-                        //progressDialog.dismiss();
-                    }
-                }, 3000);*/
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

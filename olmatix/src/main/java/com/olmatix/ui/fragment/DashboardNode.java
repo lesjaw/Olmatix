@@ -337,7 +337,6 @@ public class DashboardNode extends Fragment implements
     public void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-
     }
 
     @Override

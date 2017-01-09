@@ -2,6 +2,7 @@ package com.olmatix.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,7 @@ public class iconPickerAdapter extends ArrayAdapter<Integer> {
         this.data = data;
     }
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View row = convertView;
         RecordHolder holder = null;
         if (row == null) {
@@ -43,8 +44,14 @@ public class iconPickerAdapter extends ArrayAdapter<Integer> {
             holder = (RecordHolder) row.getTag();
         }
 
-        Integer item = data.get(position);
+        final Integer item = data.get(position);
         holder.imageItem.setImageResource(item);
+        holder.imageItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("DEBUG", "onClick2: "+item);
+            }
+        });
 
         return row;
     }

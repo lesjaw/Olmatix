@@ -172,8 +172,6 @@ public class SettingsActivity extends SettingsFragment {
             CheckBoxPreference mSLoc = (CheckBoxPreference) findPreference("switch_conn");
             final Preference setConnection = findPreference("switch_conn");
             setConnection.setOnPreferenceClickListener(NetworkClickListener());
-
-
         }
 
         private Preference.OnPreferenceClickListener NetworkClickListener() {
@@ -181,8 +179,6 @@ public class SettingsActivity extends SettingsFragment {
             return new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-
-                    Toast.makeText(getActivity(), "Persistence Clicked", Toast.LENGTH_LONG).show();
 
                     doSubAll();
 

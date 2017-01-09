@@ -50,4 +50,12 @@
 
     </PreferenceCategory>
 
+    <CheckBoxPreference
+        android:title="@string/conStatus"
+        android:key="conStatus"
+        android:defaultValue="false"
+        android:summary="@string/check_status"
+        android:clickable="false">
+    </CheckBoxPreference>
+
 </PreferenceScreen>

@@ -87,5 +87,7 @@
     <string name="switch_notifDisable">Disable status notification</string>
     <string name="loginfail">Login fail, bad user name or password!</string>
     <string name="description">Your password login</string>
+    <string name="conStatus">Server Status</string>
+    <string name="check_status">This is Olmatix connectin status</string>
 
 </resources>

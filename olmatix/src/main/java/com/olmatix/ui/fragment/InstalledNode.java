@@ -19,7 +19,6 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -84,7 +83,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     String fwName;
     Context installed_node;
     private ProgressDialog nDialog;
-    private Handler handler;
+    SharedPreferences sharedPref;
+    Boolean mStatusServer;
 
     @Nullable
     @Override
@@ -200,7 +200,11 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             @Override
             protected Void doInBackground(Void... arg0) {
                 try {
-                    doSubAll();
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    if (mStatusServer) {
+                        doSubAll();
+                    }
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block

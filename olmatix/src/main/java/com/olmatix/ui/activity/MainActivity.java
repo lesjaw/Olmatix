@@ -26,7 +26,6 @@ import android.widget.Toast;
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.service.OlmatixAlarmReceiver;
-import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.ui.fragment.Scene;
@@ -49,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
+    SharedPreferences sharedPref;
+    Boolean mStatusServer;
 
     public static int[] tabIcons = {
             R.drawable.ic_dashboard,
@@ -64,25 +65,22 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            String message = intent.getStringExtra("MQTT State");
-
-            if (message == null) {
-                message = "false";
-
+            Boolean message = intent.getBooleanExtra("MqttStatus", false);
+            if (message!=null) {
+                Log.d("DEBUG", "onReceive: "+message);
+                if (message) {
+                    serverconnected = true;
+                    imgStatus.setImageResource(R.drawable.ic_conn_green);
+                    connStat.setText("Connected");
+                } else if (!message) {
+                    serverconnected = false;
+                    imgStatus.setImageResource(R.drawable.ic_conn_red);
+                    imgStatus.startAnimation(animConn);
+                    connStat.setText("Not Connected");
+                    connStat.startAnimation(animConn);
+                }
             }
-            if (message.equals("true")) {
-                serverconnected = true;
-                imgStatus.setImageResource(R.drawable.ic_conn_green);
-                connStat.setText("Connected");
-                //connStat.startAnimation(animConn);
 
-            } else if (message.equals("false")) {
-                serverconnected = false;
-                imgStatus.setImageResource(R.drawable.ic_conn_red);
-                imgStatus.startAnimation(animConn);
-                connStat.setText("Not Connected");
-                connStat.startAnimation(animConn);
-            }
         }
     };
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
@@ -107,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         OlmatixAlarmReceiver alarm = new OlmatixAlarmReceiver();
             alarm.setAlarm(getApplication());
             Log.d("DEBUG", "Alarm set ");
@@ -115,38 +114,15 @@ public class MainActivity extends AppCompatActivity {
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(UE_ACTION);
 
-        if (flagReceiver == 0) {
-            Intent i = new Intent(this, OlmatixService.class);
-            startService(i);
-            LocalBroadcastManager.getInstance(this).registerReceiver(
-                    mMessageReceiver, new IntentFilter("MQTTStatus"));
-            flagReceiver = 1;
-            Log.d("Receiver ", "MainActivity = Starting..");
-        }
-
         initView();
         setupToolbar();
         setupTabs();
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        mSwitch_Conn = sharedPref.getBoolean("switch_conn", true);
-        //Log.d("DEBUG", "SwitchConnPreff: " + mSwitch_Conn);
-
-        if (serverconnected) {
-            imgStatus.setImageResource(R.drawable.ic_conn_green);
-            connStat.setText("Connected");
-
-        } else if (!serverconnected) {
-            imgStatus.setImageResource(R.drawable.ic_conn_red);
-            imgStatus.startAnimation(animConn);
-            connStat.setText("Not Connected");
-            connStat.startAnimation(animConn);
-        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
     }
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -158,6 +134,21 @@ public class MainActivity extends AppCompatActivity {
         mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
         setupViewPager(mViewPager);
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+        Log.d("DEBUG", "MainActivity status connection: "+mStatusServer);
+
+        if (mStatusServer) {
+            imgStatus.setImageResource(R.drawable.ic_conn_green);
+            connStat.setText("Connected");
+        } else {
+            imgStatus.setImageResource(R.drawable.ic_conn_red);
+            imgStatus.startAnimation(animConn);
+            connStat.setText("Not Connected");
+            connStat.startAnimation(animConn);
+        }
+
     }
 
     private void setupToolbar() {
@@ -187,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
@@ -199,14 +190,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mIntentReceiver);
-
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(mIntentReceiver, mIntentFilter);
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("MQTTStatus"));
+        Log.d("Receiver ", "MainActivity = Starting..");
     }
 
     // Override this method to do what you want when the menu is recreated

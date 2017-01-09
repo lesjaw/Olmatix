@@ -1,6 +1,10 @@
 package com.olmatix.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +41,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     List<DashboardNodeModel> nodeList;
     private Animation animConn;
     Context context;
+    SharedPreferences sharedPref;
+    Boolean mStatusServer;
 
 
     public NodeDashboardAdapter(ArrayList<DashboardNodeModel> nodeList, Context dashboardnode, OnStartDragListener dragStartListener) {
@@ -140,7 +146,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 @Override
                 public void onClick(View v) {
                     String payload1 = "ON";
-                    if (Connection.getClient().isConnected()) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
+                    if (mStatusServer) {
                         String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
                         if (mFavoriteModel.getStatus().trim().equals("false")) {
                             payload1 = "ON";
@@ -162,12 +171,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                             e.printStackTrace();
                         }
                     } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_LONG).show();
-                        try {
-                            Connection.getClient().connect();
-                        } catch (MqttException e) {
-                            e.printStackTrace();
-                        }
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
                     }
                 }
             });
@@ -203,7 +211,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 @Override
                 public void onClick(View v) {
                     String payload1;
-                    if (Connection.getClient().isConnected()) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
+                    if (mStatusServer) {
                         String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
                         if (mFavoriteModel.getStatus().trim().equals("false")) {
                             payload1 = "ON";
@@ -222,12 +233,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                             e.printStackTrace();
                         }
                     } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_LONG).show();
-                        try {
-                            Connection.getClient().connect();
-                        } catch (MqttException e) {
-                            e.printStackTrace();
-                        }
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Conn", "Conn1");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
                     }
                 }
             });
@@ -245,7 +255,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     public void onItemDismiss(int position) {
 
     }
-
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View v) {

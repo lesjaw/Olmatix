@@ -1,8 +1,12 @@
 package com.olmatix.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +18,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -40,6 +45,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     List<DetailNodeModel> nodeList;
     Context context;
     String fw_name;
+    SharedPreferences sharedPref;
+    Boolean mStatusServer;
 
     public NodeDetailAdapter(List<DetailNodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
 
@@ -129,7 +136,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (Connection.getClient().isConnected()) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
+                    if (mStatusServer) {
                         String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
                         String payload = "ON";
                         byte[] encodedPayload = new byte[0];
@@ -148,6 +158,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             e.printStackTrace();
                         }
                     } else {
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
 
                 }
@@ -156,8 +170,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.btn_off.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (Connection.getClient().isConnected()) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
+                    if (mStatusServer) {                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
                         String payload = "OFF";
                         byte[] encodedPayload = new byte[0];
                         try {
@@ -173,6 +189,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             e.printStackTrace();
                         }
                     } else {
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
 
                 }
@@ -229,8 +249,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (Connection.getClient().isConnected()) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
+                    if (mStatusServer) {                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
                         String payload = "ON";
                         byte[] encodedPayload = new byte[0];
                         try {
@@ -246,6 +268,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             e.printStackTrace();
                         }
                     } else {
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
 
                 }
@@ -254,7 +280,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.btn_off.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (Connection.getClient().isConnected()) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
+                    if (mStatusServer) {
                         String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
                         String payload = "OFF";
                         byte[] encodedPayload = new byte[0];
@@ -271,6 +300,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             e.printStackTrace();
                         }
                     } else {
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
 
                 }
@@ -342,21 +375,24 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         // Prepare grid view
         GridView gridView = new GridView(context);
         ImageView imageView = new ImageView(context);
-        ArrayList<Integer> mList = new ArrayList<>();
+        final ArrayList<Integer> mList = new ArrayList<>();
 
         mList.add(R.drawable.offlamp1);
         mList.add(R.drawable.onlamp1);
         mList.add(R.drawable.steckeroff);
         mList.add(R.drawable.steckeroff);
 
-
         gridView.setAdapter(new iconPickerAdapter (context, R.layout.icon_picker, mList));
         gridView.setNumColumns(4);
         gridView.setHorizontalSpacing(0);
+
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // do something here
+                Log.d("DEBUG", "onClick1: "+mList.get(position));
+
             }
         });
 

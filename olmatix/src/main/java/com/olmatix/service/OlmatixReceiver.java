@@ -32,7 +32,8 @@ public class OlmatixReceiver extends BroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Intent serviceIntent = new Intent(context, OlmatixService.class);
             context.startService(serviceIntent);
-
+            alarm = new OlmatixAlarmReceiver();
+            alarm.setAlarm(context);
         }
          if (intent.getAction().equals("com.olmatix.lesjaw.olmatix.ProximityAlert")) {
              String k = LocationManager.KEY_PROXIMITY_ENTERING;

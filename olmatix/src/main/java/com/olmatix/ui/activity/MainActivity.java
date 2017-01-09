@@ -25,7 +25,6 @@ import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.service.OlmatixAlarmReceiver;
 import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.ui.fragment.InstalledNode;
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
             Boolean message = intent.getBooleanExtra("MqttStatus", false);
             if (message!=null) {
-                Log.d("DEBUG", "onReceive: "+message);
+                //Log.d("DEBUG", "onReceive: "+message);
                 if (message) {
                     serverconnected = true;
                     imgStatus.setImageResource(R.drawable.ic_conn_green);
@@ -108,10 +107,6 @@ public class MainActivity extends AppCompatActivity {
 
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);
-
-        OlmatixAlarmReceiver alarm = new OlmatixAlarmReceiver();
-            alarm.setAlarm(getApplication());
-            Log.d("DEBUG", "Alarm set ");
 
 
         mIntentFilter = new IntentFilter();

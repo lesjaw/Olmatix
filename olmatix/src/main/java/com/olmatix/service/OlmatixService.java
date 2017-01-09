@@ -462,6 +462,10 @@ public class OlmatixService extends Service {
             editor.apply();
             Log.d(TAG, "onStartCommand status connection: " + mStatusServer);
             doConnect();
+
+            OlmatixAlarmReceiver alarm = new OlmatixAlarmReceiver();
+            alarm.setAlarm(this);
+            Log.d("DEBUG", "Alarm set ");
         }
             sendMessage();
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

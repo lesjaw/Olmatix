@@ -98,8 +98,9 @@ public class OlmatixAlarmReceiver extends WakefulBroadcastReceiver {
         // clock, and to repeat once a day.
         /*alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);*/
+        long executeRepeat = 20*60*1000;
 
-        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 20*60*1000, alarmIntent);
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), executeRepeat, alarmIntent);
 
 
         // Enable {@code SampleBootReceiver} to automatically restart the alarm when the

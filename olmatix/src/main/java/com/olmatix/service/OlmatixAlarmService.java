@@ -39,8 +39,6 @@ public class OlmatixAlarmService extends IntentService {
     Boolean Status;
     private dbNode dbnode;
     public static dbNodeRepo mDbNodeRepo;
-
-
     private ArrayList<String> notifications;
 
 
@@ -49,7 +47,6 @@ public class OlmatixAlarmService extends IntentService {
 
         mDbNodeRepo = new dbNodeRepo(getApplicationContext());
         dbnode = new dbNode();
-
 
         Log.d("DEBUG", "Intent Service run ");
         Status = Connection.getClient().isConnected();

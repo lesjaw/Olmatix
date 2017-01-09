@@ -44,12 +44,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     SharedPreferences sharedPref;
     Boolean mStatusServer;
 
-
     public NodeDashboardAdapter(ArrayList<DashboardNodeModel> nodeList, Context dashboardnode, OnStartDragListener dragStartListener) {
         this.nodeList = nodeList;
         mDragStartListener = dragStartListener;
         this.context = dashboardnode;
-
     }
 
     @Override
@@ -148,7 +146,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     String payload1 = "ON";
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
                     if (mStatusServer) {
                         String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
                         if (mFavoriteModel.getStatus().trim().equals("false")) {
@@ -213,7 +210,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     String payload1;
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
                     if (mStatusServer) {
                         String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
                         if (mFavoriteModel.getStatus().trim().equals("false")) {

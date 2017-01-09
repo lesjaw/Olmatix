@@ -19,7 +19,7 @@ import com.olmatix.ui.activity.SplashActivity;
 public class OlmatixReceiver extends BroadcastReceiver {
 
     String textNode;
-    int homestat;
+    int homestat=2;
     int homestatcur;
     OlmatixAlarmReceiver alarm;
 
@@ -69,7 +69,7 @@ public class OlmatixReceiver extends BroadcastReceiver {
                          .setAutoCancel(true)
                          .build();
 
-                 notificationManager.notify(5, notification);
+                 notificationManager.notify(7, notification);
 
              }
          }

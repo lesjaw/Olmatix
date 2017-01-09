@@ -2,6 +2,7 @@ package com.olmatix.ui.activity;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.location.Address;
@@ -90,6 +91,14 @@ public class SettingsActivity extends SettingsFragment {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+    }
+
+    @Override
+    public void onHeaderClick(Header header, int position) {
+        super.onHeaderClick(header, position);
+        if (header.id == R.id.about) {
+            Intent i = new Intent(this,AboutActivity.class);
+            startActivity(i);        }
     }
 
     @Override
@@ -489,10 +498,9 @@ public class SettingsActivity extends SettingsFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-/*
-            Intent i = new Intent(getActivity(),AboutActivity.class);
-            startActivity(i);*/
+
         }
+
     }
 
 

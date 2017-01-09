@@ -21,8 +21,8 @@
             android:padding="10dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70sp"
+                android:layout_height="70sp"
                 android:id="@+id/icon_node"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"

@@ -55,7 +55,7 @@
         android:key="conStatus"
         android:defaultValue="false"
         android:summary="@string/check_status"
-        android:clickable="false">
+        android:enabled="false">
     </CheckBoxPreference>
 
 </PreferenceScreen>

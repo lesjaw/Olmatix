@@ -32,6 +32,7 @@ import static com.olmatix.database.dbNode.KEY_ICON;
 import static com.olmatix.database.dbNode.KEY_ID;
 import static com.olmatix.database.dbNode.KEY_LEAVE;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
+import static com.olmatix.database.dbNode.KEY_LOG;
 import static com.olmatix.database.dbNode.KEY_MESSAGE;
 import static com.olmatix.database.dbNode.KEY_NAME;
 import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
@@ -57,6 +58,7 @@ import static com.olmatix.database.dbNode.KEY_TOPIC;
 import static com.olmatix.database.dbNode.KEY_UPTIME;
 import static com.olmatix.database.dbNode.TABLE;
 import static com.olmatix.database.dbNode.TABLE_FAV;
+import static com.olmatix.database.dbNode.TABLE_LOG;
 import static com.olmatix.database.dbNode.TABLE_MQTT;
 import static com.olmatix.database.dbNode.TABLE_NODE;
 import static com.olmatix.database.dbNode.TABLE_NODE_DURATION;
@@ -446,16 +448,10 @@ public class dbNodeRepo {
     }
 
     public List<SpinnerObject> getAllLabels() {
-        List<SpinnerObject> labels = new ArrayList<SpinnerObject>();
-
-        // Select All Query
+        List<SpinnerObject> labels = new ArrayList<>();
         String selectQuery = "SELECT  * FROM " + TABLE_NODE;
-
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-
 
         if (cursor.moveToFirst()) {
             do {
@@ -856,6 +852,69 @@ public class dbNodeRepo {
         cursor.close();
         db.close();
         return nodeList;
+    }
+
+    public int insertLog(dbNode DbNode) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_LOG, DbNode.getLog());
+
+        long Id = db.insert(TABLE_LOG, null, values);
+        db.close(); // Closing database connection
+        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        return (int) Id;
+    }
+
+    public List<String> getLogAlarm() {
+        List<String> nodeList = new ArrayList<>();
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_LOG;
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                nodeList.add(cursor.getString(1));
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
+    public void deleteLog() {
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(TABLE_LOG, null, null);
+        db.close(); // Closing database connection
+    }
+
+    public List<String> getLogMqtt() {
+        List<String> nodeList = new ArrayList<>();
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_MQTT;
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                nodeList.add(cursor.getString(1)+ " , "+ cursor.getString(2));
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
+    public void deleteMqtt() {
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(TABLE_MQTT, null, null);
+        db.close(); // Closing database connection
     }
 }
 

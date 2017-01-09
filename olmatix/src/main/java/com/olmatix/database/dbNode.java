@@ -15,6 +15,7 @@ public class dbNode {
     public static final String TABLE_SCENE = "scene";
     public static final String TABLE_SCENE_DETAIL = "scene_detail";
     public static final String  TABLE_INFO          = "info_data";
+    public static final String  TABLE_LOG          = "log_alarm";
 
 
 
@@ -54,6 +55,7 @@ public class dbNode {
     public static final String KEY_LEAVE     = "leave";
     public static final String KEY_PATH     = "path";
     public static final String KEY_COMMAND     = "command";
+    public static final String KEY_LOG     = "log";
 
 
 
@@ -61,7 +63,7 @@ public class dbNode {
     // property help us to keep data
     public int id;
     public String topic;
-    public String message;
+    public String message, log;
 
     public String getTopic() {
         return topic;
@@ -77,5 +79,13 @@ public class dbNode {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getLog() {
+        return log;
+    }
+
+    public void setLog(String log) {
+        this.log = log;
     }
 }

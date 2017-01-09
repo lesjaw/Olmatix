@@ -116,7 +116,6 @@ public class OlmatixService extends Service {
     private InstalledNodeModel installedNodeModel;
     private DetailNodeModel detailNodeModel;
     private DurationModel durationModel;
-    private dbNode dbnode;
     private String NodeID, Channel, mMessage;
     private int NOTIFICATION = string.local_service_label;
     private String mNodeID, mNiceName, mNiceNameN, NodeIDSensor, TopicID, mChange = "", connectionResult;
@@ -139,7 +138,7 @@ public class OlmatixService extends Service {
     boolean hasConnectivity = false;
     boolean hasChanged = false;
     SharedPreferences sharedPref;
-    Boolean mStatusServer, doCon;
+    Boolean mStatusServer, doCon, noNotif=true;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -164,17 +163,39 @@ public class OlmatixService extends Service {
                 if (!hasConnectivity) {
                     Toast.makeText(getApplication(), "No Internet connection", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getApplication(), "Internet connection avalaible", Toast.LENGTH_SHORT).show();
+                    if (add_NodeID == null) {
+                        Toast.makeText(getApplication(), "Internet connection avalaible", Toast.LENGTH_SHORT).show();
+                        doCon = false;
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putBoolean("conStatus", false);
+                        editor.apply();
                         doConnect();
+                    }
                 }
             }
 
             if (alarmService != null) {
-                if (alarmService.equals("Conn")) {
+                if (alarmService.equals("login")) {
+                    doCon=false;
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean("conStatus", false);
+                    editor.apply();
+                    doConnect();
+
 
                 }
-                if (alarmService.equals("Conn1")) {
-
+                if (alarmService.equals("con")) {
+                    doCon = false;
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean("conStatus", false);
+                    editor.apply();
+                    doConnect();
                 }
             }
             if (add_NodeID != null) {
@@ -188,7 +209,6 @@ public class OlmatixService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
 
             NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
             if (nInfo != null) {
@@ -219,13 +239,7 @@ public class OlmatixService extends Service {
 
             hasConnectivity = hasMmobile || hasWifi;
             Log.d(TAG, "hasConn: " + hasConnectivity + " hasChange: " + hasChanged );
-            /*doCon=false;
-            sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            mStatusServer = sharedPref.getBoolean("conStatus", false);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putBoolean("conStatus", false);
-            editor.apply();
-*/
+
             if (hasConnectivity && hasChanged) {
                 if (mqttClient != null) {
                     Log.d(TAG, "Pref Status con at receive: "+mStatusServer);
@@ -402,26 +416,10 @@ public class OlmatixService extends Service {
                 Log.d(TAG, "run: " + flagSub);
                 checkActivityForeground();
                 unSubIfnotForeground();
-
+                noNotif=false;
             }
         }, 30000);
     }
-
-    private void startCommand() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                mStatusServer = sharedPref.getBoolean("conStatus", false);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("conStatus", false);
-                editor.apply();
-                Log.d(TAG, "onStartCommand status connection: "+mStatusServer);
-                doConnect();
-            }
-        }, 10000);
-    }
-
 
     @Override
     public void onCreate() {
@@ -454,7 +452,7 @@ public class OlmatixService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        noNotif=true;
         if (!flagStart) {
             flagStart = true;
             sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -528,7 +526,7 @@ public class OlmatixService extends Service {
         printForegroundTask();
         Log.d("Unsubscribe", " uptime and signal");
 
-        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")||!flagOnForeground) {
+        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")||!flagOnForeground||!noNotif) {
             int countDB = mDbNodeRepo.getNodeList().size();
             Log.d("DEBUG", "Count list Node: " + countDB);
             data.addAll(mDbNodeRepo.getNodeList());
@@ -625,9 +623,8 @@ public class OlmatixService extends Service {
 
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(notifyID,mBuilder.build());
+        notificationManager.notify(15,mBuilder.build());
     }
-
 
     private void setClientID() {
         // Context mContext;
@@ -653,13 +650,6 @@ public class OlmatixService extends Service {
         Intent intent = new Intent("MQTTStatus");
         intent.putExtra("NotifyChangeNode", mChange);
         intent.putExtra("MqttStatus", flagConn);
-        intent.putExtra("ConnectionStatus", connectionResult);
-
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    private void sendMessageAuth() {
-        Intent intent = new Intent("MQTTStatus");
         intent.putExtra("ConnectionStatus", connectionResult);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -836,42 +826,44 @@ public class OlmatixService extends Service {
                 //Log.d("DEBUG", "toastAndNotif: "+flagOnForeground);
 
                 if (!flagOnForeground) {
-                    String state = "";
-                    detailNodeModel.setNode_id(NodeID);
-                    detailNodeModel.setChannel(Channel);
-                    data1.addAll(mDbNodeRepo.getNodeDetail(NodeID, Channel));
-                    int countDB = mDbNodeRepo.getNodeDetail(NodeID, Channel).size();
-                    if (countDB != 0) {
-                        for (int i = 0; i < countDB; i++) {
-                            if (data1.get(i).getNice_name_d() != null) {
-                                mNiceName = data1.get(i).getNice_name_d();
-                            } else {
-                                mNiceName = data1.get(i).getName();
+                    if (!noNotif) {
+                        String state = "";
+                        detailNodeModel.setNode_id(NodeID);
+                        detailNodeModel.setChannel(Channel);
+                        data1.addAll(mDbNodeRepo.getNodeDetail(NodeID, Channel));
+                        int countDB = mDbNodeRepo.getNodeDetail(NodeID, Channel).size();
+                        if (countDB != 0) {
+                            for (int i = 0; i < countDB; i++) {
+                                if (data1.get(i).getNice_name_d() != null) {
+                                    mNiceName = data1.get(i).getNice_name_d();
+                                } else {
+                                    mNiceName = data1.get(i).getName();
+                                }
+                                state = data1.get(i).getStatus();
                             }
-                            state = data1.get(i).getStatus();
                         }
-                    }
 
-                    if (state.equals("true") || state.equals("ON")) {
-                        state = "ON";
-                    }
-                    if (state.equals("false") || state.equals("OFF")) {
-                        state = "OFF";
-                    }
-
-                    if (mNiceName != null) {
-                        if (!state.equals("")) {
-                            // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
-                            titleNode = mNiceName;
-                            textNode = state;
-                            //notifyID = notid;
-                            notifyID = 0;
-                            showNotificationNode();
+                        if (state.equals("true") || state.equals("ON")) {
+                            state = "ON";
                         }
+                        if (state.equals("false") || state.equals("OFF")) {
+                            state = "OFF";
+                        }
+
+                        if (mNiceName != null) {
+                            if (!state.equals("")) {
+                                // Toast.makeText(getApplicationContext(), mNiceName + " is " + state, Toast.LENGTH_SHORT).show();
+                                titleNode = mNiceName;
+                                textNode = state;
+                                //notifyID = notid;
+                                notifyID = 0;
+                                showNotificationNode();
+                            }
+                        }
+                        messageReceive.clear();
+                        message_topic.clear();
+                        data1.clear();
                     }
-                    messageReceive.clear();
-                    message_topic.clear();
-                    data1.clear();
                 }
             }
         }
@@ -1128,26 +1120,28 @@ public class OlmatixService extends Service {
             printForegroundTask();
             if (!currentApp.equals("com.olmatix.lesjaw.olmatix")) {
                 if (!flagOnForeground) {
-                    installedNodeModel.setNodesID(NodeID);
-                    data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
-                    int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
-                    if (countDB != 0) {
-                        for (int i = 0; i < countDB; i++) {
-                            if (data2.get(i).getNice_name_n() != null) {
-                                mNiceNameN = data2.get(i).getNice_name_n();
-                            } else {
-                                mNiceNameN = data2.get(i).getFwName();
+                    if (!noNotif) {
+                        installedNodeModel.setNodesID(NodeID);
+                        data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
+                        int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
+                        if (countDB != 0) {
+                            for (int i = 0; i < countDB; i++) {
+                                if (data2.get(i).getNice_name_n() != null) {
+                                    mNiceNameN = data2.get(i).getNice_name_n();
+                                } else {
+                                    mNiceNameN = data2.get(i).getFwName();
+                                }
+                                int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
+                                notifyID = id + 2;
+                                if (mMessage.equals("true")) {
+                                    titleNode = mNiceNameN;
+                                    textNode = "ONLINE";
+                                } else {
+                                    titleNode = mNiceNameN;
+                                    textNode = "OFFLINE";
+                                }
+                                showNotificationNode();
                             }
-                            int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
-                            notifyID = id + 2;
-                            if (mMessage.equals("true")) {
-                                titleNode = mNiceNameN;
-                                textNode = "ONLINE";
-                            } else {
-                                titleNode = mNiceNameN;
-                                textNode = "OFFLINE";
-                            }
-                            showNotificationNode();
                         }
                     }
                 }
@@ -1244,21 +1238,22 @@ public class OlmatixService extends Service {
         String topic = "devices/" + add_NodeID + "/$online";
         int qos = 2;
         try {
-            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-            subToken.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("Subscribe", " device = " + NodeID);
-                }
+            if (mqttClient!=null) {
+                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                subToken.setActionCallback(new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d("Subscribe", " device = " + NodeID);
+                    }
 
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                }
-            });
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    }
+                });
+            }
         } catch (MqttException e) {
             e.printStackTrace();
         }
-
         flagNode = true;
     }
 
@@ -1428,6 +1423,8 @@ public class OlmatixService extends Service {
 
         @Override
         public void messageArrived(String topic, final MqttMessage message) throws Exception {
+            dbNode dbnode;
+            dbnode = new dbNode();
 
             Log.d("Receive MQTTMessage", " = " + topic + " message = " + message.toString());
             TopicID = topic;
@@ -1445,11 +1442,11 @@ public class OlmatixService extends Service {
             } else {
                 updateDetail();
             }
-            if (flagSub) {
-                dbnode.setTopic(topic);
-                dbnode.setMessage(mMessage);
-                mDbNodeRepo.insertDbMqtt(dbnode);
-            }
+            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
+
+            dbnode.setTopic(topic);
+            dbnode.setMessage(mMessage +" at " +timeformat.format(System.currentTimeMillis()));
+            mDbNodeRepo.insertDbMqtt(dbnode);
         }
 
         @Override
@@ -1623,11 +1620,4 @@ public class OlmatixService extends Service {
         manager.notify(5, notification);
     }
 
-
 }
-
-
-
-
-
-

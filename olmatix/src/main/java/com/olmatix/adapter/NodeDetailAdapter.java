@@ -138,7 +138,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 public void onClick(View view) {
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
                     if (mStatusServer) {
                         String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
                         String payload = "ON";
@@ -172,8 +171,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 public void onClick(View view) {
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
-                    if (mStatusServer) {                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
+                    if (mStatusServer) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
                         String payload = "OFF";
                         byte[] encodedPayload = new byte[0];
                         try {

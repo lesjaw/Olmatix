@@ -18,6 +18,7 @@
         android:title="@string/pref_setup" />
 
     <header
+        android:id="@+id/about"
         android:icon="@drawable/ic_about_black"
         android:title="@string/pref_about"
         android:summary="@string/about_sum"/>

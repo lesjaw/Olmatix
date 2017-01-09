@@ -73,7 +73,6 @@ public class DashboardNode extends Fragment implements
     private int mDatasetTypes[] = {mLOCATION, mBUTTON}; //view types
     Context dashboardnode;
     private LocationManager locationManager;
-
     private String mProvider;
     private LocationManager mLocateMgr;
     private Location mLocation;

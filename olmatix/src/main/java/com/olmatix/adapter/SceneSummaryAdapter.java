@@ -62,8 +62,6 @@ public class SceneSummaryAdapter extends BaseAdapter {
         mId             = (TextView) mView.findViewById(R.id.txId);
         mTypicalName    = (TextView) mView.findViewById(R.id.typicalName);
         sceneCmd        = (TextView) mView.findViewById(R.id.scene_command);
-        imgActions      = (ImageButton) mView.findViewById(R.id.imgActions);
-        imgActions.setTag(position);
 
         mSceneDetail= mSceneDetailData.get(position);
         for (int i=0; i > mSceneDetailData.size(); i++){
@@ -73,27 +71,10 @@ public class SceneSummaryAdapter extends BaseAdapter {
         mTypicalName.setText(mSceneDetail.getNiceName());
         sceneCmd.setText(mSceneDetail.getCommand());
 
-        imgActions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                Log.d("DEBUG", "onClick: " + mSceneDetailData.size());
-
-                v.setVisibility(View.GONE);
-                notifyDataSetChanged();
-                int positionToRemove = (int)v.getTag(); //get the position of the view to delete stored in the tag
-                removeItem(positionToRemove); //remove the item
-            }
-        });
 
         return mView;
     }
 
-    private void removeItem(int position) {
 
-        ArrayList<SceneDetailModel> remScene = new ArrayList<>();
-        remScene.remove(position);
-        notifyDataSetChanged();
-
-    }
 }

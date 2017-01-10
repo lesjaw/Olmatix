@@ -24,8 +24,5 @@
 
     </PreferenceCategory>
 
-    <Preference
-        android:layout="@layout/sendbuttons"
-        android:key="loginButtons"/>
 
 </PreferenceScreen>

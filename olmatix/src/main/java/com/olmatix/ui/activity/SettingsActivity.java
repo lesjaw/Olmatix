@@ -1,7 +1,9 @@
 package com.olmatix.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -11,13 +13,19 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.util.JsonWriter;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.olmatix.database.dbNodeRepo;
@@ -33,7 +41,11 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -479,18 +491,120 @@ public class SettingsActivity extends SettingsFragment {
 
     }
 
+    @SuppressLint("ValidFragment")
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class SetupPreferenceFragment extends PreferenceFragment {
+        private Button mSend, mConnect;
+
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View v = inflater.inflate(R.layout.sendbuttons, null);
             addPreferencesFromResource(R.xml.pref_setup);
             setHasOptionsMenu(true);
-
             bindPreferenceSummaryToValue(findPreference("ssid"));
             bindPreferenceSummaryToValue(findPreference("password_wifi"));
 
+            mSend = (Button) v.findViewById(R.id.sendButton);
+            mConnect = (Button) v.findViewById(R.id.connectButton);
+
+            setOnCLickistener();
+
+            sendConfig();
+
+            return v;
         }
+
+        private void setOnCLickistener() {
+            mSend.setOnClickListener(sendClickLietener());
+            mConnect.setOnClickListener(connectClickListener());
+        }
+
+        private View.OnClickListener connectClickListener() {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            };
+        }
+
+        private View.OnClickListener sendClickLietener() {
+            return new View.OnClickListener() {
+
+
+                @Override
+                public void onClick(View v) {
+
+                    //  PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_network, false);/
+                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    String mServerURL = sharedPref.getString("server_address", "");
+                    String mServerPort = sharedPref.getString("server_port", "");
+                    String mUserName = sharedPref.getString("user_name", "");
+                    String mPassword = sharedPref.getString("password", "");
+                    String mSsid = sharedPref.getString("ssid", "");
+                    String mWifiPass = sharedPref.getString("password_wifi", "");
+
+                    Log.d("DEBUG", "onClick: \nData Host " + mServerURL +"\nData Port " + mServerPort +"\nData HOST User " + mUserName +"\nData Hsst Pass " + mPassword +"\nData SSID " + mSsid  +"\nData Wifi pass " + mWifiPass);
+
+
+
+                    try {
+                        JsonWriter jsonWriter = new JsonWriter(
+                                new OutputStreamWriter(getActivity().openFileOutput("config.json" , getActivity().MODE_PRIVATE)));
+                        Log.d("DEBUG", "onClick: " + String.valueOf(jsonWriter.toString()));
+
+                        try {
+                            jsonWriter.setIndent(" ");
+                            jsonWriter.beginObject();
+                            jsonWriter.name("wifi").beginObject();
+                            jsonWriter.name("ssid");
+                            jsonWriter.value(mSsid);
+                            jsonWriter.name("password");
+                            jsonWriter.value(mWifiPass);
+                            jsonWriter.endObject();
+                            jsonWriter.name("mqtt").beginObject();
+                            jsonWriter.name("host");
+                            jsonWriter.value(mServerURL);
+                            jsonWriter.name("port");
+                            jsonWriter.value(mServerPort);
+                            jsonWriter.name("base_topic");
+                            jsonWriter.value("devices/");
+                            jsonWriter.name("auth");
+                            jsonWriter.value(true);
+                            jsonWriter.name("username");
+                            jsonWriter.value(mUserName);
+                            jsonWriter.name("password");
+                            jsonWriter.value(mPassword);
+                            jsonWriter.endObject();
+                            jsonWriter.name("ota").beginObject();
+                            jsonWriter.name("enabled");
+                            jsonWriter.value(true);
+                            jsonWriter.endObject();
+                            jsonWriter.endObject();
+                            jsonWriter.close();
+                        } finally {
+
+                        }
+
+                    } catch (IOException ex){
+                        ex.printStackTrace();
+                    }
+                }
+            };
+        }
+
+        public void sendConfig() {
+            File rootDataDir = getActivity().getFilesDir();
+            String configFiles =  rootDataDir.getAbsolutePath() + "/config.json";
+
+
+            Log.d("DEBUG", "sendConfig: " +configFiles );
+
+
+
+        }
+
+
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

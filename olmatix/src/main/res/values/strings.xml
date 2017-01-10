@@ -69,7 +69,7 @@
     <string name="opt_Thold_desc">Range at which you will be considered out of home when you leave</string>
     <string name="opt_Thold">Distance From Home</string>
     <string name="opt_homepos_err">Error getting current position</string>
-    <string name="opt_homepos_set">Home position set</string>
+    <string name="opt_homepos_set">Home position set, press back now to see the location update</string>
     <string name="scene_label">Base on what?..</string>
     <string name="scene_do">What do you want to do?...</string>
     <string name="back">Back</string>

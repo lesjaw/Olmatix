@@ -378,8 +378,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
         mList.add(R.drawable.offlamp1);
         mList.add(R.drawable.onlamp1);
-        mList.add(R.drawable.steckeroff);
-        mList.add(R.drawable.steckeroff);
+       // mList.add(R.drawable.steckeroff);
+        //mList.add(R.drawable.steckeroff);
 
         gridView.setAdapter(new iconPickerAdapter (context, R.layout.icon_picker, mList));
         gridView.setNumColumns(4);

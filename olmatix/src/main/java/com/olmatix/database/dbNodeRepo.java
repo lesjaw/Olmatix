@@ -159,6 +159,34 @@ public class dbNodeRepo {
         return (int) Id;
     }
 
+
+
+    public ArrayList<SceneModel> getAllSceneList() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_SCENE;
+
+        ArrayList<SceneModel> nodeList = new ArrayList<SceneModel>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                SceneModel node = new SceneModel();
+
+                node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
+                node.setSceneType(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
+                node.setSchedule(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCHEDULE)));
+                node.setArrived(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ARRIVE)));
+                node.setLeave(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LEAVE)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        Log.d("getlist", "getNodeList: " +cursor.getCount());
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
     public ArrayList<SceneModel> getSceneList(String sceneName) {
 
 
@@ -218,6 +246,13 @@ public class dbNodeRepo {
         return nodeList;
     }
 
+    public int deleteSceneDetailList(SceneDetailModel sceneDetailModel) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+
+        return db.delete(TABLE_SCENE_DETAIL,  dbNode.KEY_SCENE_ID + " = ?", new String[] { String.valueOf(sceneDetailModel.getSceneid()) });
+    }
+
     public ArrayList<SceneDetailModel> getAllScene() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery = "SELECT "+ TABLE_SCENE_DETAIL + ".*, "+TABLE_NODE+"."
@@ -252,6 +287,7 @@ public class dbNodeRepo {
         db.close();
         return nodeList;
     }
+
 
     public void deleteNode(String node_Id) {
 

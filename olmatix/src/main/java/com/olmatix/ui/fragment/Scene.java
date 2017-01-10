@@ -2,6 +2,7 @@ package com.olmatix.ui.fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -31,6 +32,7 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.SceneModel;
+import com.olmatix.ui.activity.SceneInput;
 
 import java.util.ArrayList;
 
@@ -51,6 +53,7 @@ public class Scene extends Fragment implements OnStartDragListener {
     private SceneAdapter adapter;
     private Paint p = new Paint();
     private SceneModel sceneModel;
+    private Intent mIntent;
 
     @Nullable
     @Override
@@ -98,6 +101,7 @@ public class Scene extends Fragment implements OnStartDragListener {
             @Override
             public void onClick(View v) {
                 final EditText mEditText = new EditText(getContext());
+                mEditText.setPadding(12,0,12,0);
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Scene")
                         .setMessage("Please type your scene name")
@@ -109,15 +113,9 @@ public class Scene extends Fragment implements OnStartDragListener {
 
                                 String inputResult = mEditText.getText().toString();
 
-                                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                                SceneInput mSceneinput = new SceneInput();
-
-                                Bundle args = new Bundle();
-                                args.putString("sceneName", inputResult);
-                                mSceneinput.setArguments(args);
-
-                                ft.replace(R.id.frame_container, mSceneinput);
-                                ft.commit();
+                                mIntent = new Intent(getActivity(), SceneInput.class);
+                                mIntent.putExtra("sceneName", inputResult);
+                                getActivity().startActivity(mIntent);
                                 mFab.hide();
 
 

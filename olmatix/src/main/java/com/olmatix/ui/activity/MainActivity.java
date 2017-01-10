@@ -3,10 +3,12 @@ package com.olmatix.ui.activity;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
@@ -30,6 +32,8 @@ import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.ui.fragment.Scene;
 
+import java.io.File;
+
 /**
  * Created by Lesjaw on 02/12/2016.
  */
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter mIntentFilter;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
+    private boolean curlAvailable = false;
 
     public static int[] tabIcons = {
             R.drawable.ic_dashboard,
@@ -115,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
         initView();
         setupToolbar();
         setupTabs();
+
+
     }
 
     @Override

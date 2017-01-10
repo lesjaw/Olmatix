@@ -62,7 +62,8 @@ public class OlmatixAlarmService extends IntentService {
             Intent a = new Intent("addNode");
             intent.putExtra("Connect", "con");
             LocalBroadcastManager.getInstance(this).sendBroadcast(a);
-
+            dbnode.setLog("Request connect" + " at " +timeformat.format(System.currentTimeMillis()));
+            mDbNodeRepo.insertLog(dbnode);
         }
 
         OlmatixAlarmReceiver.completeWakefulIntent(intent);

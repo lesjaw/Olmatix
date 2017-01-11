@@ -99,6 +99,11 @@ public class SettingsActivity extends SettingsFragment {
         if (header.id == R.id.about) {
             Intent i = new Intent(this,AboutActivity.class);
             startActivity(i);        }
+
+        if (header.id == R.id.setup) {
+            Intent i = new Intent(this,AboutActivity.class);
+            startActivity(i);        }
+
     }
 
     @Override

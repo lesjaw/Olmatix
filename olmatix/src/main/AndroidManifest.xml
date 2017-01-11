@@ -79,6 +79,10 @@
             android:theme="@style/AppTheme.Dark">
         </activity>
 
+        <activity
+            android:name="com.olmatix.ui.activity.SetupProduct"
+            android:theme="@style/AppTheme.Dark">
+        </activity>
 
         <service android:name="com.olmatix.service.OlmatixService"/>
         <service android:name="com.olmatix.service.OlmatixAlarmService"/>

@@ -152,12 +152,14 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 checkTitleStep(Wificut);
                 break;
             case CHOOSE_WIFI:
+                //verticalStepperForm.goToNextStep();
+                checkTitleStep(Wificut);
+                break;
             case TYPE_WIFI_PASSWORD:
                 // As soon as they are open, these two steps are marked as completed because they
                 // have default values
-                verticalStepperForm.setStepAsCompleted(stepNumber);
                 // In this case, the instruction above is equivalent to:
-                // verticalStepperForm.setActiveStepAsCompleted();
+                verticalStepperForm.setActiveStepAsCompleted();
                 break;
         }
 
@@ -305,7 +307,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 textHomeWifi = (String) listHome.getItemAtPosition(arg2);
                 Log.d("DEBUG", "Selected item: " + textHomeWifi);
                 arg1.setSelected(true);
-
+                verticalStepperForm.goToNextStep();
             }
         });
         return listHome;
@@ -377,7 +379,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             firmware = jObject1.getString("name");
             version = jObject1.getString("version");
 
-            Log.d("DEBUG", "parsingJson: "+deviceID);
+            //Log.d("DEBUG", "parsingJson: "+deviceID);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -491,8 +493,10 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             progressDialog.show();
 
         } else {
-            progressDialog.dismiss();
-            Log.d("DEBUG", "progressDialogStop: ");
+            if (progressDialog!=null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                Log.d("DEBUG", "progressDialogStop: ");
+            }
         }
     }
 
@@ -514,9 +518,9 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 if (iend1 != -1) {
                     wifiInfo = ssid.substring(0, iend1);
                     wifiInfo = wifiInfo.replace("\"", "");
-                    Log.d("DEBUG", "Wifi1: " + wifiInfo);
+                    //Log.d("DEBUG", "Wifi1: " + wifiInfo);
                     if (checkTitleStep(wifiInfo)) {
-                        Log.d("DEBUG", "Wifi2: " + wifiInfo);
+                        //Log.d("DEBUG", "Wifi2: " + wifiInfo);
 
                         new Handler().postDelayed(new Runnable() {
                             @Override

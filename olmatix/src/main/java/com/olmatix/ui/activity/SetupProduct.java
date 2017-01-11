@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -116,10 +117,11 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         Log.d("DEBUG", "createConnectTitleStep: " + wifiList.size());
 
         listtest = new ListView(this);
+        listtest.setOnItemClickListener(clickItemListener());
 
         statesList = new String[wifiList.size()];
         for(int i = 0; i < wifiList.size(); i++){
-            statesList[i] = String.valueOf(wifiList.get(i).SSID+ "Strength || " + wifiList.get(i).level);
+            statesList[i] = String.valueOf(wifiList.get(i).SSID+ " Strength || " + wifiList.get(i).level);
             System.out.println(statesList[i]);
 
 
@@ -146,6 +148,15 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
 
         return listtest;
+    }
+
+    private AdapterView.OnItemClickListener clickItemListener() {
+        return new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println(position);
+            }
+        };
     }
 
     class WifiReceiver extends BroadcastReceiver {

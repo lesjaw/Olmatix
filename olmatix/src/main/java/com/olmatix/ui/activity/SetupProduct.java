@@ -113,7 +113,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         mainWifi.startScan();
         wifiList  = mainWifi.getScanResults();
 
-        ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, wifiList);
+        ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(this, R.layout.list_view_wifi, wifiList);
 
         listWifiDetails.setAdapter(modeAdapter);
 

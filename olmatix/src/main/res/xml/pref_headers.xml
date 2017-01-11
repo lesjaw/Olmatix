@@ -14,7 +14,6 @@
 
     <header
         android:id="@+id/setup"
-        android:fragment="com.olmatix.ui.activity.SettingsActivity$SetupPreferenceFragment"
         android:icon="@drawable/ic_setup_black"
         android:title="@string/pref_setup" />
 

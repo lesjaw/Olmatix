@@ -101,7 +101,7 @@ public class SettingsActivity extends SettingsFragment {
             startActivity(i);        }
 
         if (header.id == R.id.setup) {
-            Intent i = new Intent(this,AboutActivity.class);
+            Intent i = new Intent(this,SetupProduct.class);
             startActivity(i);        }
 
     }

@@ -89,5 +89,12 @@
     <string name="description">Your password login</string>
     <string name="conStatus">Server Status</string>
     <string name="check_status">This is Olmatix connectin status</string>
+    <string name="setup_hint_title">Select Product WiFi/SSID</string>
+
+    <string-array name="steps_titles">
+        <item>Connect to Product</item>
+        <item>Choose WiFi</item>
+        <item>Type WiFi Password</item>
+    </string-array>
 
 </resources>

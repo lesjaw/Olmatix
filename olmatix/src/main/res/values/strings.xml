@@ -90,11 +90,12 @@
     <string name="conStatus">Server Status</string>
     <string name="check_status">This is Olmatix connectin status</string>
     <string name="setup_hint_title">Select Product WiFi/SSID</string>
+    <string name="error_wifi_pick">Pick WiFi w/ SSID: Olmatix-ID</string>
 
     <string-array name="steps_titles">
-        <item>Connect to Product</item>
-        <item>Choose WiFi</item>
-        <item>Type WiFi Password</item>
+        <item>Connect to Olmatix product..</item>
+        <item>Choose your home WiFi..</item>
+        <item>Type WiFi Password..</item>
     </string-array>
 
 </resources>

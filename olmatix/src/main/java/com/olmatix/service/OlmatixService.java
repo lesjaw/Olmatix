@@ -197,6 +197,9 @@ public class OlmatixService extends Service {
                     editor.apply();
                     doConnect();
                 }
+                if (alarmService.equals("stop")) {
+                    stopSelf();
+                }
             }
             if (add_NodeID != null) {
                 doAddNodeSub();
@@ -254,6 +257,10 @@ public class OlmatixService extends Service {
                 }
             }
         }
+    }
+
+    private void stopService (){
+        stopSelf();
     }
 
     private void doConnect() {
@@ -391,7 +398,6 @@ public class OlmatixService extends Service {
         showNotification();
 
     }
-
 
     private void doDisconnect() {
         Log.d(TAG, "doDisconnect, flagConn = " + flagConn);

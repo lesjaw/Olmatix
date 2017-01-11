@@ -1,29 +1,55 @@
 package com.olmatix.ui.activity;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.olmatix.adapter.WifiListAdapter;
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.olmatix.lesjaw.olmatix.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
+
+import static com.olmatix.lesjaw.olmatix.R.array;
+import static com.olmatix.lesjaw.olmatix.R.color;
+import static com.olmatix.lesjaw.olmatix.R.id;
+import static com.olmatix.lesjaw.olmatix.R.layout;
 
 /**
  * Created by Lesjaw on 11/01/2017.
@@ -32,43 +58,65 @@ import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
 public class SetupProduct extends AppCompatActivity implements VerticalStepperForm {
 
     private VerticalStepperFormLayout verticalStepperForm;
-    private TextView connectText;
+    private EditText wifiText;
     private static final int CONNECT_TO_PRODUCT = 0;
     private static final int CHOOSE_WIFI = 1;
     private static final int TYPE_WIFI_PASSWORD = 2;
 
     private WifiManager mainWifi;
-    private WifiReceiver receiverWifi;
-    WifiListAdapter adapter;
+    //private WifiReceiver receiverWifi;
     ListView listWifiDetails;
     List<ScanResult> wifiList;
-    ListView listtest;
+    ListView listProduct, listHome;
     String[] statesList;
+    String Wifi = "", Wificut = "",Password, textProgres, deviceID, firmware, version,textHomeWifi;
+    private ProgressDialog progressDialog;
+    private IntentFilter mIntentFilter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.setup_product);
+        setContentView(layout.setup_product);
+
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 
         initializeActivity();
+    }
+
+    @Override
+    protected void onPostResume() {
+        registerReceiver(mIntentReceiver, mIntentFilter);
+
+        super.onPostResume();
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(mIntentReceiver);
+        super.onPause();
     }
 
     private void initializeActivity() {
 
         // Vertical Stepper form vars
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
-        String[] stepsTitles = getResources().getStringArray(R.array.steps_titles);
+        int colorPrimary = ContextCompat.getColor(getApplicationContext(), color.white);
+        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), color.colorPrimaryDark);
+        String[] stepsTitles = getResources().getStringArray(array.steps_titles);
         //String[] stepsSubtitles = getResources().getStringArray(R.array.steps_subtitles);
 
         // Here we find and initialize the form
-        verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
+        verticalStepperForm = (VerticalStepperFormLayout) findViewById(id.vertical_stepper_form);
         VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, stepsTitles, this, this)
                 //.stepsSubtitles(stepsSubtitles)
                 //.materialDesignInDisabledSteps(true) // false by default
                 //.showVerticalLineWhenStepsAreCollapsed(true) // false by default
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
+                .stepNumberTextColor(color.black)
+                .stepSubtitleTextColor(color.white)
+                .buttonBackgroundColor(color.bg_button)
                 .displayBottomNavigation(true)
                 .init();
 
@@ -89,96 +137,375 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 view = createTypePasswordTitleStep();
                 break;
         }
-        return view;    }
+        return view;
+    }
 
     @Override
     public void onStepOpening(int stepNumber) {
+
+        switch (stepNumber) {
+            case CONNECT_TO_PRODUCT:
+                // When this step is open, we check that the title is correct
+                checkTitleStep(Wificut);
+                break;
+            case CHOOSE_WIFI:
+            case TYPE_WIFI_PASSWORD:
+                // As soon as they are open, these two steps are marked as completed because they
+                // have default values
+                verticalStepperForm.setStepAsCompleted(stepNumber);
+                // In this case, the instruction above is equivalent to:
+                // verticalStepperForm.setActiveStepAsCompleted();
+                break;
+        }
 
     }
 
     @Override
     public void sendData() {
-
+        sendJson();
     }
 
     private View createConnectTitleStep() {
-        connectText = new TextView(this);
-        connectText.setText("Choose WiFi/SSID Product ");
-
-
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-
-        receiverWifi = new WifiReceiver();
+        mainWifi.setWifiEnabled(true);
         listWifiDetails = new ListView(this);
 
-        registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         mainWifi.startScan();
-        wifiList  = mainWifi.getScanResults();
+        wifiList = mainWifi.getScanResults();
         Log.d("DEBUG", "createConnectTitleStep: " + wifiList.size());
 
-        listtest = new ListView(this);
-        listtest.setOnItemClickListener(clickItemListener());
-
+        listProduct = new ListView(this);
         statesList = new String[wifiList.size()];
-        for(int i = 0; i < wifiList.size(); i++){
-            statesList[i] = String.valueOf(wifiList.get(i).SSID+ " Strength || " + wifiList.get(i).level);
+        for (int i = 0; i < wifiList.size(); i++) {
+            statesList[i] = String.valueOf(wifiList.get(i).SSID + " || Signal " + wifiList.get(i).level);
             System.out.println(statesList[i]);
-
-
         }
-        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, R.layout.list_item, statesList));
+        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item, statesList));
 
-        listtest.setAdapter(testadap);
+        listProduct.setAdapter(testadap);
 
         int totalHeight = 0;
         for (int i = 0; i < testadap.getCount(); i++) {
-            View listItem = testadap.getView(i, null, listtest);
+            View listItem = testadap.getView(i, null, listProduct);
             listItem.measure(0, 0);
             totalHeight += listItem.getMeasuredHeight();
         }
 
-        Log.d("DEBUG", "createConnectTitleStep: "+totalHeight);
+        Log.d("DEBUG", "createConnectTitleStep: " + totalHeight);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.height = totalHeight + (listtest.getDividerHeight() * (testadap.getCount() - 1));
-        Log.d("DEBUG", "createConnectTitleStep: "+params);
+        params.height = totalHeight + (listProduct.getDividerHeight() * (testadap.getCount() - 1));
+        Log.d("DEBUG", "createConnectTitleStep: " + params);
 
-        listtest.setLayoutParams(params);
-        listtest.requestLayout();
+        listProduct.setLayoutParams(params);
+        listProduct.requestLayout();
 
+        listProduct.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-        return listtest;
-    }
-
-    private AdapterView.OnItemClickListener clickItemListener() {
-        return new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println(position);
-            }
-        };
-    }
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                                    long arg3) {
+                // TODO Auto-generated method stub
+                String text = (String) listProduct.getItemAtPosition(arg2);
+                Log.d("DEBUG", "Selected item: " + text);
 
-    class WifiReceiver extends BroadcastReceiver {
-        public void onReceive(Context c, Intent intent) {
-        }
+                int iend = text.indexOf("|");
+                if (iend != -1) {
+                    Wifi = text.substring(0, iend);
+                    int iend1 = Wifi.indexOf("-");
+                    if (iend1 != -1) {
+                        Wificut = Wifi.substring(0, iend1);
+                        Log.d("DEBUG", "Wifi: " + Wifi);
+                    }
+                    Password = Wifi.substring(Wifi.lastIndexOf("-") + 1);
+                    Log.d("DEBUG", "Password: " + Password);
+                    Log.d("DEBUG", "Check If: " + Wificut);
+
+                    arg1.setSelected(true);
+
+                    if (Wificut.equals("Olmatix")) {
+
+                        createAPConfiguration(Wifi, Password,"PSK");
+                        textProgres = "Connecting to Olmatix WiFi, if it takes too long connect manually through your android WiFi setting";
+                        progressDialogShow(0);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Please pick Olmatix-ID", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+        return listProduct;
+
     }
 
     private View createChooseTitleStep() {
-        connectText = new TextView(this);
-        connectText.setText("Choose WiFi/SSID Product ");
+        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        mainWifi.setWifiEnabled(true);
+        listWifiDetails = new ListView(this);
 
-        return connectText;
+        mainWifi.startScan();
+        wifiList = mainWifi.getScanResults();
+        Log.d("DEBUG", "createConnectTitleStep: " + wifiList.size());
+
+        listHome = new ListView(this);
+        statesList = new String[wifiList.size()];
+        for (int i = 0; i < wifiList.size(); i++) {
+            statesList[i] = String.valueOf(wifiList.get(i).SSID + " || Signal " + wifiList.get(i).level);
+            System.out.println(statesList[i]);
+        }
+        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item, statesList));
+
+        listHome.setAdapter(testadap);
+
+        int totalHeight = 0;
+        for (int i = 0; i < testadap.getCount(); i++) {
+            View listItem = testadap.getView(i, null, listHome);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        Log.d("DEBUG", "createConnectTitleStep: " + totalHeight);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.height = totalHeight + (listHome.getDividerHeight() * (testadap.getCount() - 1));
+        Log.d("DEBUG", "createConnectTitleStep: " + params);
+
+        listHome.setLayoutParams(params);
+        listHome.requestLayout();
+
+        listHome.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                                    long arg3) {
+                // TODO Auto-generated method stub
+                textHomeWifi = (String) listHome.getItemAtPosition(arg2);
+                Log.d("DEBUG", "Selected item: " + textHomeWifi);
+                arg1.setSelected(true);
+
+            }
+        });
+        return listHome;
+
     }
 
     private View createTypePasswordTitleStep() {
-        connectText = new TextView(this);
-        connectText.setText("Choose WiFi/SSID Product ");
+        wifiText = new EditText(this);
+        wifiText.setHint("Type your home WiFi password ");
 
-        return connectText;
+        return wifiText;
+    }
+
+    private boolean checkTitleStep(String Wificut) {
+        boolean titleIsCorrect = false;
+
+        Log.d("DEBUG", "checkTitleStep: " + Wificut);
+
+        if (Wificut.equals("Olmatix")) {
+            titleIsCorrect = true;
+
+            verticalStepperForm.setActiveStepAsCompleted();
+            // Equivalent to: verticalStepperForm.setStepAsCompleted(TITLE_STEP_NUM);
+
+        } else {
+            String titleErrorString = getResources().getString(R.string.error_wifi_pick);
+            String titleError = getResources().getString(R.string.error_wifi_pick);
+
+            verticalStepperForm.setActiveStepAsUncompleted(titleError);
+            // Equivalent to: verticalStepperForm.setStepAsUncompleted(TITLE_STEP_NUM, titleError);
+
+        }
+
+        return titleIsCorrect;
+    }
+
+    public void requestInfo() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String URL = "http://192.168.1.1/device-info";
+
+        // prepare the Request
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // display response
+                        //Log.d("Response", response.toString());
+                        parsingJson(response.toString());
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Error.Response", String.valueOf(error));
+                    }
+                }
+        );
+
+        requestQueue.add(getRequest);
+
+    }
+
+    public void parsingJson(String json) {
+        try {
+            JSONObject jObject = new JSONObject(json);
+            deviceID = jObject.getString("device_id");
+            String firmwareAll = jObject.getString("firmware");
+            JSONObject jObject1 = new JSONObject(firmwareAll);
+            firmware = jObject1.getString("name");
+            version = jObject1.getString("version");
+
+            Log.d("DEBUG", "parsingJson: "+deviceID);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void sendJson() {
+        try {
+
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            String mUserName = sharedPref.getString("user_name", "olmatix1");
+            String mPassword = sharedPref.getString("password", "olmatix");
+            String passwordHome = wifiText.getText().toString();
+            String ssidHome = String.valueOf(textHomeWifi);
+            Log.d("DEBUG", "sendJson: "+mUserName +" | "+mPassword+" | "+textHomeWifi+ " | "+passwordHome);
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            String URL = "http://192.168.1.1/config";
+            JSONObject jsonBody = new JSONObject("{\"name\":\"Olmatix\",\"wifi\": {\"ssid\": \""+ssidHome+"\",\"password\": " +
+                    "\""+passwordHome+"\"},\"mqtt\": {\"host\": \"cloud.olmatix.com\",\"port\": 1883,\"base_topic\": \"devices/\"," +
+                    "\"auth\": true, \"username\": \""+mUserName+"\",\"password\": \""+mPassword+"\"},\"ota\": {\"enabled\": false}}");
+
+            final String requestBody = jsonBody.toString();
+
+            StringRequest stringRequest = new StringRequest(Request.Method.PUT, URL, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.i("VOLLEY", response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("VOLLEY", error.toString());
+                }
+            }) {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    try {
+                        return requestBody == null ? null : requestBody.getBytes("utf-8");
+                    } catch (UnsupportedEncodingException uee) {
+                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                        return null;
+                    }
+                }
+
+                @Override
+                protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                    String responseString = "";
+                    if (response != null) {
+                        responseString = String.valueOf(response.statusCode);
+                        // can get more details such as response.headers
+                    }
+                    return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+                }
+            };
+
+            requestQueue.add(stringRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 
+    private WifiConfiguration createAPConfiguration(String networkSSID, String networkPasskey, String securityMode) {
+        Log.i("DEBUG", "* SSID request " + networkSSID + " Password " + networkPasskey + " Sec type " + securityMode);
 
+        WifiConfiguration wifiConfiguration = new WifiConfiguration();
+
+        wifiConfiguration.SSID =String.format("\"%s\"", networkSSID.trim());
+        Log.d("DEBUG", "createAPConfiguration: "+wifiConfiguration.SSID);
+
+            wifiConfiguration.preSharedKey = String.format("\"%s\"", networkPasskey.trim());
+            Log.d("DEBUG", "createAPConfiguration: "+wifiConfiguration.preSharedKey);
+            wifiConfiguration.hiddenSSID = true;
+            wifiConfiguration.status = WifiConfiguration.Status.ENABLED;
+            wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+            wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+            wifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+            wifiConfiguration.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+            wifiConfiguration.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+            wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+
+        WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+        int networkId = wifi.addNetwork(wifiConfiguration);
+        wifi.disconnect();
+        wifi.setWifiEnabled(true);
+        wifi.enableNetwork(networkId, true);
+        wifi.reconnect();
+
+
+
+        return wifiConfiguration;
+    }
+
+    private void progressDialogShow (int what){
+        if (what==0) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setCancelable(true);
+            progressDialog.setMessage(textProgres);
+            progressDialog.show();
+
+        } else {
+            progressDialog.dismiss();
+            Log.d("DEBUG", "progressDialogStop: ");
+        }
+    }
+
+    private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            final String action = intent.getAction();
+
+            if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+
+                WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+                String wifiInfo = "";
+                WifiInfo info = wifi.getConnectionInfo();
+                String ssid = info.getSSID();
+                Log.d("DEBUG", "Connected SSID now: " + ssid);
+                int iend1 = ssid.indexOf("-");
+                if (iend1 != -1) {
+                    wifiInfo = ssid.substring(0, iend1);
+                    wifiInfo = wifiInfo.replace("\"", "");
+                    Log.d("DEBUG", "Wifi1: " + wifiInfo);
+                    if (checkTitleStep(wifiInfo)) {
+                        Log.d("DEBUG", "Wifi2: " + wifiInfo);
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                verticalStepperForm.goToStep(2,true);
+                                requestInfo();
+                                progressDialogShow(1);
+                            }
+                        }, 10000);
+
+                    }
+                }
+            }
+
+        }
+    };
 
 }

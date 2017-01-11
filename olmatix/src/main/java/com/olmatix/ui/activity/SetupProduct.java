@@ -8,8 +8,10 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -99,6 +101,9 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     connectText = new TextView(this);
     connectText.setText("Choose WiFi/SSID Product ");
 
+        LayoutInflater inflater = LayoutInflater.from(getBaseContext());
+        LinearLayout timeStepContent =
+                (LinearLayout) inflater.inflate(R.layout.list_view_wifi, null, false);
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
         receiverWifi = new WifiReceiver();

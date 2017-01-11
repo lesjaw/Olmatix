@@ -3,6 +3,7 @@ package com.olmatix.ui.activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -162,7 +165,29 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
     @Override
     public void sendData() {
-        sendJson();
+        String passwordHome = wifiText.getText().toString();
+        String ssidHome = String.valueOf(textHomeWifi);
+
+        TextView result = new TextView(this);
+        result.setText("Olmatix device will connect to WiFi/SSID "+ssidHome+" with password "+passwordHome+", click OK to proceed");
+        new AlertDialog.Builder(this)
+                .setTitle("Setup Olmatix product")
+                .setMessage("Summary ...")
+                .setView(result)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        sendJson();
+
+
+
+                    }
+                }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        }).show();
     }
 
     private View createConnectTitleStep() {

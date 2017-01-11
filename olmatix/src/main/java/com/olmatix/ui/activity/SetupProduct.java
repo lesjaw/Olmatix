@@ -167,22 +167,20 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     public void sendData() {
         String passwordHome = wifiText.getText().toString();
         String ssidHome = String.valueOf(textHomeWifi);
-
+        float dpi = this.getResources().getDisplayMetrics().density;
         TextView result = new TextView(this);
         result.setText("Olmatix device will connect to WiFi/SSID "+ssidHome+" with password "+passwordHome+", click OK to proceed");
         new AlertDialog.Builder(this)
                 .setTitle("Setup Olmatix product")
                 .setMessage("Summary ...")
-                .setView(result)
+                .setView(result,(int)(19*dpi), (int)(5*dpi), (int)(14*dpi), (int)(5*dpi))
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                         sendJson();
-
-
-
+                        finish();
                     }
                 }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -275,7 +273,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         listHome = new ListView(this);
         statesList = new String[wifiList.size()];
         for (int i = 0; i < wifiList.size(); i++) {
-            statesList[i] = String.valueOf(wifiList.get(i).SSID + " || Signal " + wifiList.get(i).level);
+            statesList[i] = String.valueOf(wifiList.get(i).SSID);
             System.out.println(statesList[i]);
         }
         ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item, statesList));
@@ -409,6 +407,9 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 @Override
                 public void onResponse(String response) {
                     Log.i("VOLLEY", response);
+                    if (requestBody.equals("200")){
+                        Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_SHORT).show();
+                    }
                 }
             }, new Response.ErrorListener() {
                 @Override

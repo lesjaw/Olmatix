@@ -53,7 +53,7 @@ public class WifiListAdapter extends BaseAdapter {
         System.out.println("viewpos" + position);
         View view = convertView;
         if (view == null) {
-            view = inflater.inflate(R.layout.list_view_wifi, null);
+            view = inflater.inflate(R.layout.wifi_item, null);
             holder = new Holder();
             holder.txWifi = (TextView) view.findViewById(R.id.wifi);
 

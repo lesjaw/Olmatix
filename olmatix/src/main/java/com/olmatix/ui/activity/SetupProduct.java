@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -39,8 +40,9 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     private WifiReceiver receiverWifi;
     WifiListAdapter adapter;
     ListView listWifiDetails;
-    List wifiList;
+    List<ScanResult> wifiList;
     ListView listtest;
+    String[] statesList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,9 +104,26 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         connectText = new TextView(this);
         connectText.setText("Choose WiFi/SSID Product ");
 
+
+        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+        receiverWifi = new WifiReceiver();
+        listWifiDetails = new ListView(this);
+
+        registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        mainWifi.startScan();
+        wifiList  = mainWifi.getScanResults();
+        Log.d("DEBUG", "createConnectTitleStep: " + wifiList.size());
+
         listtest = new ListView(this);
 
-        String[] statesList = {"listItem 1", "listItem 2", "listItem 3"};
+        statesList = new String[wifiList.size()];
+        for(int i = 0; i < wifiList.size(); i++){
+            statesList[i] = String.valueOf(wifiList.get(i).SSID+ "Strength || " + wifiList.get(i).level);
+            System.out.println(statesList[i]);
+
+
+        }
         ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, R.layout.list_item, statesList));
 
         listtest.setAdapter(testadap);
@@ -125,18 +144,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         listtest.setLayoutParams(params);
         listtest.requestLayout();
 
-        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-
-        receiverWifi = new WifiReceiver();
-        listWifiDetails = new ListView(this);
-
-        registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-        mainWifi.startScan();
-        wifiList  = mainWifi.getScanResults();
-        Log.d("DEBUG", "createConnectTitleStep: " + wifiList.size());
-
-       /* adapter = new WifiListAdapter(this, wifiList);
-        listWifiDetails.setAdapter(adapter);*/
 
         return listtest;
     }

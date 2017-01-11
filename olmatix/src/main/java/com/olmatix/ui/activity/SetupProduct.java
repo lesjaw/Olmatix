@@ -9,11 +9,10 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.olmatix.adapter.WifiListAdapter;
@@ -41,6 +40,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     WifiListAdapter adapter;
     ListView listWifiDetails;
     List wifiList;
+    ListView listtest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,9 +102,29 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         connectText = new TextView(this);
         connectText.setText("Choose WiFi/SSID Product ");
 
-        LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-        RelativeLayout choseWifiStep =
-                (RelativeLayout) inflater.inflate(R.layout.list_view_wifi, null, false);
+        listtest = new ListView(this);
+
+        String[] statesList = {"listItem 1", "listItem 2", "listItem 3"};
+        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, R.layout.list_item, statesList));
+
+        listtest.setAdapter(testadap);
+
+        int totalHeight = 0;
+        for (int i = 0; i < testadap.getCount(); i++) {
+            View listItem = testadap.getView(i, null, listtest);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        Log.d("DEBUG", "createConnectTitleStep: "+totalHeight);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.height = totalHeight + (listtest.getDividerHeight() * (testadap.getCount() - 1));
+        Log.d("DEBUG", "createConnectTitleStep: "+params);
+
+        listtest.setLayoutParams(params);
+        listtest.requestLayout();
+
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
         receiverWifi = new WifiReceiver();
@@ -114,16 +134,11 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         mainWifi.startScan();
         wifiList  = mainWifi.getScanResults();
         Log.d("DEBUG", "createConnectTitleStep: " + wifiList.size());
-        setAdapter();
 
+       /* adapter = new WifiListAdapter(this, wifiList);
+        listWifiDetails.setAdapter(adapter);*/
 
-        return choseWifiStep;
-    }
-
-
-    private void setAdapter() {
-        adapter = new WifiListAdapter(getApplicationContext(), wifiList);
-        listWifiDetails.setAdapter(adapter);
+        return listtest;
     }
 
     class WifiReceiver extends BroadcastReceiver {

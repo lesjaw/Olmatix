@@ -2,6 +2,7 @@ package com.olmatix.adapter;
 
 import android.content.Context;
 import android.net.wifi.ScanResult;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,9 @@ public class WifiListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        Log.d("DEBUG", "getCount: "+wifiList.size());
         return wifiList.size();
+
     }
 
     @Override

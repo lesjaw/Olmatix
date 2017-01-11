@@ -10,7 +10,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -57,6 +56,7 @@ public class OlmatixAlarmService extends IntentService {
 
             dbnode.setLog("M = "+Status+" | P = "+mStatusServer + " at " +timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertLog(dbnode);
+/*
 
         if (!Status){
             Intent a = new Intent("addNode");
@@ -65,6 +65,7 @@ public class OlmatixAlarmService extends IntentService {
             dbnode.setLog("Request connect" + " at " +timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertLog(dbnode);
         }
+*/
 
         OlmatixAlarmReceiver.completeWakefulIntent(intent);
         // END_INCLUDE(service_onhandle)

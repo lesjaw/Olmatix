@@ -58,7 +58,7 @@ public class OlmatixAlarmService extends IntentService {
             dbnode.setLog("M = "+Status+" | P = "+mStatusServer + " at " +timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertLog(dbnode);
 
-        if (!Status || !mStatusServer){
+        if (!Status){
             Intent a = new Intent("addNode");
             intent.putExtra("Connect", "con");
             LocalBroadcastManager.getInstance(this).sendBroadcast(a);

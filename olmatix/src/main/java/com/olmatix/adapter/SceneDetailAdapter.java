@@ -82,7 +82,7 @@ public class SceneDetailAdapter extends BaseAdapter {
                 mDialog  = new AlertDialog.Builder(v.getContext());
                 mDialog.setTitle("Warning..");
                 mDialog.setMessage("Are you sure want to remove "+sceneDetailItem.getNiceName()+" items? \n\n this actions cannot be cancelled.");
-                mDialog.setIcon(R.drawable.ic_warning);
+                mDialog.setIcon(R.drawable.ic_done_green);
                 mDialog.setPositiveButton("OK", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

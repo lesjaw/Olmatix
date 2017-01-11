@@ -3,7 +3,6 @@ package com.olmatix.ui.activity;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -13,14 +12,12 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.util.JsonWriter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +25,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
@@ -40,12 +48,11 @@ import com.olmatix.utils.OlmatixUtils;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -544,69 +551,99 @@ public class SettingsActivity extends SettingsFragment {
                     String mSsid = sharedPref.getString("ssid", "");
                     String mWifiPass = sharedPref.getString("password_wifi", "");
 
-                    Log.d("DEBUG", "onClick: \nData Host " + mServerURL +"\nData Port " + mServerPort +"\nData HOST User " + mUserName +"\nData Hsst Pass " + mPassword +"\nData SSID " + mSsid  +"\nData Wifi pass " + mWifiPass);
+                    //Log.d("DEBUG", "onClick: \nData Host " + mServerURL + "\nData Port " + mServerPort + "\nData HOST User " + mUserName + "\nData Hsst Pass " + mPassword + "\nData SSID " + mSsid + "\nData Wifi pass " + mWifiPass);
 
 
 
-                    try {
-                        JsonWriter jsonWriter = new JsonWriter(
-                                new OutputStreamWriter(getActivity().openFileOutput("config.json" , getActivity().MODE_PRIVATE)));
-                        Log.d("DEBUG", "onClick: " + String.valueOf(jsonWriter.toString()));
-
-                        try {
-                            jsonWriter.setIndent(" ");
-                            jsonWriter.beginObject();
-                            jsonWriter.name("wifi").beginObject();
-                            jsonWriter.name("ssid");
-                            jsonWriter.value(mSsid);
-                            jsonWriter.name("password");
-                            jsonWriter.value(mWifiPass);
-                            jsonWriter.endObject();
-                            jsonWriter.name("mqtt").beginObject();
-                            jsonWriter.name("host");
-                            jsonWriter.value(mServerURL);
-                            jsonWriter.name("port");
-                            jsonWriter.value(mServerPort);
-                            jsonWriter.name("base_topic");
-                            jsonWriter.value("devices/");
-                            jsonWriter.name("auth");
-                            jsonWriter.value(true);
-                            jsonWriter.name("username");
-                            jsonWriter.value(mUserName);
-                            jsonWriter.name("password");
-                            jsonWriter.value(mPassword);
-                            jsonWriter.endObject();
-                            jsonWriter.name("ota").beginObject();
-                            jsonWriter.name("enabled");
-                            jsonWriter.value(true);
-                            jsonWriter.endObject();
-                            jsonWriter.endObject();
-                            jsonWriter.close();
-                        } finally {
-
-                        }
-
-                    } catch (IOException ex){
-                        ex.printStackTrace();
-                    }
                 }
             };
         }
 
         public void sendConfig() {
-            File rootDataDir = getActivity().getFilesDir();
-            String configFiles =  rootDataDir.getAbsolutePath() + "/config.json";
+            sendJson();
+        }
 
+        public void requestInfo() {
+            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+            String URL = "http://192.168.1.1/device-info";
 
-            Log.d("DEBUG", "sendConfig: " +configFiles );
+            // prepare the Request
+            JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
+                    new Response.Listener<JSONObject>()
+                    {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            // display response
+                            Log.d("Response", response.toString());
+                        }
+                    },
+                    new Response.ErrorListener()
+                    {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d("Error.Response", String.valueOf(error));
+                        }
+                    }
+            );
 
+            requestQueue.add(getRequest);
+        }
 
+        public void sendJson() {
+            try {
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+                String URL = "http://192.168.1.1/config";
+                JSONObject jsonBody = new JSONObject("{\"name\":\"Bedroom\",\"wifi\": {\"ssid\": \"olmatix ap\",\"password\": " +
+                        "\"11111111\"},\"mqtt\": {\"host\": \"cloud.olmatix.com\",\"port\": 1883,\"base_topic\": \"devices/\"," +
+                        "\"auth\": true, \"username\": \"olmatix\",\"password\": \"olmatix\"},\"ota\": {\"enabled\": false}}");
 
+                final String requestBody = jsonBody.toString();
+
+                StringRequest stringRequest = new StringRequest(Request.Method.PUT, URL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("VOLLEY", response);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("VOLLEY", error.toString());
+                    }
+                }) {
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
+
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        try {
+                            return requestBody == null ? null : requestBody.getBytes("utf-8");
+                        } catch (UnsupportedEncodingException uee) {
+                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                        String responseString = "";
+                        if (response != null) {
+                            responseString = String.valueOf(response.statusCode);
+                            // can get more details such as response.headers
+                        }
+                        return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+                    }
+                };
+
+                requestQueue.add(stringRequest);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
 
     }
-
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class AboutPreferenceFragment extends PreferenceFragment {
         @Override
@@ -616,6 +653,5 @@ public class SettingsActivity extends SettingsFragment {
         }
 
     }
-
 
 }

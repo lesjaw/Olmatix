@@ -47,5 +47,5 @@ dependencies {
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
     compile 'com.azoft.carousellayoutmanager:carousel:1.2.0'
     compile 'com.jaredrummler:material-spinner:1.1.0'
-
+    compile 'com.android.volley:volley:1.0.0'
 }

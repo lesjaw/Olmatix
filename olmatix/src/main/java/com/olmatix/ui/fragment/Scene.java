@@ -51,12 +51,8 @@ public class Scene extends Fragment implements OnStartDragListener {
     private View mView;
     private FloatingActionButton mFab;
     private RecyclerView mRecycleView;
-    private ItemTouchHelper mItemTouchHelper;
     private SceneAdapter adapter;
     private Paint p = new Paint();
-    private SceneModel sceneModel;
-    private Intent mIntent;
-    private RecyclerView.LayoutManager layoutManager;
     Context scene_node;
     public static final int NEW_ALARM = 1;
 
@@ -75,7 +71,6 @@ public class Scene extends Fragment implements OnStartDragListener {
         super.onViewCreated(view, savedInstanceState);
 
         dbNodeRepo = new dbNodeRepo(getActivity());
-        sceneModel = new SceneModel();
         data = new ArrayList<>();
 
         scene_node=getContext();
@@ -123,7 +118,7 @@ public class Scene extends Fragment implements OnStartDragListener {
 
         mRecycleView.setHasFixedSize(true);
 
-        layoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
@@ -133,12 +128,10 @@ public class Scene extends Fragment implements OnStartDragListener {
         adapter = new SceneAdapter(data,scene_node,this);
         mRecycleView.setAdapter(adapter);
 
-        setAdapter();
-
         initSwipe();
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

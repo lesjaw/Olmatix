@@ -192,6 +192,75 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         }));
     }
 
+    class load extends AsyncTask<Void, Integer, String> {
+
+
+        protected void onPreExecute (){
+            nDialog = new ProgressDialog(getContext());
+            nDialog.setMessage("Loading Nodes, Please wait..");
+            nDialog.setIndeterminate(true);
+            nDialog.setCancelable(false);
+            nDialog.show();        }
+
+        protected String doInBackground(Void...arg0) {
+            sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            mStatusServer = sharedPref.getBoolean("conStatus", false);
+            if (mStatusServer) {
+                final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
+                if (!mSwitch_conn) {
+                    int countDB = dbNodeRepo.getNodeList().size();
+                    data.addAll(dbNodeRepo.getNodeList());
+                    for (int i = 0; i < countDB; i++) {
+                        final String mNodeID = data.get(i).getNodesID();
+                        for (int a = 0; a < 4; a++) {
+                            String topic = "";
+                            if (a == 0) {
+                                topic = "devices/" + mNodeID + "/$online";
+                            }
+                            if (a == 1) {
+                                topic = "devices/" + mNodeID + "/$signal";
+                            }
+                            if (a == 2) {
+                                topic = "devices/" + mNodeID + "/$uptime";
+                            }
+                            if (a == 3) {
+                                topic = "devices/" + mNodeID + "/$localip";
+                            }
+                            int qos = 2;
+                            try {
+                                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                subToken.setActionCallback(new IMqttActionListener() {
+                                    @Override
+                                    public void onSuccess(IMqttToken asyncActionToken) {
+                                    }
+
+                                    @Override
+                                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                    }
+                                });
+                            } catch (MqttException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    data.clear();
+                }
+            }
+
+            return "You are at PostExecute";
+        }
+
+        protected void onProgressUpdate(Integer...a){
+//            Log.d(TAG + " onProgressUpdate", "You are in progress update ... " + a[0]);
+        }
+
+        protected void onPostExecute(String result) {
+            nDialog.dismiss();
+            setAdapter();
+            mFab.show();
+        }
+    }
+
     private void load(){
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
 
@@ -410,7 +479,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-        load();
+        new load().execute();
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

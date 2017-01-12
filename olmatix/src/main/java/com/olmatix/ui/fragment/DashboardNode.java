@@ -10,9 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.graphics.Paint;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -64,23 +61,15 @@ public class DashboardNode extends Fragment implements
     NodeDashboardAdapter adapter;
     InfoAdapter infoAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ItemTouchHelper mItemTouchHelper;
     private DashboardNodeModel dashboardNodeModel;
     public  static dbNodeRepo mDbNodeRepo;
-    private Paint p = new Paint();
     private static ArrayList<DashboardNodeModel> data;
     Spinner mSpinner;
     private int mDatasetTypes[] = {mLOCATION, mBUTTON}; //view types
     Context dashboardnode;
-    private LocationManager locationManager;
-    private String mProvider;
-    private LocationManager mLocateMgr;
-    private Location mLocation;
-    //private Context mContext;
+
     private String Distance;
     private String dist;
-    String adString = "";
-    String loc = null;
 
     @Nullable
     @Override
@@ -101,7 +90,7 @@ public class DashboardNode extends Fragment implements
         dashboardNodeModel= new DashboardNodeModel();
         dashboardnode=getActivity();
         mDbNodeRepo.getAllScene();
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        //LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         setupView();
         onClickListener();
@@ -131,11 +120,9 @@ public class DashboardNode extends Fragment implements
             @Override
             public void onClick(View v) {
                 mSpinner = new Spinner(getContext());
-                String[] labelData;
-
                 List<SpinnerObject> lables = mDbNodeRepo.getAllLabels();
 
-                ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<SpinnerObject>(getActivity(),
+                ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<>(getActivity(),
                         android.R.layout.simple_spinner_item,lables);
                 dataAdapter
                         .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -213,7 +200,7 @@ public class DashboardNode extends Fragment implements
 
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
         int currentOrientation = getResources().getConfiguration().orientation;
@@ -294,7 +281,7 @@ public class DashboardNode extends Fragment implements
                 //Log.d("receiver", "Notifydashboard : " + message);
             }
             updatelist();
-            if (!String.valueOf(DistService).trim().equals(null)){
+            if (!String.valueOf(DistService).trim().equals("null")){
                 Distance = DistService;
                 resetAdapter();
 
@@ -349,7 +336,7 @@ public class DashboardNode extends Fragment implements
         private DashboardNode.ClickListener clicklistener;
         private GestureDetector gestureDetector;
 
-        public RecyclerTouchListener(Context context, final RecyclerView recycleView, final DashboardNode.ClickListener clicklistener){
+        RecyclerTouchListener(Context context, final RecyclerView recycleView, final DashboardNode.ClickListener clicklistener){
 
             this.clicklistener=clicklistener;
             gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
@@ -382,7 +369,6 @@ public class DashboardNode extends Fragment implements
 
         @Override
         public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
         }
 
         @Override
@@ -391,11 +377,8 @@ public class DashboardNode extends Fragment implements
         }
     }
 
-
     public void resetAdapter(){
-
         infoAdapter.notifyDistance(Distance);
-
     }
 
 }

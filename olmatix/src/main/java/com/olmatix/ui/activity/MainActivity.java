@@ -19,7 +19,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -52,10 +51,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     boolean serverconnected;
-    boolean mSwitch_Conn;
     int backButtonCount;
-    int flagReceiver = 0;
-    private OrientationEventListener mOrientationListener;
     private TabLayout tabLayout;
     private ImageView imgStatus;
     private TextView connStat;
@@ -127,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);
-
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(UE_ACTION);

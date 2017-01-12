@@ -16,6 +16,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -33,7 +34,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
@@ -116,7 +116,7 @@ public class DashboardNode extends Fragment implements
             @Override
             public void onLongClick(View view, int position) {
                 adapter.removeItem(position);
-                Toast.makeText(getActivity(),"Successfully Deleted",Toast.LENGTH_LONG).show();
+                Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Dashboard item deleted",Snackbar.LENGTH_LONG).show();
                 setRefresh();
             }
         }));

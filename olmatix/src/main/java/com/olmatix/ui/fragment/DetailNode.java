@@ -16,6 +16,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -31,7 +32,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.olmatix.adapter.NodeDetailAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -316,7 +316,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
                             detailNodeModel.setChannel(data.get(position).getChannel());
                             detailNodeModel.setNice_name_d(nice_name);
                             mDbNodeRepo.update_detail_NiceName(detailNodeModel);
-                            Toast.makeText(getApplicationContext(),"Renaming button success",Toast.LENGTH_LONG).show();
+                            Snackbar.make(getWindow().getDecorView().getRootView(),"Renaming Button success",Snackbar.LENGTH_LONG).show();
                             setRefresh();
 
                         }

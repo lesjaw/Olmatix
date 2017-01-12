@@ -3,13 +3,12 @@ package com.olmatix.ui.activity;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
@@ -23,7 +22,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.lesjaw.olmatix.R;
@@ -31,8 +29,6 @@ import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.ui.fragment.Scene;
-
-import java.io.File;
 
 /**
  * Created by Lesjaw on 02/12/2016.
@@ -72,17 +68,20 @@ public class MainActivity extends AppCompatActivity {
 
             Boolean message = intent.getBooleanExtra("MqttStatus", false);
             if (message!=null) {
-                //Log.d("DEBUG", "onReceive: "+message);
+                Log.d("DEBUG", "MainActivity Onreceive: "+message);
                 if (message) {
                     serverconnected = true;
                     imgStatus.setImageResource(R.drawable.ic_conn_green);
                     connStat.setText("Connected");
+                    Snackbar.make(getWindow().getDecorView().getRootView()," Olmatix Connected",Snackbar.LENGTH_LONG).show();
+
                 } else if (!message) {
                     serverconnected = false;
                     imgStatus.setImageResource(R.drawable.ic_conn_red);
                     imgStatus.startAnimation(animConn);
                     connStat.setText("Not Connected");
                     connStat.startAnimation(animConn);
+                    Snackbar.make(getWindow().getDecorView().getRootView()," Olmatix Disonnected",Snackbar.LENGTH_LONG).show();
                 }
             }
 
@@ -261,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
             System.exit(0);
         } else {
-            Toast.makeText(this, R.string.backbutton, Toast.LENGTH_SHORT).show();
+            Snackbar.make(getWindow().getDecorView().getRootView(), R.string.backbutton,Snackbar.LENGTH_LONG).show();
             backButtonCount++;
         }
     }

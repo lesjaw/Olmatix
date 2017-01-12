@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -38,7 +39,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.olmatix.adapter.NodeAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -85,6 +85,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     private ProgressDialog nDialog;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
+    private static String TAG = InstalledNode.class.getSimpleName();
+
 
     @Nullable
     @Override
@@ -123,9 +125,10 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         i.putExtra("nice_name", nice_name);
                         startActivity(i);
                     } else {
-                        Toast.makeText(getActivity(), nice_name + " is OFFLINE!, please check it, if the " + nice_name
-                                        + " led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",
-                                Toast.LENGTH_LONG).show();
+                        Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
+                                nice_name + " is OFFLINE!, please check it, if the " + nice_name +
+                                        " led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",Snackbar.LENGTH_LONG).show();
+
                     }
             }
             @Override
@@ -147,7 +150,9 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                                 String statusnode = data.get(position).getOnline();
                                 if (statusnode.equals("true")) {
 
-                                    if (Connection.getClient().isConnected()) {
+                                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+                                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                                    if (!mStatusServer) {
                                         String topic = "devices/" + nodeid + "/$reset";
                                         String payload = "true";
                                         byte[] encodedPayload = new byte[0];
@@ -162,12 +167,13 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                                             e.printStackTrace();
                                         }
                                     } else {
-                                        Toast.makeText(getActivity(), "You don't connect to the server", Toast.LENGTH_LONG).show();
+                                        Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"You don't connect to the server",Snackbar.LENGTH_LONG).show();
                                         setRefresh();
                                     }
-                                    Toast.makeText(getActivity(), "Successfully Reset", Toast.LENGTH_LONG).show();
-                                    //setRefresh();
-                                } else {Toast.makeText(getActivity(), "Your device Offline, No reset have been done", Toast.LENGTH_LONG).show();}
+                                    Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Nodes succesfully reset",Snackbar.LENGTH_LONG).show();
+                                } else {
+                                    Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Your device/Node Offline",Snackbar.LENGTH_LONG).show();
+                                }
                             }
                         });
                         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -279,17 +285,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String serverCon =intent.getStringExtra("ServerConn");
             String mChange = intent.getStringExtra("NotifyChangeNode");
-
-            if (serverCon==null){
-
-            } else if (serverCon.equals("true")){
-                stateMqtt=true;
-            }else {
-                stateMqtt=false;
-            }
-
+            //Log.d(TAG, "onReceive: ");
             if (mChange==null){
                 mChange ="0";
             }
@@ -368,10 +365,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     @Override
     public void onResume() {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                    mMessageReceiver, new IntentFilter("MQTTStatus"));
-            //Log.d("Receiver ", "InstalledNode = Starting..");
-            //Log.d("DEBUG", "Server: "+stateMqtt);
-
+                    mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
         super.onResume();
     }
 
@@ -486,7 +480,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             adapter.removeItem(position);
-                            Toast.makeText(getActivity(),"Successfully Deleted",Toast.LENGTH_LONG).show();
+                            Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Node deleted",Snackbar.LENGTH_LONG).show();
                             setRefresh();
 
                         }
@@ -522,7 +516,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             installedNodeModel.setNodesID(data.get(position).getNodesID());
                             installedNodeModel.setNice_name_n(nice_name);
                             dbNodeRepo.updateNameNice(installedNodeModel);
-                            Toast.makeText(getActivity(),"Renaming Node success",Toast.LENGTH_LONG).show();
+                            Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Renaming Node success",Snackbar.LENGTH_LONG).show();
                             setRefresh();
 
                         }

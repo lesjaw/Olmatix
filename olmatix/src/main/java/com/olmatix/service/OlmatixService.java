@@ -658,15 +658,14 @@ public class OlmatixService extends Service {
 
     private void sendMessage() {
         Intent intent = new Intent("MQTTStatus");
-        intent.putExtra("NotifyChangeNode", mChange);
         intent.putExtra("MqttStatus", flagConn);
         intent.putExtra("ConnectionStatus", connectionResult);
-
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void sendMessageDetail() {
         Intent intent = new Intent("MQTTStatusDetail");
+        intent.putExtra("NotifyChangeNode", mChange);
         intent.putExtra("NotifyChangeDetail", mChange);
         intent.putExtra("distance", Distance);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -1175,7 +1174,7 @@ public class OlmatixService extends Service {
         messageReceive.clear();
         data.clear();
         mChange = "2";
-        sendMessage();
+        sendMessageDetail();
 
     }
 

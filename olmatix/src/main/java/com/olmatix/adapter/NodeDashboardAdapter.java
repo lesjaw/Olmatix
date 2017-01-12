@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,7 +16,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -137,7 +137,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
             } else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
-
             }
 
             holder.imgNode.setOnClickListener(new View.OnClickListener() {
@@ -147,32 +146,35 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
-                        if (mFavoriteModel.getStatus().trim().equals("false")) {
-                            payload1 = "ON";
-                        } else {
-                            payload1 = "OFF";
-                        }
-                        String payload = payload1;
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.imgSending.setVisibility(View.VISIBLE);
-                            holder.imgSending.startAnimation(animConn);
+                        if (mFavoriteModel.getOnline().trim().equals("true")) {
+                            String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
+                            if (mFavoriteModel.getStatus().trim().equals("false")) {
+                                payload1 = "ON";
+                            } else {
+                                payload1 = "OFF";
+                            }
+                            String payload = payload1;
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.imgSending.setVisibility(View.VISIBLE);
+                                holder.imgSending.startAnimation(animConn);
 
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else{
+                            Snackbar.make(v.getRootView(), mFavoriteModel.getNice_name_d()+" Offline", Snackbar.LENGTH_LONG).show();
                         }
                     } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
+                            Snackbar.make(v.getRootView(), "You don't connect to the server", Snackbar.LENGTH_LONG).show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
                 }
             });
@@ -211,25 +213,30 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
-                        if (mFavoriteModel.getStatus().trim().equals("false")) {
-                            payload1 = "ON";
+                        if (mFavoriteModel.getOnline().trim().equals("true")) {
+
+                            String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
+                            if (mFavoriteModel.getStatus().trim().equals("false")) {
+                                payload1 = "ON";
+                            } else {
+                                payload1 = "OFF";
+                            }
+                            String payload = payload1;
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
                         } else {
-                            payload1 = "OFF";
-                        }
-                        String payload = payload1;
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                            Snackbar.make(v.getRootView(),  mFavoriteModel.getNice_name_d()+" Offline", Snackbar.LENGTH_LONG).show();
                         }
                     } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        Snackbar.make(v.getRootView(),"You don't connect to the server",Snackbar.LENGTH_LONG).show();
                         Intent intent = new Intent("addNode");
                         intent.putExtra("Conn", "Conn1");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

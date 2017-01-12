@@ -14,6 +14,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +26,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -251,10 +251,12 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     if (Wificut.equals("Olmatix")) {
 
                         createAPConfiguration(Wifi, Password,"PSK");
-                        textProgres = "Connecting to Olmatix WiFi, if it takes too long connect manually through your android WiFi setting";
+                        textProgres = "Connecting to Olmatix WiFi, if it takes too long connect" +
+                                ", please do it manually through your android WiFi setting";
                         progressDialogShow(0);
                     } else {
-                        Toast.makeText(getApplicationContext(), "Please pick Olmatix-ID", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(getWindow().getDecorView().getRootView(), "Please pick Olmatix-ID",
+                                Snackbar.LENGTH_LONG).show();
                     }
                 }
             }
@@ -379,13 +381,14 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             firmware = jObject1.getString("name");
             version = jObject1.getString("version");
 
-            Toast.makeText(this," You are connected to "+deviceID+" "+firmware.toUpperCase() +" product",Toast.LENGTH_SHORT).show();
-            //Log.d("DEBUG", "parsingJson: "+deviceID);
+            progressDialogShow(1);
+
+            Snackbar.make(getWindow().getDecorView().getRootView(), "You are connected to "+deviceID+" " +
+                    ""+firmware.toUpperCase() +" product", Snackbar.LENGTH_INDEFINITE).show();
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     public void sendJson() {
@@ -412,11 +415,9 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     @Override
                     public void onResponse(String response) {
                         Log.i("VOLLEY", response);
-                       // Toast.makeText(getApplicationContext(), "Success" +response, Toast.LENGTH_SHORT).show();
-
                         if (response.equals("200")) {
-                            Toast.makeText(getApplicationContext(), "Setting Olmatix success", Toast.LENGTH_SHORT).show();
-                        }
+                            Snackbar.make(getWindow().getDecorView().getRootView(), "Setting Olmatix success",
+                                    Snackbar.LENGTH_LONG).show();                        }
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -452,7 +453,8 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
                 requestQueue.add(stringRequest);
             } else {
-                Toast.makeText(this,"You need to choose Home WiFi, Cancel setup!", Toast.LENGTH_SHORT).show();
+                Snackbar.make(getWindow().getDecorView().getRootView(), "You need to choose Home WiFi, Cancel setup!",
+                        Snackbar.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -534,7 +536,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                             public void run() {
                                 verticalStepperForm.goToStep(2,true);
                                 requestInfo();
-                                progressDialogShow(1);
                             }
                         }, 10000);
 

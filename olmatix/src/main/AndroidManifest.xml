@@ -85,6 +85,12 @@
             android:theme="@style/AppTheme.Dark">
         </activity>
 
+        <activity
+            android:name="com.olmatix.ui.activity.SceneActivity"
+            android:theme="@style/AppTheme.Dark">
+        </activity>
+
+
         <service android:name="com.olmatix.service.OlmatixService"/>
         <service android:name="com.olmatix.service.OlmatixAlarmService"/>
         <service android:name="org.eclipse.paho.android.service.MqttService" />

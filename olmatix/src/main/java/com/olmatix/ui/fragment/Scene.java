@@ -13,9 +13,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
@@ -32,7 +33,7 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.SceneModel;
-import com.olmatix.ui.activity.SceneInput;
+import com.olmatix.ui.activity.SceneActivity;
 
 import java.util.ArrayList;
 
@@ -43,7 +44,8 @@ import static com.olmatix.lesjaw.olmatix.R.id.fab;
  */
 public class Scene extends Fragment implements OnStartDragListener {
 
-    public static dbNodeRepo mDbNodeRepo;
+    private static String TAG = Scene.class.getSimpleName();
+    public static dbNodeRepo dbNodeRepo;
     private static ArrayList<SceneModel> data;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private View mView;
@@ -54,6 +56,11 @@ public class Scene extends Fragment implements OnStartDragListener {
     private Paint p = new Paint();
     private SceneModel sceneModel;
     private Intent mIntent;
+    private RecyclerView.LayoutManager layoutManager;
+    Context scene_node;
+    public static final int NEW_ALARM = 1;
+
+
 
     @Nullable
     @Override
@@ -67,15 +74,16 @@ public class Scene extends Fragment implements OnStartDragListener {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mDbNodeRepo = new dbNodeRepo(getActivity());
+        dbNodeRepo = new dbNodeRepo(getActivity());
         sceneModel = new SceneModel();
+        data = new ArrayList<>();
 
+        scene_node=getContext();
         setupView();
-
         onClickListener();
 
-        mRecycleView.addOnItemTouchListener(new Scene.RecyclerTouchListener(getActivity(), mRecycleView,
-                new Scene.ClickListener() {
+        mRecycleView.addOnItemTouchListener(new Scene.RecyclerTouchListener(getActivity(),
+                mRecycleView, new Scene.ClickListener() {
 
 
                     @Override
@@ -100,30 +108,8 @@ public class Scene extends Fragment implements OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText mEditText = new EditText(getContext());
-                mEditText.setPadding(12,0,12,0);
-                new AlertDialog.Builder(getContext())
-                        .setTitle("Add Scene")
-                        .setMessage("Please type your scene name")
-                        .setView(mEditText)
-                        .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-
-                                String inputResult = mEditText.getText().toString();
-
-                                mIntent = new Intent(getActivity(), SceneInput.class);
-                                mIntent.putExtra("sceneName", inputResult);
-                                getActivity().startActivity(mIntent);
-                                mFab.hide();
-
-
-                            }
-                        }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    }
-                }).show();
+                Intent intent = new Intent(getContext(), SceneActivity.class);
+                startActivityForResult(intent, NEW_ALARM);
             }
 
         };
@@ -136,6 +122,19 @@ public class Scene extends Fragment implements OnStartDragListener {
         mFab = (FloatingActionButton) mView.findViewById(fab);
 
         mRecycleView.setHasFixedSize(true);
+
+        layoutManager = new LinearLayoutManager(getActivity());
+
+        mRecycleView.setLayoutManager(layoutManager);
+        mRecycleView.setItemAnimator(new DefaultItemAnimator());
+
+        data.clear();
+        data.addAll(dbNodeRepo.getScene());
+        adapter = new SceneAdapter(data,scene_node,this);
+        mRecycleView.setAdapter(adapter);
+
+        setAdapter();
+
         initSwipe();
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
@@ -168,7 +167,13 @@ public class Scene extends Fragment implements OnStartDragListener {
             }
         });
     }
+    private void setAdapter(){
+        data.clear();
+        data.addAll(dbNodeRepo.getScene());
+        adapter = new SceneAdapter(data,scene_node,this);
+        mRecycleView.setAdapter(adapter);
 
+    }
     private void setRefresh() {
 
         mSwipeRefreshLayout.setRefreshing(false);

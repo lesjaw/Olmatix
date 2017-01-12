@@ -92,6 +92,9 @@
     <string name="setup_hint_title">Select Product WiFi/SSID</string>
     <string name="error_wifi_pick">Pick WiFi w/ SSID: Olmatix-ID</string>
     <string name="action_reset">Reset Nodes</string>
+    <string name="form_hint_title">Scene title required</string>
+    <string name="form_hint_description">Scene Description</string>
+    <string name="error_title_min_characters">At least %1$d characters</string>
 
     <string-array name="steps_titles">
         <item>Connect to Olmatix product..</item>

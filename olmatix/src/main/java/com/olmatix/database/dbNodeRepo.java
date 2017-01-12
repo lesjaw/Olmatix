@@ -208,6 +208,30 @@ public class dbNodeRepo {
         return nodeList;
     }
 
+    public ArrayList<SceneModel> getScene() {
+
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_SCENE ;
+
+        ArrayList<SceneModel> nodeList = new ArrayList<SceneModel>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                SceneModel node = new SceneModel();
+                node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
+
     public int insertSceneDetail(SceneDetailModel sceneDetailModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -281,7 +305,6 @@ public class dbNodeRepo {
 
             } while (cursor.moveToNext());
         }
-        Log.d("getlist", "getNodeList: " +cursor.getCount());
         cursor.close();
         db.close();
         return nodeList;

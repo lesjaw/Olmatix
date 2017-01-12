@@ -210,7 +210,45 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        doSubAll();
+                        final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
+                        if (!mSwitch_conn) {
+                            int countDB = dbNodeRepo.getNodeList().size();
+                            data.addAll(dbNodeRepo.getNodeList());
+                            for (int i = 0; i < countDB; i++) {
+                                final String mNodeID = data.get(i).getNodesID();
+                                for (int a = 0; a < 4; a++) {
+                                    String topic = "";
+                                    if (a == 0) {
+                                        topic = "devices/" + mNodeID + "/$online";
+                                    }
+                                    if (a == 1) {
+                                        topic = "devices/" + mNodeID + "/$signal";
+                                    }
+                                    if (a == 2) {
+                                        topic = "devices/" + mNodeID + "/$uptime";
+                                    }
+                                    if (a == 3) {
+                                        topic = "devices/" + mNodeID + "/$localip";
+                                    }
+                                    int qos = 2;
+                                    try {
+                                        IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                        subToken.setActionCallback(new IMqttActionListener() {
+                                            @Override
+                                            public void onSuccess(IMqttToken asyncActionToken) {
+                                            }
+
+                                            @Override
+                                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                            }
+                                        });
+                                    } catch (MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                            data.clear();
+                        }
                     }
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -313,50 +351,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     }
 
-    private void doSubAll(){
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
-        if (!mSwitch_conn) {
-
-            int countDB = dbNodeRepo.getNodeList().size();
-            data.addAll(dbNodeRepo.getNodeList());
-            for (int i = 0; i < countDB; i++) {
-                final String mNodeID = data.get(i).getNodesID();
-                for (int a = 0; a < 4; a++) {
-                    String topic = "";
-                    if (a == 0) {
-                        topic = "devices/" + mNodeID + "/$online";
-                    }
-                    if (a == 1) {
-                        topic = "devices/" + mNodeID + "/$signal";
-                    }
-                    if (a == 2) {
-                        topic = "devices/" + mNodeID + "/$uptime";
-                    }
-                    if (a == 3) {
-                        topic = "devices/" + mNodeID + "/$localip";
-                    }
-                    int qos = 2;
-                    try {
-                        IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                        subToken.setActionCallback(new IMqttActionListener() {
-                            @Override
-                            public void onSuccess(IMqttToken asyncActionToken) {
-                            }
-
-                            @Override
-                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                            }
-                        });
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            data.clear();
-        }
-    }
 
     @Override
     public void onDestroy() {

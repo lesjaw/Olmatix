@@ -25,9 +25,9 @@ public class OlmatixReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("DEBUG", "OlmatixReceiver");
+        //Log.d("DEBUG", "OlmatixReceiver");
         String action = intent.getAction();
-        Log.i("DEBUG", "Broadcast received: " + action+" : " +homestat +" : "+homestatcur);
+        //Log.i("DEBUG", "Broadcast received: " + action+" : " +homestat +" : "+homestatcur);
 
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Intent serviceIntent = new Intent(context, OlmatixService.class);

@@ -379,6 +379,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             firmware = jObject1.getString("name");
             version = jObject1.getString("version");
 
+            Toast.makeText(this," You are connected to "+deviceID+" "+firmware.toUpperCase() +" product",Toast.LENGTH_SHORT).show();
             //Log.d("DEBUG", "parsingJson: "+deviceID);
 
         } catch (JSONException e) {
@@ -397,55 +398,62 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             String ssidHome = String.valueOf(textHomeWifi);
             Log.d("DEBUG", "sendJson: "+mUserName +" | "+mPassword+" | "+textHomeWifi+ " | "+passwordHome);
 
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            String URL = "http://192.168.1.1/config";
-            JSONObject jsonBody = new JSONObject("{\"name\":\"Olmatix\",\"wifi\": {\"ssid\": \""+ssidHome+"\",\"password\": " +
-                    "\""+passwordHome+"\"},\"mqtt\": {\"host\": \"cloud.olmatix.com\",\"port\": 1883,\"base_topic\": \"devices/\"," +
-                    "\"auth\": true, \"username\": \""+mUserName+"\",\"password\": \""+mPassword+"\"},\"ota\": {\"enabled\": false}}");
+            if (ssidHome!=null) {
 
-            final String requestBody = jsonBody.toString();
+                RequestQueue requestQueue = Volley.newRequestQueue(this);
+                String URL = "http://192.168.1.1/config";
+                JSONObject jsonBody = new JSONObject("{\"name\":\"Olmatix\",\"wifi\": {\"ssid\": \"" + ssidHome + "\",\"password\": " +
+                        "\"" + passwordHome + "\"},\"mqtt\": {\"host\": \"cloud.olmatix.com\",\"port\": 1883,\"base_topic\": \"devices/\"," +
+                        "\"auth\": true, \"username\": \"" + mUserName + "\",\"password\": \"" + mPassword + "\"},\"ota\": {\"enabled\": false}}");
 
-            StringRequest stringRequest = new StringRequest(Request.Method.PUT, URL, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.i("VOLLEY", response);
-                    if (requestBody.equals("200")){
-                        Toast.makeText(getApplicationContext(),"Success",Toast.LENGTH_SHORT).show();
+                final String requestBody = jsonBody.toString();
+
+                StringRequest stringRequest = new StringRequest(Request.Method.PUT, URL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("VOLLEY", response);
+                       // Toast.makeText(getApplicationContext(), "Success" +response, Toast.LENGTH_SHORT).show();
+
+                        if (response.equals("200")) {
+                            Toast.makeText(getApplicationContext(), "Setting Olmatix success", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("VOLLEY", error.toString());
-                }
-            }) {
-                @Override
-                public String getBodyContentType() {
-                    return "application/json; charset=utf-8";
-                }
-
-                @Override
-                public byte[] getBody() throws AuthFailureError {
-                    try {
-                        return requestBody == null ? null : requestBody.getBytes("utf-8");
-                    } catch (UnsupportedEncodingException uee) {
-                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
-                        return null;
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("VOLLEY", error.toString());
                     }
-                }
-
-                @Override
-                protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                    String responseString = "";
-                    if (response != null) {
-                        responseString = String.valueOf(response.statusCode);
-                        // can get more details such as response.headers
+                }) {
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
                     }
-                    return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
-                }
-            };
 
-            requestQueue.add(stringRequest);
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        try {
+                            return requestBody == null ? null : requestBody.getBytes("utf-8");
+                        } catch (UnsupportedEncodingException uee) {
+                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                        String responseString = "";
+                        if (response != null) {
+                            responseString = String.valueOf(response.statusCode);
+                            // can get more details such as response.headers
+                        }
+                        return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+                    }
+                };
+
+                requestQueue.add(stringRequest);
+            } else {
+                Toast.makeText(this,"You need to choose Home WiFi, Cancel setup!", Toast.LENGTH_SHORT).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -461,7 +469,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         Log.d("DEBUG", "createAPConfiguration: "+wifiConfiguration.SSID);
 
             wifiConfiguration.preSharedKey = String.format("\"%s\"", networkPasskey.trim());
-            Log.d("DEBUG", "createAPConfiguration: "+wifiConfiguration.preSharedKey);
             wifiConfiguration.hiddenSSID = true;
             wifiConfiguration.status = WifiConfiguration.Status.ENABLED;
             wifiConfiguration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);

@@ -32,6 +32,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -96,6 +97,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Log.d(TAG, "InstalledNode: ");
 
         installed_node=getContext();
 
@@ -193,7 +196,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     }
 
     class load extends AsyncTask<Void, Integer, String> {
-
 
         protected void onPreExecute (){
             nDialog = new ProgressDialog(getContext());
@@ -479,7 +481,10 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-        new load().execute();
+        data.clear();
+        data.addAll(dbNodeRepo.getNodeList());
+        adapter = new NodeAdapter(data,installed_node,this);
+        mRecycleView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -516,8 +521,23 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     }
 
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+
+        if ( menuVisible ) {
+
+            //new load().execute();
+
+        } else  {
+            /**
+             * Fragment not currently Visible.
+             */
+        }
+    }
+
     private void setRefresh() {
-        load();
+        new load().execute();
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

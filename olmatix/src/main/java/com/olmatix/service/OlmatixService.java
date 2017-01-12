@@ -424,7 +424,7 @@ public class OlmatixService extends Service {
                 unSubIfnotForeground();
                 noNotif=false;
             }
-        }, 30000);
+        }, 10000);
     }
 
     @Override

@@ -356,6 +356,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
+    int tabpos = tabLayout.getSelectedTabPosition();
+        Log.d("DEBUG", "onBackPressed: "+tabpos);
+
+    if (tabpos==2){
+        mViewPager.setCurrentItem(1);
+    }else if (tabpos==1){
+        mViewPager.setCurrentItem(0);
+    }else {
         if (backButtonCount >= 1) {
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
@@ -364,11 +372,10 @@ public class MainActivity extends AppCompatActivity {
             finish();
             System.exit(0);
         } else {
-            Snackbar.make(getWindow().getDecorView().getRootView(), R.string.backbutton,Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getWindow().getDecorView().getRootView(), R.string.backbutton, Snackbar.LENGTH_LONG).show();
             backButtonCount++;
         }
     }
-
-
+    }
 
 }

@@ -51,8 +51,7 @@ import static com.olmatix.adapter.InfoAdapter.mBUTTON;
 import static com.olmatix.adapter.InfoAdapter.mLOCATION;
 
 
-public class DashboardNode extends Fragment implements
-        OnStartDragListener{
+public class DashboardNode extends Fragment implements OnStartDragListener {
 
     private View mView;
     private RecyclerView mRecycleView;
@@ -78,7 +77,6 @@ public class DashboardNode extends Fragment implements
         mView = inflater.inflate(R.layout.frag_dashboard, container, false);
         return mView;
     }
-
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {

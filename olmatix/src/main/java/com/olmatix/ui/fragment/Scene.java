@@ -56,8 +56,6 @@ public class Scene extends Fragment implements OnStartDragListener {
     Context scene_node;
     public static final int NEW_ALARM = 1;
 
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

@@ -93,7 +93,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             final OlmatixHolder holder = (OlmatixHolder) viewHolder;
 
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
-            holder.imgNode.setImageResource(R.drawable.olmatixlogo);
+            holder.imgNode.setImageResource(R.drawable.olmatixmed);
             if(mInstalledNodeModel.getDuration()!=null) {
                 holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
                 Log.d("DEBUG", "onBindViewHolder: " + OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getDuration())));
@@ -202,7 +202,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         } else if (fw_name.equals("smartsensordoor")) {
             final OlmatixSensorHolder holder = (OlmatixSensorHolder) viewHolder;
 
-            holder.imgNode.setImageResource(R.drawable.olmatixlogo);
+            holder.imgNode.setImageResource(R.drawable.olmatixmed);
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
 

@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
             statesList[i] = String.valueOf(NodeID.get(i).getNodesID() + " || " + NodeID.get(i).getNice_name_n());
             System.out.println(statesList[i]);
         }
-        ArrayAdapter<String> testadap = (new ArrayAdapter(this,
+        ArrayAdapter<String> testadap = (new ArrayAdapter<String>(this,
                 R.layout.list_view_reset, statesList));
 
         listView.setAdapter(testadap);
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 Log.d("DEBUG", "onClick1: " + listView.getItemAtPosition(arg2));
                 arg1.setSelected(true);
-                Snackbar.make(getWindow().getDecorView().getRootView(), " You have pick" + listView.getItemAtPosition(arg2)
+                Snackbar.make(getWindow().getDecorView().getRootView(), "You have pick " + listView.getItemAtPosition(arg2)
                         , Snackbar.LENGTH_LONG).show();
 
                 String node = (String) listView.getItemAtPosition(arg2);
@@ -324,29 +324,28 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + NodeID + "/$reset";
-                        String payload = "true";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            Snackbar.make(getWindow().getDecorView().getRootView(),
-                                   node+ " succesfully reset",Snackbar.LENGTH_LONG).show();
-                            Log.d("DEBUG", "onClick: "+node);
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                mStatusServer = sharedPref.getBoolean("conStatus", false);
+                if (mStatusServer) {
+                    String topic = "devices/" + String.valueOf(NodeID).trim() + "/$reset";
+                    String payload = "true";
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
                         Snackbar.make(getWindow().getDecorView().getRootView(),
-                                "You don't connect to the server",Snackbar.LENGTH_LONG).show();
+                                node+ " succesfully reset",Snackbar.LENGTH_LONG).show();
+                        Log.d("DEBUG", "onClick: "+node);
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
                     }
-            }
+                } else {
+                    Snackbar.make(getWindow().getDecorView().getRootView(),
+                            "You don't connect to the server",Snackbar.LENGTH_LONG).show();
+                }            }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override

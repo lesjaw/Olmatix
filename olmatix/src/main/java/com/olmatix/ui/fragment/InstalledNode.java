@@ -32,14 +32,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.olmatix.adapter.NodeAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -52,9 +50,7 @@ import com.olmatix.utils.Connection;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -133,6 +129,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             }
             @Override
             public void onLongClick(View view, final int position) {
+/*
                 ImageView imgNode;
                 imgNode=(ImageView)view.findViewById(R.id.icon_node);
                 imgNode.setOnClickListener(new View.OnClickListener() {
@@ -189,6 +186,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         builder.show();
                     }
                 });
+*/
 
             }
         }));

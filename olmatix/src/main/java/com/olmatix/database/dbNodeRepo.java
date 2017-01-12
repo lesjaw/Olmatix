@@ -181,7 +181,6 @@ public class dbNodeRepo {
 
             } while (cursor.moveToNext());
         }
-        Log.d("getlist", "getNodeList: " +cursor.getCount());
         cursor.close();
         db.close();
         return nodeList;
@@ -482,6 +481,43 @@ public class dbNodeRepo {
         db.close();
         return nodeList;
     }
+
+    public ArrayList<InstalledNodeModel> getNodeListReset(String nodesID) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE;
+
+        ArrayList<InstalledNodeModel> nodeList = new ArrayList<InstalledNodeModel>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                InstalledNodeModel node = new InstalledNodeModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNodesID(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNodes(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
+                node.setName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setNice_name_n(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_N)));
+                node.setLocalip(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCALIP)));
+                node.setFwName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWNAME)));
+                node.setFwVersion(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FWVERSION)));
+                node.setOnline(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.setIcon(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ICON)));
+                node.setAdding(cursor.getLong(cursor.getColumnIndex(dbNode.KEY_ADDING)));
+                node.setSignal(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SIGNAL)));
+                node.setUptime(cursor.getString(cursor.getColumnIndex(dbNode.KEY_UPTIME)));
+                node.setReset(cursor.getString(cursor.getColumnIndex(dbNode.KEY_RESET)));
+                node.setOta(cursor.getString(cursor.getColumnIndex(dbNode.KEY_OTA)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        //Log.d("getlist", "getNodeList: " +cursor.getCount());
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
 
     public List<SpinnerObject> getAllLabels() {
         List<SpinnerObject> labels = new ArrayList<>();

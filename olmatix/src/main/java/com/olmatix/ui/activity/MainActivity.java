@@ -3,6 +3,7 @@ package com.olmatix.ui.activity;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -12,23 +13,37 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.olmatix.adapter.OlmatixPagerAdapter;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.service.OlmatixService;
 import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.ui.fragment.Scene;
+import com.olmatix.utils.Connection;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * Created by Lesjaw on 02/12/2016.
@@ -50,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter mIntentFilter;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
-    private boolean curlAvailable = false;
+    public static dbNodeRepo dbNodeRepo;
+    private InstalledNodeModel installedNodeModel;
 
     public static int[] tabIcons = {
             R.drawable.ic_dashboard,
@@ -240,13 +256,107 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        if (id == R.id.action_about) {
-            Intent i = new Intent(this, AboutActivity.class);
-            startActivity(i);
+        if (id == R.id.action_reset) {
+            resetNode();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void resetNode (){
+        final String[] statesList;
+        List<InstalledNodeModel> NodeID;
+
+        dbNodeRepo = new dbNodeRepo(this);
+        installedNodeModel = new InstalledNodeModel();
+        final ListView listView = new ListView(this);
+
+        NodeID = dbNodeRepo.getNodeList();
+
+        statesList = new String[NodeID.size()];
+        for (int i = 0; i < NodeID.size(); i++) {
+            statesList[i] = String.valueOf(NodeID.get(i).getNodesID() + " || " + NodeID.get(i).getNice_name_n());
+            System.out.println(statesList[i]);
+        }
+        ArrayAdapter<String> testadap = (new ArrayAdapter(this,
+                R.layout.list_view_reset, statesList));
+
+        listView.setAdapter(testadap);
+
+        // Set grid view to alertDialog
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(listView);
+        builder.setTitle("Pick Nodes");
+        final AlertDialog ad = builder.show();
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                                    long arg3) {
+                // TODO Auto-generated method stub
+                Log.d("DEBUG", "onClick1: " + listView.getItemAtPosition(arg2));
+                arg1.setSelected(true);
+                Snackbar.make(getWindow().getDecorView().getRootView(), " You have pick" + listView.getItemAtPosition(arg2)
+                        , Snackbar.LENGTH_LONG).show();
+
+                String node = (String) listView.getItemAtPosition(arg2);
+                int iend = node.indexOf("|");
+                if (iend != -1) {
+                    String nodeid = node.substring(0, iend);
+                    resetConfirm(nodeid, node);
+                    Log.d("DEBUG", "onItemClick: "+nodeid);
+                    ad.dismiss();
+                }
+
+            }
+        });
+
+    }
+
+    private void resetConfirm(final String NodeID, final String node){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Reset this Node?");
+        builder.setMessage(node);
+        builder.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    if (mStatusServer) {
+                        String topic = "devices/" + NodeID + "/$reset";
+                        String payload = "true";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            Snackbar.make(getWindow().getDecorView().getRootView(),
+                                   node+ " succesfully reset",Snackbar.LENGTH_LONG).show();
+                            Log.d("DEBUG", "onClick: "+node);
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Snackbar.make(getWindow().getDecorView().getRootView(),
+                                "You don't connect to the server",Snackbar.LENGTH_LONG).show();
+                    }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+
     }
 
     @Override

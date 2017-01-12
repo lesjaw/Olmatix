@@ -32,6 +32,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -128,13 +129,11 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
                                 nice_name + " is OFFLINE!, please check it, if the " + nice_name +
                                         " led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",Snackbar.LENGTH_LONG).show();
-
                     }
             }
             @Override
             public void onLongClick(View view, final int position) {
                 ImageView imgNode;
-
                 imgNode=(ImageView)view.findViewById(R.id.icon_node);
                 imgNode.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -142,17 +141,16 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle("Reset this Node?");
                         builder.setMessage(data.get(position).getNice_name_n());
-
                         builder.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String nodeid = data.get(position).getNodesID();
                                 String statusnode = data.get(position).getOnline();
                                 if (statusnode.equals("true")) {
-
                                     sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
                                     mStatusServer = sharedPref.getBoolean("conStatus", false);
-                                    if (!mStatusServer) {
+                                    Log.d(TAG, "onClick: "+mStatusServer);
+                                    if (mStatusServer) {
                                         String topic = "devices/" + nodeid + "/$reset";
                                         String payload = "true";
                                         byte[] encodedPayload = new byte[0];
@@ -163,17 +161,22 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                                             message.setRetained(true);
                                             Connection.getClient().publish(topic, message);
 
+                                            Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
+                                                    "Nodes succesfully reset",Snackbar.LENGTH_LONG).show();
+
                                         } catch (UnsupportedEncodingException | MqttException e) {
                                             e.printStackTrace();
                                         }
                                     } else {
-                                        Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"You don't connect to the server",Snackbar.LENGTH_LONG).show();
-                                        setRefresh();
+                                        Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
+                                                "You don't connect to the server",Snackbar.LENGTH_LONG).show();
                                     }
-                                    Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Nodes succesfully reset",Snackbar.LENGTH_LONG).show();
                                 } else {
-                                    Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Your device/Node Offline",Snackbar.LENGTH_LONG).show();
+                                    Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
+                                            "Your device/Node Offline",Snackbar.LENGTH_LONG).show();
                                 }
+                                setRefresh();
+
                             }
                         });
                         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

@@ -2,13 +2,11 @@
     <item
         android:state_selected="true"
         android:state_pressed="false"
-        android:drawable="@color/red">
+        android:drawable="@color/light_blue">
     </item>
     <item
         android:state_pressed="true"
         android:drawable="@color/white">
     </item>
-    <item
-        android:drawable="@color/colorPrimary">
-    </item>   <!-- for other state -->
+    <!-- for other state -->
 </selector>

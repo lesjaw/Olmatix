@@ -205,7 +205,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             statesList[i] = String.valueOf(wifiList.get(i).SSID + " || Signal " + wifiList.get(i).level);
             System.out.println(statesList[i]);
         }
-        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item, statesList));
+        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item_wifi, statesList));
 
         listProduct.setAdapter(testadap);
 
@@ -280,7 +280,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             statesList[i] = String.valueOf(wifiList.get(i).SSID);
             System.out.println(statesList[i]);
         }
-        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item, statesList));
+        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item_wifi, statesList));
 
         listHome.setAdapter(testadap);
 

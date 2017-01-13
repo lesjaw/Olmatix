@@ -81,13 +81,11 @@
         </activity>
 
         <activity
-            android:name="com.olmatix.ui.activity.SetupProduct"
-            android:theme="@style/AppTheme.Dark">
+            android:name="com.olmatix.ui.activity.SetupProduct">
         </activity>
 
         <activity
-            android:name="com.olmatix.ui.activity.SceneActivity"
-            android:theme="@style/AppTheme.Dark">
+            android:name="com.olmatix.ui.activity.SceneActivity">
         </activity>
 
 

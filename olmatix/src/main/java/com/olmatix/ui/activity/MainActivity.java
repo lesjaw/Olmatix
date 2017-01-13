@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetNode (){
-        final String[] statesList;
+        final String[] nodelist;
         List<InstalledNodeModel> NodeID;
 
         dbNodeRepo = new dbNodeRepo(this);
@@ -269,13 +269,13 @@ public class MainActivity extends AppCompatActivity {
 
         NodeID = dbNodeRepo.getNodeList();
 
-        statesList = new String[NodeID.size()];
+        nodelist = new String[NodeID.size()];
         for (int i = 0; i < NodeID.size(); i++) {
-            statesList[i] = String.valueOf(NodeID.get(i).getNodesID() + " || " + NodeID.get(i).getNice_name_n());
-            System.out.println(statesList[i]);
+            nodelist[i] = String.valueOf(NodeID.get(i).getNodesID() + " || " + NodeID.get(i).getNice_name_n());
+            System.out.println(nodelist[i]);
         }
-        ArrayAdapter<String> testadap = (new ArrayAdapter<String>(this,
-                R.layout.list_view_reset, statesList));
+        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this,
+                R.layout.list_view_reset, nodelist));
 
         listView.setAdapter(testadap);
 
@@ -287,11 +287,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                                    long arg3) {
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 // TODO Auto-generated method stub
                 Log.d("DEBUG", "onClick1: " + listView.getItemAtPosition(arg2));
                 arg1.setSelected(true);

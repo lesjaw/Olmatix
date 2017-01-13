@@ -104,7 +104,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     private void initializeActivity() {
 
         // Vertical Stepper form vars
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), color.white);
+        int colorPrimary = ContextCompat.getColor(getApplicationContext(), color.light_blue);
         int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), color.colorPrimaryDark);
         String[] stepsTitles = getResources().getStringArray(array.steps_titles);
         //String[] stepsSubtitles = getResources().getStringArray(R.array.steps_subtitles);
@@ -488,9 +488,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         wifi.setWifiEnabled(true);
         wifi.enableNetwork(networkId, true);
         wifi.reconnect();
-
-
-
+        
         return wifiConfiguration;
     }
 

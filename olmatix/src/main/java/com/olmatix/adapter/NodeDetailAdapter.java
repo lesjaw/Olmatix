@@ -372,14 +372,22 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
     private void showAlertDialog() {
         // Prepare grid view
-        GridView gridView = new GridView(context);
-        ImageView imageView = new ImageView(context);
-        final ArrayList<Integer> mList = new ArrayList<>();
+        final GridView gridView = new GridView(context);
+        //int icon[] = {R.drawable.onlamp1,R.drawable.steckeroff};
 
+        final ArrayList mList = new ArrayList<>();
         mList.add(R.drawable.onlamp1);
         mList.add(R.drawable.steckeroff);
 
-        gridView.setAdapter(new iconPickerAdapter (context, R.layout.icon_picker, mList));
+        final ArrayList<String> icon = new ArrayList();
+        icon.add("R.drawable.onlamp1");
+        icon.add("R.drawable.steckeroff");
+
+
+        gridView.setAdapter(new iconPickerAdapter (context, R.layout.icon_picker, mList,icon));
+        //ArrayAdapter<String> testadap = new ArrayAdapter<String>(context, R.layout.icon_picker, mList);
+        //gridView.setAdapter(testadap);
+
         gridView.setNumColumns(4);
         gridView.setHorizontalSpacing(0);
 
@@ -388,7 +396,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // do something here
-                Log.d("DEBUG", "onClick1: "+mList.get(position));
+                view.setSelected(true);
+                Log.d("DEBUG", "onClick1: "+gridView.getSelectedItem().toString());
 
             }
         });

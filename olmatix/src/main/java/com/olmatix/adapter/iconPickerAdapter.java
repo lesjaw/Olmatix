@@ -21,13 +21,16 @@ public class iconPickerAdapter extends ArrayAdapter<Integer> {
     Context context;
     int layoutResourceId;
     ArrayList<Integer> data = new ArrayList<>();
+    ArrayList<String> data1 = new ArrayList<>();
 
-    public iconPickerAdapter(Context context, int layoutResourceId, ArrayList<Integer> data) {
+
+    public iconPickerAdapter(Context context, int layoutResourceId, ArrayList<Integer> data, ArrayList<String> icon) {
         super(context, layoutResourceId, data);
-
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
+        this.data1 = icon;
+
     }
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -45,11 +48,14 @@ public class iconPickerAdapter extends ArrayAdapter<Integer> {
         }
 
         final Integer item = data.get(position);
+        final String item1 = data1.get(position);
+
         holder.imageItem.setImageResource(item);
         holder.imageItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("DEBUG", "onClick2: "+item);
+                Log.d("DEBUG", "onClick2: " +item1);
+                v.setSelected(true);
             }
         });
 

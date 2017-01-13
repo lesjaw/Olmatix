@@ -1,4 +1,4 @@
-package com.olmatix.ui.activity;
+package com.olmatix.ui.activity.scene;
 
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
@@ -9,43 +9,34 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
-import com.olmatix.model.SceneDetailModel;
-import com.olmatix.model.SceneModel;
-
-import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.fragments.BackConfirmationFragment;
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
-import static com.olmatix.lesjaw.olmatix.R.layout;
 
 /**
- * Created by Lesjaw on 12/01/2017.
+ * Created by Rahman on 1/13/2017.
  */
 
-public class SceneActivity extends AppCompatActivity implements VerticalStepperForm {
-    public static final String NEW_SCENE_ADDED = "new_scene_added";
+public class ScheduleActivity extends AppCompatActivity implements VerticalStepperForm {
+    
+    public static final String NEW_SCHEDULE_ADDED = "new_schedule_added";
 
     // Information about the steps/fields of the form
     private static final int TITLE_STEP_NUM = 0;
@@ -77,24 +68,18 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
     private boolean confirmBack = true;
     private ProgressDialog progressDialog;
     private VerticalStepperFormLayout verticalStepperForm;
-
-    private dbNodeRepo mDbNodeRepo;
-    private SceneModel mSceneModel;
-    private SceneDetailModel mSceneDetailModel;
-
-    ListView mListScenetype;
-    int stepNumber;
+    private Intent mIntent;
+    private LayoutInflater mInflater;
+    private TextView mTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vertical_stepper_form);
+        setContentView(R.layout.schedule_activity);
 
         initializeActivity();
-        mDbNodeRepo = new dbNodeRepo(this);
-        mSceneModel= new SceneModel();
-        mSceneDetailModel = new SceneDetailModel();
-
+        String s = getIntent().getStringExtra("scene");
+        mTitle.setText(s);
     }
 
     private void initializeActivity() {
@@ -106,28 +91,26 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
         // Week days step vars
         weekDays = new boolean[7];
 
+        mTitle = (TextView) findViewById(R.id.mTitle);
+
         // Vertical Stepper form vars
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.light_blue);
+        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
-        String[] stepsTitles = getResources().getStringArray(R.array.steps_scene_titles);
+        String[] stepsTitles = getResources().getStringArray(R.array.steps_schedule_titles);
         //String[] stepsSubtitles = getResources().getStringArray(R.array.steps_subtitles);
 
         // Here we find and initialize the form
-        verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
+        verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form_schedule);
         VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, stepsTitles, this, this)
                 //.stepsSubtitles(stepsSubtitles)
                 //.materialDesignInDisabledSteps(true) // false by default
                 //.showVerticalLineWhenStepsAreCollapsed(true) // false by default
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
-                .stepNumberTextColor(R.color.black)
-                .stepSubtitleTextColor(R.color.white)
-                .buttonBackgroundColor(R.color.bg_button)
                 .displayBottomNavigation(true)
                 .init();
 
     }
-
 
     // METHODS THAT HAVE TO BE IMPLEMENTED TO MAKE THE LIBRARY WORK
     // (Implementation of the interface "VerticalStepperForm")
@@ -139,17 +122,16 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
         View view = null;
         switch (stepNumber) {
             case TITLE_STEP_NUM:
-                view = createSceneTitleStep();
+                view = createAlarmTitleStep();
                 break;
             case DESCRIPTION_STEP_NUM:
-                view = createSceneDescriptionStep();
-                Log.d("DEBUG", "createStepContentView: "+ "step kedua");
+                view = createAlarmDescriptionStep();
                 break;
             case TIME_STEP_NUM:
-                view = createSceneTimeStep();
+                view = createAlarmTimeStep();
                 break;
             case DAYS_STEP_NUM:
-                view = createSceneDaysStep();
+                view = createAlarmDaysStep();
                 break;
         }
         return view;
@@ -163,8 +145,6 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
                 checkTitleStep(titleEditText.getText().toString());
                 break;
             case DESCRIPTION_STEP_NUM:
-                verticalStepperForm.setStepAsCompleted(stepNumber);
-                break;
             case TIME_STEP_NUM:
                 // As soon as they are open, these two steps are marked as completed because they
                 // have default values
@@ -194,25 +174,20 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
 
         // TODO Use here the data of the form as you wish
 
-        final String mSceneName =  titleEditText.getText().toString();
-        final String mSceneType =  titleEditText.getText().toString();
-
-        mSceneModel.setSceneName(mSceneName);
-        //mSceneModel.setSceneType();
-
+        // Fake data sending effect
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(1000);
-                    Intent intent = getIntent();
-                    setResult(RESULT_OK, intent);
-                    intent.putExtra(NEW_SCENE_ADDED, true);
-                    intent.putExtra(STATE_TITLE, mSceneName);
-                    intent.putExtra(STATE_DESCRIPTION, descriptionEditText.getText().toString());
-                    intent.putExtra(STATE_TIME_HOUR, time.first);
-                    intent.putExtra(STATE_TIME_MINUTES, time.second);
-                    intent.putExtra(STATE_WEEK_DAYS, weekDays);
+                    mIntent = getIntent();
+                    setResult(RESULT_OK, mIntent);
+                    mIntent.putExtra(NEW_SCHEDULE_ADDED, true);
+                    mIntent.putExtra(STATE_TITLE, titleEditText.getText().toString());
+                    mIntent.putExtra(STATE_DESCRIPTION, descriptionEditText.getText().toString());
+                    mIntent.putExtra(STATE_TIME_HOUR, time.first);
+                    mIntent.putExtra(STATE_TIME_MINUTES, time.second);
+                    mIntent.putExtra(STATE_WEEK_DAYS, weekDays);
                     // You must set confirmBack to false before calling finish() to avoid the confirmation dialog
                     confirmBack = false;
                     finish();
@@ -223,7 +198,7 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
         }).start(); // You should delete this code and add yours
     }
 
-    private View createSceneTitleStep() {
+    private View createAlarmTitleStep() {
         // This step view is generated programmatically
         titleEditText = new EditText(this);
         titleEditText.setHint(R.string.form_hint_title);
@@ -236,6 +211,7 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 checkTitleStep(s.toString());
             }
+
 
             @Override
             public void afterTextChanged(Editable s) {}
@@ -252,62 +228,24 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
         return titleEditText;
     }
 
-    private View createSceneDescriptionStep() {
-        mListScenetype = new ListView(this);
-        String[] sceneListItem = {"Scheduled Time", "Home Arrived", "Home Leave", "Base On Sensor", "Manual Triger"};
-        ArrayAdapter<String> listTypeAdapter = new ArrayAdapter<>(this, layout.scene_type_item, sceneListItem);
-
-        mListScenetype.setAdapter(listTypeAdapter);
-
-        int totalHeight = 0;
-        for (int i = 0; i < listTypeAdapter.getCount(); i++) {
-            View listItem = listTypeAdapter.getView(i, null, mListScenetype);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.height = totalHeight + (mListScenetype.getDividerHeight() * (listTypeAdapter.getCount() - 1));
-        Log.d("DEBUG", "createConnectTitleStep: " + params);
-
-        mListScenetype.setLayoutParams(params);
-        mListScenetype.requestLayout();
-
-        mListScenetype.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+    private View createAlarmDescriptionStep() {
+        descriptionEditText = new EditText(this);
+        descriptionEditText.setHint(R.string.form_hint_description);
+        descriptionEditText.setSingleLine(true);
+        descriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                                    long arg3) {
-                // TODO Auto-generated method stub
-                String text = (String) mListScenetype.getItemAtPosition(arg2);
-                arg1.setSelected(true);
-
-
-                if(arg2 == 0){
-
-                } else {
-                    Log.d("DEBUG", "onItemClick: " + stepNumber);
-                    //verticalStepperForm.goToStep((stepNumber + 2), false);
-
-                }
-                Snackbar.make(getWindow().getDecorView().getRootView(),"You had choose " + text,
-                        Snackbar.LENGTH_LONG).show();
-
-
-
-
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                verticalStepperForm.goToNextStep();
+                return false;
             }
         });
-
-
-        return mListScenetype;
+        return descriptionEditText;
     }
 
-    private View createSceneTimeStep() {
+    private View createAlarmTimeStep() {
         // This step view is generated by inflating a layout XML file
-        LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-        LinearLayout timeStepContent =
-                (LinearLayout) inflater.inflate(R.layout.step_time_layout, null, false);
+        mInflater = LayoutInflater.from(getBaseContext());
+        LinearLayout timeStepContent = (LinearLayout) mInflater.inflate(R.layout.step_time_layout, null, false);
         timeTextView = (TextView) timeStepContent.findViewById(R.id.time);
         timeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -318,7 +256,7 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
         return timeStepContent;
     }
 
-    private View createSceneDaysStep() {
+    private View createAlarmDaysStep() {
         LayoutInflater inflater = LayoutInflater.from(getBaseContext());
         daysStepContent = (LinearLayout) inflater.inflate(
                 R.layout.step_days_of_week_layout, null, false);
@@ -516,8 +454,8 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
         }
 
         // Saving description field
-        if(mListScenetype != null) {
-            savedInstanceState.putString(STATE_DESCRIPTION, mListScenetype.getSelectedItem().toString());
+        if(descriptionEditText != null) {
+            savedInstanceState.putString(STATE_DESCRIPTION, descriptionEditText.getText().toString());
         }
 
         // Saving time field

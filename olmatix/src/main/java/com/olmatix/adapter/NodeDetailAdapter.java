@@ -377,7 +377,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
         final ArrayList mList = new ArrayList<>();
         mList.add(R.drawable.onlamp1);
-        mList.add(R.drawable.steckeroff);
+        mList.add(R.drawable.steckeron);
 
         final ArrayList<String> icon = new ArrayList();
         icon.add("R.drawable.onlamp1");

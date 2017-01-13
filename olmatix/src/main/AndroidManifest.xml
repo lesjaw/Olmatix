@@ -44,6 +44,7 @@
             android:name="com.olmatix.ui.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
+
         </activity>
 
         <activity
@@ -62,6 +63,10 @@
         <activity
             android:name="com.olmatix.ui.activity.SettingsActivity"
             android:label="@string/action_settings">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.olmatix.ui.activity.MainActivity" />
         </activity>
 
         <activity
@@ -86,6 +91,10 @@
         <activity
             android:name="com.olmatix.ui.activity.SceneActivity">
         </activity>
+
+        <activity
+            android:name="com.olmatix.ui.activity.scene.ScheduleActivity"/>
+
 
 
         <service android:name="com.olmatix.service.OlmatixService"/>

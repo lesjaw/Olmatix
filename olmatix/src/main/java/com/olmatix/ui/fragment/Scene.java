@@ -20,12 +20,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import com.olmatix.adapter.SceneAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -34,6 +39,7 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.SceneModel;
 import com.olmatix.ui.activity.SceneActivity;
+import com.olmatix.ui.activity.scene.ScheduleActivity;
 
 import java.util.ArrayList;
 
@@ -55,6 +61,9 @@ public class Scene extends Fragment implements OnStartDragListener {
     private Paint p = new Paint();
     Context scene_node;
     public static final int NEW_ALARM = 1;
+    private ListView mListScenetype;
+    private Intent mIntent;
+    private String sceneType;
 
     @Nullable
     @Override
@@ -143,8 +152,52 @@ public class Scene extends Fragment implements OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mListScenetype = new ListView(getActivity());
+                String[] sceneListItem = {"Scheduled Time", "Home Location", "Base On Sensor", "Manual Triger"};
+                ArrayAdapter<String> listTypeAdapter = new ArrayAdapter<>(getActivity(), R.layout.scene_type_item, sceneListItem);
+                mListScenetype.setAdapter(listTypeAdapter);
+                mListScenetype.setPadding(4,0,4,0);
+
+                int totalHeight = 0;
+                for (int i = 0; i < listTypeAdapter.getCount(); i++) {
+                    View listItem = listTypeAdapter.getView(i, null, mListScenetype);
+                    listItem.measure(0, 0);
+                    totalHeight += listItem.getMeasuredHeight();
+                }
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.height = totalHeight + (mListScenetype.getDividerHeight() * (listTypeAdapter.getCount() - 1));
+                Log.d("DEBUG", "createConnectTitleStep: " + params);
+
+                mListScenetype.setLayoutParams(params);
+                mListScenetype.requestLayout();
+
+                mListScenetype.setAdapter(listTypeAdapter);
+                // Set grid view to alertDialog
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setView(mListScenetype);
+                builder.setTitle("Pick Scene Type");
+                final AlertDialog ad = builder.show();
+
+                mListScenetype.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        view.setSelected(true);
+                        if(position == 0){
+                            sceneType = mListScenetype.getItemAtPosition(position).toString();
+                            Log.d(TAG, "onItemClick: " + sceneType);
+
+                            mIntent = new Intent(getContext(), ScheduleActivity.class);
+                            mIntent.putExtra("scene", sceneType);
+                            startActivity(mIntent);
+                        } else {
+
+                        }
+                    }
+                });
+                /*
                 Intent intent = new Intent(getContext(), SceneActivity.class);
-                startActivityForResult(intent, NEW_ALARM);
+                startActivityForResult(intent, NEW_ALARM);*/
             }
 
         };

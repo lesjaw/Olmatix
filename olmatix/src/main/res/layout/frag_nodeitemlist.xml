@@ -11,13 +11,22 @@
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="2dp"
-        card_view:cardUseCompatPadding="true">
+        android:clickable="true"
+        android:background="?android:selectableItemBackground">
 
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp">
+
+            <ImageButton
+                android:id="@+id/rvbut"
+                android:layout_width="300sp"
+                android:layout_height="90sp"
+                android:stateListAnimator="@null"
+                android:background="@color/white"
+                />
 
             <ImageView
                 android:id="@+id/icon_node"
@@ -79,7 +88,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/icon_status"
-
                 android:paddingTop="0sp"
                 android:text="Uptime" />
 
@@ -91,6 +99,21 @@
                 android:layout_below="@+id/uptime"
                 android:paddingTop="0sp"
                 android:text="nodeID" />
+
+            <ImageButton
+                android:id="@+id/opt"
+                android:layout_width="35sp"
+                android:layout_height="35sp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/nodeid"
+                android:src="@android:drawable/arrow_down_float"
+                android:stateListAnimator="@null"
+                android:theme="@style/AppTheme.Button"
+                android:scaleType="centerCrop"
+                />
+
+
 
 
         </RelativeLayout>

@@ -21,8 +21,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,14 +32,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.NodeAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
@@ -75,7 +76,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     public static dbNodeRepo dbNodeRepo;
     private InstalledNodeModel installedNodeModel;
     private String inputResult;
-    Boolean stateMqtt=false;
     SwipeRefreshLayout mSwipeRefreshLayout;
     String nice_name;
     String fwName;
@@ -84,21 +84,21 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     SharedPreferences sharedPref;
     Boolean mStatusServer;
     private static String TAG = InstalledNode.class.getSimpleName();
-
+    private CoordinatorLayout coordinatorLayout;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mView = inflater.inflate(R.layout.frag_installed_node, container, false);
+        coordinatorLayout=(CoordinatorLayout)mView.findViewById(R.id.installednode);
+
         return mView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        Log.d(TAG, "InstalledNode: ");
 
         installed_node=getContext();
 
@@ -107,92 +107,51 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         installedNodeModel = new InstalledNodeModel();
         setupView();
         onClickListener();
-
+        onTouchListener();
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
                 mRecycleView, new ClickListener() {
             @Override
             public void onClick(View view, final int position) {
 
-                    fwName = data.get(position).getFwName();
-                    nice_name = data.get(position).getNice_name_n();
-
-                    String state = data.get(position).getOnline();
-                    if (state.equals("true")) {
-
-                        Intent i = new Intent(getActivity(), DetailNode.class);
-                        i.putExtra("node_id", data.get(position).getNodesID());
-                        i.putExtra("node_name", fwName);
-                        i.putExtra("nice_name", nice_name);
-                        startActivity(i);
-                    } else {
-                        Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
-                                nice_name + " is OFFLINE!, please check it, if the " + nice_name +
-                                        " led blink something is wrong, slow blink mean no WiFi, fast blink mean no Internet",Snackbar.LENGTH_LONG).show();
-                    }
-            }
-            @Override
-            public void onLongClick(View view, final int position) {
-/*
-                ImageView imgNode;
-                imgNode=(ImageView)view.findViewById(R.id.icon_node);
-                imgNode.setOnClickListener(new View.OnClickListener() {
+                ImageView picture=(ImageView)view.findViewById(R.id.rvbut);
+                picture.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setTitle("Reset this Node?");
-                        builder.setMessage(data.get(position).getNice_name_n());
-                        builder.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String nodeid = data.get(position).getNodesID();
-                                String statusnode = data.get(position).getOnline();
-                                if (statusnode.equals("true")) {
-                                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-                                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                                    Log.d(TAG, "onClick: "+mStatusServer);
-                                    if (mStatusServer) {
-                                        String topic = "devices/" + nodeid + "/$reset";
-                                        String payload = "true";
-                                        byte[] encodedPayload = new byte[0];
-                                        try {
-                                            encodedPayload = payload.getBytes("UTF-8");
-                                            MqttMessage message = new MqttMessage(encodedPayload);
-                                            message.setQos(1);
-                                            message.setRetained(true);
-                                            Connection.getClient().publish(topic, message);
+                        fwName = data.get(position).getFwName();
+                        nice_name = data.get(position).getNice_name_n();
 
-                                            Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
-                                                    "Nodes succesfully reset",Snackbar.LENGTH_LONG).show();
+                        String state = data.get(position).getOnline();
+                        if (state.equals("true")) {
 
-                                        } catch (UnsupportedEncodingException | MqttException e) {
-                                            e.printStackTrace();
-                                        }
-                                    } else {
-                                        Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
-                                                "You don't connect to the server",Snackbar.LENGTH_LONG).show();
-                                    }
-                                } else {
-                                    Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),
-                                            "Your device/Node Offline",Snackbar.LENGTH_LONG).show();
-                                }
-                                setRefresh();
-
-                            }
-                        });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        });
-
-                        builder.show();
+                            Intent i = new Intent(getActivity(), DetailNode.class);
+                            i.putExtra("node_id", data.get(position).getNodesID());
+                            i.putExtra("node_name", fwName);
+                            i.putExtra("nice_name", nice_name);
+                            startActivity(i);
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " is OFFLINE!, please check it, " +
+                                    "if led blink something is wrong, slow blink mean no WiFi, " +
+                                    "fast blink mean no Internet",TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbar.show();
+                        }
                     }
                 });
-*/
+
 
             }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+
         }));
+    }
+
+    private void onTouchListener() {
+        mFab.setOnTouchListener(mFabTouchListener());
     }
 
     class load extends AsyncTask<Void, Integer, String> {
@@ -263,83 +222,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         }
     }
 
-    private void load(){
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected void onPreExecute() {
-                nDialog = new ProgressDialog(getContext());
-                nDialog.setMessage("Loading Nodes, Please wait..");
-                nDialog.setIndeterminate(true);
-                nDialog.setCancelable(false);
-                nDialog.show();
-            }
-
-            @Override
-            protected Void doInBackground(Void... arg0) {
-                try {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
-                        if (!mSwitch_conn) {
-                            int countDB = dbNodeRepo.getNodeList().size();
-                            data.addAll(dbNodeRepo.getNodeList());
-                            for (int i = 0; i < countDB; i++) {
-                                final String mNodeID = data.get(i).getNodesID();
-                                for (int a = 0; a < 4; a++) {
-                                    String topic = "";
-                                    if (a == 0) {
-                                        topic = "devices/" + mNodeID + "/$online";
-                                    }
-                                    if (a == 1) {
-                                        topic = "devices/" + mNodeID + "/$signal";
-                                    }
-                                    if (a == 2) {
-                                        topic = "devices/" + mNodeID + "/$uptime";
-                                    }
-                                    if (a == 3) {
-                                        topic = "devices/" + mNodeID + "/$localip";
-                                    }
-                                    int qos = 2;
-                                    try {
-                                        IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                                        subToken.setActionCallback(new IMqttActionListener() {
-                                            @Override
-                                            public void onSuccess(IMqttToken asyncActionToken) {
-                                            }
-
-                                            @Override
-                                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                                            }
-                                        });
-                                    } catch (MqttException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                            data.clear();
-                        }
-                    }
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                    nDialog.dismiss();
-                    setAdapter();
-                mFab.show();
-            }
-
-        };
-        task.execute((Void[])null);
-    }
-
     private void setAdapter(){
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
@@ -347,6 +229,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         mRecycleView.setAdapter(adapter);
 
     }
+
     private void refreshHeader() {
         autoUpdate = new Timer();
         autoUpdate.schedule(new TimerTask() {
@@ -370,7 +253,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     public void onStart() {
         super.onStart();
         mFab.hide();
-
         refreshHeader();
     }
 
@@ -412,16 +294,19 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     private void updatelist (){
         adapter.notifyDataSetChanged();
-        data.clear();
-        data.addAll(dbNodeRepo.getNodeList());
-
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                data.clear();
+                data.addAll(dbNodeRepo.getNodeList());
+            }
+        });
         if(adapter != null) {
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
         assert adapter != null;
 
     }
-
 
     @Override
     public void onDestroy() {
@@ -439,6 +324,59 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         Intent intent = new Intent("addNode");
         intent.putExtra("NodeID", inputResult);
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+    }
+
+    private View.OnTouchListener mFabTouchListener(){
+        return  new View.OnTouchListener() {
+            float dX;
+            float dY;
+            int lastAction;
+
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                         dX = view.getX() - event.getRawX();
+                         dY = view.getY() - event.getRawY();
+                        lastAction = MotionEvent.ACTION_DOWN;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        view.setY(event.getRawY() + dY);
+                        view.setX(event.getRawX() + dX);
+                        lastAction = MotionEvent.ACTION_MOVE;
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        final EditText mEditText = new EditText(getContext());
+                        if (lastAction == MotionEvent.ACTION_DOWN)
+                        new AlertDialog.Builder(getContext())
+                                .setTitle("Add Node")
+                                .setMessage("Please type Olmatix product ID!")
+                                .setView(mEditText)
+                                .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                        inputResult = mEditText.getText().toString();
+                                        sendMessage();
+
+
+                                    }
+                                }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        }).show();                            break;
+                    case MotionEvent.ACTION_BUTTON_PRESS:
+
+                    default:
+                        return false;
+                }
+                return true;
+            }
+        };
+
     }
 
     private View.OnClickListener mFabClickListener() {
@@ -475,14 +413,25 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
         mFab            = (FloatingActionButton) mView.findViewById(fab);
 
+
         mRecycleView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(getActivity());
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-        data.clear();
-        data.addAll(dbNodeRepo.getNodeList());
+        initSwipe();
+
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                data.clear();
+                data.addAll(dbNodeRepo.getNodeList());
+            }
+        });
+
+
         adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
 
@@ -494,12 +443,9 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             }
         });
 
-        initSwipe();
-
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
-
 
         mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -542,7 +488,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     }
 
     private void initSwipe(){
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT |
+                ItemTouchHelper.RIGHT) {
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -564,7 +511,10 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             adapter.removeItem(position);
-                            Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Node deleted",Snackbar.LENGTH_LONG).show();
+                            TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + "Node deleted",TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbar.show();
                             setRefresh();
 
                         }
@@ -584,7 +534,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("Rename Node");
-
                     final EditText input = new EditText(getActivity());
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input);
@@ -600,7 +549,10 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             installedNodeModel.setNodesID(data.get(position).getNodesID());
                             installedNodeModel.setNice_name_n(nice_name);
                             dbNodeRepo.updateNameNice(installedNodeModel);
-                            Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Renaming Node success",Snackbar.LENGTH_LONG).show();
+                            TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " Renaming Node success",TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbar.show();
                             setRefresh();
 
                         }
@@ -654,7 +606,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        //mItemTouchHelper.startDrag(viewHolder);
+        mItemTouchHelper.startDrag(viewHolder);
     }
 
     public interface ClickListener{

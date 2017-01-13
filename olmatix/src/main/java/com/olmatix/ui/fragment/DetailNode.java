@@ -16,7 +16,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -33,6 +33,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.NodeDetailAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
@@ -70,12 +71,15 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
     ArrayList<DetailNodeModel> data1;
+    private CoordinatorLayout coordinatorLayout;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_node);
+
+        coordinatorLayout = (CoordinatorLayout)findViewById(R.id.main_content);
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(UE_ACTION);
@@ -275,7 +279,8 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
     }
 
     private void initSwipe(){
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT |
+                ItemTouchHelper.RIGHT) {
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -316,7 +321,11 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
                             detailNodeModel.setChannel(data.get(position).getChannel());
                             detailNodeModel.setNice_name_d(nice_name);
                             mDbNodeRepo.update_detail_NiceName(detailNodeModel);
-                            Snackbar.make(getWindow().getDecorView().getRootView(),"Renaming Button success",Snackbar.LENGTH_LONG).show();
+                            TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Renaming Button success"
+                                    ,TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbar.show();
                             setRefresh();
 
                         }

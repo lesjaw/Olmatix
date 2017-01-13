@@ -37,11 +37,14 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
+import com.olmatix.helper.SnackbarWrapper;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.DurationModel;
@@ -680,7 +683,6 @@ public class OlmatixService extends Service {
         // Cancel the persistent notification.
         // Tell the user we stopped.
         doDisconnect();
-        //Toast.makeText(this, R.string.service_stop, Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Service stop!! ");
         messageReceive.clear();
         message_topic.clear();
@@ -712,8 +714,19 @@ public class OlmatixService extends Service {
                     Log.d("CheckValid online", " true Passed");
                     saveFirst();
                 } else {
-                    Toast.makeText(getApplicationContext(), string.deviceoffline, Toast.LENGTH_SHORT).show();
-                    doUnsubscribe();
+
+                    final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                            "Your device Offline",TSnackbar.LENGTH_LONG);
+                    snackbarWrapper.setAction("Olmatix",
+                            new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getApplicationContext(), "Action",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                    snackbarWrapper.show();
                 }
             }
             flagNode = false;
@@ -733,14 +746,35 @@ public class OlmatixService extends Service {
             installedNodeModel.setAdding(now.getTimeInMillis());
 
             mDbNodeRepo.insertDb(installedNodeModel);
-            Toast.makeText(getApplicationContext(), "Add Node Successfully", Toast.LENGTH_SHORT).show();
-            Log.d("saveFirst", "Add Node success, ");
+            final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                    "Add "+NodeID +" success",TSnackbar.LENGTH_LONG);
+            snackbarWrapper.setAction("Olmatix",
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getApplicationContext(), "Action",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+            snackbarWrapper.show();
             doSub();
         } else {
             installedNodeModel.setNodesID(NodeID);
             if (mDbNodeRepo.hasObject(installedNodeModel)) {
-                Toast.makeText(getApplicationContext(), "Checking this Node ID : " + NodeID + ", its exist, we are updating Node status", Toast.LENGTH_SHORT).show();
-                Log.d("saveFirst", "You already have this Node, DB = " + NodeID + ", Exist, we are updating Node status");
+
+                final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                        "Checking this Node ID : " + NodeID + ", its exist, we are updating Node status",TSnackbar.LENGTH_LONG);
+                snackbarWrapper.setAction("Olmatix",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(getApplicationContext(), "Action",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                snackbarWrapper.show();
                 saveDatabase();
 
             } else {
@@ -752,8 +786,18 @@ public class OlmatixService extends Service {
                 installedNodeModel.setAdding(now.getTimeInMillis());
 
                 mDbNodeRepo.insertDb(installedNodeModel);
-                Toast.makeText(getApplicationContext(), "Successfully Add Node", Toast.LENGTH_SHORT).show();
-                Log.d("saveFirst", "Add Node success, ");
+                final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                        "Add "+NodeID +" success",TSnackbar.LENGTH_LONG);
+                snackbarWrapper.setAction("Olmatix",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(getApplicationContext(), "Action",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                snackbarWrapper.show();
                 doSub();
 
             }
@@ -1479,13 +1523,34 @@ public class OlmatixService extends Service {
 
         public void onProviderDisabled(String provider)
         {
-            //Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
-        }
+            final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                    "GPS Disabled..",TSnackbar.LENGTH_LONG);
+            snackbarWrapper.setAction("Olmatix",
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getApplicationContext(), "Action",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+            snackbarWrapper.show();        }
 
 
         public void onProviderEnabled(String provider)
         {
-            //Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+            final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                    "GPS Enable..",TSnackbar.LENGTH_LONG);
+            snackbarWrapper.setAction("Olmatix",
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getApplicationContext(), "Action",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+            snackbarWrapper.show();
         }
 
 

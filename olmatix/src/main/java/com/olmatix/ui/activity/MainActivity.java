@@ -7,9 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
@@ -28,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     Boolean mStatusServer;
     public static dbNodeRepo dbNodeRepo;
     private InstalledNodeModel installedNodeModel;
+    CoordinatorLayout coordinatorLayout;
+
 
     public static int[] tabIcons = {
             R.drawable.ic_dashboard,
@@ -85,7 +89,11 @@ public class MainActivity extends AppCompatActivity {
                     serverconnected = true;
                     imgStatus.setImageResource(R.drawable.ic_conn_green);
                     connStat.setText("Connected");
-                    Snackbar.make(getWindow().getDecorView().getRootView()," Olmatix Connected",Snackbar.LENGTH_LONG).show();
+                    TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Olmatix connected"
+                            ,TSnackbar.LENGTH_LONG);
+                    View snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                    snackbar.show();
 
                 } else if (!message) {
                     serverconnected = false;
@@ -93,7 +101,11 @@ public class MainActivity extends AppCompatActivity {
                     imgStatus.startAnimation(animConn);
                     connStat.setText("Not Connected");
                     connStat.startAnimation(animConn);
-                    Snackbar.make(getWindow().getDecorView().getRootView()," Olmatix Disonnected",Snackbar.LENGTH_LONG).show();
+                    TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Olmatix disconnected"
+                            ,TSnackbar.LENGTH_LONG);
+                    View snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                    snackbar.show();
                 }
             }
 
@@ -123,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
 
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);
+
+        coordinatorLayout=(CoordinatorLayout)findViewById(R.id.main_content);
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(UE_ACTION);
@@ -172,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupTabs(){
         tabLayout.setupWithViewPager(mViewPager);
-        setupTabIcons();
+        //setupTabIcons();
     }
 
     private void setupTabIcons() {
@@ -292,8 +306,13 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 Log.d("DEBUG", "onClick1: " + listView.getItemAtPosition(arg2));
                 arg1.setSelected(true);
-                Snackbar.make(getWindow().getDecorView().getRootView(), "You have pick " + listView.getItemAtPosition(arg2)
-                        , Snackbar.LENGTH_LONG).show();
+
+                TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"You have pick " + listView.getItemAtPosition(arg2)
+                        ,TSnackbar.LENGTH_LONG);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                snackbar.setIconLeft(R.drawable.ic_light_black, 24);
+                snackbar.show();
 
                 String node = (String) listView.getItemAtPosition(arg2);
                 int iend = node.indexOf("|");
@@ -328,16 +347,23 @@ public class MainActivity extends AppCompatActivity {
                         message.setQos(1);
                         message.setRetained(true);
                         Connection.getClient().publish(topic, message);
-                        Snackbar.make(getWindow().getDecorView().getRootView(),
-                                node+ " succesfully reset",Snackbar.LENGTH_LONG).show();
-                        Log.d("DEBUG", "onClick: "+node);
+                        TSnackbar snackbar = TSnackbar.make((coordinatorLayout),node+ " succesfully reset"
+                                ,TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbar.setIconLeft(R.drawable.ic_light_black, 24);
+                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                        snackbar.show();
                     } catch (UnsupportedEncodingException | MqttException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    Snackbar.make(getWindow().getDecorView().getRootView(),
-                            "You don't connect to the server",Snackbar.LENGTH_LONG).show();
-                }            }
+                    TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"You don't connect to server"
+                            ,TSnackbar.LENGTH_LONG);
+                    View snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                    snackbar.show();
+                }
+            }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -369,7 +395,13 @@ public class MainActivity extends AppCompatActivity {
             finish();
             System.exit(0);
         } else {
-            Snackbar.make(getWindow().getDecorView().getRootView(), R.string.backbutton, Snackbar.LENGTH_LONG).show();
+            TSnackbar snackbar = TSnackbar.make((coordinatorLayout), R.string.backbutton
+                    ,TSnackbar.LENGTH_LONG);
+            View snackbarView = snackbar.getView();
+            snackbar.setIconLeft(R.drawable.ic_light_black, 24);
+            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+            snackbar.show();
+
             backButtonCount++;
         }
     }

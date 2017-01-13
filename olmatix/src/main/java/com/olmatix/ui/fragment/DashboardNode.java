@@ -10,10 +10,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,6 +33,7 @@ import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -69,12 +71,15 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
     private String Distance;
     private String dist;
+    CoordinatorLayout coordinatorLayout;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mView = inflater.inflate(R.layout.frag_dashboard, container, false);
+        coordinatorLayout=(CoordinatorLayout)mView.findViewById(R.id.main_content);
+
         return mView;
     }
 
@@ -88,10 +93,10 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         dashboardNodeModel= new DashboardNodeModel();
         dashboardnode=getActivity();
         mDbNodeRepo.getAllScene();
-        //LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         setupView();
         onClickListener();
+        onTouchListener();
 
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),mRecycleView, new ClickListener() {
 
@@ -103,7 +108,11 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             @Override
             public void onLongClick(View view, int position) {
                 adapter.removeItem(position);
-                Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),"Dashboard item deleted",Snackbar.LENGTH_LONG).show();
+                TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Dashboard item deleted"
+                        ,TSnackbar.LENGTH_LONG);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                snackbar.show();
                 setRefresh();
             }
         }));
@@ -119,13 +128,10 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             public void onClick(View v) {
                 mSpinner = new Spinner(getContext());
                 List<SpinnerObject> lables = mDbNodeRepo.getAllLabels();
-
                 ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<>(getActivity(),
                         android.R.layout.simple_spinner_item,lables);
-                dataAdapter
-                        .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 mSpinner.setAdapter(dataAdapter);
-
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")
                         .setMessage("Please choose your existing Nodes!")
@@ -134,15 +140,10 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mSpinner.setOnItemSelectedListener(new SpinnerListener());
-
-                                //Log.d("DEBUG", "onItemSelected: "+ mSpinner.getSelectedItem().toString());
                                 int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
-                                System.out.println(String.valueOf(databaseId));
-
                                 dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                 mDbNodeRepo.insertFavNode(dashboardNodeModel);
                                 setRefresh();
-
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -151,6 +152,70 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
             }
         };
+    }
+
+    private View.OnTouchListener mFabTouchListener(){
+        return  new View.OnTouchListener() {
+            float dX;
+            float dY;
+            int lastAction;
+            float distanceX;
+
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        dX = view.getX() - event.getRawX();
+                        dY = view.getY() - event.getRawY();
+                        lastAction = MotionEvent.ACTION_DOWN;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        view.setY(event.getRawY() + dY);
+                        view.setX(event.getRawX() + dX);
+                        lastAction = MotionEvent.ACTION_MOVE;
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        mSpinner = new Spinner(getContext());
+                        List<SpinnerObject> lables = mDbNodeRepo.getAllLabels();
+                        ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<>(getActivity(),
+                                android.R.layout.simple_spinner_item,lables);
+
+                        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        mSpinner.setAdapter(dataAdapter);
+                        if (lastAction == MotionEvent.ACTION_DOWN)
+                        new AlertDialog.Builder(getContext())
+                                .setTitle("Add Node")
+                                .setMessage("Please choose your existing Nodes!")
+                                .setView(mSpinner)
+                                .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mSpinner.setOnItemSelectedListener(new SpinnerListener());
+                                        int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
+                                        dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
+                                        mDbNodeRepo.insertFavNode(dashboardNodeModel);
+                                        setRefresh();
+                                    }
+                                }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        }).show();
+                            break;
+                    case MotionEvent.ACTION_BUTTON_PRESS:
+
+                    default:
+                        return false;
+                }
+                return true;
+            }
+        };
+
+    }
+
+    private void onTouchListener() {
+        mFab.setOnTouchListener(mFabTouchListener());
     }
 
     private void setupView() {
@@ -177,8 +242,15 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         mRecycleViewInfo.setItemAnimator(new DefaultItemAnimator());
 
-        data.clear();
-        data.addAll(mDbNodeRepo.getNodeDetailDash());
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                data.clear();
+                data.addAll(mDbNodeRepo.getNodeDetailDash());
+            }
+        });
+
+
         adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
 
@@ -263,6 +335,8 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
     @Override
     public void onStart() {
         super.onStart();
+        mFab.hide();
+
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -286,9 +360,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             } else {
                 Distance = "Unknown";
                 resetAdapter();
-
             }
-
         }
     };
 

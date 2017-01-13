@@ -5,16 +5,24 @@ package com.olmatix.adapter;
  */
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidadvance.topsnackbar.TSnackbar;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
@@ -41,11 +49,13 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     CharSequence textNode;
     CharSequence titleNode;
     String topic;
+    dbNodeRepo dbNodeRepo;
 
 
-    public class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView fwName, ipAddrs, upTime, siGnal, nodeid,lastAdd;
-        public ImageView imgNode, imgStatus;
+    class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        TextView fwName, ipAddrs, upTime, siGnal, nodeid,lastAdd;
+        ImageView imgNode, imgStatus;
+        ImageButton imgBut;
 
         public OlmatixHolder(View view) {
             super(view);
@@ -57,6 +67,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             upTime      = (TextView) view.findViewById(R.id.uptime);
             nodeid      = (TextView) view.findViewById(R.id.nodeid);
             lastAdd     = (TextView) view.findViewById(R.id.latestAdd);
+            imgBut      = (ImageButton) view.findViewById(R.id.opt);
+
             view.setOnClickListener(this);
         }
 
@@ -84,9 +96,11 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     }
 
     @Override
-    public void onBindViewHolder(final OlmatixHolder holder, int position) {
+    public void onBindViewHolder(final OlmatixHolder holder, final int position) {
 
         final InstalledNodeModel mInstalledNodeModel = nodeList.get(position);
+        dbNodeRepo = new dbNodeRepo(context);
+
 
         if(mInstalledNodeModel.getOnline() != null) {
             if (mInstalledNodeModel.getOnline().equals("true")) {
@@ -137,6 +151,89 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             cal.getTimeInMillis();
             holder.lastAdd.setText("Updated : "+OlmatixUtils.getTimeAgo(cal));
         }
+
+        holder.imgBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Nodes");
+                builder.setMessage("What do you want to do?");
+
+                builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        builder.setTitle("Delete this Node?");
+                        builder.setMessage(mInstalledNodeModel.getNice_name_n());
+
+                        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                removeItem(position);
+                                TSnackbar snackbar = TSnackbar.make((v), mInstalledNodeModel.getNice_name_n() + "Node deleted",TSnackbar.LENGTH_LONG);
+                                View snackbarView = snackbar.getView();
+                                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                snackbar.show();
+                                notifyDataSetChanged();
+
+                            }
+                        });
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                dialog.cancel();
+                            }
+                        });
+
+                        builder.show();
+
+                        dialog.cancel();
+
+                    }
+                });
+                builder.setNegativeButton("Rename", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        notifyDataSetChanged();
+                        builder.setTitle("Rename Node");
+                        final EditText input = new EditText(context);
+                        input.setInputType(InputType.TYPE_CLASS_TEXT);
+                        builder.setView(input);
+                        if (mInstalledNodeModel.getNice_name_n()!=null) {
+                            input.setText(mInstalledNodeModel.getNice_name_n());
+                        } else{
+                            input.setText(mInstalledNodeModel.getFwName());
+                        }
+                        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String nice_name = input.getText().toString();
+                                mInstalledNodeModel.setNodesID(mInstalledNodeModel.getNodesID());
+                                mInstalledNodeModel.setNice_name_n(nice_name);
+                                dbNodeRepo.updateNameNice(mInstalledNodeModel);
+                                TSnackbar snackbar = TSnackbar.make((v), nice_name + " Renaming Node success",TSnackbar.LENGTH_LONG);
+                                View snackbarView = snackbar.getView();
+                                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                snackbar.show();
+
+                            }
+                        });
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        builder.show();
+
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
     }
 
     public static String calculateTime(long seconds) {

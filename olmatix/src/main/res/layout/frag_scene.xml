@@ -36,13 +36,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_anchor="@id/swipeRefreshLayout"
-            app:layout_anchorGravity="bottom|right|end"
+            app:layout_anchorGravity="bottom|right"
             android:src="@android:drawable/ic_input_add"
             app:elevation="6dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_marginBottom="70sp"
-            android:layout_marginRight="10sp" />
+            android:layout_marginRight="20sp" />
 
     </android.support.design.widget.CoordinatorLayout>
 

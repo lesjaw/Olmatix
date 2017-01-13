@@ -3,8 +3,8 @@ package com.olmatix.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
@@ -114,19 +115,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             final ButtonHolder holder = (ButtonHolder) viewHolder;
 
-            /*new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    holder.imgSending.setVisibility(View.GONE);
-                }
-            }, 1000);*/
-
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
 
             if (mFavoriteModel.getStatus().trim().equals("false")) {
                 holder.imgNode.setImageResource(R.drawable.offlamp1);
                 holder.imgSending.setVisibility(View.GONE);
-
 
             } else {
                 holder.imgNode.setImageResource(R.drawable.onlamp1);
@@ -164,14 +157,22 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 holder.imgSending.setVisibility(View.VISIBLE);
                                 holder.imgSending.startAnimation(animConn);
 
+
                             } catch (UnsupportedEncodingException | MqttException e) {
                                 e.printStackTrace();
                             }
                         } else{
-                            Snackbar.make(v.getRootView(), mFavoriteModel.getNice_name_d()+" Offline", Snackbar.LENGTH_LONG).show();
+                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
+                            snackbar.setActionTextColor(Color.BLACK);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbar.show();
                         }
                     } else {
-                            Snackbar.make(v.getRootView(), "You don't connect to the server", Snackbar.LENGTH_LONG).show();
+                        TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                        snackbar.show();
                             Intent intent = new Intent("addNode");
                             intent.putExtra("Connect", "con");
                             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -188,6 +189,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             if ((mFavoriteModel.getStatus().trim()).equals("true")) {
                 holder.imgNodesBut.setImageResource(R.drawable.onsec);
+
             } else {
                 holder.imgNodesBut.setImageResource(R.drawable.offsec);
 
@@ -233,11 +235,16 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 e.printStackTrace();
                             }
                         } else {
-                            Snackbar.make(v.getRootView(),  mFavoriteModel.getNice_name_d()+" Offline", Snackbar.LENGTH_LONG).show();
+                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbar.show();
                         }
                     } else {
-                        Snackbar.make(v.getRootView(),"You don't connect to the server",Snackbar.LENGTH_LONG).show();
-                        Intent intent = new Intent("addNode");
+                        TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                        snackbar.show();                        Intent intent = new Intent("addNode");
                         intent.putExtra("Conn", "Conn1");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 

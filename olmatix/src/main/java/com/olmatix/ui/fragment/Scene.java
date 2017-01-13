@@ -74,6 +74,7 @@ public class Scene extends Fragment implements OnStartDragListener {
         scene_node=getContext();
         setupView();
         onClickListener();
+        onTouchListener();
 
         mRecycleView.addOnItemTouchListener(new Scene.RecyclerTouchListener(getActivity(),
                 mRecycleView, new Scene.ClickListener() {
@@ -90,6 +91,47 @@ public class Scene extends Fragment implements OnStartDragListener {
                     }
                 }));
 
+
+    }
+
+    private void onTouchListener() {
+        mFab.setOnTouchListener(mFabTouchListener());
+    }
+
+
+    private View.OnTouchListener mFabTouchListener(){
+        return  new View.OnTouchListener() {
+            float dX;
+            float dY;
+            int lastAction;
+
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        dX = view.getX() - event.getRawX();
+                        dY = view.getY() - event.getRawY();
+                        lastAction = MotionEvent.ACTION_DOWN;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        view.setY(event.getRawY() + dY);
+                        view.setX(event.getRawX() + dX);
+                        lastAction = MotionEvent.ACTION_MOVE;
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        Intent intent = new Intent(getContext(), SceneActivity.class);
+                        startActivityForResult(intent, NEW_ALARM);
+                        break;
+                    case MotionEvent.ACTION_BUTTON_PRESS:
+
+                    default:
+                        return false;
+                }
+                return true;
+            }
+        };
 
     }
 
@@ -121,8 +163,13 @@ public class Scene extends Fragment implements OnStartDragListener {
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-        data.clear();
-        data.addAll(dbNodeRepo.getScene());
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                data.clear();
+                data.addAll(dbNodeRepo.getScene());
+            }
+        });
         adapter = new SceneAdapter(data,scene_node,this);
         mRecycleView.setAdapter(adapter);
 
@@ -271,6 +318,12 @@ public class Scene extends Fragment implements OnStartDragListener {
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
 
+    }
+
+    @Override
+    public void onStart() {
+        mFab.hide();
+        super.onStart();
     }
 
     public interface ClickListener {

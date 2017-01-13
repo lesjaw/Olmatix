@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
@@ -14,6 +15,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -75,12 +77,15 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     String Wifi = "", Wificut = "",Password, textProgres, deviceID, firmware, version,textHomeWifi;
     private ProgressDialog progressDialog;
     private IntentFilter mIntentFilter;
+    private CoordinatorLayout coordinatorLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.setup_product);
+
+        coordinatorLayout=(CoordinatorLayout)findViewById(R.id.main_content);
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
@@ -255,8 +260,11 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                                 ", please do it manually through your android WiFi setting";
                         progressDialogShow(0);
                     } else {
-                        Snackbar.make(getWindow().getDecorView().getRootView(), "Please pick Olmatix-ID",
-                                Snackbar.LENGTH_LONG).show();
+                        Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"Please pick WiFi with Olmatix-XXXXXXXX"
+                                ,Snackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                        snackbar.show();
                     }
                 }
             }
@@ -383,8 +391,12 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
             progressDialogShow(1);
 
-            Snackbar.make(getWindow().getDecorView().getRootView(), "You are connected to "+deviceID+" " +
-                    ""+firmware.toUpperCase() +" product", Snackbar.LENGTH_INDEFINITE).show();
+            Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"You are connected to "+deviceID+" " +
+                            ""+firmware.toUpperCase() +" product"
+                    ,Snackbar.LENGTH_INDEFINITE);
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+            snackbar.show();
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -416,8 +428,13 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     public void onResponse(String response) {
                         Log.i("VOLLEY", response);
                         if (response.equals("200")) {
-                            Snackbar.make(getWindow().getDecorView().getRootView(), "Setting Olmatix success",
-                                    Snackbar.LENGTH_LONG).show();                        }
+
+                            Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"Setting Olmatix success"
+                                    ,Snackbar.LENGTH_INDEFINITE);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbar.show();
+                        }
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -453,8 +470,11 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
                 requestQueue.add(stringRequest);
             } else {
-                Snackbar.make(getWindow().getDecorView().getRootView(), "You need to choose Home WiFi, Cancel setup!",
-                        Snackbar.LENGTH_LONG).show();
+                Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"You need to choose Home WiFi, Cancel setup!"
+                        ,Snackbar.LENGTH_INDEFINITE);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                snackbar.show();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -488,7 +508,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         wifi.setWifiEnabled(true);
         wifi.enableNetwork(networkId, true);
         wifi.reconnect();
-        
+
         return wifiConfiguration;
     }
 

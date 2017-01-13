@@ -88,7 +88,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         dashboardNodeModel= new DashboardNodeModel();
         dashboardnode=getActivity();
         mDbNodeRepo.getAllScene();
-        //LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
 
         setupView();
         onClickListener();
@@ -137,7 +137,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
                                 //Log.d("DEBUG", "onItemSelected: "+ mSpinner.getSelectedItem().toString());
                                 int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
-                                System.out.println(String.valueOf(databaseId));
+
 
                                 dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                 mDbNodeRepo.insertFavNode(dashboardNodeModel);
@@ -177,8 +177,14 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         mRecycleViewInfo.setItemAnimator(new DefaultItemAnimator());
 
-        data.clear();
-        data.addAll(mDbNodeRepo.getNodeDetailDash());
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                data.clear();
+                data.addAll(mDbNodeRepo.getNodeDetailDash());
+
+            }
+        });
+
         adapter = new NodeDashboardAdapter(data,dashboardnode,this);
         mRecycleView.setAdapter(adapter);
 

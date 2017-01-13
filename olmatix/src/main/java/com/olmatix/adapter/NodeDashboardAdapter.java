@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
@@ -43,6 +44,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     Context context;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
+    dbNodeRepo mDbNodeRepo;
 
     public NodeDashboardAdapter(ArrayList<DashboardNodeModel> nodeList, Context dashboardnode, OnStartDragListener dragStartListener) {
         this.nodeList = nodeList;

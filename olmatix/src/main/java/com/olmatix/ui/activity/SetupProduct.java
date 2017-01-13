@@ -205,7 +205,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             statesList[i] = String.valueOf(wifiList.get(i).SSID + " || Signal " + wifiList.get(i).level);
             System.out.println(statesList[i]);
         }
-        ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item_wifi, statesList));
+        ArrayAdapter<String> testadap = new ArrayAdapter<>(this, layout.list_item_wifi, statesList);
 
         listProduct.setAdapter(testadap);
 
@@ -414,7 +414,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 StringRequest stringRequest = new StringRequest(Request.Method.PUT, URL, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.i("VOLLEY", response);
                         if (response.equals("200")) {
                             Snackbar.make(getWindow().getDecorView().getRootView(), "Setting Olmatix success",
                                     Snackbar.LENGTH_LONG).show();                        }

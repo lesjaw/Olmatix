@@ -139,7 +139,7 @@ public class dbNodeRepo {
         db.insert(TABLE_FAV, null, values);
 
         db.close(); // Closing database connection
-       
+
         return;
     }
 

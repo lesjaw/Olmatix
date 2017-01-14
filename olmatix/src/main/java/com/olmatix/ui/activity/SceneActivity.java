@@ -33,11 +33,10 @@ import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.SceneDetailModel;
 import com.olmatix.model.SceneModel;
 
-import java.util.List;
-
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.fragments.BackConfirmationFragment;
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
+
 import static com.olmatix.lesjaw.olmatix.R.layout;
 
 /**
@@ -143,7 +142,6 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
                 break;
             case DESCRIPTION_STEP_NUM:
                 view = createSceneDescriptionStep();
-                Log.d("DEBUG", "createStepContentView: "+ "step kedua");
                 break;
             case TIME_STEP_NUM:
                 view = createSceneTimeStep();

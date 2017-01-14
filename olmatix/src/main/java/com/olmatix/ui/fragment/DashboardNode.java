@@ -116,7 +116,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                 TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Dashboard item deleted"
                         ,TSnackbar.LENGTH_LONG);
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                 snackbar.show();
                 setRefresh();
             }

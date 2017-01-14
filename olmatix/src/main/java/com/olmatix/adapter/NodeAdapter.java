@@ -214,7 +214,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                         dbNodeRepo.updateNameNice(mInstalledNodeModel);
                         TSnackbar snackbar = TSnackbar.make((v), nice_name + " renaming node success", TSnackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                         notifyDataSetChanged();
 
@@ -248,7 +248,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                         removeItem(position);
                         TSnackbar snackbar = TSnackbar.make((v), mInstalledNodeModel.getNice_name_n() + " node deleted", TSnackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                         notifyDataSetChanged();
 
@@ -294,7 +294,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                                         , TSnackbar.LENGTH_LONG);
                                 View snackbarView = snackbar.getView();
                                 snackbar.setIconLeft(R.drawable.ic_light_black, 24);
-                                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                                 snackbar.show();
                             } catch (UnsupportedEncodingException | MqttException e) {
                                 e.printStackTrace();
@@ -303,7 +303,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                             TSnackbar snackbar = TSnackbar.make((v), "You don't connect to server"
                                     , TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                         }
                     }

@@ -30,6 +30,55 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="330dp"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="25sp"
+            android:visibility="invisible"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp"
+            android:src="@drawable/ic_done"
+            app:backgroundTint="@color/black"
+            />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="270dp"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="25sp"
+            android:visibility="invisible"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp"
+            android:src="@drawable/ic_done"
+            app:backgroundTint="@color/light_blue"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="210dp"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="25sp"
+            android:visibility="invisible"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp"
+            android:src="@drawable/ic_done"
+            app:backgroundTint="@color/green"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="150dp"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="25sp"
+            android:visibility="invisible"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp"
+            android:src="@drawable/ic_done"
+            app:backgroundTint="@color/grey"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
@@ -41,7 +90,8 @@
             app:elevation="6dp"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="70sp"
-            android:layout_marginRight="20sp" />
+            android:layout_marginRight="12sp"
+            />
 
     </android.support.design.widget.CoordinatorLayout>
 

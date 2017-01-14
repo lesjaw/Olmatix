@@ -133,7 +133,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                                     "if led blink something is wrong, slow blink mean no WiFi, " +
                                     "fast blink mean no Internet",TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                         }
                     }
@@ -513,7 +513,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             adapter.removeItem(position);
                             TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " Node deleted",TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                             setRefresh();
 
@@ -551,7 +551,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             dbNodeRepo.updateNameNice(installedNodeModel);
                             TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " Renaming Node success",TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                             setRefresh();
 

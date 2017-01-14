@@ -324,7 +324,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
                             TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Renaming Button success"
                                     ,TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                             setRefresh();
 

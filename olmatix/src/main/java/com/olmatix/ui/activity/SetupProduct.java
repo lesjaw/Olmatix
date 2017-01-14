@@ -263,7 +263,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                         Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"Please pick WiFi with Olmatix-XXXXXXXX"
                                 ,Snackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                     }
                 }
@@ -395,7 +395,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                             ""+firmware.toUpperCase() +" product"
                     ,Snackbar.LENGTH_INDEFINITE);
             View snackbarView = snackbar.getView();
-            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
             snackbar.show();
 
         } catch (JSONException e) {
@@ -431,7 +431,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                             Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"Setting Olmatix success"
                                     ,Snackbar.LENGTH_INDEFINITE);
                             View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                         }
                     }
@@ -472,7 +472,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"You need to choose Home WiFi, Cancel setup!"
                         ,Snackbar.LENGTH_INDEFINITE);
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                 snackbar.show();
             }
         } catch (JSONException e) {

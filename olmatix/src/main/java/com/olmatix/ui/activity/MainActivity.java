@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Olmatix connected"
                             ,TSnackbar.LENGTH_LONG);
                     View snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                     snackbar.show();
 
                 } else if (!message) {
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                     TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Olmatix disconnected"
                             ,TSnackbar.LENGTH_LONG);
                     View snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                     snackbar.show();
                 }
             }
@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                 TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"You have pick " + listView.getItemAtPosition(arg2)
                         ,TSnackbar.LENGTH_LONG);
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                 snackbar.setIconLeft(R.drawable.ic_light_black, 24);
                 snackbar.show();
 
@@ -351,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
                                 ,TSnackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
                         snackbar.setIconLeft(R.drawable.ic_light_black, 24);
-                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                     } catch (UnsupportedEncodingException | MqttException e) {
                         e.printStackTrace();
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
                     TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"You don't connect to server"
                             ,TSnackbar.LENGTH_LONG);
                     View snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                     snackbar.show();
                 }
             }
@@ -399,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
                     ,TSnackbar.LENGTH_LONG);
             View snackbarView = snackbar.getView();
             snackbar.setIconRight(R.drawable.olmatixsmall, 24);
-            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
             snackbar.show();
 
             backButtonCount++;

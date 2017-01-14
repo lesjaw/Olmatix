@@ -164,13 +164,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                             TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
                             snackbar.setActionTextColor(Color.BLACK);
                             View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                         }
                     } else {
                         TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                             Intent intent = new Intent("addNode");
                             intent.putExtra("Connect", "con");
@@ -237,13 +237,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         } else {
                             TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                         }
                     } else {
                         TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                         Intent intent = new Intent("addNode");
                         intent.putExtra("Conn", "Conn1");

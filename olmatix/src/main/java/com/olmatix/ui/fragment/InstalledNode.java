@@ -511,7 +511,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             adapter.removeItem(position);
-                            TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + "Node deleted",TSnackbar.LENGTH_LONG);
+                            TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " Node deleted",TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
                             snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
                             snackbar.show();

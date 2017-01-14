@@ -276,7 +276,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 }
             });
 
-                    holder.btn_off.setOnClickListener(new View.OnClickListener() {
+            holder.btn_off.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);

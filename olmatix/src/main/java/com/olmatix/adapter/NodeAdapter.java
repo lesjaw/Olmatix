@@ -6,16 +6,18 @@ package com.olmatix.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -32,15 +34,18 @@ import com.olmatix.utils.ClickListener;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
-import org.eclipse.paho.client.mqttv3.MqttException;
+import net.cachapa.expandablelayout.ExpandableLayout;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter
-{
+public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter {
 
     List<InstalledNodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
@@ -50,25 +55,38 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     CharSequence titleNode;
     String topic;
     dbNodeRepo dbNodeRepo;
+    int UNSELECTED = -1;
+    int selectedItem = UNSELECTED;
+    int position;
+    SharedPreferences sharedPref;
+    Boolean mStatusServer;
 
 
     class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView fwName, ipAddrs, upTime, siGnal, nodeid,lastAdd;
+        TextView fwName, ipAddrs, upTime, siGnal, nodeid, lastAdd;
         ImageView imgNode, imgStatus;
         ImageButton imgBut;
+        TextView reset, rename, delete;
+        ExpandableLayout expandableLayout;
+
 
         public OlmatixHolder(View view) {
             super(view);
-            imgNode     = (ImageView) view.findViewById(R.id.icon_node);
-            imgStatus   = (ImageView) view.findViewById(R.id.icon_status);
-            fwName    = (TextView) view.findViewById(R.id.fw_name);
-            ipAddrs     = (TextView) view.findViewById(R.id.ipaddrs);
-            siGnal      = (TextView) view.findViewById(R.id.signal);
-            upTime      = (TextView) view.findViewById(R.id.uptime);
-            nodeid      = (TextView) view.findViewById(R.id.nodeid);
-            lastAdd     = (TextView) view.findViewById(R.id.latestAdd);
-            imgBut      = (ImageButton) view.findViewById(R.id.opt);
+            imgNode = (ImageView) view.findViewById(R.id.icon_node);
+            imgStatus = (ImageView) view.findViewById(R.id.icon_status);
+            fwName = (TextView) view.findViewById(R.id.fw_name);
+            ipAddrs = (TextView) view.findViewById(R.id.ipaddrs);
+            siGnal = (TextView) view.findViewById(R.id.signal);
+            upTime = (TextView) view.findViewById(R.id.uptime);
+            nodeid = (TextView) view.findViewById(R.id.nodeid);
+            lastAdd = (TextView) view.findViewById(R.id.latestAdd);
+            imgBut = (ImageButton) view.findViewById(R.id.opt);
+            reset = (TextView) view.findViewById(R.id.reset);
+            rename = (TextView) view.findViewById(R.id.rename);
+            delete = (TextView) view.findViewById(R.id.delete);
 
+            expandableLayout = (ExpandableLayout) itemView.findViewById(R.id.expandable_layout);
+            expandableLayout.setInterpolator(new OvershootInterpolator());
             view.setOnClickListener(this);
         }
 
@@ -100,9 +118,11 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
 
         final InstalledNodeModel mInstalledNodeModel = nodeList.get(position);
         dbNodeRepo = new dbNodeRepo(context);
+        this.position = position;
+        holder.expandableLayout.collapse(false);
+        holder.imgBut.setSelected(false);
 
-
-        if(mInstalledNodeModel.getOnline() != null) {
+        if (mInstalledNodeModel.getOnline() != null) {
             if (mInstalledNodeModel.getOnline().equals("true")) {
                 holder.imgStatus.setImageResource(R.drawable.ic_check_green);
             } else {
@@ -110,7 +130,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             }
         }
         holder.imgNode.setImageResource(R.drawable.olmatixmed);
-        if(mInstalledNodeModel.getFwName() != null) {
+        if (mInstalledNodeModel.getFwName() != null) {
             if (mInstalledNodeModel.getFwName().equals("smartfitting")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_light);
             } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")) {
@@ -130,109 +150,175 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         });
 
 
-        if(mInstalledNodeModel.getNice_name_n() != null) {
+        if (mInstalledNodeModel.getNice_name_n() != null) {
             holder.fwName.setText(mInstalledNodeModel.getNice_name_n());
             titleNode = mInstalledNodeModel.getNice_name_n();
         } else
             holder.fwName.setText(mInstalledNodeModel.getFwName());
 
-        holder.ipAddrs.setText("IP : "+mInstalledNodeModel.getLocalip());
-        holder.siGnal.setText("Signal : "+mInstalledNodeModel.getSignal()+"%");
-        if (mInstalledNodeModel.getUptime()!=null) {
+        holder.ipAddrs.setText("IP : " + mInstalledNodeModel.getLocalip());
+        holder.siGnal.setText("Signal : " + mInstalledNodeModel.getSignal() + "%");
+        if (mInstalledNodeModel.getUptime() != null) {
             long seconds = Long.parseLong(mInstalledNodeModel.getUptime());
             calculateTime(seconds);
             holder.upTime.setText("Uptime : " + calculateTime(seconds));
         }
 
-        if(mInstalledNodeModel.getAdding() != null) {
+        if (mInstalledNodeModel.getAdding() != null) {
             holder.nodeid.setText(mInstalledNodeModel.getNodesID());
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date(mInstalledNodeModel.getAdding()));
             cal.getTimeInMillis();
-            holder.lastAdd.setText("Updated : "+OlmatixUtils.getTimeAgo(cal));
+            holder.lastAdd.setText("Updated : " + OlmatixUtils.getTimeAgo(cal));
         }
 
         holder.imgBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
+
+                if (holder != null) {
+                    holder.imgBut.setSelected(false);
+                    holder.expandableLayout.collapse();
+                }
+
+                if (position == selectedItem) {
+                    selectedItem = UNSELECTED;
+                } else {
+                    holder.imgBut.setSelected(true);
+                    holder.expandableLayout.expand();
+                    selectedItem = position;
+                }
+            }
+        });
+
+        holder.rename.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                holder.rename.setSelected(true);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Nodes");
-                builder.setMessage("What do you want to do?");
+                builder.setTitle("Rename Node");
+                final EditText input = new EditText(context);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                if (mInstalledNodeModel.getNice_name_n() != null) {
+                    input.setText(mInstalledNodeModel.getNice_name_n());
+                } else {
+                    input.setText(mInstalledNodeModel.getFwName());
+                }
+                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String nice_name = input.getText().toString();
+                        mInstalledNodeModel.setNodesID(mInstalledNodeModel.getNodesID());
+                        mInstalledNodeModel.setNice_name_n(nice_name);
+                        dbNodeRepo.updateNameNice(mInstalledNodeModel);
+                        TSnackbar snackbar = TSnackbar.make((v), nice_name + " renaming node success", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                        snackbar.show();
+                        notifyDataSetChanged();
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
+            }
+
+
+        });
+
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                holder.rename.setSelected(true);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Delete this Node?");
+                builder.setMessage(mInstalledNodeModel.getNice_name_n());
 
                 builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        builder.setTitle("Delete this Node?");
-                        builder.setMessage(mInstalledNodeModel.getNice_name_n());
-
-                        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                removeItem(position);
-                                TSnackbar snackbar = TSnackbar.make((v), mInstalledNodeModel.getNice_name_n() + "Node deleted",TSnackbar.LENGTH_LONG);
-                                View snackbarView = snackbar.getView();
-                                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
-                                snackbar.show();
-                                notifyDataSetChanged();
-
-                            }
-                        });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                dialog.cancel();
-                            }
-                        });
-
-                        builder.show();
-
-                        dialog.cancel();
+                        removeItem(position);
+                        TSnackbar snackbar = TSnackbar.make((v), mInstalledNodeModel.getNice_name_n() + " node deleted", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                        snackbar.show();
+                        notifyDataSetChanged();
 
                     }
                 });
-                builder.setNegativeButton("Rename", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        notifyDataSetChanged();
-                        builder.setTitle("Rename Node");
-                        final EditText input = new EditText(context);
-                        input.setInputType(InputType.TYPE_CLASS_TEXT);
-                        builder.setView(input);
-                        if (mInstalledNodeModel.getNice_name_n()!=null) {
-                            input.setText(mInstalledNodeModel.getNice_name_n());
-                        } else{
-                            input.setText(mInstalledNodeModel.getFwName());
-                        }
-                        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String nice_name = input.getText().toString();
-                                mInstalledNodeModel.setNodesID(mInstalledNodeModel.getNodesID());
-                                mInstalledNodeModel.setNice_name_n(nice_name);
-                                dbNodeRepo.updateNameNice(mInstalledNodeModel);
-                                TSnackbar snackbar = TSnackbar.make((v), nice_name + " Renaming Node success",TSnackbar.LENGTH_LONG);
-                                View snackbarView = snackbar.getView();
-                                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
-                                snackbar.show();
-
-                            }
-                        });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        });
-
-                        builder.show();
 
                         dialog.cancel();
                     }
                 });
 
                 builder.show();
+
             }
+        });
+
+        holder.reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Reset this Node?");
+                builder.setMessage(mInstalledNodeModel.getNodesID()+" || "+mInstalledNodeModel.getNice_name_n());
+                builder.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNodesID() + "/$reset";
+                            String payload = "true";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                TSnackbar snackbar = TSnackbar.make((v), mInstalledNodeModel.getNodesID() +" || "
+                                        +mInstalledNodeModel.getNice_name_n() + " succesfully reset"
+                                        , TSnackbar.LENGTH_LONG);
+                                View snackbarView = snackbar.getView();
+                                snackbar.setIconLeft(R.drawable.ic_light_black, 24);
+                                snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                                snackbar.show();
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make((v), "You don't connect to server"
+                                    , TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+                            snackbar.show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
+            }
+
         });
     }
 
@@ -283,7 +369,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             } catch (MqttException e) {
                 e.printStackTrace();
             }
-            Log.d("DEBUG", "removeItem: " +a +" / "+mNodeID);
         }
 
         InstalledNode.dbNodeRepo.deleteNode(nodeList.get(position).getNodesID());

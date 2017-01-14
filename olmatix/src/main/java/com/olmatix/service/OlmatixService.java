@@ -164,11 +164,32 @@ public class OlmatixService extends Service {
 
             if (alarmService==null){
                 if (!hasConnectivity) {
-                    Toast.makeText(getApplication(), "No Internet connection", Toast.LENGTH_SHORT).show();
+                    final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                            "Internet connection avalaible",TSnackbar.LENGTH_LONG);
+                    snackbarWrapper.setAction("Olmatix",
+                            new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getApplicationContext(), "Action",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                    snackbarWrapper.show();
                 } else {
                     if (add_NodeID == null) {
-                        Toast.makeText(getApplication(), "Internet connection avalaible", Toast.LENGTH_SHORT).show();
-                        doCon = false;
+                        final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                                "Your device Offline",TSnackbar.LENGTH_LONG);
+                        snackbarWrapper.setAction("Olmatix",
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getApplicationContext(), "Action",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        snackbarWrapper.show();                        doCon = false;
                         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                         mStatusServer = sharedPref.getBoolean("conStatus", false);
                         SharedPreferences.Editor editor = sharedPref.edit();
@@ -227,9 +248,18 @@ public class OlmatixService extends Service {
                 }
             } else {
                 //Not Connected info
-                String msg = getString(string.err_internet);
-                Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
-                toast.show();
+                final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                        "No Internet connection",TSnackbar.LENGTH_LONG);
+                snackbarWrapper.setAction("Olmatix",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(getApplicationContext(), "Action",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                snackbarWrapper.show();
                 text = "Disconnected";
                 flagConn = false;
                 doCon=false;

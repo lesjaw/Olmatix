@@ -16,6 +16,7 @@ public class DashboardNodeModel {
     private String status_theft;
     private String online;
     private String onduration;
+    private String id_node_detail;
 
     public int getId() {
         return id;
@@ -95,5 +96,13 @@ public class DashboardNodeModel {
 
     public void setOnduration(String onduration) {
         this.onduration = onduration;
+    }
+
+    public String getId_node_detail() {
+        return id_node_detail;
+    }
+
+    public void setId_node_detail(String id_node_detail) {
+        this.id_node_detail = id_node_detail;
     }
 }

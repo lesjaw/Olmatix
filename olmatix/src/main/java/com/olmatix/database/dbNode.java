@@ -56,8 +56,7 @@ public class dbNode {
     public static final String KEY_PATH     = "path";
     public static final String KEY_COMMAND     = "command";
     public static final String KEY_LOG     = "log";
-
-
+    public static final String KEY_ID_NODE_DETAIL = "id_node_detail";
 
 
     // property help us to keep data

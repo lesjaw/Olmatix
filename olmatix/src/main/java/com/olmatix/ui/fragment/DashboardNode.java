@@ -24,6 +24,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -68,7 +69,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
     Spinner mSpinner;
     private int mDatasetTypes[] = {mLOCATION, mBUTTON}; //view types
     Context dashboardnode;
-
+    private ItemTouchHelper mItemTouchHelper;
     private String Distance;
     private String dist;
     CoordinatorLayout coordinatorLayout;
@@ -93,6 +94,10 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         dashboardNodeModel= new DashboardNodeModel();
         dashboardnode=getActivity();
         mDbNodeRepo.getAllScene();
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
         setupView();
         onClickListener();
@@ -140,7 +145,8 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mSpinner.setOnItemSelectedListener(new SpinnerListener());
-                                int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
+                                int databaseId = Integer.parseInt(String.valueOf(((SpinnerObject) mSpinner.getSelectedItem()).getId()));
+                                Log.d("DEBUG", "onClick: "+String.valueOf(databaseId));
                                 dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                 mDbNodeRepo.insertFavNode(dashboardNodeModel);
                                 setRefresh();
@@ -397,7 +403,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        //mItemTouchHelper.startDrag(viewHolder);
+        mItemTouchHelper.startDrag(viewHolder);
 
     }
 

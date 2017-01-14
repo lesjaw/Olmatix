@@ -30,6 +30,7 @@ import static com.olmatix.database.dbNode.KEY_FWNAME;
 import static com.olmatix.database.dbNode.KEY_FWVERSION;
 import static com.olmatix.database.dbNode.KEY_ICON;
 import static com.olmatix.database.dbNode.KEY_ID;
+import static com.olmatix.database.dbNode.KEY_ID_NODE_DETAIL;
 import static com.olmatix.database.dbNode.KEY_LEAVE;
 import static com.olmatix.database.dbNode.KEY_LOCALIP;
 import static com.olmatix.database.dbNode.KEY_LOG;
@@ -109,7 +110,6 @@ public class dbNodeRepo {
         return (int) Id;
     }
 
-
     public int insertInstalledNode(DetailNodeModel detailNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -134,13 +134,12 @@ public class dbNodeRepo {
 
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NICE_NAME_D, dashboardNodeModel.getNice_name_d());
+        values.put(KEY_ID_NODE_DETAIL, dashboardNodeModel.getNice_name_d());
 
         db.insert(TABLE_FAV, null, values);
 
         db.close(); // Closing database connection
-        //Log.d("DEBUG", "insertFav: " + String.valueOf(KEY_NICE_NAME_D));
-
+       
         return;
     }
 
@@ -158,8 +157,6 @@ public class dbNodeRepo {
         //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
     }
-
-
 
     public ArrayList<SceneModel> getAllSceneList() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -230,7 +227,6 @@ public class dbNodeRepo {
         db.close();
         return nodeList;
     }
-
 
     public int insertSceneDetail(SceneDetailModel sceneDetailModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -310,7 +306,6 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-
     public void deleteNode(String node_Id) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -324,11 +319,11 @@ public class dbNodeRepo {
         db.close(); // Closing database connection
     }
 
-    public void deleteFav(int node_Id) {
+    public void deleteFav(String node_Id) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
-        db.delete(TABLE_FAV, dbNode.KEY_NICE_NAME_D + "= ?", new String[]{
+        db.delete(TABLE_FAV, dbNode.KEY_ID_NODE_DETAIL + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
         db.close(); // Closing database connection
@@ -541,7 +536,6 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-
     public List<SpinnerObject> getAllLabels() {
         List<SpinnerObject> labels = new ArrayList<>();
         String selectQuery = "SELECT  * FROM " + TABLE_NODE;
@@ -676,7 +670,7 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_FAV +
                 " favorite_node INNER JOIN " + TABLE_NODE +
-                " detail_node ON favorite_node." + KEY_NICE_NAME_D + " = detail_node." + KEY_ID +
+                " detail_node ON favorite_node." + KEY_ID_NODE_DETAIL+ " = detail_node." + KEY_ID +
                 " INNER JOIN " + TABLE +
                 " installed_node ON installed_node." + KEY_NODE_ID + " = detail_node." + KEY_NODE_ID;
 
@@ -687,6 +681,7 @@ public class dbNodeRepo {
             do {
                 DashboardNodeModel node = new DashboardNodeModel();
                 node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setId_node_detail(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ID_NODE_DETAIL)));
                 node.setNice_name_d(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));

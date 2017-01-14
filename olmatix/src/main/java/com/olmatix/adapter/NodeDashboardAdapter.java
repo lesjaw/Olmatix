@@ -30,6 +30,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -72,9 +73,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     public void removeItem(int position) {
 
-        int mNodeID = nodeList.get(position).getId();
+        String mNodeID = nodeList.get(position).getId_node_detail();
         Log.d("DEBUG", "removeItem: "+mNodeID);
-        DashboardNode.mDbNodeRepo.deleteFav(nodeList.get(position).getId());
+        DashboardNode.mDbNodeRepo.deleteFav(mNodeID);
         nodeList.remove(position);
 
         notifyItemRemoved(position);
@@ -83,7 +84,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-
         View v;
 
         animConn = AnimationUtils.loadAnimation(context, R.anim.blinkfast);
@@ -108,7 +108,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-
         final DashboardNodeModel mFavoriteModel = nodeList.get(position);
 
         if ((mFavoriteModel.getSensor().trim()).equals("light")) {
@@ -180,8 +179,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 }
             });
 
+        }
 
-        } else if ((mFavoriteModel.getSensor().trim()).equals("close")) {
+        else if ((mFavoriteModel.getSensor().trim()).equals("close")) {
 
             final StatusHolder holder = (StatusHolder) viewHolder;
 
@@ -244,10 +244,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
                         snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
-                        snackbar.show();                        Intent intent = new Intent("addNode");
+                        snackbar.show();
+                        Intent intent = new Intent("addNode");
                         intent.putExtra("Conn", "Conn1");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
                     }
                 }
             });
@@ -256,7 +256,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        //Collections.swap(nodeList, fromPosition, toPosition);
+        Collections.swap(nodeList, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }
@@ -267,9 +267,14 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+
+
         public ViewHolder(View v) {
             super(v);
+
         }
+
+
     }
 
     public class ButtonHolder extends ViewHolder {
@@ -283,8 +288,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             node_name = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
             imgSending = (ImageView) view.findViewById(R.id.icon_sending);
-
-
         }
     }
 

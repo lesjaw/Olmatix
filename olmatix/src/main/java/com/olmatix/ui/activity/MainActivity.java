@@ -398,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
             TSnackbar snackbar = TSnackbar.make((coordinatorLayout), R.string.backbutton
                     ,TSnackbar.LENGTH_LONG);
             View snackbarView = snackbar.getView();
-            snackbar.setIconLeft(R.drawable.ic_light_black, 24);
+            snackbar.setIconRight(R.drawable.olmatixsmall, 24);
             snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
             snackbar.show();
 

@@ -506,14 +506,17 @@ public class OlmatixService extends Service {
             alarm.setAlarm(this);
             Log.d("DEBUG", "Alarm set ");
         }
+
             sendMessage();
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             listener = new MyLocationListener();
 
-            NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
+            final NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
 
             if (nInfo != null) {
-                if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
@@ -531,10 +534,10 @@ public class OlmatixService extends Service {
                 }
             }
 
-            LocationManager mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            String mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
+        LocationManager mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        String mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
 
-            Location mLocation = mLocationMgr.getLastKnownLocation(mProvider);
+        Location mLocation = mLocationMgr.getLastKnownLocation(mProvider);
             if (mLocation == null) {
                 mLocation = mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             } else if (mLocation == null) {
@@ -543,20 +546,19 @@ public class OlmatixService extends Service {
                 mLocation = mLocationMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
             }
 
-            lat = mLocation.getLatitude();
-            lng = mLocation.getLongitude();
-            locationDistance();
+        lat = mLocation.getLatitude();
+        lng = mLocation.getLongitude();
+        locationDistance();
 
-            Intent i = new Intent(proximityIntentAction);
-            PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
+        PreferenceHelper mPrefHelper = new PreferenceHelper(this.getApplicationContext());
 
-            final PreferenceHelper mPrefHelper = new PreferenceHelper(this.getApplicationContext());
-
-            double homeLat = mPrefHelper.getHomeLatitude();
-            double homelng = mPrefHelper.getHomeLongitude();
-            long thres = mPrefHelper.getHomeThresholdDistance();
-            Log.d("DEBUG", "proximity: " + homeLat + " | " + homelng + ":" + thres);
-            mLocationMgr.addProximityAlert(homeLat, homelng, thres, -1, pi);
+        double homeLat = mPrefHelper.getHomeLatitude();
+        double homelng = mPrefHelper.getHomeLongitude();
+        long thres = mPrefHelper.getHomeThresholdDistance();
+        Log.d("DEBUG", "proximity: " + homeLat + " | " + homelng + ":" + thres);
+        Intent i = new Intent(proximityIntentAction);
+        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
+        mLocationMgr.addProximityAlert(homeLat, homelng, thres, -1, pi);
 
             filter = new IntentFilter(proximityIntentAction);
             registerReceiver(new OlmatixReceiver(), filter);
@@ -1566,7 +1568,6 @@ public class OlmatixService extends Service {
 
             snackbarWrapper.show();        }
 
-
         public void onProviderEnabled(String provider)
         {
             final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
@@ -1583,8 +1584,7 @@ public class OlmatixService extends Service {
             snackbarWrapper.show();
         }
 
-
-        public void onStatusChanged(String provider, int status, Bundle extras)
+    public void onStatusChanged(String provider, int status, Bundle extras)
         {
 
         }

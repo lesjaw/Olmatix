@@ -102,15 +102,15 @@
 
             <ImageButton
                 android:id="@+id/opt"
-                android:layout_width="35sp"
-                android:layout_height="35sp"
+                android:layout_width="40sp"
+                android:layout_height="40sp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/nodeid"
-                android:src="@android:drawable/arrow_down_float"
+                android:src="@android:drawable/ic_menu_view"
                 android:stateListAnimator="@null"
                 android:theme="@style/AppTheme.Button"
-                android:scaleType="centerCrop"
+                android:scaleType="fitXY"
                 />
 
             <net.cachapa.expandablelayout.ExpandableLayout

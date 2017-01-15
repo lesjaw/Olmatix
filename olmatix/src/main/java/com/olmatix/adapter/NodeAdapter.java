@@ -47,20 +47,19 @@ import java.util.List;
 
 public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>  implements ItemTouchHelperAdapter {
 
-    List<InstalledNodeModel> nodeList;
+    private List<InstalledNodeModel> nodeList;
     private final OnStartDragListener mDragStartListener;
     private ClickListener clicklistener = null;
-    Context context;
-    CharSequence textNode;
-    CharSequence titleNode;
-    String topic;
-    dbNodeRepo dbNodeRepo;
-    int UNSELECTED = -1;
-    int selectedItem = UNSELECTED;
-    int position;
-    SharedPreferences sharedPref;
-    Boolean mStatusServer;
-
+    private Context context;
+    private CharSequence titleNode;
+    private String topic;
+    private dbNodeRepo dbNodeRepo;
+    private int UNSELECTED = -1;
+    private int selectedItem = UNSELECTED;
+    private int position1;
+    private SharedPreferences sharedPref;
+    private Boolean mStatusServer;
+    private InstalledNode installedNode;
 
     class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView fwName, ipAddrs, upTime, siGnal, nodeid, lastAdd;
@@ -85,6 +84,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             rename = (TextView) view.findViewById(R.id.rename);
             delete = (TextView) view.findViewById(R.id.delete);
 
+            installedNode = new InstalledNode();
             expandableLayout = (ExpandableLayout) itemView.findViewById(R.id.expandable_layout);
             expandableLayout.setInterpolator(new OvershootInterpolator());
             view.setOnClickListener(this);
@@ -118,7 +118,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
 
         final InstalledNodeModel mInstalledNodeModel = nodeList.get(position);
         dbNodeRepo = new dbNodeRepo(context);
-        this.position = position;
+        this.position1 = position;
         holder.expandableLayout.collapse(false);
         holder.imgBut.setSelected(false);
 
@@ -172,21 +172,24 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             holder.lastAdd.setText("Updated : " + OlmatixUtils.getTimeAgo(cal));
         }
 
+
         holder.imgBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
 
                 if (holder != null) {
+                    installedNode.cancelSchedule();
                     holder.imgBut.setSelected(false);
                     holder.expandableLayout.collapse();
                 }
 
-                if (position == selectedItem) {
+                if (position1 == selectedItem) {
                     selectedItem = UNSELECTED;
                 } else {
                     holder.imgBut.setSelected(true);
                     holder.expandableLayout.expand();
-                    selectedItem = position;
+                    selectedItem = position1;
+
                 }
             }
         });

@@ -32,6 +32,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -230,7 +231,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     }
 
-    private void refreshHeader() {
+    public void refreshHeader() {
         autoUpdate = new Timer();
         autoUpdate.schedule(new TimerTask() {
             @Override
@@ -242,7 +243,15 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     }
                 });
             }
-        }, 100, 5000); // updates GUI each 40 secs
+        }, 100, 10000); // updates GUI each 40 secs
+    }
+
+    public void cancelSchedule(){
+        Log.d(TAG, "cancelSchedule: "+autoUpdate);
+        if (autoUpdate != null){
+            autoUpdate.cancel();
+        }
+
     }
 
     private void onClickListener() {
@@ -420,8 +429,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-        initSwipe();
-
+        //initSwipe();
 
         getActivity().runOnUiThread(new Runnable() {
             @Override

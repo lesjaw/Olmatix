@@ -2,6 +2,7 @@
 
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -57,7 +58,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            app:passwordToggleContentDescription="@string/description"
+            app:passwordToggleDrawable="@drawable/ic_password_visibility_selector"
+            app:passwordToggleEnabled="true">
             <EditText android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,6 +81,7 @@
             android:text="Create Account"
             android:layout_gravity="center"
             android:layout_marginBottom="24dp"
+
             />
 
         <TextView android:id="@+id/link_login"

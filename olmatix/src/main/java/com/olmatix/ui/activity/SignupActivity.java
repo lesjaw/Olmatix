@@ -156,7 +156,6 @@ public class SignupActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(String response) {
                     String err="";
-                    //Log.d(TAG, "onResponse: "+response);
                     int iend1 = response.indexOf(":");
                     if (iend1 != -1) {
                         err = response.substring(0, iend1);

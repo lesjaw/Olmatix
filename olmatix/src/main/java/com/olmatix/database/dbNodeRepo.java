@@ -135,6 +135,8 @@ public class dbNodeRepo {
         ContentValues values = new ContentValues();
 
         values.put(KEY_ID_NODE_DETAIL, dashboardNodeModel.getNice_name_d());
+        values.put(KEY_NODE_ID, dashboardNodeModel.getNodeid());
+
 
         db.insert(TABLE_FAV, null, values);
 
@@ -314,6 +316,9 @@ public class dbNodeRepo {
                 String.valueOf(node_Id)});
 
         db.delete(TABLE_NODE, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(node_Id)});
+
+        db.delete(TABLE_FAV, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
         db.close(); // Closing database connection

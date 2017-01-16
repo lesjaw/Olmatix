@@ -54,6 +54,7 @@ public class dbHelper extends SQLiteOpenHelper {
 
         String CREATE_TABLE_FAVORITE = "CREATE TABLE " + dbNode.TABLE_FAV  + "("
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_NODE_ID + " TEXT, "
                 + dbNode.KEY_ID_NODE_DETAIL + " TEXT) ";
 
         String CREATE_TABLE_MQTT = "CREATE TABLE " + dbNode.TABLE_MQTT  + "("

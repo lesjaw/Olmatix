@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.app.usage.UsageStats;
@@ -27,10 +28,12 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -142,6 +145,8 @@ public class OlmatixService extends Service {
     boolean hasChanged = false;
     SharedPreferences sharedPref;
     Boolean mStatusServer, doCon, noNotif=true;
+    private ProgressDialog nDialog;
+
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -354,7 +359,9 @@ public class OlmatixService extends Service {
                         sendMessage();
                         if (!mSwitch_conn) {
                                 Log.d(TAG, "Doing subscribe nodes");
-                                doSubAll();
+                                //doSubAll();
+                            new OlmatixService.load().execute();
+
                         } else {
                             //Log.d(TAG, "Call Disconn: " + flagConn);
                         }
@@ -448,7 +455,7 @@ public class OlmatixService extends Service {
     }
 
     private void setFlagSub() {
-        new Handler().postDelayed(new Runnable() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 flagSub = true;
@@ -502,9 +509,11 @@ public class OlmatixService extends Service {
             Log.d(TAG, "onStartCommand status connection: " + mStatusServer);
             doConnect();
 
-            OlmatixAlarmReceiver alarm = new OlmatixAlarmReceiver();
-            alarm.setAlarm(this);
-            Log.d("DEBUG", "Alarm set ");
+            OlmatixAlarmReceiver alarmCheckConn = new OlmatixAlarmReceiver();
+            if (alarmCheckConn==null) {
+                alarmCheckConn.setAlarm(this);
+                Log.d("DEBUG", "Alarm set ");
+            }
         }
 
             sendMessage();
@@ -1353,115 +1362,128 @@ public class OlmatixService extends Service {
     }
 
     private void doSubAll() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-        int countDB = mDbNodeRepo.getNodeList().size();
-        Log.d("DEBUG", "Count list Node: " + countDB);
-        data.addAll(mDbNodeRepo.getNodeList());
-        if (countDB != 0) {
-            for (int i = 0; i < countDB; i++) {
-                final String mNodeID = data.get(i).getNodesID();
-                //Log.d("DEBUG", "Count list: " + mNodeID);
-                for (int a = 0; a < 5; a++) {
-                    if (a == 0) {
-                        topic = "devices/" + mNodeID + "/$online";
-                    }
-                    if (a == 1) {
-                        topic = "devices/" + mNodeID + "/$fwname";
-                    }
-                    if (a == 2) {
-                        topic = "devices/" + mNodeID + "/$signal";
-                    }
-                    if (a == 3) {
-                        topic = "devices/" + mNodeID + "/$uptime";
-                    }
-                    if (a == 4) {
-                        topic = "devices/" + mNodeID + "/$localip";
-                    }
-                    int qos = 2;
-                    try {
-                        if (mqttClient!=null) {
-                            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                            subToken.setActionCallback(new IMqttActionListener() {
-                                @Override
-                                public void onSuccess(IMqttToken asyncActionToken) {
-                                    //Log.d("SubscribeNode", " device = " + mNodeID);
-                                }
+                int countDB = mDbNodeRepo.getNodeList().size();
+                Log.d("DEBUG", "Count list Node: " + countDB);
+                data.addAll(mDbNodeRepo.getNodeList());
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        final String mNodeID = data.get(i).getNodesID();
+                        //Log.d("DEBUG", "Count list: " + mNodeID);
+                        for (int a = 0; a < 5; a++) {
+                            if (a == 0) {
+                                topic = "devices/" + mNodeID + "/$online";
+                            }
+                            if (a == 1) {
+                                topic = "devices/" + mNodeID + "/$fwname";
+                            }
+                            if (a == 2) {
+                                topic = "devices/" + mNodeID + "/$signal";
+                            }
+                            if (a == 3) {
+                                topic = "devices/" + mNodeID + "/$uptime";
+                            }
+                            if (a == 4) {
+                                topic = "devices/" + mNodeID + "/$localip";
+                            }
+                            int qos = 2;
+                            try {
+                                if (mqttClient!=null) {
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                    subToken.setActionCallback(new IMqttActionListener() {
+                                        @Override
+                                        public void onSuccess(IMqttToken asyncActionToken) {
+                                            //Log.d("SubscribeNode", " device = " + mNodeID);
+                                        }
 
-                                @Override
-                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        @Override
+                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        }
+                                    });
                                 }
-                            });
+                            } catch (MqttException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    } catch (MqttException e) {
-                        e.printStackTrace();
                     }
+                    data.clear();
+                    doSubAllDetail();
                 }
             }
-            data.clear();
-            doSubAllDetail();
-        }
-
+        }).start();
     }
 
-    private void doSubAllDetail() {
-        int countDB = mDbNodeRepo.getNodeDetailList().size();
-        Log.d("DEBUG", "Count list Detail: " + countDB);
-        data1.addAll(mDbNodeRepo.getNodeDetailList());
-        countDB = mDbNodeRepo.getNodeDetailList().size();
-        if (countDB != 0) {
-            for (int i = 0; i < countDB; i++) {
-                final String mNodeID = data1.get(i).getNode_id();
-                final String mChannel = data1.get(i).getChannel();
-                topic1 = "devices/" + mNodeID + "/light/" + mChannel;
-                int qos = 2;
-                try {
-                    IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
-                    subToken.setActionCallback(new IMqttActionListener() {
-                        @Override
-                        public void onSuccess(IMqttToken asyncActionToken) {
-                            //Log.d("SubscribeButton", " device = " + mNodeID);
-                        }
+    class load extends AsyncTask<Void, Integer, String> {
 
-                        @Override
-                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                        }
-                    });
-                } catch (MqttException e) {
-                    e.printStackTrace();
-                }
+        protected void onPreExecute (){
 
-            }
-            doAllsubDetailSensor();
         }
-        data1.clear();
-    }
 
-    private void doAllsubDetailSensor() {
-        int countDB = mDbNodeRepo.getNodeDetailList().size();
-        Log.d("DEBUG", "Count list Sensor: " + countDB);
-        data1.addAll(mDbNodeRepo.getNodeDetailList());
-        countDB = mDbNodeRepo.getNodeDetailList().size();
-        if (countDB != 0) {
-            for (int i = 0; i < countDB; i++) {
-                final String mNodeID1 = data1.get(i).getNode_id();
-                final String mSensorT = data1.get(i).getSensor();
-                //Log.d("DEBUG", "Count list Sensor: " + mSensorT);
-                if (mSensorT != null && mSensorT.equals("close")) {
-                    for (int a = 0; a < 2; a++) {
+        protected String doInBackground(Void...arg0) {
+
+            int countDB = mDbNodeRepo.getNodeList().size();
+            Log.d("DEBUG", "Count list Node: " + countDB);
+            data.addAll(mDbNodeRepo.getNodeList());
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    final String mNodeID = data.get(i).getNodesID();
+                    //Log.d("DEBUG", "Count list: " + mNodeID);
+                    for (int a = 0; a < 5; a++) {
                         if (a == 0) {
-                            topic1 = "devices/" + mNodeID1 + "/door/close";
+                            topic = "devices/" + mNodeID + "/$online";
                         }
                         if (a == 1) {
-                            topic1 = "devices/" + mNodeID1 + "/door/theft";
+                            topic = "devices/" + mNodeID + "/$fwname";
                         }
+                        if (a == 2) {
+                            topic = "devices/" + mNodeID + "/$signal";
+                        }
+                        if (a == 3) {
+                            topic = "devices/" + mNodeID + "/$uptime";
+                        }
+                        if (a == 4) {
+                            topic = "devices/" + mNodeID + "/$localip";
+                        }
+                        int qos = 2;
+                        try {
+                            if (mqttClient != null) {
+                                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                subToken.setActionCallback(new IMqttActionListener() {
+                                    @Override
+                                    public void onSuccess(IMqttToken asyncActionToken) {
+                                        //Log.d("SubscribeNode", " device = " + mNodeID);
+                                    }
 
+                                    @Override
+                                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                    }
+                                });
+                            }
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                data.clear();
+                int countDB1 = mDbNodeRepo.getNodeDetailList().size();
+                Log.d("DEBUG", "Count list Detail: " + countDB1);
+                data1.addAll(mDbNodeRepo.getNodeDetailList());
+                countDB1 = mDbNodeRepo.getNodeDetailList().size();
+                if (countDB1 != 0) {
+                    for (int i = 0; i < countDB1; i++) {
+                        final String mNodeID = data1.get(i).getNode_id();
+                        final String mChannel = data1.get(i).getChannel();
+                        topic1 = "devices/" + mNodeID + "/light/" + mChannel;
                         int qos = 2;
                         try {
                             IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
                             subToken.setActionCallback(new IMqttActionListener() {
                                 @Override
                                 public void onSuccess(IMqttToken asyncActionToken) {
-                                    //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                    //Log.d("SubscribeButton", " device = " + mNodeID);
                                 }
 
                                 @Override
@@ -1472,13 +1494,157 @@ public class OlmatixService extends Service {
                             e.printStackTrace();
                         }
                     }
+                    for (int i = 0; i < countDB; i++) {
+                        final String mNodeID1 = data1.get(i).getNode_id();
+                        final String mSensorT = data1.get(i).getSensor();
+                        //Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                        if (mSensorT != null && mSensorT.equals("close")) {
+                            for (int a = 0; a < 2; a++) {
+                                if (a == 0) {
+                                    topic1 = "devices/" + mNodeID1 + "/door/close";
+                                }
+                                if (a == 1) {
+                                    topic1 = "devices/" + mNodeID1 + "/door/theft";
+                                }
 
+                                int qos = 2;
+                                try {
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                                    subToken.setActionCallback(new IMqttActionListener() {
+                                        @Override
+                                        public void onSuccess(IMqttToken asyncActionToken) {
+                                            //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                        }
+
+                                        @Override
+                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        }
+                                    });
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
+                    }
+                    flagSub = false;
+                    data1.clear();
+                }
+
+            }
+            return "You are at PostExecute";
+        }
+
+        protected void onProgressUpdate(Integer...a){
+            //Log.d(TAG + " onProgressUpdate", "You are in progress update ... " + a[0]);
+        }
+
+        protected void onPostExecute(String result) {
+           /* final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                    "Registering done...",TSnackbar.LENGTH_LONG);
+            snackbarWrapper.setAction("Olmatix",
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getApplicationContext(), "Action",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+            snackbarWrapper.show();*/
+        }
+    }
+
+    private void doSubAllDetail() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int countDB = mDbNodeRepo.getNodeDetailList().size();
+                Log.d("DEBUG", "Count list Detail: " + countDB);
+                data1.addAll(mDbNodeRepo.getNodeDetailList());
+                countDB = mDbNodeRepo.getNodeDetailList().size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        final String mNodeID = data1.get(i).getNode_id();
+                        final String mChannel = data1.get(i).getChannel();
+                        topic1 = "devices/" + mNodeID + "/light/" + mChannel;
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    //Log.d("SubscribeButton", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    doAllsubDetailSensor();
+                }
+                data1.clear();
+            }
+        }).start();
+
+
+    }
+
+    private void doAllsubDetailSensor() {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int countDB = mDbNodeRepo.getNodeDetailList().size();
+                Log.d("DEBUG", "Count list Sensor: " + countDB);
+                data1.addAll(mDbNodeRepo.getNodeDetailList());
+                countDB = mDbNodeRepo.getNodeDetailList().size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        final String mNodeID1 = data1.get(i).getNode_id();
+                        final String mSensorT = data1.get(i).getSensor();
+                        //Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                        if (mSensorT != null && mSensorT.equals("close")) {
+                            for (int a = 0; a < 2; a++) {
+                                if (a == 0) {
+                                    topic1 = "devices/" + mNodeID1 + "/door/close";
+                                }
+                                if (a == 1) {
+                                    topic1 = "devices/" + mNodeID1 + "/door/theft";
+                                }
+
+                                int qos = 2;
+                                try {
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                                    subToken.setActionCallback(new IMqttActionListener() {
+                                        @Override
+                                        public void onSuccess(IMqttToken asyncActionToken) {
+                                            //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                        }
+
+                                        @Override
+                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        }
+                                    });
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
+                    }
+                    flagSub = false;
+                    data1.clear();
                 }
             }
-            flagSub = false;
-            setFlagSub();
-            data1.clear();
-        }
+        }).start();
+        setFlagSub();
+
     }
 
     public class OlmatixBinder extends Binder {
@@ -1550,7 +1716,6 @@ public class OlmatixService extends Service {
                 lng = (mLocation.getLongitude());
                 locationDistance();
             }
-
         }
 
         public void onProviderDisabled(String provider)
@@ -1588,7 +1753,6 @@ public class OlmatixService extends Service {
         {
 
         }
-
     }
 
     public void locationDistance(){

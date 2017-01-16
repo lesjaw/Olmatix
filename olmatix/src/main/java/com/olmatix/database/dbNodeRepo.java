@@ -606,7 +606,6 @@ public class dbNodeRepo {
 
         Cursor cursor = db.rawQuery(selectString, null);
 
-
         if (cursor.moveToFirst()) {
             do {
                 DetailNodeModel node = new DetailNodeModel();

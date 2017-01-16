@@ -8,8 +8,10 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +20,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.lesjaw.olmatix.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -33,12 +48,17 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.link_login) TextView _loginLink;
     String name, email, password;
     ProgressDialog progressDialog;
+    CoordinatorLayout coordinatorLayout;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         ButterKnife.inject(this);
+
+        coordinatorLayout=(CoordinatorLayout)findViewById(R.id.main_content);
+
 
         _signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,14 +99,6 @@ public class SignupActivity extends AppCompatActivity {
 
         onSignupSuccess();
 
-        /*new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onSignupSuccess or onSignupFailed
-                        // depending on success
-                        onSignupSuccess();
-                    }
-                }, 3000);*/
     }
 
 
@@ -94,8 +106,7 @@ public class SignupActivity extends AppCompatActivity {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
         progressDialog.dismiss();
-        sendEmail();
-        finish();
+        sendJsonSignUp();
     }
 
     public void onSignupFailed() {
@@ -133,6 +144,76 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    private void sendJsonSignUp(){
+
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
+
+
+            String url = "http://cloud.olmatix.com/rest/insert.php";
+            StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    String err="";
+                    //Log.d(TAG, "onResponse: "+response);
+                    int iend1 = response.indexOf(":");
+                    if (iend1 != -1) {
+                        err = response.substring(0, iend1);
+                        Log.d(TAG, "onResponse: "+err);
+                    }
+                    if (!err.equals("Error")) {
+                        parsingJson(response);
+                    } else {
+                        TSnackbar snackbar = TSnackbar.make(coordinatorLayout,"Email exist, create another one or please login..",TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                    }
+                }
+            }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //This code is executed if there is an error.
+                }
+            }) {
+                protected Map<String, String> getParams() {
+                    Map<String, String> MyData = new HashMap<String, String>();
+                    MyData.put("name", name); //Add the data you'd like to send to the server.
+                    MyData.put("email", email);
+                    MyData.put("password", password);
+                    return MyData;
+                }
+            };
+
+        MyRequestQueue.add(MyStringRequest);
+
+
+    }
+
+    public void parsingJson(String json) {
+        try {
+            JSONObject jObject = new JSONObject(json);
+            String msg = jObject.getString("msg");
+
+            TSnackbar snackbar = TSnackbar.make(coordinatorLayout,msg,TSnackbar.LENGTH_INDEFINITE);
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+            snackbar.setAction("OK", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+            snackbar.show();
+            if (msg.equals("Sign up success, please wait for email confirmation")) {
+                _signupButton.setEnabled(false);
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendEmail() {

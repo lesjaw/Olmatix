@@ -257,7 +257,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
                         createAPConfiguration(Wifi, Password,"PSK");
                         textProgres = "Connecting to Olmatix WiFi, if it takes too long connect" +
-                                ", please do it manually through your android WiFi setting";
+                                ", please do it manuall connect through your android WiFi setting, and comeback here to continue setup product..";
                         progressDialogShow(0);
                     } else {
                         Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"Please pick WiFi with Olmatix-XXXXXXXX"

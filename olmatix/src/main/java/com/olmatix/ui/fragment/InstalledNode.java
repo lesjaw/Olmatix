@@ -388,6 +388,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                                     }
                                 }).show();
                         }
+
+                        onTouchListener(0);
                         break;
                     case MotionEvent.ACTION_BUTTON_PRESS:
 

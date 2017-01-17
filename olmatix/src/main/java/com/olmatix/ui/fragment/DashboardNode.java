@@ -166,7 +166,6 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             float dX;
             float dY;
             int lastAction;
-            float distanceX;
 
             @Override
             public boolean onTouch(View view, MotionEvent event) {
@@ -209,7 +208,9 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                             public void onClick(DialogInterface dialog, int whichButton) {
                             }
                         }).show();
-                            break;
+                        onTouchListener(0);
+
+                        break;
                     case MotionEvent.ACTION_BUTTON_PRESS:
 
                     default:

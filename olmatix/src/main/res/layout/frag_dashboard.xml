@@ -15,8 +15,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="0sp">
+            android:layout_height="match_parent">
 
             <View
                 android:layout_width="match_parent"

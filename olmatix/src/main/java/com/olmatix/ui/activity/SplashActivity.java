@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,21 +25,17 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent i = new Intent(this, OlmatixService.class);
-        startService(i);
-
-        /*sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        mStatusServer = sharedPref.getBoolean("conStatus", false);
-        Log.d("DEBUG", "onStartCommand status connection: "+mStatusServer);
-        if (mStatusServer) {
-            Intent a = new Intent(getApplication(), MainActivity.class);
-            startActivity(a);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String mUserName = sharedPref.getString("user_name", "olmatix1");
+        if (mUserName.equals("olmatix1")){
+            Intent i = new Intent(getApplication(), LoginActivity.class);
+            startActivity(i);
             finish();
         } else {
-            Intent b = new Intent(getApplication(), LoginActivity.class);
-            startActivity(b);
-            finish();
-        }*/
+
+            Intent i = new Intent(this, OlmatixService.class);
+            startService(i);
+        }
 
     }
 

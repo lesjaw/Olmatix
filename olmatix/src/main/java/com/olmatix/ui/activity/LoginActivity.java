@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.service.OlmatixService;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -94,11 +95,12 @@ public class LoginActivity extends AppCompatActivity {
 
         Log.d(TAG, "login: "+mUserName +" : "+mPassword);
 
+        Intent i = new Intent(this, OlmatixService.class);
+        startService(i);
+
         Intent intent = new Intent("addNode");
         intent.putExtra("Connect", "login");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
-
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

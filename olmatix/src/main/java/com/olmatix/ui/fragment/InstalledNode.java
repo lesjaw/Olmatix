@@ -108,7 +108,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         installedNodeModel = new InstalledNodeModel();
         setupView();
         onClickListener();
-        onTouchListener();
+
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),
                 mRecycleView, new ClickListener() {
             @Override
@@ -151,18 +151,23 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         }));
     }
 
-    private void onTouchListener() {
-        mFab.setOnTouchListener(mFabTouchListener());
+    private void onTouchListener(int drag) {
+        if (drag==1) {
+            mFab.setOnTouchListener(mFabTouchListener());
+        } else {
+            mFab.setOnTouchListener(null);
+        }
     }
 
     class load extends AsyncTask<Void, Integer, String> {
 
         protected void onPreExecute (){
-            nDialog = new ProgressDialog(getContext());
+           /* nDialog = new ProgressDialog(getContext());
             nDialog.setMessage("Loading Nodes, Please wait..");
             nDialog.setIndeterminate(true);
             nDialog.setCancelable(false);
-            nDialog.show();        }
+            nDialog.show();  */
+        }
 
         protected String doInBackground(Void...arg0) {
             sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -217,9 +222,10 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         }
 
         protected void onPostExecute(String result) {
-            nDialog.dismiss();
+            //nDialog.dismiss();
             setAdapter();
             mFab.show();
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -340,6 +346,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             float dX;
             float dY;
             int lastAction;
+            float distanceX;
 
             @Override
             public boolean onTouch(View view, MotionEvent event) {
@@ -357,26 +364,31 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        final EditText mEditText = new EditText(getContext());
-                        if (lastAction == MotionEvent.ACTION_DOWN)
-                        new AlertDialog.Builder(getContext())
-                                .setTitle("Add Node")
-                                .setMessage("Please type Olmatix product ID!")
-                                .setView(mEditText)
-                                .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+                        distanceX = event.getRawX()-event.getRawX();
+                        if (Math.abs(distanceX)< 10) {
 
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                            final EditText mEditText = new EditText(getContext());
+                            if (lastAction == MotionEvent.ACTION_DOWN)
+                                new AlertDialog.Builder(getContext())
+                                        .setTitle("Add Node")
+                                        .setMessage("Please type Olmatix product ID!")
+                                        .setView(mEditText)
+                                        .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
 
-                                        inputResult = mEditText.getText().toString();
-                                        sendMessage();
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                                inputResult = mEditText.getText().toString();
+                                                sendMessage();
 
 
+                                            }
+                                        }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
                                     }
-                                }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                            }
-                        }).show();                            break;
+                                }).show();
+                        }
+                        break;
                     case MotionEvent.ACTION_BUTTON_PRESS:
 
                     default:
@@ -392,6 +404,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                onTouchListener(0);
                 final EditText mEditText = new EditText(getContext());
                 new AlertDialog.Builder(getContext())
                         .setTitle("Add Node")
@@ -413,6 +426,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                 }).show();
 
             }
+
+
         };
     }
 
@@ -451,6 +466,14 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             }
         });
 
+        mFab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                    onTouchListener(1);
+                return false;
+            }
+        });
+
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
@@ -458,8 +481,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0 ||dy<0 && mFab.isShown())
-                {
+                if (dy > 0 ||dy<0 && mFab.isShown()) {
                     mFab.hide();
                 }
             }
@@ -468,6 +490,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     mFab.show();
+
                 }
                 super.onScrollStateChanged(recyclerView, newState);
             }
@@ -491,8 +514,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     }
 
     private void setRefresh() {
+        onTouchListener(0);
         new load().execute();
-        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     private void initSwipe(){

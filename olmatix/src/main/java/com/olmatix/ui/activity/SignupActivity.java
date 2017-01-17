@@ -20,9 +20,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -86,17 +88,11 @@ public class SignupActivity extends AppCompatActivity {
 
         _signupButton.setEnabled(false);
 
-        progressDialog = new ProgressDialog(SignupActivity.this);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Creating Account...");
-        progressDialog.show();
-
         name = _nameText.getText().toString();
         email = _emailText.getText().toString();
         password = _passwordText.getText().toString();
 
-        // TODO: Implement your own signup logic here.
-
+        progressDialogShow(0);
         onSignupSuccess();
 
     }
@@ -105,7 +101,6 @@ public class SignupActivity extends AppCompatActivity {
     public void onSignupSuccess() {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
-        progressDialog.dismiss();
         sendJsonSignUp();
     }
 
@@ -155,25 +150,13 @@ public class SignupActivity extends AppCompatActivity {
             StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    String err="";
-                    int iend1 = response.indexOf(":");
-                    if (iend1 != -1) {
-                        err = response.substring(0, iend1);
-                        Log.d(TAG, "onResponse: "+err);
-                    }
-                    if (!err.equals("Error")) {
+                    Log.d(TAG, "onResponse: "+response);
                         parsingJson(response);
-                    } else {
-                        TSnackbar snackbar = TSnackbar.make(coordinatorLayout,"Email exist, create another one or please login..",TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                    }
                 }
             }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    //This code is executed if there is an error.
+                    Log.d(TAG, "onErrorResponse: "+error);
                 }
             }) {
                 protected Map<String, String> getParams() {
@@ -185,6 +168,9 @@ public class SignupActivity extends AppCompatActivity {
                 }
             };
 
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        MyStringRequest.setRetryPolicy(policy);
         MyRequestQueue.add(MyStringRequest);
 
 
@@ -205,6 +191,8 @@ public class SignupActivity extends AppCompatActivity {
                 }
             });
             snackbar.show();
+            progressDialogShow(1);
+
             if (msg.equals("Sign up success, please wait for email confirmation")) {
                 _signupButton.setEnabled(false);
             }
@@ -212,6 +200,21 @@ public class SignupActivity extends AppCompatActivity {
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void progressDialogShow (int what){
+        if (what==0) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setCancelable(true);
+            progressDialog.setMessage("Registering your ID, please wait..");
+            progressDialog.show();
+
+        } else {
+            if (progressDialog!=null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                Log.d("DEBUG", "progressDialogStop: ");
+            }
         }
     }
 

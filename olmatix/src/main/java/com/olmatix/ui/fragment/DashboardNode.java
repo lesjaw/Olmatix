@@ -74,6 +74,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
     private String dist;
     CoordinatorLayout coordinatorLayout;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -101,7 +102,6 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
         setupView();
         onClickListener();
-        onTouchListener();
 
         mRecycleView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(),mRecycleView, new ClickListener() {
 
@@ -131,6 +131,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                onTouchListener(0);
                 mSpinner = new Spinner(getContext());
                 List<SpinnerObject> lables = mDbNodeRepo.getAllLabels();
                 ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<>(getActivity(),
@@ -220,8 +221,12 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
     }
 
-    private void onTouchListener() {
-        mFab.setOnTouchListener(mFabTouchListener());
+    private void onTouchListener(int drag) {
+        if (drag==1) {
+            mFab.setOnTouchListener(mFabTouchListener());
+        } else {
+            mFab.setOnTouchListener(null);
+        }
     }
 
     private void setupView() {
@@ -296,6 +301,14 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
         }
 
+        mFab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                    onTouchListener(1);
+                return false;
+            }
+        });
+
         mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener()
         {
             @Override
@@ -329,7 +342,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         dist = Distance;
         infoAdapter = new InfoAdapter(dist, mDatasetTypes,dashboardnode, this);
         mRecycleViewInfo.setAdapter(infoAdapter);
-
+        onTouchListener(0);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

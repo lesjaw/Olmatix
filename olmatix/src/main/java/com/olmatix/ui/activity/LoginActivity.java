@@ -36,14 +36,14 @@ public class LoginActivity extends AppCompatActivity {
     @InjectView(R.id.input_password) EditText _passwordText;
     @InjectView(R.id.btn_login) Button _loginButton;
     @InjectView(R.id.link_signup) TextView _signupLink;
-    @InjectView(R.id.labelolmatix) TextView _labelOlmatix;
+    //@InjectView(R.id.labelolmatix) TextView _labelOlmatix;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
-        _labelOlmatix.setSelected(true);
+        //_labelOlmatix.setSelected(true);
 
         _loginButton.setOnClickListener(new View.OnClickListener() {
 

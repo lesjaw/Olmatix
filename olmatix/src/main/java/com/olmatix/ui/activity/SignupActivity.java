@@ -151,7 +151,7 @@ public class SignupActivity extends AppCompatActivity {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
 
 
-            String url = "http://cloud.olmatix.com/rest/insert.php";
+            String url = "http://cloud.olmatix.com/rest/insert_sent.php";
             StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -194,7 +194,7 @@ public class SignupActivity extends AppCompatActivity {
         try {
             JSONObject jObject = new JSONObject(json);
             String msg = jObject.getString("msg");
-
+            Log.d(TAG, "parsingJson: "+msg);
             TSnackbar snackbar = TSnackbar.make(coordinatorLayout,msg,TSnackbar.LENGTH_INDEFINITE);
             View snackbarView = snackbar.getView();
             snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));

@@ -97,14 +97,6 @@
                 android:textSize="15sp"
                 android:textColor="@color/white"/>
         </RelativeLayout>
-            <ImageButton
-                android:id="@+id/recentbut"
-                android:layout_width="200sp"
-                android:layout_height="40sp"
-                android:layout_below="@+id/header"
-                android:stateListAnimator="@null"
-                android:background="@color/white"
-                 />
 
             <ImageView
                 android:id="@+id/imgrecent"
@@ -125,7 +117,8 @@
                 android:textSize="15sp"
                 android:layout_below="@+id/header"
                 android:layout_toRightOf="@+id/imgrecent"
-                android:layout_toEndOf="@+id/imgrecent"/>
+                android:layout_toEndOf="@+id/imgrecent"
+                android:background="@drawable/selected_item"/>
 
             <ImageButton
                 android:id="@+id/deleterecent"

@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton butRecent, deleteRecent;
     private Animation animConn;
     private Toolbar mToolbar;
-    private TextView settingLabel, aboutLabel;
+    private TextView settingLabel, aboutLabel, recentLabel;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
     SharedPreferences sharedPref;
@@ -199,10 +199,10 @@ public class MainActivity extends AppCompatActivity {
         animConn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink);
         listViewRecent = (ListView) findViewById(R.id.recent_status);
         imgRecent = (ImageView) findViewById(R.id.imgrecent);
-        butRecent = (ImageButton) findViewById(R.id.recentbut);
         deleteRecent = (ImageButton) findViewById(R.id.deleterecent);
         settingLabel = (TextView) findViewById(R.id.settingLabel);
         aboutLabel = (TextView) findViewById(R.id.aboutLabel);
+        recentLabel = (TextView) findViewById(R.id.recentchangelabel);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        butRecent.setOnClickListener(new View.OnClickListener() {
+        recentLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (expandableLayout0.isExpanded()) {

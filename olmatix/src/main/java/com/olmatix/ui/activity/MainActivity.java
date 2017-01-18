@@ -29,11 +29,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.OlmatixPagerAdapter;
+import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.InstalledNodeModel;
@@ -43,10 +45,13 @@ import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.ui.fragment.Scene;
 import com.olmatix.utils.Connection;
 
+import net.cachapa.expandablelayout.ExpandableLayout;
+
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
     boolean serverconnected;
     int backButtonCount;
     private TabLayout tabLayout;
-    private ImageView imgStatus;
+    private ImageView imgStatus, imgRecent;
+    private ImageButton butRecent, deleteRecent;
     private Animation animConn;
     private Toolbar mToolbar;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
@@ -68,6 +74,12 @@ public class MainActivity extends AppCompatActivity {
     public static dbNodeRepo dbNodeRepo;
     private InstalledNodeModel installedNodeModel;
     CoordinatorLayout coordinatorLayout;
+    ListView listViewRecent;
+    dbNode dbnode;
+    private ExpandableLayout expandableLayout0;
+    private Animation rotate_forward,rotate_backward;
+    ArrayAdapter listAdap;
+    ArrayList<String> recentChange;
 
 
     public static int[] tabIcons = {
@@ -110,6 +122,27 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    private BroadcastReceiver mMessageReceiver1 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("NotifyChangeDetail");
+            String DistService = intent.getStringExtra("distance");
+            if (message==null){
+                message = "1";
+            }
+            if (message.equals("2")){
+                updatelist();
+            }
+        }
+    };
+
+    private void updatelist (){
+        recentChange.clear();
+        recentChange.addAll(dbNodeRepo.getLogMqtt());
+        listAdap.notifyDataSetChanged();
+    }
+
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -131,6 +164,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dbNodeRepo = new dbNodeRepo(this);
+        dbnode = new dbNode();
+
+        recentChange = new ArrayList<>();
+
 
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);
@@ -156,11 +195,22 @@ public class MainActivity extends AppCompatActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         imgStatus = (ImageView) findViewById(R.id.conn_state);
         animConn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink);
+        listViewRecent = (ListView) findViewById(R.id.recent_status);
+        imgRecent = (ImageView) findViewById(R.id.imgrecent);
+        butRecent = (ImageButton) findViewById(R.id.recentbut);
+        deleteRecent = (ImageButton) findViewById(R.id.deleterecent);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
+
+        rotate_forward = AnimationUtils.loadAnimation(this, R.anim.rotate_forward90);
+        rotate_backward = AnimationUtils.loadAnimation(this,R.anim.rotate_backward90);
+
         setupViewPager(mViewPager);
+
+        expandableLayout0 = (ExpandableLayout) findViewById(R.id.expandable_layout_0);
+        imgRecent.startAnimation(rotate_forward);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         mStatusServer = sharedPref.getBoolean("conStatus", false);
@@ -173,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
             imgStatus.startAnimation(animConn);
         }
 
+        listRecent();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -191,7 +242,8 @@ public class MainActivity extends AppCompatActivity {
 
                 } else if (id == R.id.nav_about) {
                     Intent i = new Intent(getApplicationContext(), AboutActivity.class);
-                    startActivity(i);                }
+                    startActivity(i);
+                }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawer.closeDrawer(GravityCompat.START);
@@ -199,6 +251,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        butRecent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (expandableLayout0.isExpanded()) {
+                    expandableLayout0.collapse();
+                    imgRecent.startAnimation(rotate_backward);
+                } else {
+                    expandableLayout0.expand();
+                    imgRecent.startAnimation(rotate_forward);
+
+                    recentChange.clear();
+                    recentChange.addAll(dbNodeRepo.getLogMqtt());
+                    listAdap.notifyDataSetChanged();
+                }
+            }
+        });
+
+        deleteRecent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbNodeRepo.deleteMqtt();
+                TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"You have clearing recent status.."
+                        ,TSnackbar.LENGTH_LONG);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                snackbar.show();
+
+            }
+        });
     }
 
     private void setupToolbar() {
@@ -249,6 +330,8 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(mIntentReceiver, mIntentFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter("MQTTStatus"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver1, new IntentFilter("MQTTStatusDetail"));
         Log.d("Receiver ", "MainActivity = Starting..");
     }
 
@@ -301,6 +384,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void listRecent (){
+
+        recentChange.addAll(dbNodeRepo.getLogMqtt());
+        listAdap = new ArrayAdapter<>(this,R.layout.list_log_alarm,recentChange);
+        listViewRecent.setAdapter(listAdap);
+
+    }
+
     private void resetNode (){
         final String[] nodelist;
         List<InstalledNodeModel> NodeID;
@@ -339,7 +430,7 @@ public class MainActivity extends AppCompatActivity {
                         ,TSnackbar.LENGTH_LONG);
                 View snackbarView = snackbar.getView();
                             snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                snackbar.setIconLeft(R.drawable.ic_light_black, 24);
+                snackbar.setIconRight(R.drawable.ic_light_black, 24);
                 snackbar.show();
 
                 String node = (String) listView.getItemAtPosition(arg2);
@@ -350,7 +441,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("DEBUG", "onItemClick: "+nodeid);
                     ad.dismiss();
                 }
-
             }
         });
 

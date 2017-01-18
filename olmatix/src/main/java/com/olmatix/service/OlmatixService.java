@@ -955,6 +955,8 @@ public class OlmatixService extends Service {
         messageReceive.clear();
         message_topic.clear();
         data1.clear();
+        textNode="";
+        titleNode="";
     }
 
     protected void checkActivityForeground() {
@@ -1208,21 +1210,30 @@ public class OlmatixService extends Service {
             installedNodeModel.setNodesID(NodeID);
             data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
-                if (countDB != 0) {
+            Log.d(TAG, "saveDatabase: "+NodeID);
+
+            if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         if (data2.get(i).getNice_name_n() != null) {
                             mNiceNameN = data2.get(i).getNice_name_n();
+                            Log.d(TAG, "saveDatabase1: "+mNiceNameN);
                         } else {
                             mNiceNameN = data2.get(i).getFwName();
+                            Log.d(TAG, "saveDatabase2: "+mNiceNameN);
+
                         }
                         int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
                         notifyID = id + 2;
                         if (mMessage.equals("true")) {
                             titleNode = mNiceNameN;
                             textNode = "ONLINE";
+                            Log.d(TAG, "saveDatabase3: "+mNiceNameN);
+
                         } else {
                             titleNode = mNiceNameN;
                             textNode = "OFFLINE";
+                            Log.d(TAG, "saveDatabase4: "+mNiceNameN);
+
                         }
                         if (!flagOnForeground) {
                             if (!noNotif) {
@@ -1233,11 +1244,10 @@ public class OlmatixService extends Service {
                 }
 
             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
-            dbnode.setTopic(mNiceName);
+            dbnode.setTopic(mNiceNameN);
             dbnode.setMessage(textNode +" at " +timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertDbMqtt(dbnode);
             data2.clear();
-
         }
 
         installedNodeModel.setSignal(messageReceive.get("signal"));
@@ -1257,6 +1267,8 @@ public class OlmatixService extends Service {
         data.clear();
         mChange = "2";
         sendMessageDetail();
+        textNode="";
+        titleNode="";
 
     }
 

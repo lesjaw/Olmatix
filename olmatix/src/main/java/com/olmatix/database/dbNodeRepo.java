@@ -989,7 +989,8 @@ public class dbNodeRepo {
         List<String> nodeList = new ArrayList<>();
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_MQTT;
+        String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+10;
+
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 

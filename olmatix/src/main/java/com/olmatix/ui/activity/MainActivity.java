@@ -32,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.OlmatixPagerAdapter;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton butRecent, deleteRecent;
     private Animation animConn;
     private Toolbar mToolbar;
+    private TextView settingLabel, aboutLabel;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
     SharedPreferences sharedPref;
@@ -199,6 +201,8 @@ public class MainActivity extends AppCompatActivity {
         imgRecent = (ImageView) findViewById(R.id.imgrecent);
         butRecent = (ImageButton) findViewById(R.id.recentbut);
         deleteRecent = (ImageButton) findViewById(R.id.deleterecent);
+        settingLabel = (TextView) findViewById(R.id.settingLabel);
+        aboutLabel = (TextView) findViewById(R.id.aboutLabel);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
@@ -260,10 +264,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     expandableLayout0.expand();
                     imgRecent.startAnimation(rotate_forward);
-
-                    recentChange.clear();
-                    recentChange.addAll(dbNodeRepo.getLogMqtt());
-                    listAdap.notifyDataSetChanged();
+                    updatelist();
                 }
             }
         });
@@ -277,7 +278,24 @@ public class MainActivity extends AppCompatActivity {
                 View snackbarView = snackbar.getView();
                 snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                 snackbar.show();
+                updatelist();
 
+            }
+        });
+
+        settingLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(i);
+            }
+        });
+
+        aboutLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(i);
             }
         });
     }

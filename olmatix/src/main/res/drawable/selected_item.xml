@@ -6,7 +6,7 @@
     </item>
     <item
         android:state_pressed="true"
-        android:drawable="@color/white">
+        android:drawable="@color/light_blue">
     </item>
     <!-- for other state -->
 </selector>

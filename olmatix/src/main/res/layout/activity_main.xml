@@ -169,7 +169,7 @@
                 />
             <TextView
                 android:id="@+id/settingLabel"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Settings"
                 android:padding="10sp"
@@ -177,7 +177,8 @@
                 android:textSize="15sp"
                 android:layout_below="@+id/expandable_layout_0"
                 android:layout_toRightOf="@+id/imgSetting"
-                android:layout_toEndOf="@+id/imgSetting"/>
+                android:layout_toEndOf="@+id/imgSetting"
+                android:background="@drawable/selected_item"/>
 
 
             <ImageView
@@ -190,7 +191,7 @@
                 />
             <TextView
                 android:id="@+id/aboutLabel"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="About"
                 android:padding="10sp"
@@ -198,7 +199,8 @@
                 android:textSize="15sp"
                 android:layout_below="@+id/imgSetting"
                 android:layout_toRightOf="@+id/imgABout"
-                android:layout_toEndOf="@+id/imgABout"/>
+                android:layout_toEndOf="@+id/imgABout"
+                android:background="@drawable/selected_item"/>
 
 
 

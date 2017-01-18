@@ -10,16 +10,6 @@
     app:layout_scrollFlags="scroll|enterAlways|snap"
     app:layout_collapseMode="pin">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/status_conn"
-        android:textColor="@color/white"
-        android:id="@+id/conn_state1"
-        android:paddingRight="0sp"
-        android:textSize="15sp"
-        android:layout_gravity = "right"/>
-
     <ImageView
         android:layout_height = "wrap_content"
         android:layout_width = "wrap_content"

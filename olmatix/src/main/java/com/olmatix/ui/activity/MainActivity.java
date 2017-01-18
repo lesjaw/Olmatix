@@ -11,9 +11,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,7 +31,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.OlmatixPagerAdapter;
@@ -56,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     int backButtonCount;
     private TabLayout tabLayout;
     private ImageView imgStatus;
-    private TextView connStat;
     private Animation animConn;
     private Toolbar mToolbar;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
@@ -88,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
                 if (message) {
                     serverconnected = true;
                     imgStatus.setImageResource(R.drawable.ic_conn_green);
-                    connStat.setText("Connected");
                     TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Olmatix connected"
                             ,TSnackbar.LENGTH_LONG);
                     View snackbarView = snackbar.getView();
@@ -99,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
                     serverconnected = false;
                     imgStatus.setImageResource(R.drawable.ic_conn_red);
                     imgStatus.startAnimation(animConn);
-                    connStat.setText("Not Connected");
-                    connStat.startAnimation(animConn);
                     TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Olmatix disconnected"
                             ,TSnackbar.LENGTH_LONG);
                     View snackbarView = snackbar.getView();
@@ -156,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         imgStatus = (ImageView) findViewById(R.id.conn_state);
-        connStat = (TextView) findViewById(R.id.conn_state1);
         animConn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink);
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -170,13 +168,36 @@ public class MainActivity extends AppCompatActivity {
 
         if (mStatusServer) {
             imgStatus.setImageResource(R.drawable.ic_conn_green);
-            connStat.setText("Connected");
         } else {
             imgStatus.setImageResource(R.drawable.ic_conn_red);
             imgStatus.startAnimation(animConn);
-            connStat.setText("Not Connected");
-            connStat.startAnimation(animConn);
         }
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert navigationView != null;
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_preferences) {
+                    Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+                    startActivity(i);
+
+                } else if (id == R.id.nav_about) {
+                    Intent i = new Intent(getApplicationContext(), AboutActivity.class);
+                    startActivity(i);                }
+
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
 
     }
 
@@ -249,9 +270,16 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if (id == android.R.id.home) {
+                drawer.openDrawer(GravityCompat.START);
+
+            return true;
+        }
 
         if (id == R.id.action_settings) {
             Intent i = new Intent(this, SettingsActivity.class);
@@ -378,31 +406,43 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        int tabpos = tabLayout.getSelectedTabPosition();
 
-    int tabpos = tabLayout.getSelectedTabPosition();
-        Log.d("DEBUG", "onBackPressed: "+tabpos);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
     if (tabpos==2){
-        mViewPager.setCurrentItem(1);
-    }else if (tabpos==1){
-        mViewPager.setCurrentItem(0);
-    }else {
-        if (backButtonCount >= 1) {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-            System.exit(0);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
         } else {
-            TSnackbar snackbar = TSnackbar.make((coordinatorLayout), R.string.backbutton
-                    ,TSnackbar.LENGTH_LONG);
-            View snackbarView = snackbar.getView();
-            snackbar.setIconRight(R.drawable.olmatixsmall, 24);
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-            snackbar.show();
+            mViewPager.setCurrentItem(1);
+        }
+    }else if (tabpos==1){
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            mViewPager.setCurrentItem(0);
+        }
+    }else if (tabpos==0) {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            if (backButtonCount >= 1) {
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+                System.exit(0);
+            } else {
+                TSnackbar snackbar = TSnackbar.make((coordinatorLayout), R.string.backbutton
+                        , TSnackbar.LENGTH_LONG);
+                View snackbarView = snackbar.getView();
+                snackbar.setIconRight(R.drawable.olmatixsmall, 24);
+                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                snackbar.show();
 
-            backButtonCount++;
+                backButtonCount++;
+            }
         }
     }
     }

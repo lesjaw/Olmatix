@@ -95,6 +95,7 @@
     <string name="form_hint_description">Scene Description</string>
     <string name="error_title_min_characters">At least %1$d characters</string>
     <string name="error_wifi_pick">Pick WiFi w/ SSID: Olmatix-ID</string>
+    <string name="action_drawer">Drawer</string>
 
     <string-array name="steps_titles">
         <item>Connect to Olmatix product..</item>
@@ -116,5 +117,8 @@
 
         <item>Choose nodes..</item>
     </string-array>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>

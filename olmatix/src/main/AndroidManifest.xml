@@ -28,12 +28,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/olmatixlogo"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/SplashTheme">
 
         <activity
             android:name="com.olmatix.ui.activity.SplashActivity"
             android:theme="@style/SplashTheme">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

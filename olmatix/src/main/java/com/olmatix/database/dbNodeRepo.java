@@ -996,7 +996,28 @@ public class dbNodeRepo {
 
         if (cursor.moveToFirst()) {
             do {
-                nodeList.add(cursor.getString(1)+ " , "+ cursor.getString(2));
+                nodeList.add(cursor.getString(1)+ ", "+ cursor.getString(2));
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
+    public List<dbNode> getLogStatus() {
+        List<dbNode> nodeList = new ArrayList<>();
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+10;
+
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+
 
             } while (cursor.moveToNext());
         }

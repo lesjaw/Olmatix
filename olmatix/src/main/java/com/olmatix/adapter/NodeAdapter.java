@@ -131,7 +131,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         }
         holder.imgNode.setImageResource(R.drawable.olmatixmed);
         if (mInstalledNodeModel.getFwName() != null) {
-            if (mInstalledNodeModel.getFwName().equals("smartfitting")) {
+            if (mInstalledNodeModel.getFwName().equals("smartfitting")||mInstalledNodeModel.getFwName().equals("smartadapter1ch")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_light);
             } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_adapter);

@@ -1,5 +1,6 @@
 package com.olmatix.ui.activity;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,24 +9,35 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 
+import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.service.OlmatixService;
 
 /**
  * Created by Lesjaw on 04/12/2016.
  */
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends Activity {
     SharedPreferences sharedPref;
     Boolean mStatusServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.splash_screen);
+
+
+        ImageView imgSplash = (ImageView) findViewById(R.id.splash);
+        Animation animConn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink);
+
+        imgSplash.startAnimation(animConn);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
         String mUserName = sharedPref.getString("user_name", "olmatix1");
         if (mUserName.equals("olmatix1")){
             Intent i = new Intent(getApplication(), LoginActivity.class);

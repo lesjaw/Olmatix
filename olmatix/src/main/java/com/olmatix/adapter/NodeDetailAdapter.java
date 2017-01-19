@@ -66,7 +66,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView;
 
-        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
+        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")||fw_name.equals("smartadapter1ch")) {
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_button, parent, false);
 
@@ -87,7 +87,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
         final DetailNodeModel mInstalledNodeModel = nodeList.get(position);
 
-        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")) {
+        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")||fw_name.equals("smartadapter1ch")) {
 
             //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
             final OlmatixHolder holder = (OlmatixHolder) viewHolder;

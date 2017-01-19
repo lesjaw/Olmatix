@@ -28,6 +28,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckedTextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private Animation animConn;
     private Toolbar mToolbar;
     private TextView settingLabel, aboutLabel, recentLabel;
+    private CheckedTextView logText;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
     SharedPreferences sharedPref;
@@ -202,6 +204,8 @@ public class MainActivity extends AppCompatActivity {
         settingLabel = (TextView) findViewById(R.id.settingLabel);
         aboutLabel = (TextView) findViewById(R.id.aboutLabel);
         recentLabel = (TextView) findViewById(R.id.recentchangelabel);
+        logText = (CheckedTextView) findViewById(R.id.loglabel);
+
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
@@ -402,11 +406,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void listRecent (){
-
         recentChange.addAll(dbNodeRepo.getLogMqtt());
         listAdap = new ArrayAdapter<>(this,R.layout.list_log_alarm,recentChange);
         listViewRecent.setAdapter(listAdap);
-
+        //logText.setText(dbnode.getTopic());
     }
 
     private void resetNode (){

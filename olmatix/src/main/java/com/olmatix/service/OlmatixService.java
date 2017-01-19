@@ -949,8 +949,8 @@ public class OlmatixService extends Service {
         }
 
         SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
-        dbnode.setTopic(mNiceName);
-        dbnode.setMessage(textNode +" at " +timeformat.format(System.currentTimeMillis()));
+        dbnode.setTopic(mNiceNameN+", "+textNode);
+        dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
         mDbNodeRepo.insertDbMqtt(dbnode);
         messageReceive.clear();
         message_topic.clear();
@@ -1047,7 +1047,7 @@ public class OlmatixService extends Service {
 
         if (installedNodeModel.getFwName() != null) {
 
-            if (installedNodeModel.getFwName().equals("smartfitting")) {
+            if (installedNodeModel.getFwName().equals("smartfitting")||installedNodeModel.getFwName().equals("smartadapter1ch")) {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
                 if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
@@ -1250,8 +1250,8 @@ public class OlmatixService extends Service {
                 }
 
             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
-            dbnode.setTopic(mNiceNameN);
-            dbnode.setMessage(textNode +" at " +timeformat.format(System.currentTimeMillis()));
+            dbnode.setTopic(mNiceNameN+", "+textNode);
+            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertDbMqtt(dbnode);
             data2.clear();
         }

@@ -1,5 +1,6 @@
 package com.olmatix.ui.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,11 +8,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -61,6 +65,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int TAG_CODE_PERMISSION_LOCATION = 1;
     boolean serverconnected;
     int backButtonCount;
     private TabLayout tabLayout;
@@ -168,11 +173,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        askForPermission(Manifest.permission.ACCESS_FINE_LOCATION,0x1);
+
         dbNodeRepo = new dbNodeRepo(this);
         dbnode = new dbNode();
 
         recentChange = new ArrayList<>();
 
+        askForPermission(Manifest.permission.ACCESS_FINE_LOCATION,0x1);
+        askForPermission(Manifest.permission.ACCESS_COARSE_LOCATION,0x2);
 
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);
@@ -187,6 +196,24 @@ public class MainActivity extends AppCompatActivity {
         setupTabs();
 
 
+    }
+
+    private void askForPermission(String permission, Integer requestCode) {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
+
+                //This is called if user has denied the permission before
+                //In this case I am just asking the permission again
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+
+            } else {
+
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+            }
+        } else {
+        }
     }
 
     @Override

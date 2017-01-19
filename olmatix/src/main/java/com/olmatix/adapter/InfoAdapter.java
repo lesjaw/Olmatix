@@ -269,7 +269,6 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
 
             }
 
-
         }
 
         return xVals;

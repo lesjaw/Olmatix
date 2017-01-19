@@ -54,5 +54,4 @@ dependencies {
     compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.9'
     compile 'com.androidadvance:topsnackbar:1.1.1'
     compile 'net.cachapa.expandablelayout:expandablelayout:[2.6]'
-
 }

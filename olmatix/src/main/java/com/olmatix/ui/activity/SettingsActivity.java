@@ -1,9 +1,11 @@
 package com.olmatix.ui.activity;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Address;
 import android.location.Geocoder;
@@ -16,6 +18,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -345,6 +348,7 @@ public class SettingsActivity extends SettingsFragment {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class MiscPreferenceFragment extends PreferenceFragment {
+        private static final int TAG_CODE_PERMISSION_LOCATION = 2;
         private LocationManager mLocationMgr;
         private String mProvider;
         private Preference setLocation;
@@ -424,31 +428,36 @@ public class SettingsActivity extends SettingsFragment {
                 public boolean onPreferenceClick(Preference preference) {
                     final PreferenceHelper mPrefHelper;
                     try {
-                        mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
-                        Location mLocation = mLocationMgr.getLastKnownLocation(mProvider);
-                        if (mLocation == null){
-                            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        }  else if (mLocation == null) {
-                            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                                != PackageManager.PERMISSION_GRANTED ) {
+                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0x1);
                         } else {
-                            mLocation= mLocationMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-                        }
+                            mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
+                            Location mLocation = mLocationMgr.getLastKnownLocation(mProvider);
+                            if (mLocation == null){
+                                mLocation= mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            }  else if (mLocation == null) {
+                                mLocation= mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            } else {
+                                mLocation= mLocationMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                            }
 
-                        Log.d("DEBUG", "location mpref: " + mLocation.getLatitude() + " "+mLocation.getLongitude() );
-                        mPrefHelper = new PreferenceHelper(getActivity());
+                            //Log.d("DEBUG", "location mpref: " + mLocation.getLatitude() + " "+mLocation.getLongitude() );
 
-                        if (mLocation!=null){
-                            mPrefHelper.setHomeLatitude(mLocation.getLatitude());
-                            mPrefHelper.setHomeLongitude(mLocation.getLongitude());
-                            mPrefHelper.initializePrefs();
-                            resetMesg(setLocation);
+                            mPrefHelper = new PreferenceHelper(getActivity());
 
-                            Toast.makeText(getActivity(), getString(R.string.opt_homepos_set), Toast.LENGTH_SHORT).show();
-                        } else {
-                            mPrefHelper.setHomeLatitude(0);
-                            mPrefHelper.setHomeLongitude(0);
-                            Toast.makeText(getActivity(), getString(R.string.opt_homepos_set_false), Toast.LENGTH_SHORT).show();
+                            if (mLocation!=null){
+                                mPrefHelper.setHomeLatitude(mLocation.getLatitude());
+                                mPrefHelper.setHomeLongitude(mLocation.getLongitude());
+                                mPrefHelper.initializePrefs();
+                                resetMesg(setLocation);
 
+                                Toast.makeText(getActivity(), getString(R.string.opt_homepos_set), Toast.LENGTH_SHORT).show();
+                            } else {
+                                mPrefHelper.setHomeLatitude(0);
+                                mPrefHelper.setHomeLongitude(0);
+                                Toast.makeText(getActivity(), getString(R.string.opt_homepos_set_false), Toast.LENGTH_SHORT).show();}
                         }
 
                     } catch (SecurityException ex) {

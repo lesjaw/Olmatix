@@ -2,14 +2,11 @@ package com.olmatix.service;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
-import android.app.usage.UsageStats;
-import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,8 +24,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -66,7 +61,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -78,8 +72,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import static com.olmatix.lesjaw.olmatix.R.drawable;
 import static com.olmatix.lesjaw.olmatix.R.string;
@@ -95,7 +87,7 @@ import static com.olmatix.lesjaw.olmatix.R.string;
  */
 public class OlmatixService extends Service {
 
-    public final static String MY_ACTION = "MY_ACTION";
+    //public final static String MY_ACTION = "MY_ACTION";
     public static dbNodeRepo mDbNodeRepo;
     private static String TAG = OlmatixService.class.getSimpleName();
     private static boolean hasWifi = false;
@@ -114,18 +106,15 @@ public class OlmatixService extends Service {
     boolean flagStart = false;
     boolean flagOnForeground = true;
     int notifyID = 0;
-    String currentApp = "NULL", topic, topic1;
-    private Thread thread;
+    String topic, topic1;
     private ConnectivityManager mConnMan;
     private String deviceId;
     private InstalledNodeModel installedNodeModel;
     private DetailNodeModel detailNodeModel;
     private DurationModel durationModel;
     private String NodeID, Channel, mMessage;
-    private int NOTIFICATION = string.local_service_label;
     private String mNodeID, mNiceName, mNiceNameN, NodeIDSensor, TopicID, mChange = "", connectionResult;
-    final static String GROUP_KEY_NOTIF = "group_key_notif";
-    private ArrayList<String> notifications, notifications1;
+    private ArrayList<String> notifications;
     private static final int TWO_MINUTES = 1000 * 60 * 5;
     public LocationManager locationManager;
     public MyLocationListener listener;
@@ -135,8 +124,6 @@ public class OlmatixService extends Service {
     String loc = null;
     double lat;
     double lng;
-    private String proximityIntentAction = new String("com.olmatix.lesjaw.olmatix.ProximityAlert");
-    private static final String MY_PREFERENCES = "my_preferences";
     IntentFilter filter;
     int numMessages = 0;
     int count = 0;
@@ -145,7 +132,6 @@ public class OlmatixService extends Service {
     SharedPreferences sharedPref;
     Boolean mStatusServer, doCon, noNotif=true;
     dbNode dbnode;
-
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -296,9 +282,9 @@ public class OlmatixService extends Service {
         }
     }
 
-    private void stopService (){
+    /*private void stopService (){
         stopSelf();
-    }
+    }*/
 
     private void doConnect() {
 
@@ -361,8 +347,6 @@ public class OlmatixService extends Service {
                                 doSubAll();
                             //new OlmatixService.load().execute();
 
-                        } else {
-                            //Log.d(TAG, "Call Disconn: " + flagConn);
                         }
 
                         try {
@@ -427,14 +411,13 @@ public class OlmatixService extends Service {
                     }
                 });
 
-            } catch (MqttSecurityException e) {
-                e.printStackTrace();
             } catch (MqttException e) {
                 e.printStackTrace();
             }
         }
         sendMessage();
         showNotification();
+        setFlagSub();
 
     }
 
@@ -458,7 +441,6 @@ public class OlmatixService extends Service {
             @Override
             public void run() {
                 flagSub = true;
-                Log.d(TAG, "run: " + flagSub);
                 checkActivityForeground();
                 unSubIfnotForeground();
                 noNotif=false;
@@ -479,7 +461,6 @@ public class OlmatixService extends Service {
         data1 = new ArrayList<>();
         data2 = new ArrayList<>();
         notifications = new ArrayList<>();
-
         dbnode = new dbNode();
 
         Connection.setClient(mqttClient);
@@ -499,6 +480,9 @@ public class OlmatixService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        String mProvider = locationManager.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
+
         noNotif=true;
         if (!flagStart) {
             flagStart = true;
@@ -517,71 +501,54 @@ public class OlmatixService extends Service {
             }
         }
 
-            sendMessage();
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            listener = new MyLocationListener();
+        sendMessage();
 
-            final NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
+        listener = new MyLocationListener();
 
-            if (nInfo != null) {
-                if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
+        if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                    OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                    OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+
+                Location mLocation = locationManager.getLastKnownLocation(mProvider);
+                if (mLocation == null) {
+                    mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                } else if (mLocation == null) {
+                    mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                } else {
+                    mLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                 }
-                if (nInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
-                            OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
-                } else if (nInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
-                            OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+                if (mLocation!=null) {
+                    lat = mLocation.getLatitude();
+                    lng = mLocation.getLongitude();
+                    locationDistance();
+                    PreferenceHelper mPrefHelper = new PreferenceHelper(this.getApplicationContext());
+                    double homeLat = mPrefHelper.getHomeLatitude();
+                    double homelng = mPrefHelper.getHomeLongitude();
+                    long thres = mPrefHelper.getHomeThresholdDistance();
+                    Log.d("DEBUG", "proximity: " + homeLat + " | " + homelng + ":" + thres);
+                    String proximityIntentAction = "com.olmatix.lesjaw.olmatix.ProximityAlert";
+                    Intent i = new Intent(proximityIntentAction);
+                    PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
+                    locationManager.addProximityAlert(homeLat, homelng, thres, -1, pi);
+
+                    filter = new IntentFilter(proximityIntentAction);
+                    registerReceiver(new OlmatixReceiver(), filter);
+                } else {
+
                 }
             }
-
-        LocationManager mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        String mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
-
-        Location mLocation = mLocationMgr.getLastKnownLocation(mProvider);
-            if (mLocation == null) {
-                mLocation = mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            } else if (mLocation == null) {
-                mLocation = mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            } else {
-                mLocation = mLocationMgr.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-            }
-
-        lat = mLocation.getLatitude();
-        lng = mLocation.getLongitude();
-        locationDistance();
-
-        PreferenceHelper mPrefHelper = new PreferenceHelper(this.getApplicationContext());
-
-        double homeLat = mPrefHelper.getHomeLatitude();
-        double homelng = mPrefHelper.getHomeLongitude();
-        long thres = mPrefHelper.getHomeThresholdDistance();
-        Log.d("DEBUG", "proximity: " + homeLat + " | " + homelng + ":" + thres);
-        Intent i = new Intent(proximityIntentAction);
-        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
-        mLocationMgr.addProximityAlert(homeLat, homelng, thres, -1, pi);
-
-            filter = new IntentFilter(proximityIntentAction);
-            registerReceiver(new OlmatixReceiver(), filter);
-
         return START_STICKY;
     }
 
     private void unSubIfnotForeground() {
 
-        printForegroundTask();
         Log.d("Unsubscribe", " uptime and signal");
-
-        if (!currentApp.equals("com.olmatix.lesjaw.olmatix")||!flagOnForeground||!noNotif) {
+        if (!flagOnForeground||!noNotif) {
             int countDB = mDbNodeRepo.getNodeList().size();
             Log.d("DEBUG", "Count list Node: " + countDB);
             data.addAll(mDbNodeRepo.getNodeList());
@@ -634,6 +601,7 @@ public class OlmatixService extends Service {
         // Send the notification.
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
+        int NOTIFICATION = string.local_service_label;
         notificationManager.notify(NOTIFICATION, mBuilder.build());
     }
 
@@ -714,10 +682,6 @@ public class OlmatixService extends Service {
         intent.putExtra("NotifyChangeDetail", mChange);
         intent.putExtra("distance", Distance);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    public String getThread() {
-        return Long.valueOf(thread.getId()).toString();
     }
 
     @Override
@@ -880,30 +844,6 @@ public class OlmatixService extends Service {
         messageReceive.clear();
     }
 
-    private void printForegroundTask() {
-        //String currentApp = "NULL";
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            UsageStatsManager usm = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);
-            long time = System.currentTimeMillis();
-            List<UsageStats> appList = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 1000, time);
-            if (appList != null && appList.size() > 0) {
-                SortedMap<Long, UsageStats> mySortedMap = new TreeMap<Long, UsageStats>();
-                for (UsageStats usageStats : appList) {
-                    mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
-                }
-                if (mySortedMap != null && !mySortedMap.isEmpty()) {
-                    currentApp = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
-                }
-            }
-        } else {
-            ActivityManager am = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-            List<ActivityManager.RunningAppProcessInfo> tasks = am.getRunningAppProcesses();
-            currentApp = tasks.get(0).processName;
-        }
-
-        //Log.e(TAG, "Current App in foreground is: " + currentApp);
-    }
-
     private void toastAndNotif() {
 
         checkActivityForeground();
@@ -949,7 +889,7 @@ public class OlmatixService extends Service {
         }
 
         SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
-        dbnode.setTopic(mNiceNameN+", "+textNode);
+        dbnode.setTopic(mNiceName+", "+textNode);
         dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
         mDbNodeRepo.insertDbMqtt(dbnode);
         messageReceive.clear();
@@ -1372,7 +1312,7 @@ public class OlmatixService extends Service {
         flagNode = true;
     }
 
-    private void doUnsubscribe() {
+    /*private void doUnsubscribe() {
         String topic = "devices/" + NodeID + "/$online";
         try {
             Connection.getClient().unsubscribe(topic);
@@ -1380,7 +1320,7 @@ public class OlmatixService extends Service {
         } catch (MqttException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     private void doSubAll() {
                 int countDB = mDbNodeRepo.getNodeList().size();
@@ -1431,7 +1371,7 @@ public class OlmatixService extends Service {
                 }
     }
 
-    class load extends AsyncTask<Void, Integer, String> {
+    /*class load extends AsyncTask<Void, Integer, String> {
 
         protected void onPreExecute (){
 
@@ -1558,7 +1498,7 @@ public class OlmatixService extends Service {
             data1.clear();
 
         }
-    }
+    }*/
 
     private void doSubAllDetail() {
                 int countDB = mDbNodeRepo.getNodeDetailList().size();
@@ -1640,11 +1580,11 @@ public class OlmatixService extends Service {
         setFlagSub();
     }
 
-    public class OlmatixBinder extends Binder {
+    /*public class OlmatixBinder extends Binder {
         public OlmatixService getService() {
             return OlmatixService.this;
         }
-    }
+    }*/
 
     private class MqttEventCallback implements MqttCallback {
 
@@ -1705,9 +1645,8 @@ public class OlmatixService extends Service {
             }
         }
 
-        public void onProviderDisabled(String provider)
-        {
-            final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+        public void onProviderDisabled(String provider) {
+            /*final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
                     "Your GPS is disable.. We'll use Network for location",TSnackbar.LENGTH_LONG);
             snackbarWrapper.setAction("Olmatix",
                     new View.OnClickListener() {
@@ -1718,11 +1657,11 @@ public class OlmatixService extends Service {
                         }
                     });
 
-            snackbarWrapper.show();        }
+            snackbarWrapper.show(); */
+        }
 
-        public void onProviderEnabled(String provider)
-        {
-            final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+        public void onProviderEnabled(String provider) {
+            /*final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
                     "GPS Enable.. Nice, it will be much more accurate",TSnackbar.LENGTH_LONG);
             snackbarWrapper.setAction("Olmatix",
                     new View.OnClickListener() {
@@ -1733,7 +1672,7 @@ public class OlmatixService extends Service {
                         }
                     });
 
-            snackbarWrapper.show();
+            snackbarWrapper.show();*/
         }
 
     public void onStatusChanged(String provider, int status, Bundle extras)

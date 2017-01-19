@@ -1195,6 +1195,12 @@ public class OlmatixService extends Service {
 
     private void saveDatabase() {
 
+       /* new Thread(new Runnable() {
+            @Override
+            public void run() {
+*/
+
+
         installedNodeModel.setNodesID(NodeID);
         installedNodeModel.setNodes(messageReceive.get("nodes"));
         installedNodeModel.setName(messageReceive.get("name"));
@@ -1269,34 +1275,40 @@ public class OlmatixService extends Service {
         sendMessageDetail();
         textNode="";
         titleNode="";
-
+           /* }
+        }).start();*/
     }
 
     private void saveDatabase_Detail() {
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {*/
 
-        if (!mNodeID.contains("door")) {
-            detailNodeModel.setNode_id(NodeID);
-            detailNodeModel.setChannel(Channel);
-            if (mMessage.equals("true")) {
-                detailNodeModel.setStatus(mMessage);
+                if (!mNodeID.contains("door")) {
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel(Channel);
+                    if (mMessage.equals("true")) {
+                        detailNodeModel.setStatus(mMessage);
 
-                saveOnTime();
+                        saveOnTime();
 
-            } else if (mMessage.equals("false")) {
-                detailNodeModel.setStatus(mMessage);
+                    } else if (mMessage.equals("false")) {
+                        detailNodeModel.setStatus(mMessage);
 
-                saveOffTime();
-            }
+                        saveOffTime();
+                    }
 
-            mDbNodeRepo.update_detail(detailNodeModel);
-            mChange = "2";
-            sendMessageDetail();
-            data1.clear();
-        }
+                    mDbNodeRepo.update_detail(detailNodeModel);
+                    mChange = "2";
+                    sendMessageDetail();
+                    data1.clear();
+                }
+           /* }
+        }).start();*/
     }
 
     private void saveOnTime() {
-        new Handler().post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
 
             @Override
             public void run() {
@@ -1316,7 +1328,7 @@ public class OlmatixService extends Service {
     }
 
     private void saveOffTime() {
-        new Handler().post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
 
             @Override
             public void run() {
@@ -1696,7 +1708,7 @@ public class OlmatixService extends Service {
         public void onProviderDisabled(String provider)
         {
             final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                    "GPS Disabled..",TSnackbar.LENGTH_LONG);
+                    "Your GPS is disable.. We'll use Network for location",TSnackbar.LENGTH_LONG);
             snackbarWrapper.setAction("Olmatix",
                     new View.OnClickListener() {
                         @Override
@@ -1711,7 +1723,7 @@ public class OlmatixService extends Service {
         public void onProviderEnabled(String provider)
         {
             final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                    "GPS Enable..",TSnackbar.LENGTH_LONG);
+                    "GPS Enable.. Nice, it will be much more accurate",TSnackbar.LENGTH_LONG);
             snackbarWrapper.setAction("Olmatix",
                     new View.OnClickListener() {
                         @Override
@@ -1758,7 +1770,7 @@ public class OlmatixService extends Service {
                                 public void run() {
                                     Log.e("DEBUG", "Geocoder ERROR", e);
                                 }
-                            });
+                            }).start();
                             loc = OlmatixUtils.gpsDecimalFormat.format(lat) + " : " + OlmatixUtils.gpsDecimalFormat.format(lng);
                         }
 

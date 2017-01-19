@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -234,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        /*NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -254,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-
+*/
         recentLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

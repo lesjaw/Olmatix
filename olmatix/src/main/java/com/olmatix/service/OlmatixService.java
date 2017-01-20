@@ -509,8 +509,10 @@ public class OlmatixService extends Service {
                     == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
                     Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
-                    OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                        OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+            }
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
                     OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
 
@@ -889,7 +891,7 @@ public class OlmatixService extends Service {
         }
 
         SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
-        dbnode.setTopic(mNiceName+", "+textNode);
+        dbnode.setTopic(mNiceName+" is "+textNode);
         dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
         mDbNodeRepo.insertDbMqtt(dbnode);
         messageReceive.clear();
@@ -1190,7 +1192,7 @@ public class OlmatixService extends Service {
                 }
 
             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
-            dbnode.setTopic(mNiceNameN+", "+textNode);
+            dbnode.setTopic(mNiceNameN+" is "+textNode);
             dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertDbMqtt(dbnode);
             data2.clear();

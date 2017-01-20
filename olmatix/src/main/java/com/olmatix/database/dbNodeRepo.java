@@ -996,7 +996,7 @@ public class dbNodeRepo {
 
         if (cursor.moveToFirst()) {
             do {
-                nodeList.add(cursor.getString(1)+ ", "+ cursor.getString(2));
+                nodeList.add(cursor.getString(1)+ "\n"+ cursor.getString(2));
 
             } while (cursor.moveToNext());
         }

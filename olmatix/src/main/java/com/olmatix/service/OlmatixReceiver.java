@@ -9,8 +9,12 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.util.Log;
 
+import com.olmatix.database.dbNode;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.ui.activity.SplashActivity;
+
+import java.text.SimpleDateFormat;
 
 /**
  * Created by Lesjaw on 30/12/2016.
@@ -22,6 +26,10 @@ public class OlmatixReceiver extends BroadcastReceiver {
     int homestat=2;
     int homestatcur;
     OlmatixAlarmReceiver alarm;
+    dbNode dbnode;
+    dbNodeRepo mDbNodeRepo;
+
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -59,6 +67,14 @@ public class OlmatixReceiver extends BroadcastReceiver {
                  PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
                  homestatcur = homestat;
                  Log.d("DEBUG", "onReceive: "+homestatcur +" ; "+homestat);
+
+                 dbnode = new dbNode();
+                 mDbNodeRepo = new dbNodeRepo(context);
+
+                 SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
+                 dbnode.setTopic(textNode);
+                 dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                 mDbNodeRepo.insertDbMqtt(dbnode);
 
                  Notification notification = new Notification.Builder(context)
                          .setSmallIcon(R.drawable.ic_location_red)  // the status icon

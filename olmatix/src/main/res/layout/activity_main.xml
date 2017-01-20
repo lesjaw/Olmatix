@@ -7,7 +7,6 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
     <android.support.design.widget.CoordinatorLayout
@@ -71,7 +70,7 @@
             android:gravity="bottom">
             <ImageView android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="10sp"
+                android:paddingTop="25sp"
                 android:paddingRight="10sp"
                 android:paddingStart="10sp"
                 android:paddingEnd="10sp"
@@ -84,7 +83,7 @@
                 android:id="@+id/label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10sp"
+                android:paddingTop="20sp"
                 android:text="Olmatix 2.0"
                 android:textSize="20sp"
                 android:textColor="@color/white"/>

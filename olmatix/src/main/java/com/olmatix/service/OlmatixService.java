@@ -288,6 +288,7 @@ public class OlmatixService extends Service {
 
     private void doConnect() {
 
+        final SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
         String mServerPort = sharedPref.getString("server_port", "1883");
@@ -315,6 +316,9 @@ public class OlmatixService extends Service {
             }
 
             Log.d(TAG, "doConnect: " + count);
+            dbnode.setTopic("Connecting to server");
+            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+            mDbNodeRepo.insertDbMqtt(dbnode);
 
             String topic = "status/" + deviceId + "/$online";
             byte[] payload = "false".getBytes();
@@ -348,6 +352,10 @@ public class OlmatixService extends Service {
                             //new OlmatixService.load().execute();
 
                         }
+
+                        dbnode.setTopic("Connected to server");
+                        dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                        mDbNodeRepo.insertDbMqtt(dbnode);
 
                         try {
                             String topic = "status/" + deviceId + "/$online";
@@ -385,12 +393,17 @@ public class OlmatixService extends Service {
                             });
                         } catch (MqttException e) {
                             e.printStackTrace();
-                            text = "Fail to subscribe";
+                            text = "Failed to subscribe";
                             showNotification();
                             editor.putBoolean("conStatus", false);
                             editor.apply();
                             flagConn = false;
                             sendMessage();
+                            dbnode.setTopic("Failed to subscribe");
+                            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                            mDbNodeRepo.insertDbMqtt(dbnode);
+
+
                         }
                     }
 
@@ -408,6 +421,9 @@ public class OlmatixService extends Service {
                         flagConn = false;
                         sendMessage();
                         showNotification();
+                        dbnode.setTopic((String) text);
+                        dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                        mDbNodeRepo.insertDbMqtt(dbnode);
                     }
                 });
 
@@ -417,6 +433,7 @@ public class OlmatixService extends Service {
         }
         sendMessage();
         showNotification();
+        noNotif=true;
         setFlagSub();
 
     }

@@ -142,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
             if (message.equals("2")){
                 updatelist();
             }
+            updatelist();
+
         }
     };
 

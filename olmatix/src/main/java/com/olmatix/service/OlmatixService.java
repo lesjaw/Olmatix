@@ -288,7 +288,7 @@ public class OlmatixService extends Service {
 
     private void doConnect() {
 
-        final SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
+        final SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String mServerURL = sharedPref.getString("server_address", "cloud.olmatix.com");
         String mServerPort = sharedPref.getString("server_port", "1883");
@@ -319,6 +319,7 @@ public class OlmatixService extends Service {
             dbnode.setTopic("Connecting to server");
             dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertDbMqtt(dbnode);
+            sendMessageDetail();
 
             String topic = "status/" + deviceId + "/$online";
             byte[] payload = "false".getBytes();
@@ -356,6 +357,7 @@ public class OlmatixService extends Service {
                         dbnode.setTopic("Connected to server");
                         dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
                         mDbNodeRepo.insertDbMqtt(dbnode);
+                        sendMessageDetail();
 
                         try {
                             String topic = "status/" + deviceId + "/$online";
@@ -402,7 +404,7 @@ public class OlmatixService extends Service {
                             dbnode.setTopic("Failed to subscribe");
                             dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
                             mDbNodeRepo.insertDbMqtt(dbnode);
-
+                            sendMessageDetail();
 
                         }
                     }
@@ -424,6 +426,7 @@ public class OlmatixService extends Service {
                         dbnode.setTopic((String) text);
                         dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
                         mDbNodeRepo.insertDbMqtt(dbnode);
+                        sendMessageDetail();
                     }
                 });
 
@@ -907,7 +910,7 @@ public class OlmatixService extends Service {
             }
         }
 
-        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
+        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
         dbnode.setTopic(mNiceName+" is "+textNode);
         dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
         mDbNodeRepo.insertDbMqtt(dbnode);
@@ -1208,7 +1211,7 @@ public class OlmatixService extends Service {
                     }
                 }
 
-            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
+            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
             dbnode.setTopic(mNiceNameN+" is "+textNode);
             dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertDbMqtt(dbnode);
@@ -1622,6 +1625,11 @@ public class OlmatixService extends Service {
             flagConn = false;
             doCon=false;
             sendMessage();
+            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+            dbnode.setTopic("Connection lost");
+            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+            mDbNodeRepo.insertDbMqtt(dbnode);
+            sendMessageDetail();
         }
 
         @Override

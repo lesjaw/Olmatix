@@ -59,7 +59,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         if ((nodeList.get(position).getSensor().trim()).equals("light")) {
             viewType = 0;
 
-        } else if ((nodeList.get(position).getSensor().trim()).equals("close")) {
+        } else if ((nodeList.get(position).getSensor().trim()).equals("close")||(nodeList.get(position).getSensor().trim()).equals("motion")) {
             viewType = 1;
         }
 
@@ -179,9 +179,84 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 }
             });
 
-        }
+        } else if ((mFavoriteModel.getSensor().trim()).equals("close")||(mFavoriteModel.getSensor().trim()).equals("motion")) {
 
-        else if ((mFavoriteModel.getSensor().trim()).equals("close")) {
+            final StatusHolder holder = (StatusHolder) viewHolder;
+
+            holder.node_names.setText(mFavoriteModel.getNice_name_d());
+
+            if ((mFavoriteModel.getStatus().trim()).equals("true")) {
+                holder.imgNodesBut.setImageResource(R.drawable.onsec);
+
+            } else {
+                holder.imgNodesBut.setImageResource(R.drawable.offsec);
+            }
+
+            if (mFavoriteModel.getOnline().trim().equals("true")) {
+                holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+            } else {
+                holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+            }
+
+
+            if ((mFavoriteModel.getStatus_sensor().trim().equals("true"))) {
+                if ((mFavoriteModel.getSensor().trim()).equals("close")) {
+                    holder.imgNodes.setImageResource(R.drawable.door_close);
+                } else {
+                    holder.imgNodes.setImageResource(R.drawable.motion);
+                }
+            } else {
+                if ((mFavoriteModel.getSensor().trim()).equals("close")) {
+                    holder.imgNodes.setImageResource(R.drawable.door_open);
+                } else {
+                    holder.imgNodes.setImageResource(R.drawable.no_motion);
+                }
+
+            }
+            holder.imgNodesBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String payload1;
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    if (mStatusServer) {
+                        if (mFavoriteModel.getOnline().trim().equals("true")) {
+
+                            String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
+                            if (mFavoriteModel.getStatus().trim().equals("false")) {
+                                payload1 = "ON";
+                            } else {
+                                payload1 = "OFF";
+                            }
+                            String payload = payload1;
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                        }
+                    } else {
+                        TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Conn", "Conn1");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                    }
+                }
+            });
+        } else if ((mFavoriteModel.getSensor().trim()).equals("close")) {
 
             final StatusHolder holder = (StatusHolder) viewHolder;
 
@@ -236,13 +311,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         } else {
                             TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
-                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
                         }
                     } else {
                         TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
-                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                         Intent intent = new Intent("addNode");
                         intent.putExtra("Conn", "Conn1");

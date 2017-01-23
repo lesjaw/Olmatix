@@ -975,7 +975,6 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_sensor(mMessage);
-
             mDbNodeRepo.update_detailSensor(detailNodeModel);
             mChange = "2";
             sendMessageDetail();
@@ -1166,6 +1165,59 @@ public class OlmatixService extends Service {
                         }
                     }
                 }
+            } else if (installedNodeModel.getFwName().equals("smartsensormotion")) {
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel("0");
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
+                } else {
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel("0");
+                    detailNodeModel.setSensor("motion");
+                    detailNodeModel.setStatus("false");
+                    detailNodeModel.setStatus_sensor("false");
+                    detailNodeModel.setStatus_theft("false");
+                    detailNodeModel.setNice_name_d(NodeID);
+
+                    mDbNodeRepo.insertInstalledNode(detailNodeModel);
+
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel("0");
+                    durationModel.setTimeStampOn((long) 0);
+                    durationModel.setTimeStampOff((long) 0);
+                    durationModel.setDuration((long) 0);
+
+                    mDbNodeRepo.insertDurationNode(durationModel);
+
+
+                    for (int a = 0; a < 3; a++) {
+                        if (a == 0) {
+                            topic1 = "devices/" + NodeID + "/light/0";
+                        }
+                        if (a == 1) {
+                            topic1 = "devices/" + NodeID + "/motion/motion";
+                        }
+                        if (a == 2) {
+                            topic1 = "devices/" + NodeID + "/motion/theft";
+                        }
+
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeSensor", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
         }
     }
@@ -1253,7 +1305,7 @@ public class OlmatixService extends Service {
             @Override
             public void run() {*/
 
-                if (!mNodeID.contains("door")) {
+                if (!mNodeID.contains("door")||!mNodeID.contains("motion")) {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel(Channel);
                     if (mMessage.equals("true")) {
@@ -1602,6 +1654,34 @@ public class OlmatixService extends Service {
                             }
 
                         }
+                        if (mSensorT != null && mSensorT.equals("motion")) {
+                            for (int a = 0; a < 2; a++) {
+                                if (a == 0) {
+                                    topic1 = "devices/" + mNodeID1 + "/motion/motion";
+                                }
+                                if (a == 1) {
+                                    topic1 = "devices/" + mNodeID1 + "/motion/theft";
+                                }
+
+                                int qos = 2;
+                                try {
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                                    subToken.setActionCallback(new IMqttActionListener() {
+                                        @Override
+                                        public void onSuccess(IMqttToken asyncActionToken) {
+                                            //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                        }
+
+                                        @Override
+                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        }
+                                    });
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
                     }
                     flagSub = false;
                     data1.clear();
@@ -1651,7 +1731,7 @@ public class OlmatixService extends Service {
 
             if (mNodeID.contains("$")) {
                 addNode();
-            } else if (mNodeID.contains("close")) {
+            } else if (mNodeID.contains("close")||mNodeID.contains("motion")) {
                 updateSensorDoor();
             } else if (mNodeID.contains("theft")) {
                 updateSensorTheft();

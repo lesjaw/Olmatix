@@ -76,9 +76,14 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
         } else if (fw_name.equals("smartsensordoor")) {
             itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.frag_node_sensor, parent, false);
+                    .inflate(R.layout.frag_node_sensor_door, parent, false);
 
-            return new OlmatixSensorHolder(itemView);
+            return new OlmatixSensorDoorHolder(itemView);
+        } else if (fw_name.equals("smartsensormotion")) {
+            itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.frag_node_sensor_motion, parent, false);
+
+            return new OlmatixSensorMotionHolder(itemView);
         }
 
         return null;
@@ -199,19 +204,15 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
 
         } else if (fw_name.equals("smartsensordoor")) {
-            final OlmatixSensorHolder holder = (OlmatixSensorHolder) viewHolder;
+            final OlmatixSensorDoorHolder holder = (OlmatixSensorDoorHolder) viewHolder;
 
             holder.imgNode.setImageResource(R.drawable.olmatixmed);
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-
             } else {
                 holder.node_name.setText(mInstalledNodeModel.getName());
             }
-
-
             holder.fwName.setText(mInstalledNodeModel.getNode_id());
-
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
@@ -221,7 +222,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.sensorStatus.setText("Door Open!");
                 holder.imgSensor.setImageResource(R.drawable.door_open);
             }
-
             if (mInstalledNodeModel.getStatus().equals("true")) {
                 holder.imgNode.setImageResource(R.mipmap.armed);
                 holder.statuslabel.setText("Status:");
@@ -233,16 +233,117 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("NOT ARMED");
             }
-
             if (mInstalledNodeModel.getStatus_theft().equals("true")) {
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("ALARM!!");
                 holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 holder.status.setTypeface(null, Typeface.BOLD);
             }
-            //Log.d("DEBUG", "Adapter: " + mInstalledNodeModel.getStatus_sensor());
+            holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    if (mStatusServer) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
+                        String payload = "ON";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.statuslabel.setText("Sending");
+                            holder.status.setText(" ARMED");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                    }
+
+                }
+            });
+
+            holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
+                    if (mStatusServer) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
+                        String payload = "OFF";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.statuslabel.setText("Sending");
+                            holder.status.setText(" NOT ARMED");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                    }
+
+                }
+
+            });
+        } else if (fw_name.equals("smartsensormotion")) {
+            final OlmatixSensorMotionHolder holder = (OlmatixSensorMotionHolder) viewHolder;
+
+            holder.imgNode.setImageResource(R.drawable.olmatixmed);
+            if (mInstalledNodeModel.getNice_name_d() != null) {
+                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+            } else {
+                holder.node_name.setText(mInstalledNodeModel.getName());
+            }
+            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+            holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+
+            if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
+                holder.sensorStatus.setText("Motion detected!");
+                holder.imgSensor.setImageResource(R.drawable.motion);
+            } else {
+                holder.sensorStatus.setText("No Motion detected!");
+                holder.imgSensor.setImageResource(R.drawable.no_motion);
+            }
+            if (mInstalledNodeModel.getStatus().equals("true")) {
+                holder.imgNode.setImageResource(R.mipmap.armed);
+                holder.statuslabel.setText("Status:");
+                holder.status.setText("ARMED");
 
 
+            } else {
+                holder.imgNode.setImageResource(R.mipmap.not_armed);
+                holder.statuslabel.setText("Status:");
+                holder.status.setText("NOT ARMED");
+            }
+            if (mInstalledNodeModel.getStatus_theft().equals("true")) {
+                holder.statuslabel.setText("Status:");
+                holder.status.setText("ALARM!!");
+                holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                holder.status.setTypeface(null, Typeface.BOLD);
+            }
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -355,12 +456,12 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         }
     }
 
-    public class OlmatixSensorHolder extends ViewHolder {
+    public class OlmatixSensorDoorHolder extends ViewHolder {
         public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel;
         public ImageView imgNode, imgSensor;
         Button btn_off, btn_on;
 
-        public OlmatixSensorHolder(View view) {
+        public OlmatixSensorDoorHolder(View view) {
             super(view);
             imgNode = (ImageView) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
@@ -374,10 +475,30 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             imgSensor = (ImageView) view.findViewById(R.id.door);
         }
     }
+
+    public class OlmatixSensorMotionHolder extends ViewHolder {
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel;
+        public ImageView imgNode, imgSensor;
+        Button btn_off, btn_on;
+
+        public OlmatixSensorMotionHolder(View view) {
+            super(view);
+            imgNode = (ImageView) view.findViewById(R.id.icon_node);
+            node_name = (TextView) view.findViewById(R.id.node_name);
+            fwName = (TextView) view.findViewById(R.id.fw_name);
+            sensorStatus = (TextView) view.findViewById(R.id.sensorstatus);
+            status = (TextView) view.findViewById(R.id.status);
+            statuslabel = (TextView) view.findViewById(R.id.statuslabel);
+            upTime = (TextView) view.findViewById(R.id.uptime);
+            btn_off = (Button) view.findViewById(R.id.btn_off);
+            btn_on = (Button) view.findViewById(R.id.btn_on);
+            imgSensor = (ImageView) view.findViewById(R.id.door);
+        }
+    }
+
     private void showAlertDialog() {
         // Prepare grid view
         final GridView gridView = new GridView(context);
-        //int icon[] = {R.drawable.onlamp1,R.drawable.steckeroff};
 
         final ArrayList mList = new ArrayList<>();
         mList.add(R.drawable.onlamp1);

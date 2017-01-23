@@ -146,7 +146,7 @@ public class SignupActivity extends AppCompatActivity {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
 
 
-            String url = "http://cloud.olmatix.com/rest/insert_sent.php";
+            String url = "http://olmatix.com/api/register";
             StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -163,7 +163,7 @@ public class SignupActivity extends AppCompatActivity {
                     Map<String, String> MyData = new HashMap<String, String>();
                     MyData.put("name", name); //Add the data you'd like to send to the server.
                     MyData.put("email", email);
-                    MyData.put("password", password);
+                    MyData.put("pass", password);
                     return MyData;
                 }
             };
@@ -179,7 +179,7 @@ public class SignupActivity extends AppCompatActivity {
     public void parsingJson(String json) {
         try {
             JSONObject jObject = new JSONObject(json);
-            String msg = jObject.getString("msg");
+            String msg = jObject.getString("error_msg");
             Log.d(TAG, "parsingJson: "+msg);
             TSnackbar snackbar = TSnackbar.make(coordinatorLayout,msg,TSnackbar.LENGTH_INDEFINITE);
             View snackbarView = snackbar.getView();
@@ -193,7 +193,7 @@ public class SignupActivity extends AppCompatActivity {
             snackbar.show();
             progressDialogShow(1);
 
-            if (msg.equals("Sign up success, please wait for email confirmation")) {
+            if (msg.equals("Sign up succcess, We need process your registration, please wait our confirmation on your email")) {
                 _signupButton.setEnabled(false);
             }
 

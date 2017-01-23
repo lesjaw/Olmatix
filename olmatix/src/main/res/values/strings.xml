@@ -123,5 +123,22 @@
     <string name="recent_status_changes">Recent Status Changes</string>
     <string name="home_automation_amp_security_system"><![CDATA[Home Automation & Security System]]></string>
     <string name="no_location_detected">No location detected</string>
+    <string name="label_setup_connecting">Connecting to Olmatix WiFi, if it takes too long to connect, please do it manuall connect through your android WiFi setting, and comeback here to continue setup product..</string>
+    <string name="labe_setup_pick">Please pick WiFi with Olmatix-XXXXXXXX</string>
+    <string name="label_setup_sum1">"Olmatix device will connect to WiFi/SSID "</string>
+    <string name="label_setup_sum2">" with password "</string>
+    <string name="label_setup_sum3">, click OK to proceed</string>
+    <string name="label_setup_alert_title">Setup Olmatix product</string>
+    <string name="label_setup_sum">Summary ...</string>
+    <string name="label_ok">OK</string>
+    <string name="label_cancel">CANCEL</string>
+    <string name="label_setup_pass_home_wifi">"Type your home WiFi password "</string>
+    <string name="label_setup_connect_to">"You are connected to "</string>
+    <string name="label_product">" product"</string>
+    <string name="label_setup_success">Setting Olmatix success</string>
+    <string name="label_setup_choose_wifi">You need to choose Home WiFi, Cancel setup!</string>
+    <string name="label_setup_signal">" || Signal "</string>
+    <string name="label_alarm_service_conn">Request connect</string>
+    <string name="label_alarm_service_at">"at "</string>
 
 </resources>

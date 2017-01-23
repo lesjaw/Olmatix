@@ -107,7 +107,6 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
             @Override
             public void onClick(View view, int position) {
-
             }
 
             @Override
@@ -370,13 +369,11 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             }
             if (message.equals("2")){
                 updatelist();
-                //Log.d("receiver", "Notifydashboard : " + message);
             }
             updatelist();
             if (!String.valueOf(DistService).trim().equals("null")){
                 Distance = DistService;
                 resetAdapter();
-
             } else {
                 Distance = "Unknown";
                 resetAdapter();

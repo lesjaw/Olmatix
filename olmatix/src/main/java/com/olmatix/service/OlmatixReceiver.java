@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
+import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.ui.activity.SplashActivity;
 
@@ -23,19 +24,20 @@ import java.text.SimpleDateFormat;
 public class OlmatixReceiver extends BroadcastReceiver {
 
     String textNode;
-    int homestat=2;
+    int homestat;
     int homestatcur;
     OlmatixAlarmReceiver alarm;
     dbNode dbnode;
     dbNodeRepo mDbNodeRepo;
+    PreferenceHelper mPrefHelper;
 
 
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //Log.d("DEBUG", "OlmatixReceiver");
         String action = intent.getAction();
-        //Log.i("DEBUG", "Broadcast received: " + action+" : " +homestat +" : "+homestatcur);
+        mPrefHelper = new PreferenceHelper(context);
+
 
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Intent serviceIntent = new Intent(context, OlmatixService.class);
@@ -43,29 +45,32 @@ public class OlmatixReceiver extends BroadcastReceiver {
             alarm = new OlmatixAlarmReceiver();
             alarm.setAlarm(context);
         }
-         if (intent.getAction().equals("com.olmatix.lesjaw.olmatix.ProximityAlert")) {
+        if (intent.getAction().equals("com.olmatix.lesjaw.olmatix.ProximityAlert")) {
              String k = LocationManager.KEY_PROXIMITY_ENTERING;
              // Key for determining whether user is leaving or entering
              boolean state = intent.getBooleanExtra(k, false);
              //Gives whether the user is entering or leaving in boolean form
              if (state) {
                  // Call the Notification Service or anything else that you would like to do here
-                 //Toast.makeText(context, "You arrive at home..", Toast.LENGTH_LONG).show();
                  textNode = "You are entering home radius location..";
-                 homestat = 0;
+                 mPrefHelper.setHomeCurrent(0);
 
              } else {
                  //Other custom Notification
-                 //Toast.makeText(context, "You are leaving home..", Toast.LENGTH_LONG).show();
                  textNode = "You are leaving home..";
-                 homestat=1;
+                 mPrefHelper.setHomeCurrent(1);
              }
 
-             if (homestat!=homestatcur) {
+            homestat = mPrefHelper.getHomeCurrent();
+            homestatcur  = mPrefHelper.getHome();
+
+            Log.i("DEBUG", "Broadcast received: " + action+" : " +homestat +" : "+homestatcur);
+
+            if (homestat!=homestatcur) {
                  NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                  Intent notificationIntent = new Intent(context, SplashActivity.class);
                  PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-                 homestatcur = homestat;
+                 mPrefHelper.setHome(homestat);
                  Log.d("DEBUG", "onReceive: "+homestatcur +" ; "+homestat);
 
                  dbnode = new dbNode();

@@ -37,6 +37,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
@@ -48,7 +54,6 @@ import com.olmatix.model.DurationModel;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.MainActivity;
 import com.olmatix.ui.activity.SplashActivity;
-import com.olmatix.ui.fragment.DetailNode;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
@@ -61,6 +66,9 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -87,7 +95,7 @@ import static com.olmatix.lesjaw.olmatix.R.string;
  */
 public class OlmatixService extends Service {
 
-    //public final static String MY_ACTION = "MY_ACTION";
+    public final static String MY_ACTION = "MY_ACTION";
     public static dbNodeRepo mDbNodeRepo;
     private static String TAG = OlmatixService.class.getSimpleName();
     private static boolean hasWifi = false;
@@ -169,7 +177,7 @@ public class OlmatixService extends Service {
                 } else {
                     if (add_NodeID == null) {
                         final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                                "Your device Offline",TSnackbar.LENGTH_LONG);
+                                "Your device Offline, trying to connect now",TSnackbar.LENGTH_LONG);
                         snackbarWrapper.setAction("Olmatix",
                                 new View.OnClickListener() {
                                     @Override
@@ -179,14 +187,11 @@ public class OlmatixService extends Service {
                                     }
                                 });
 
-                        snackbarWrapper.show();                        doCon = false;
-                        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                        mStatusServer = sharedPref.getBoolean("conStatus", false);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putBoolean("conStatus", false);
-                        editor.apply();
-                        doConnect();
-                    }
+                        snackbarWrapper.show();
+                        if(!doCon) {
+                            Log.d(TAG, "Alarm Service: "+doCon);
+                            doConnect();
+                        }                    }
                 }
             }
 
@@ -203,13 +208,19 @@ public class OlmatixService extends Service {
 
                 }
                 if (alarmService.equals("con")) {
-                    doCon = false;
+/*
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putBoolean("conStatus", false);
-                    editor.apply();
-                    doConnect();
+                    editor.apply
+*/
+                    Log.d(TAG, "Alarm Service: "+doCon);
+
+                    if(!doCon) {
+                        Log.d(TAG, "Alarm Service: "+doCon);
+                        doConnect();
+                    }
                 }
                 if (alarmService.equals("stop")) {
                     stopSelf();
@@ -460,10 +471,11 @@ public class OlmatixService extends Service {
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "setFlagSub run: ");
                 flagSub = true;
                 checkActivityForeground();
-                unSubIfnotForeground();
                 noNotif=false;
+                unSubIfnotForeground();
             }
         }, 10000);
     }
@@ -503,6 +515,8 @@ public class OlmatixService extends Service {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         String mProvider = locationManager.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
 
+        checkActivityForeground();
+
         noNotif=true;
         if (!flagStart) {
             flagStart = true;
@@ -515,9 +529,11 @@ public class OlmatixService extends Service {
             doConnect();
 
             OlmatixAlarmReceiver alarmCheckConn = new OlmatixAlarmReceiver();
+
+            alarmCheckConn.setAlarm(this);
             if (alarmCheckConn==null) {
                 alarmCheckConn.setAlarm(this);
-                Log.d("DEBUG", "Alarm set ");
+                Log.d("DEBUG", "Alarm set "+alarmCheckConn);
             }
         }
 
@@ -569,7 +585,7 @@ public class OlmatixService extends Service {
 
     private void unSubIfnotForeground() {
 
-        Log.d("Unsubscribe", " uptime and signal");
+        Log.d("Unsubscribe", " uptime and signal "+flagOnForeground+" : "+noNotif);
         if (!flagOnForeground||!noNotif) {
             int countDB = mDbNodeRepo.getNodeList().size();
             Log.d("DEBUG", "Count list Node: " + countDB);
@@ -924,7 +940,7 @@ public class OlmatixService extends Service {
     protected void checkActivityForeground() {
         //Log.d(TAG, "start checking for Activity in foreground");
         Intent intent = new Intent();
-        intent.setAction(DetailNode.UE_ACTION);
+        intent.setAction(MainActivity.UE_ACTION);
         sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
 
             @Override
@@ -936,7 +952,7 @@ public class OlmatixService extends Service {
                     activityInForeground();
                     return;
                 }
-                //Log.d(TAG, "No activity did catch the broadcast.");
+                Log.d(TAG, "No activity did catch the broadcast.");
                 noActivityInForeground();
             }
         }, null, Activity.RESULT_CANCELED, null, null);
@@ -951,7 +967,6 @@ public class OlmatixService extends Service {
     protected void noActivityInForeground() {
         // TODO something you want to happen when no Activity is in the foreground
         flagOnForeground = false;
-        //stopSelf(); // quit
     }
 
     private void updateSensorDoor() {
@@ -1161,8 +1176,6 @@ public class OlmatixService extends Service {
             @Override
             public void run() {
 */
-
-
         installedNodeModel.setNodesID(NodeID);
         installedNodeModel.setNodes(messageReceive.get("nodes"));
         installedNodeModel.setName(messageReceive.get("name"));
@@ -1178,16 +1191,13 @@ public class OlmatixService extends Service {
             installedNodeModel.setNodesID(NodeID);
             data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
-            Log.d(TAG, "saveDatabase: "+NodeID);
 
             if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         if (data2.get(i).getNice_name_n() != null) {
                             mNiceNameN = data2.get(i).getNice_name_n();
-                            Log.d(TAG, "saveDatabase1: "+mNiceNameN);
                         } else {
                             mNiceNameN = data2.get(i).getFwName();
-                            Log.d(TAG, "saveDatabase2: "+mNiceNameN);
 
                         }
                         int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
@@ -1195,13 +1205,10 @@ public class OlmatixService extends Service {
                         if (mMessage.equals("true")) {
                             titleNode = mNiceNameN;
                             textNode = "ONLINE";
-                            Log.d(TAG, "saveDatabase3: "+mNiceNameN);
 
                         } else {
                             titleNode = mNiceNameN;
                             textNode = "OFFLINE";
-                            Log.d(TAG, "saveDatabase4: "+mNiceNameN);
-
                         }
                         if (!flagOnForeground) {
                             if (!noNotif) {
@@ -1738,6 +1745,7 @@ public class OlmatixService extends Service {
                                 }
                             }).start();
                             loc = OlmatixUtils.gpsDecimalFormat.format(lat) + " : " + OlmatixUtils.gpsDecimalFormat.format(lng);
+                            getLocationCityName(lat,lng);
                         }
 
                         final float[] res = new float[3];
@@ -1839,6 +1847,61 @@ public class OlmatixService extends Service {
         // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(5, notification);
+    }
+
+    public String getLocationCityName(double lat, double lon){
+        JSONObject result = getLocationFormGoogle(lat + "," + lon );
+        //return getCityAddress(result);
+        return null;
+    }
+
+    protected JSONObject getLocationFormGoogle(String placesName) {
+
+        RequestQueue reqQueue = Volley.newRequestQueue(this);
+
+        String apiRequest = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+placesName; //+ "&ka&sensor=false"
+
+        JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, apiRequest, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                getCityAddress(response);
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Error.Response", error.toString());
+            }
+        });
+        // add it to the RequestQueue
+        reqQueue.add(stateReq);
+
+        return null;
+    }
+
+    protected static String getCityAddress( JSONObject result ){
+        if( result.has("results") ){
+            try {
+                JSONArray array = result.getJSONArray("results");
+                if( array.length() > 0 ){
+                    JSONObject place = array.getJSONObject(0);
+                    JSONArray components = place.getJSONArray("address_components");
+                    for( int i = 0 ; i < components.length() ; i++ ){
+                        JSONObject component = components.getJSONObject(i);
+                        JSONArray types = component.getJSONArray("types");
+                        for( int j = 0 ; j < types.length() ; j ++ ){
+                            if( types.getString(j).equals("locality") ){
+                                return component.getString("long_name");
+                            }
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 
 }

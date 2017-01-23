@@ -50,7 +50,7 @@
                 android:id="@+id/sensorstatus"
                 android:textSize="16sp"
                 android:text="Sensor Status"
-                android:layout_alignBottom="@+id/icon_node"
+                android:layout_below="@+id/node_name"
                 android:layout_toRightOf="@+id/icon_node"
                 android:layout_toEndOf="@+id/icon_node"
                 android:textStyle="bold"/>
@@ -122,9 +122,10 @@
                 android:id="@+id/fw_name"
                 android:textSize="10sp"
                 android:text="fw Name"
-                android:layout_below="@+id/btn_off"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:paddingTop="5sp"
+                android:layout_marginLeft="20sp"
+                android:layout_below="@+id/icon_node"
+                 />
 
 
         </RelativeLayout>

@@ -53,6 +53,26 @@ public class PreferenceHelper {
         return homeThold;
     }
 
+    public void setHomeCurrent (int current){
+        SharedPreferences.Editor mEditor = customCachedPrefs.edit();
+        mEditor.putString("homecurrent", String.valueOf(current));
+        mEditor.apply();
+    }
+
+    public int getHomeCurrent() {
+        return Integer.parseInt(customCachedPrefs.getString("homecurrent", "0"));
+    }
+
+    public void setHome (int current){
+        SharedPreferences.Editor mEditor = customCachedPrefs.edit();
+        mEditor.putString("home", String.valueOf(current));
+        mEditor.apply();
+    }
+
+    public int getHome() {
+        return Integer.parseInt(customCachedPrefs.getString("home", "0"));
+    }
+
     public void initializePrefs() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         homeThold = prefs.getInt("distanceThold", 150);

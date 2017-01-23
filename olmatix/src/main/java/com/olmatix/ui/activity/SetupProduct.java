@@ -176,12 +176,12 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         String ssidHome = String.valueOf(textHomeWifi);
         float dpi = this.getResources().getDisplayMetrics().density;
         TextView result = new TextView(this);
-        result.setText("Olmatix device will connect to WiFi/SSID "+ssidHome+" with password "+passwordHome+", click OK to proceed");
+        result.setText(getString(R.string.label_setup_sum1)+ssidHome+getString(R.string.label_setup_sum2)+passwordHome+getString(R.string.label_setup_sum3));
         new AlertDialog.Builder(this)
-                .setTitle("Setup Olmatix product")
-                .setMessage("Summary ...")
+                .setTitle(R.string.label_setup_alert_title)
+                .setMessage(R.string.label_setup_sum)
                 .setView(result,(int)(19*dpi), (int)(5*dpi), (int)(14*dpi), (int)(5*dpi))
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.label_ok, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -189,7 +189,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                         sendJson();
                         finish();
                     }
-                }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                }).setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
             }
         }).show();
@@ -202,12 +202,11 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
         mainWifi.startScan();
         wifiList = mainWifi.getScanResults();
-        Log.d("DEBUG", "createConnectTitleStep: " + wifiList.size());
 
         listProduct = new ListView(this);
         statesList = new String[wifiList.size()];
         for (int i = 0; i < wifiList.size(); i++) {
-            statesList[i] = String.valueOf(wifiList.get(i).SSID + " || Signal " + wifiList.get(i).level);
+            statesList[i] = String.valueOf(wifiList.get(i).SSID + getString(R.string.label_setup_signal) + wifiList.get(i).level);
             System.out.println(statesList[i]);
         }
         ArrayAdapter<String> testadap = new ArrayAdapter<>(this, layout.list_item_wifi, statesList);
@@ -221,11 +220,9 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             totalHeight += listItem.getMeasuredHeight();
         }
 
-        Log.d("DEBUG", "createConnectTitleStep: " + totalHeight);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.height = totalHeight + (listProduct.getDividerHeight() * (testadap.getCount() - 1));
-        Log.d("DEBUG", "createConnectTitleStep: " + params);
 
         listProduct.setLayoutParams(params);
         listProduct.requestLayout();
@@ -237,7 +234,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                                     long arg3) {
                 // TODO Auto-generated method stub
                 String text = (String) listProduct.getItemAtPosition(arg2);
-                Log.d("DEBUG", "Selected item: " + text);
 
                 int iend = text.indexOf("|");
                 if (iend != -1) {
@@ -245,22 +241,18 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     int iend1 = Wifi.indexOf("-");
                     if (iend1 != -1) {
                         Wificut = Wifi.substring(0, iend1);
-                        Log.d("DEBUG", "Wifi: " + Wifi);
                     }
                     Password = Wifi.substring(Wifi.lastIndexOf("-") + 1);
-                    Log.d("DEBUG", "Password: " + Password);
-                    Log.d("DEBUG", "Check If: " + Wificut);
 
                     arg1.setSelected(true);
 
                     if (Wificut.equals("Olmatix")) {
 
                         createAPConfiguration(Wifi, Password,"PSK");
-                        textProgres = "Connecting to Olmatix WiFi, if it takes too long connect" +
-                                ", please do it manuall connect through your android WiFi setting, and comeback here to continue setup product..";
+                        textProgres = getString(R.string.label_setup_connecting);
                         progressDialogShow(0);
                     } else {
-                        Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"Please pick WiFi with Olmatix-XXXXXXXX"
+                        Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), R.string.labe_setup_pick
                                 ,Snackbar.LENGTH_LONG);
                         View snackbarView = snackbar.getView();
                                     snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
@@ -299,11 +291,8 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             totalHeight += listItem.getMeasuredHeight();
         }
 
-        Log.d("DEBUG", "createConnectTitleStep: " + totalHeight);
-
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.height = totalHeight + (listHome.getDividerHeight() * (testadap.getCount() - 1));
-        Log.d("DEBUG", "createConnectTitleStep: " + params);
 
         listHome.setLayoutParams(params);
         listHome.requestLayout();
@@ -326,15 +315,13 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
     private View createTypePasswordTitleStep() {
         wifiText = new EditText(this);
-        wifiText.setHint("Type your home WiFi password ");
+        wifiText.setHint(R.string.label_setup_pass_home_wifi);
 
         return wifiText;
     }
 
     private boolean checkTitleStep(String Wificut) {
         boolean titleIsCorrect = false;
-
-        Log.d("DEBUG", "checkTitleStep: " + Wificut);
 
         if (Wificut.equals("Olmatix")) {
             titleIsCorrect = true;
@@ -391,8 +378,8 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
             progressDialogShow(1);
 
-            Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"You are connected to "+deviceID+" " +
-                            ""+firmware.toUpperCase() +" product"
+            Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),getString(R.string.label_setup_connect_to)+deviceID+" " +
+                            ""+firmware.toUpperCase() +getString(R.string.label_product)
                     ,Snackbar.LENGTH_INDEFINITE);
             View snackbarView = snackbar.getView();
                         snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
@@ -428,7 +415,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     public void onResponse(String response) {
                         if (response.equals("200")) {
 
-                            Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"Setting Olmatix success"
+                            Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), R.string.label_setup_success
                                     ,Snackbar.LENGTH_INDEFINITE);
                             View snackbarView = snackbar.getView();
                                         snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
@@ -469,7 +456,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
                 requestQueue.add(stringRequest);
             } else {
-                Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),"You need to choose Home WiFi, Cancel setup!"
+                Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), R.string.label_setup_choose_wifi
                         ,Snackbar.LENGTH_INDEFINITE);
                 View snackbarView = snackbar.getView();
                             snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
@@ -482,12 +469,10 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
 
     private WifiConfiguration createAPConfiguration(String networkSSID, String networkPasskey, String securityMode) {
-        Log.i("DEBUG", "* SSID request " + networkSSID + " Password " + networkPasskey + " Sec type " + securityMode);
 
         WifiConfiguration wifiConfiguration = new WifiConfiguration();
 
         wifiConfiguration.SSID =String.format("\"%s\"", networkSSID.trim());
-        Log.d("DEBUG", "createAPConfiguration: "+wifiConfiguration.SSID);
 
             wifiConfiguration.preSharedKey = String.format("\"%s\"", networkPasskey.trim());
             wifiConfiguration.hiddenSSID = true;
@@ -539,14 +524,11 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 String wifiInfo = "";
                 WifiInfo info = wifi.getConnectionInfo();
                 String ssid = info.getSSID();
-                Log.d("DEBUG", "Connected SSID now: " + ssid);
                 int iend1 = ssid.indexOf("-");
                 if (iend1 != -1) {
                     wifiInfo = ssid.substring(0, iend1);
                     wifiInfo = wifiInfo.replace("\"", "");
-                    //Log.d("DEBUG", "Wifi1: " + wifiInfo);
                     if (checkTitleStep(wifiInfo)) {
-                        //Log.d("DEBUG", "Wifi2: " + wifiInfo);
 
                         new Handler().postDelayed(new Runnable() {
                             @Override

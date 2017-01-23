@@ -3,6 +3,7 @@ package com.olmatix.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
@@ -96,7 +98,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.imgNode.setImageResource(R.drawable.olmatixmed);
             if(mInstalledNodeModel.getDuration()!=null) {
                 holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
-                Log.d("DEBUG", "onBindViewHolder: " + OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getDuration())));
             }
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
@@ -151,8 +152,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             holder.statuslabel.setText("Sending");
                             holder.status.setText(" ON");
                             holder.status.setSingleLine();
-
-
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
                         }
@@ -216,7 +215,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
-                Log.d("DEBUG", "onBindViewHolder: "+ mInstalledNodeModel.getStatus_sensor());
                 holder.sensorStatus.setText("Door Close!");
                 holder.imgSensor.setImageResource(R.drawable.door_close);
             } else {
@@ -250,8 +248,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 public void onClick(View view) {
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
-                    if (mStatusServer) {                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
+                    if (mStatusServer) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
                         String payload = "ON";
                         byte[] encodedPayload = new byte[0];
                         try {
@@ -267,7 +265,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             e.printStackTrace();
                         }
                     } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
                         Intent intent = new Intent("addNode");
                         intent.putExtra("Connect", "con");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -299,7 +300,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             e.printStackTrace();
                         }
                     } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
                         Intent intent = new Intent("addNode");
                         intent.putExtra("Connect", "con");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -385,8 +389,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
 
         gridView.setAdapter(new iconPickerAdapter (context, R.layout.icon_picker, mList,icon));
-        //ArrayAdapter<String> testadap = new ArrayAdapter<String>(context, R.layout.icon_picker, mList);
-        //gridView.setAdapter(testadap);
 
         gridView.setNumColumns(4);
         gridView.setHorizontalSpacing(0);

@@ -296,7 +296,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                                         +mInstalledNodeModel.getNice_name_n() + " succesfully reset"
                                         , TSnackbar.LENGTH_LONG);
                                 View snackbarView = snackbar.getView();
-                                snackbar.setIconLeft(R.drawable.ic_light_black, 24);
+                                snackbar.setIconRight(R.drawable.ic_light_black, 24);
                                             snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                                 snackbar.show();
                             } catch (UnsupportedEncodingException | MqttException e) {

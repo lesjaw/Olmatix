@@ -10,6 +10,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -52,20 +53,21 @@ public class OlmatixAlarmService extends IntentService {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         //showNotificationNode();
-        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
+        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
 
             dbnode.setLog("M = "+Status+" | P = "+mStatusServer + " at " +timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertLog(dbnode);
-/*
 
-        if (!Status){
+
+        if (!mStatusServer){
             Intent a = new Intent("addNode");
             intent.putExtra("Connect", "con");
             LocalBroadcastManager.getInstance(this).sendBroadcast(a);
-            dbnode.setLog("Request connect" + " at " +timeformat.format(System.currentTimeMillis()));
-            mDbNodeRepo.insertLog(dbnode);
+            dbnode.setTopic(getString(R.string.label_alarm_service_conn) );
+            dbnode.setMessage(getString(R.string.label_alarm_service_at) +timeformat.format(System.currentTimeMillis()));
+            mDbNodeRepo.insertDbMqtt(dbnode);
         }
-*/
+
 
         OlmatixAlarmReceiver.completeWakefulIntent(intent);
         // END_INCLUDE(service_onhandle)

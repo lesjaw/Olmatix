@@ -216,9 +216,12 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     data.addAll(dbNodeRepo.getNodeList());
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data.get(i).getNodesID();
-                        for (int a = 0; a < 2; a++) {
+                        for (int a = 0; a < 3; a++) {
                             String topic = "";
                             if (a == 0) {
+                                topic = "devices/" + mNodeID + "/$online";
+                            }
+                            if (a == 1) {
                                 topic = "devices/" + mNodeID + "/$signal";
                             }
                             if (a == 1) {

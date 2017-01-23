@@ -192,7 +192,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             } else {
                 holder.imgNodesBut.setImageResource(R.drawable.offsec);
-
             }
 
             if (mFavoriteModel.getOnline().trim().equals("true")) {
@@ -267,14 +266,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-
-
         public ViewHolder(View v) {
             super(v);
-
         }
-
-
     }
 
     public class ButtonHolder extends ViewHolder {

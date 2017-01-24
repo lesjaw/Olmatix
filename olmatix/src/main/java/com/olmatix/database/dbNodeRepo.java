@@ -23,6 +23,8 @@ import java.util.List;
 
 import static com.olmatix.database.dbNode.KEY_ADDING;
 import static com.olmatix.database.dbNode.KEY_ARRIVE;
+import static com.olmatix.database.dbNode.KEY_BY_DATE;
+import static com.olmatix.database.dbNode.KEY_BY_TIME;
 import static com.olmatix.database.dbNode.KEY_CHANNEL;
 import static com.olmatix.database.dbNode.KEY_COMMAND;
 import static com.olmatix.database.dbNode.KEY_DURATION;
@@ -150,9 +152,9 @@ public class dbNodeRepo {
         ContentValues values = new ContentValues();
         values.put(KEY_SCENE_NAME, sceneModel.getSceneName());
         values.put(KEY_SCENE_TYPE, sceneModel.getSceneType());
-        values.put(KEY_SCHEDULE, sceneModel.getSchedule());
-        values.put(KEY_ARRIVE, sceneModel.getArrived());
-        values.put(KEY_LEAVE, sceneModel.getLeave());
+        values.put(KEY_BY_DATE, sceneModel.getDate());
+        values.put(KEY_BY_TIME, sceneModel.getTime());
+        values.put(KEY_SENSOR, sceneModel.getSensor());
 
         long Id = db.insert(TABLE_SCENE, null, values);
         db.close(); // Closing database connection
@@ -173,9 +175,9 @@ public class dbNodeRepo {
 
                 node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
                 node.setSceneType(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
-                node.setSchedule(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCHEDULE)));
-                node.setArrived(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ARRIVE)));
-                node.setLeave(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LEAVE)));
+                node.setDate(cursor.getString(cursor.getColumnIndex(dbNode.KEY_BY_DATE)));
+                node.setTime(cursor.getString(cursor.getColumnIndex(dbNode.KEY_BY_TIME)));
+                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());
@@ -318,8 +320,10 @@ public class dbNodeRepo {
         db.delete(TABLE_NODE, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
-        db.delete(TABLE_FAV, dbNode.KEY_NODE_ID + "= ?", new String[]{
+        db.delete(TABLE_FAV, dbNode.KEY_ID_NODE_DETAIL + "= ?", new String[]{
                 String.valueOf(node_Id)});
+
+        Log.d("DEBUG", "deleteNode: " + String.valueOf(node_Id));
 
         db.close(); // Closing database connection
     }
@@ -330,6 +334,7 @@ public class dbNodeRepo {
         // It's a good practice to use parameter ?, instead of concatenate string
         db.delete(TABLE_FAV, dbNode.KEY_ID_NODE_DETAIL + "= ?", new String[]{
                 String.valueOf(node_Id)});
+
 
         db.close(); // Closing database connection
     }
@@ -452,11 +457,11 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_sensor() != null) {
             values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+            //Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
         }
         if (detailNodeModel.getStatus_theft() != null) {
             values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
-            Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
+            //Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -550,8 +555,8 @@ public class dbNodeRepo {
         if (cursor.moveToFirst()) {
             do {
                 //labels.add(cursor.getString(0)+","+ cursor.getString(3));
-                labels.add(new SpinnerObject(cursor.getInt(0), cursor.getString(3)));
-                //labels.add(cursor.getString(1));
+                labels.add(new SpinnerObject(cursor.getInt(0),cursor.getString(3)));
+                //labels.add(cursor.getString(2));
                 //labels.add(cursor.getString(3));
 
             } while (cursor.moveToNext());
@@ -996,28 +1001,7 @@ public class dbNodeRepo {
 
         if (cursor.moveToFirst()) {
             do {
-                nodeList.add(cursor.getString(1)+ "\n"+ cursor.getString(2));
-
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
-        return nodeList;
-    }
-
-    public List<dbNode> getLogStatus() {
-        List<dbNode> nodeList = new ArrayList<>();
-
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+10;
-
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-
-
+                nodeList.add(cursor.getString(1)+ " , "+ cursor.getString(2));
 
             } while (cursor.moveToNext());
         }

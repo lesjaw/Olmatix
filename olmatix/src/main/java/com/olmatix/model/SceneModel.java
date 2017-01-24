@@ -7,7 +7,7 @@ package com.olmatix.model;
 public class SceneModel {
 
     private int id, sceneType;
-    private String sceneName, schedule, arrived, leave;
+    private String sceneName, date, time, sensor;
 
     public int getId() {
         return id;
@@ -33,27 +33,27 @@ public class SceneModel {
         this.sceneName = sceneName;
     }
 
-    public String getSchedule() {
-        return schedule;
+    public String getDate() {
+        return date;
     }
 
-    public void setSchedule(String schedule) {
-        this.schedule = schedule;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public String getArrived() {
-        return arrived;
+    public String getTime() {
+        return time;
     }
 
-    public void setArrived(String arrived) {
-        this.arrived = arrived;
+    public void setTime(String time) {
+        this.time = time;
     }
 
-    public String getLeave() {
-        return leave;
+    public String getSensor() {
+        return sensor;
     }
 
-    public void setLeave(String leave) {
-        this.leave = leave;
+    public void setSensor(String sensor) {
+        this.sensor = sensor;
     }
 }

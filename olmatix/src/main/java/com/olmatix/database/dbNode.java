@@ -50,16 +50,20 @@ public class dbNode {
     public static final String KEY_SCENE_ID  = "sceneid" ;
     public static final String KEY_SCENE_TYPE  = "scene_type" ;
     public static final String KEY_INFO_TYPE  = "info_type" ;
-    public static final String KEY_SCHEDULE     = "schedule";
-    public static final String KEY_ARRIVE     = "arrive";
-    public static final String KEY_LEAVE     = "leave";
     public static final String KEY_PATH     = "path";
     public static final String KEY_COMMAND     = "command";
     public static final String KEY_LOG     = "log";
     public static final String KEY_ID_NODE_DETAIL = "id_node_detail";
     public static final String KEY_LOCATION = "location";
-    public static final String KEY_BY_TIME = "time";
-    public static final String KEY_BY_DATE = "date";
+    public static final String KEY_HOURS = "hours";
+    public static final String KEY_MINS = "minute";
+    public static final String KEY_SUN = "sunday";
+    public static final String KEY_MON = "monday";
+    public static final String KEY_TUE = "tuesday";
+    public static final String KEY_WED = "wednesday";
+    public static final String KEY_THUR = "thursday";
+    public static final String KEY_FRI = "friday";
+    public static final String KEY_SAT = "saturday";
 
 
     // property help us to keep data

@@ -1,7 +1,12 @@
 package com.olmatix.database;
 
 /**
- * Created by Lesjaw on 05/12/2016.
+ * Created              : Lesjaw on 05/12/2016.
+ * Date Created         : 05/12/2016 / 3:50 PM.
+ * ===================================================
+ * Package              : com.olmatix.database.
+ * Project Name         : Olmatix.
+ * Copyright            : Copyright @ 2017 Olmatix.
  */
 
 import android.content.ContentValues;
@@ -21,52 +26,7 @@ import com.olmatix.model.SpinnerObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.olmatix.database.dbNode.KEY_ADDING;
-import static com.olmatix.database.dbNode.KEY_ARRIVE;
-import static com.olmatix.database.dbNode.KEY_BY_DATE;
-import static com.olmatix.database.dbNode.KEY_BY_TIME;
-import static com.olmatix.database.dbNode.KEY_CHANNEL;
-import static com.olmatix.database.dbNode.KEY_COMMAND;
-import static com.olmatix.database.dbNode.KEY_DURATION;
-import static com.olmatix.database.dbNode.KEY_FWNAME;
-import static com.olmatix.database.dbNode.KEY_FWVERSION;
-import static com.olmatix.database.dbNode.KEY_ICON;
-import static com.olmatix.database.dbNode.KEY_ID;
-import static com.olmatix.database.dbNode.KEY_ID_NODE_DETAIL;
-import static com.olmatix.database.dbNode.KEY_LEAVE;
-import static com.olmatix.database.dbNode.KEY_LOCALIP;
-import static com.olmatix.database.dbNode.KEY_LOG;
-import static com.olmatix.database.dbNode.KEY_MESSAGE;
-import static com.olmatix.database.dbNode.KEY_NAME;
-import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
-import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
-import static com.olmatix.database.dbNode.KEY_NODES;
-import static com.olmatix.database.dbNode.KEY_NODE_ID;
-import static com.olmatix.database.dbNode.KEY_ONLINE;
-import static com.olmatix.database.dbNode.KEY_OTA;
-import static com.olmatix.database.dbNode.KEY_PATH;
-import static com.olmatix.database.dbNode.KEY_RESET;
-import static com.olmatix.database.dbNode.KEY_SCENE_ID;
-import static com.olmatix.database.dbNode.KEY_SCENE_NAME;
-import static com.olmatix.database.dbNode.KEY_SCENE_TYPE;
-import static com.olmatix.database.dbNode.KEY_SCHEDULE;
-import static com.olmatix.database.dbNode.KEY_SENSOR;
-import static com.olmatix.database.dbNode.KEY_SIGNAL;
-import static com.olmatix.database.dbNode.KEY_STATUS;
-import static com.olmatix.database.dbNode.KEY_STATUS_SENSOR;
-import static com.olmatix.database.dbNode.KEY_STATUS_THEFT;
-import static com.olmatix.database.dbNode.KEY_TIMESTAMPS_OFF;
-import static com.olmatix.database.dbNode.KEY_TIMESTAMPS_ON;
-import static com.olmatix.database.dbNode.KEY_TOPIC;
-import static com.olmatix.database.dbNode.KEY_UPTIME;
-import static com.olmatix.database.dbNode.TABLE;
-import static com.olmatix.database.dbNode.TABLE_FAV;
-import static com.olmatix.database.dbNode.TABLE_LOG;
-import static com.olmatix.database.dbNode.TABLE_MQTT;
-import static com.olmatix.database.dbNode.TABLE_NODE;
-import static com.olmatix.database.dbNode.TABLE_NODE_DURATION;
-import static com.olmatix.database.dbNode.TABLE_SCENE;
-import static com.olmatix.database.dbNode.TABLE_SCENE_DETAIL;
+import static com.olmatix.database.dbNode.*;
 
 public class dbNodeRepo {
     private com.olmatix.database.dbHelper dbHelper;
@@ -152,8 +112,16 @@ public class dbNodeRepo {
         ContentValues values = new ContentValues();
         values.put(KEY_SCENE_NAME, sceneModel.getSceneName());
         values.put(KEY_SCENE_TYPE, sceneModel.getSceneType());
-        values.put(KEY_BY_DATE, sceneModel.getDate());
-        values.put(KEY_BY_TIME, sceneModel.getTime());
+        values.put(KEY_HOURS, sceneModel.getHour());
+        values.put(KEY_MINS, sceneModel.getMin());
+        values.put(KEY_MON, sceneModel.getMonday());
+        values.put(KEY_SUN, sceneModel.getSunday());
+        values.put(KEY_TUE, sceneModel.getTuesday());
+        values.put(KEY_WED, sceneModel.getWednesday());
+        values.put(KEY_THUR, sceneModel.getThursday());
+        values.put(KEY_FRI, sceneModel.getFriday());
+        values.put(KEY_SAT, sceneModel.getSaturday());
+        values.put(KEY_LOCATION, sceneModel.getLocation());
         values.put(KEY_SENSOR, sceneModel.getSensor());
 
         long Id = db.insert(TABLE_SCENE, null, values);
@@ -175,9 +143,17 @@ public class dbNodeRepo {
 
                 node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
                 node.setSceneType(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
-                node.setDate(cursor.getString(cursor.getColumnIndex(dbNode.KEY_BY_DATE)));
-                node.setTime(cursor.getString(cursor.getColumnIndex(dbNode.KEY_BY_TIME)));
+                node.setHour(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_HOURS)));
+                node.setMin(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_MINS)));
+                node.setMonday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_MON)));
+                node.setSunday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SUN)));
+                node.setTuesday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TUE)));
+                node.setWednesday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_WED)));
+                node.setThursday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_THUR)));
+                node.setFriday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FRI)));
+                node.setSaturday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SAT)));
                 node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setLocation(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCATION)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

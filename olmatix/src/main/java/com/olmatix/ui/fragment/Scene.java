@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -32,6 +33,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.SceneAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -39,6 +41,7 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.SceneModel;
+import com.olmatix.ui.activity.scene.ScheduleActivity;
 
 import java.util.ArrayList;
 
@@ -84,8 +87,7 @@ public class Scene extends Fragment implements OnStartDragListener {
 
         dbNodeRepo = new dbNodeRepo(getActivity());
         data = new ArrayList<>();
-
-        scene_node=getContext();
+        scene_node=getActivity();
         setupView();
         onClickListener();
         //onTouchListener();
@@ -94,16 +96,16 @@ public class Scene extends Fragment implements OnStartDragListener {
                 mRecycleView, new Scene.ClickListener() {
 
 
-                    @Override
-                    public void onClick(View view, int position) {
+            @Override
+            public void onClick(View view, int position) {
 
-                    }
+            }
 
-                    @Override
-                    public void onLongClick(View view, int position) {
+            @Override
+            public void onLongClick(View view, int position) {
 
-                    }
-                }));
+            }
+        }));
 
 
     }
@@ -135,7 +137,7 @@ public class Scene extends Fragment implements OnStartDragListener {
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        animateFAB();
+                        //animateFAB();
 
                         break;
                     case MotionEvent.ACTION_BUTTON_PRESS:
@@ -151,130 +153,55 @@ public class Scene extends Fragment implements OnStartDragListener {
 
     private void onClickListener() {
         mFab.setOnClickListener(mFabClickListener());
-        fab1.setOnClickListener(Fab1ClickListener());
-        fab2.setOnClickListener(Fab2ClickListener());
-        fab3.setOnClickListener(Fab3ClickListener());
-        fab4.setOnClickListener(Fab4ClickListener());
+
 
     }
 
-    public void animateFAB(){
-        if(isFabOpen){
-
-            mFab.startAnimation(rotate_backward);
-            fab1.startAnimation(fab_close);
-            fab2.startAnimation(fab_close);
-            fab3.startAnimation(fab_close);
-            fab4.startAnimation(fab_close);
-
-            fab1.setClickable(false);
-            fab2.setClickable(false);
-            fab3.setClickable(false);
-            fab4.setClickable(false);
-
-            isFabOpen = false;
-            Log.d("Raj", "close");
-
-        } else {
-
-            mFab.startAnimation(rotate_forward);
-            fab1.startAnimation(fab_open);
-            fab2.startAnimation(fab_open);
-            fab3.startAnimation(fab_open);
-            fab4.startAnimation(fab_open);
-
-            fab1.setClickable(true);
-            fab2.setClickable(true);
-            fab3.setClickable(true);
-            fab4.setClickable(true);
-
-            isFabOpen = true;
-            Log.d("Raj","open");
-
-        }
-    }
 
     private View.OnClickListener mFabClickListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                animateFAB();
+                new MaterialDialog.Builder(getActivity())
+                        .title("Select your scene mode!")
+                        .items(R.array.scene_arry)
+                        .itemsCallbackSingleChoice(0, (dialog, view, which, text) -> {
+                            String test =  which + ": " + text;
+                            //showToast("Hello, " + test + "!");
+                            MaterialDialog mDialog = new MaterialDialog.Builder(getActivity())
+                                    .title("Scene Name")
+                                    .content("Type your scene name!")
+                                    .inputType(InputType.TYPE_CLASS_TEXT)
+                                    .inputRange(2, 16)
+                                    .positiveText("Submit")
+                                    .input(text, "", new MaterialDialog.InputCallback(){
+                                        @Override
+                                        public void onInput(@NonNull MaterialDialog dialog, CharSequence inputVals) {
+                                            //showToast("Hello, " + input.toString() + "!");
+                                            Intent intent = new Intent(getActivity(), ScheduleActivity.class);
+                                            intent.putExtra("SCENETYPE", inputVals.toString());
+                                            intent.putExtra("SCENEID", which);
+                                            Log.d(TAG, "onInput: " + inputVals.toString());
+                                            startActivity(intent);
+                                        }
+                                    })
+                                    .show();
+                            return true; // allow selection
+                        })
+                        .positiveText(R.string.md_choose_label)
+                        .show();
             }
 
         };
     }
 
-    private View.OnClickListener Fab1ClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Scheduled Scene"
-                        ,TSnackbar.LENGTH_LONG);
-                View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                snackbar.show();
-            }
 
-        };
-    }
-
-    private View.OnClickListener Fab2ClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Home Location Scene"
-                        ,TSnackbar.LENGTH_LONG);
-                View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                snackbar.show();
-            }
-
-        };
-    }
-
-    private View.OnClickListener Fab3ClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Sensor Base Scene"
-                        ,TSnackbar.LENGTH_LONG);
-                View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                snackbar.show();
-            }
-
-        };
-    }
-
-    private View.OnClickListener Fab4ClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Self Trigger Scene"
-                        ,TSnackbar.LENGTH_LONG);
-                View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                snackbar.show();
-            }
-
-        };
-    }
 
     private void setupView() {
         mRecycleView = (RecyclerView) mView.findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
 
         mFab = (FloatingActionButton) mView.findViewById(fab);
-        fab1 = (FloatingActionButton) mView.findViewById(R.id.fab1);
-        fab2 = (FloatingActionButton) mView.findViewById(R.id.fab2);
-        fab3 = (FloatingActionButton) mView.findViewById(R.id.fab3);
-        fab4 = (FloatingActionButton) mView.findViewById(R.id.fab4);
-
-        fab_open = AnimationUtils.loadAnimation(getContext(), R.anim.fab_open);
-        fab_close = AnimationUtils.loadAnimation(getContext(),R.anim.fab_close);
-        rotate_forward = AnimationUtils.loadAnimation(getContext(),R.anim.rotate_forward);
-        rotate_backward = AnimationUtils.loadAnimation(getContext(),R.anim.rotate_backward);
-        mRecycleView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
 

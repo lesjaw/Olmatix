@@ -31,5 +31,6 @@
     <color name="aluminum">#999999</color>
     <color name="base">#AAAAAA</color>
     <color name="iron">#CCCCCC</color>
+    <color name="blue_400">#42A5F5</color>
 
 </resources>

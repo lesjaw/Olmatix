@@ -58,7 +58,7 @@ import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
  * Created by Rahman on 1/13/2017.
  */
 
-public class ScheduleActivity extends AppCompatActivity implements HorizontalListView.OnListItemClickListener {
+public class ScheduleActivity extends AppCompatActivity {
 
     private boolean[] weekDays;
     private TimePickerDialog mTimePicker;
@@ -88,7 +88,7 @@ public class ScheduleActivity extends AppCompatActivity implements HorizontalLis
     private ArrayList<String> mDayList;
     String mDayValue = null;
     public boolean stateChanged = false;
-    private int selectedPosition;
+    private int mSelectedPosition= -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,7 +126,7 @@ public class ScheduleActivity extends AppCompatActivity implements HorizontalLis
         mDayAdapter = new DayAdapter(this);
         mDayRv.setAdapter(mDayAdapter);
         mDayAdapter.notifyDataSetChanged();
-        mDayRv.registerListItemClickListener(this);
+
     }
 
 
@@ -243,11 +243,46 @@ public class ScheduleActivity extends AppCompatActivity implements HorizontalLis
 
     }
 
+
+
     private void setClickListeners() {
         btnAdd.setOnClickListener(addBtnClickListener());
         mTimeTxt.setOnClickListener(mTimeClickListener());
+        mDayRv.registerListItemClickListener(mItemClickListener());
 
     }
+
+    private HorizontalListView.OnListItemClickListener mItemClickListener() {
+        return (v, position) -> {
+            Log.d("TAG", "onClick: " + v +"\n\n"+ position);
+            v.setSelected(true);
+            if (position == 0){
+                mSceneModel.setSunday("1");
+            } else if (position == 1){
+                mSceneModel.setMonday("1");
+            }else if (position == 2){
+                mSceneModel.setTuesday("1");
+            }else if (position == 3){
+                mSceneModel.setWednesday("1");
+            }else if (position == 4){
+                mSceneModel.setThursday("1");
+            }else if (position == 5){
+                mSceneModel.setFriday("1");
+            }else if (position == 6){
+                mSceneModel.setSaturday("1");
+            }else{
+                v.setSelected(false);
+                mSceneModel.setSunday("");
+                mSceneModel.setMonday("");
+                mSceneModel.setTuesday("");
+                mSceneModel.setWednesday("");
+                mSceneModel.setThursday("");
+                mSceneModel.setFriday("");
+                mSceneModel.setSaturday("");
+            }
+        };
+    }
+
 
     private View.OnClickListener mTimeClickListener() {
 
@@ -282,9 +317,6 @@ public class ScheduleActivity extends AppCompatActivity implements HorizontalLis
         if (mSceneIdData == 0) {
             String timeData = mTimeTxt.getText().toString();
             String[] outputTime = timeData.split(":");
-
-            Log.d("TAG", "setDataScene: " + mDayValue);
-            mClickEvent(stateChanged);
             mSceneModel.setHour(Integer.parseInt(outputTime[0]));
             mSceneModel.setMin(Integer.parseInt(outputTime[1]));
             mSceneModel.setLocation("");
@@ -294,13 +326,7 @@ public class ScheduleActivity extends AppCompatActivity implements HorizontalLis
         } else {
             mSceneModel.setHour(00);
             mSceneModel.setMin(00);
-            /*mSceneModel.setSunday("");
-            mSceneModel.setMonday("");
-            mSceneModel.setTuesday("");
-            mSceneModel.setWednesday("");
-            mSceneModel.setThursday("");
-            mSceneModel.setFriday("");
-            mSceneModel.setSaturday("");*/
+
             mSceneModel.setLocation("");
             mSceneModel.setSensor("");
             mSceneModel.setLocation("Null");
@@ -399,68 +425,4 @@ public class ScheduleActivity extends AppCompatActivity implements HorizontalLis
             return dayList.size();
         }
     }*/
-
-    private void mClickEvent(boolean stateChanged) {
-
-        for (int i=0 ; i< mDayList.size(); i++){
-            if (stateChanged){
-                mDayValue = "1";
-                if(i == 0){
-                    Log.d("TAG", "mClickEvent: " + i);
-                    mSceneModel.setSunday(mDayValue);
-                }
-                if(i == 1){
-                    Log.d("TAG", "mClickEvent: " + i);
-                    mSceneModel.setMonday(mDayValue);
-                }
-                if(i == 2){
-                    Log.d("TAG", "mClickEvent: " + i);
-                    mSceneModel.setTuesday(mDayValue);
-
-                }
-                if(i == 3){
-                    Log.d("TAG", "mClickEvent: " + i);
-                    mSceneModel.setWednesday(mDayValue);
-
-                }
-                if(i == 4){
-                    Log.d("TAG", "mClickEvent: " + i);
-                    mSceneModel.setThursday(mDayValue);
-
-                }
-                if(i == 5){
-                    Log.d("TAG", "mClickEvent: " + i);
-                    mSceneModel.setFriday(mDayValue);
-
-                }
-                if(i == 6){
-                    Log.d("TAG", "mClickEvent: " + i);
-                    mSceneModel.setSaturday(mDayValue);
-                }
-            } else {
-                mDayValue = null;
-            }
-        }
-       /*
-
-
-
-
-       } else {
-
-       }*/
-    }
-
-
-    @Override
-    public void onClick(View v, int position) {
-        if (position == selectedPosition) {
-            v.setBackgroundResource(R.drawable.ic_check);
-            v.setSelected(true);
-
-        } else{
-            v.setBackgroundResource(R.drawable.circle_step_done);
-        }
-        Toast.makeText(this, "Click " + String.valueOf(position), Toast.LENGTH_SHORT).show();
-    }
 }

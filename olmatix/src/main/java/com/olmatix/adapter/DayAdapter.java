@@ -1,6 +1,7 @@
 package com.olmatix.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,7 @@ public class DayAdapter extends BaseAdapter  {
     public TextView mDayText;
     private boolean stateChanged;
     LayoutInflater inflater;
-    private int selectedPosition;
+    private int mSelectedPosition = -1;
 
     public DayAdapter(Context context) {
         mContext = context;
@@ -65,7 +66,6 @@ public class DayAdapter extends BaseAdapter  {
             mHolder = (Holder) mView.getTag();
         }
         mHolder.mDayText.setText(mDayArray[position]);
-
         mView.setLayoutParams(new ViewGroup.LayoutParams(110, 100));
 
         return mView;

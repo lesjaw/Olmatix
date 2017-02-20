@@ -59,7 +59,8 @@
                 android:id="@+id/listview"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:focusable="false"/>
             <TextView
                 android:id="@+id/time"
                 android:layout_width="0dp"

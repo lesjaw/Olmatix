@@ -1,9 +1,11 @@
 package com.olmatix.helper;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -24,6 +26,9 @@ public class HorizontalListView extends HorizontalScrollView {
     private ListAdapter mAdapter = null;
     private OnListItemClickListener mListItemClickListener = null;
 
+
+
+
     /**
      * OnListItemClickListener interface
      * Interface definition for a callback to be invoked when a list item is clicked.
@@ -35,8 +40,10 @@ public class HorizontalListView extends HorizontalScrollView {
          * @param v The view that was clicked.
          * @param position The position if the item that was clicked
          */
-        void onClick(View v, int position);
+        void onClick( View v, int position);
     }
+
+
 
     /**
      * Register a listener for list item click.
@@ -45,6 +52,7 @@ public class HorizontalListView extends HorizontalScrollView {
     public void registerListItemClickListener(OnListItemClickListener listItemClickListener) {
         mListItemClickListener = listItemClickListener;
     }
+
 
     /**
      * Custom OnClickListener for list item

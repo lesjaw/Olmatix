@@ -140,5 +140,6 @@
     <string name="label_setup_signal">" || Signal "</string>
     <string name="label_alarm_service_conn">Request connect</string>
     <string name="label_alarm_service_at">"at "</string>
+    <string name="label_setup_sending">Sending configuration data to device, please wait..</string>
 
 </resources>

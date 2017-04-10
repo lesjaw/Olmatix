@@ -548,9 +548,10 @@ public class OlmatixService extends Service {
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
                         OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+            } else {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                        OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
             }
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
-                    OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
 
                 Location mLocation = locationManager.getLastKnownLocation(mProvider);
                 if (mLocation == null) {
@@ -976,6 +977,7 @@ public class OlmatixService extends Service {
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_sensor(mMessage);
             mDbNodeRepo.update_detailSensor(detailNodeModel);
+
             mChange = "2";
             sendMessageDetail();
         }
@@ -985,28 +987,34 @@ public class OlmatixService extends Service {
         if (!mNodeID.contains("light")) {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
-            detailNodeModel.setStatus_theft(mMessage);
+            if (mMessage.equals("true")) {
+                detailNodeModel.setStatus_theft(mMessage);
 
-            mDbNodeRepo.update_detailSensor(detailNodeModel);
-            mChange = "2";
-            sendMessageDetail();
-            data1.addAll(mDbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
-            int countDB = mDbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
-            if (countDB != 0) {
-                for (int i = 0; i < countDB; i++) {
-                    if (data1.get(i).getNice_name_d() != null) {
-                        mNiceName = data1.get(i).getNice_name_d();
-                    } else {
-                        mNiceName = data1.get(i).getName();
+                mDbNodeRepo.update_detailSensorTheft(detailNodeModel);
+                mChange = "2";
+                sendMessageDetail();
+                data1.addAll(mDbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
+                int countDB = mDbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        if (data1.get(i).getNice_name_d() != null) {
+                            mNiceName = data1.get(i).getNice_name_d();
+                        } else {
+                            mNiceName = data1.get(i).getName();
+                        }
                     }
                 }
+                if (mMessage.equals("true")) {
+                    titleNode = mNiceName;
+                    textNode = "ALARM!!";
+                    showNotificationNode();
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dbnode.setTopic(mNiceName+" is "+textNode);
+                    dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                    mDbNodeRepo.insertDbMqtt(dbnode);
+                }
+                data1.clear();
             }
-            if (mMessage.equals("true")) {
-                titleNode = mNiceName;
-                textNode = "ALARM!!";
-                showNotificationNode();
-            }
-            data1.clear();
         }
     }
 
@@ -1305,7 +1313,7 @@ public class OlmatixService extends Service {
             @Override
             public void run() {*/
 
-                if (!mNodeID.contains("door")||!mNodeID.contains("motion")) {
+                if (!mNodeID.contains("door/close")||!mNodeID.contains("motion/motion")) {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel(Channel);
                     if (mMessage.equals("true")) {
@@ -1315,6 +1323,9 @@ public class OlmatixService extends Service {
 
                     } else if (mMessage.equals("false")) {
                         detailNodeModel.setStatus(mMessage);
+
+                            detailNodeModel.setStatus_theft("false");
+                            mDbNodeRepo.update_detailSensorTheft(detailNodeModel);
 
                         saveOffTime();
                     }
@@ -1731,10 +1742,14 @@ public class OlmatixService extends Service {
 
             if (mNodeID.contains("$")) {
                 addNode();
-            } else if (mNodeID.contains("close")||mNodeID.contains("motion")) {
+            } else if (mNodeID.contains("door/close")||mNodeID.contains("motion/motion")) {
                 updateSensorDoor();
+
             } else if (mNodeID.contains("theft")) {
-                updateSensorTheft();
+                if (mMessage.equals("true")) {
+                    updateSensorTheft();
+                }
+
             } else {
                 updateDetail();
             }

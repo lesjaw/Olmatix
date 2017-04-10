@@ -121,6 +121,7 @@ public class dbNodeRepo {
         values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
         values.put(KEY_SENSOR, detailNodeModel.getSensor());
         values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
+        values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
@@ -454,6 +455,23 @@ public class dbNodeRepo {
             values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
             Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
         }
+
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel())
+        });
+        db.close(); // Closing database connection
+        //Log.d("DEBUG", "updateDetailSensor: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
+        //String.valueOf(detailNodeModel.getChannel()));
+
+    }
+
+    public void update_detailSensorTheft(DetailNodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
+
         if (detailNodeModel.getStatus_theft() != null) {
             values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
             Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());

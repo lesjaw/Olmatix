@@ -80,6 +80,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     private CoordinatorLayout coordinatorLayout;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +90,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-
         initializeActivity();
     }
 
@@ -187,7 +187,9 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     public void onClick(DialogInterface dialog, int which) {
 
                         sendJson();
-                        finish();
+                        textProgres = getString(R.string.label_setup_sending);
+                        progressDialogShow(0);
+
                     }
                 }).setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -342,6 +344,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     }
 
     public void requestInfo() {
+        Log.d("DEBUG", "requestInfo: ");
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         String URL = "http://192.168.1.1/device-info";
 
@@ -353,6 +356,32 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                         // display response
                         //Log.d("Response", response.toString());
                         parsingJson(response.toString());
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Error requestInfo", String.valueOf(error));
+                        requestInfo1();
+                    }
+                }
+        );
+
+        requestQueue.add(getRequest);
+    }
+
+    public void requestInfo1() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String URL = "http://192.168.244.1/device-info";
+
+        // prepare the Request
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // display response
+                        //Log.d("Response", response.toString());
+                        parsingJson1(response.toString());
                     }
                 },
                 new Response.ErrorListener() {
@@ -390,6 +419,29 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         }
     }
 
+    public void parsingJson1(String json) {
+        try {
+            JSONObject jObject = new JSONObject(json);
+            deviceID = jObject.getString("device_id");
+            String firmwareAll = jObject.getString("firmware");
+            JSONObject jObject1 = new JSONObject(firmwareAll);
+            firmware = jObject1.getString("name");
+            version = jObject1.getString("version");
+
+            progressDialogShow(1);
+
+            Snackbar snackbar = Snackbar.make((getWindow().getDecorView()),getString(R.string.label_setup_connect_to)+deviceID+" " +
+                            ""+firmware.toUpperCase() +getString(R.string.label_product)
+                    ,Snackbar.LENGTH_INDEFINITE);
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+            snackbar.show();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendJson() {
         try {
 
@@ -420,12 +472,22 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                             View snackbarView = snackbar.getView();
                                         snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
+                            progressDialogShow(1);
+
+                            finish();
+
                         }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("VOLLEY", error.toString());
+                        Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), "Failed. tryig another address, please wait.."
+                                ,Snackbar.LENGTH_INDEFINITE);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                        sendJson1();
                     }
                 }) {
                     @Override
@@ -466,6 +528,94 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             e.printStackTrace();
         }
     }
+
+    public void sendJson1() {
+        try {
+
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            String mUserName = sharedPref.getString("user_name", "olmatix1");
+            String mPassword = sharedPref.getString("password", "olmatix");
+            String passwordHome = wifiText.getText().toString();
+            String ssidHome = String.valueOf(textHomeWifi);
+            Log.d("DEBUG", "sendJson: "+mUserName +" | "+mPassword+" | "+textHomeWifi+ " | "+passwordHome);
+
+            if (ssidHome!=null) {
+
+                RequestQueue requestQueue = Volley.newRequestQueue(this);
+                String URL = "http://192.168.244.1/config";
+                JSONObject jsonBody = new JSONObject("{\"name\":\"Olmatix\",\"wifi\": {\"ssid\": \"" + ssidHome + "\",\"password\": " +
+                        "\"" + passwordHome + "\"},\"mqtt\": {\"host\": \"cloud.olmatix.com\",\"port\": 1883,\"base_topic\": \"devices/\"," +
+                        "\"auth\": true, \"username\": \"" + mUserName + "\",\"password\": \"" + mPassword + "\"},\"ota\": {\"enabled\": false}}");
+
+                final String requestBody = jsonBody.toString();
+
+                StringRequest stringRequest = new StringRequest(Request.Method.PUT, URL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response.equals("200")) {
+
+                            Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), R.string.label_setup_success
+                                    ,Snackbar.LENGTH_INDEFINITE);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            progressDialogShow(0);
+
+                            finish();
+
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("VOLLEY", error.toString());
+                        Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), "Failed setup devices after 2 tries.."
+                                ,Snackbar.LENGTH_INDEFINITE);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                        finish();
+                    }
+                }) {
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
+
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        try {
+                            return requestBody == null ? null : requestBody.getBytes("utf-8");
+                        } catch (UnsupportedEncodingException uee) {
+                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                        String responseString = "";
+                        if (response != null) {
+                            responseString = String.valueOf(response.statusCode);
+                            // can get more details such as response.headers
+                        }
+                        return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+                    }
+                };
+
+                requestQueue.add(stringRequest);
+            } else {
+                Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), R.string.label_setup_choose_wifi
+                        ,Snackbar.LENGTH_INDEFINITE);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                snackbar.show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     private WifiConfiguration createAPConfiguration(String networkSSID, String networkPasskey, String securityMode) {
@@ -519,7 +669,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
             if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
 
-                WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+                final WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
                 String wifiInfo = "";
                 WifiInfo info = wifi.getConnectionInfo();
@@ -529,7 +679,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     wifiInfo = ssid.substring(0, iend1);
                     wifiInfo = wifiInfo.replace("\"", "");
                     if (checkTitleStep(wifiInfo)) {
-
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {

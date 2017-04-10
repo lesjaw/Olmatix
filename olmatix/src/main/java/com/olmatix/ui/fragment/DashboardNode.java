@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -50,7 +49,6 @@ import com.olmatix.utils.SpinnerListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.olmatix.adapter.InfoAdapter.mBUTTON;
 import static com.olmatix.adapter.InfoAdapter.mLOCATION;
 
 
@@ -67,7 +65,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
     public  static dbNodeRepo mDbNodeRepo;
     private static ArrayList<DashboardNodeModel> data;
     Spinner mSpinner;
-    private int mDatasetTypes[] = {mLOCATION, mBUTTON}; //view types
+    private int mDatasetTypes[] = {mLOCATION}; //view types
     Context dashboardnode;
     private ItemTouchHelper mItemTouchHelper;
     private String Distance;
@@ -285,7 +283,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
         int currentOrientation = getResources().getConfiguration().orientation;
-        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+        //if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             mRecycleViewInfo.setVisibility(View.GONE);
             mViewDash1.setVisibility(View.GONE);
 
@@ -295,11 +293,11 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             p.addRule(RelativeLayout.BELOW, R.id.view_dash1);
             mRecycleView.setLayoutParams(p);
 
-        }
-        else {
-            mRecycleViewInfo.setVisibility(View.VISIBLE);
+        //}
+        //else {
+        //    mRecycleViewInfo.setVisibility(View.VISIBLE);
 
-        }
+        //}
 
         mFab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

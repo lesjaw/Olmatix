@@ -101,7 +101,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        installed_node=getContext();
+        installed_node=getActivity();
 
         data = new ArrayList<>();
         dbNodeRepo = new dbNodeRepo(getActivity());
@@ -313,7 +313,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         if (autoUpdate != null) {
             autoUpdate.cancel();
         }
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
@@ -322,7 +322,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
          if (autoUpdate != null){
              autoUpdate.cancel();
          }
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -403,9 +403,9 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         distanceX = event.getRawX()-event.getRawX();
                         if (Math.abs(distanceX)< 10) {
 
-                            final EditText mEditText = new EditText(getContext());
+                            final EditText mEditText = new EditText(getActivity());
                             if (lastAction == MotionEvent.ACTION_DOWN)
-                                new AlertDialog.Builder(getContext())
+                                new AlertDialog.Builder(getActivity())
                                         .setTitle("Add Node")
                                         .setMessage("Please type Olmatix product ID!")
                                         .setView(mEditText)
@@ -443,8 +443,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             @Override
             public void onClick(View v) {
                 onTouchListener(0);
-                final EditText mEditText = new EditText(getContext());
-                new AlertDialog.Builder(getContext())
+                final EditText mEditText = new EditText(getActivity());
+                new AlertDialog.Builder(getActivity())
                         .setTitle("Add Node")
                         .setMessage("Please type Olmatix product ID!")
                         .setView(mEditText)

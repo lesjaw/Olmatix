@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -129,13 +130,13 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             @Override
             public void onClick(View v) {
                 onTouchListener(0);
-                mSpinner = new Spinner(getContext());
+                mSpinner = new Spinner(getActivity());
                 List<SpinnerObject> lables = mDbNodeRepo.getAllLabels();
                 ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<>(getActivity(),
                         android.R.layout.simple_spinner_item,lables);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 mSpinner.setAdapter(dataAdapter);
-                new AlertDialog.Builder(getContext())
+                new AlertDialog.Builder(getActivity())
                         .setTitle("Add Node")
                         .setMessage("Please choose your existing Nodes!")
                         .setView(mSpinner)
@@ -180,7 +181,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        mSpinner = new Spinner(getContext());
+                        mSpinner = new Spinner(getActivity());
                         List<SpinnerObject> lables = mDbNodeRepo.getAllLabels();
                         ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<>(getActivity(),
                                 android.R.layout.simple_spinner_item,lables);
@@ -188,7 +189,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         mSpinner.setAdapter(dataAdapter);
                         if (lastAction == MotionEvent.ACTION_DOWN)
-                        new AlertDialog.Builder(getContext())
+                        new AlertDialog.Builder(getActivity())
                                 .setTitle("Add Node")
                                 .setMessage("Please choose your existing Nodes!")
                                 .setView(mSpinner)
@@ -238,9 +239,9 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         mRecycleView.setHasFixedSize(true);
         mRecycleViewInfo.setHasFixedSize(true);
 
-        int mNoOfColumns = OlmatixUtils.calculateNoOfColumns(getContext());
+        int mNoOfColumns = OlmatixUtils.calculateNoOfColumns(getActivity());
 
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), mNoOfColumns);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), mNoOfColumns);
 
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.addItemDecoration(new GridSpacesItemDecoration(OlmatixUtils.dpToPx(2),true));
@@ -283,7 +284,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
         int currentOrientation = getResources().getConfiguration().orientation;
-        //if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             mRecycleViewInfo.setVisibility(View.GONE);
             mViewDash1.setVisibility(View.GONE);
 
@@ -293,11 +294,11 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             p.addRule(RelativeLayout.BELOW, R.id.view_dash1);
             mRecycleView.setLayoutParams(p);
 
-        //}
-        //else {
-        //    mRecycleViewInfo.setVisibility(View.VISIBLE);
+        }
+        else {
+            mRecycleViewInfo.setVisibility(View.VISIBLE);
 
-        //}
+        }
 
         mFab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

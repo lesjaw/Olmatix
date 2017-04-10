@@ -1,7 +1,9 @@
 package com.olmatix.ui.activity.scene;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -12,19 +14,41 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.olmatix.adapter.DayAdapter;
+import com.olmatix.adapter.SceneDetailAdapter;
+import com.olmatix.database.dbNodeRepo;
+import com.olmatix.helper.HorizontalListView;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.DetailNodeModel;
+import com.olmatix.model.SceneDetailModel;
+import com.olmatix.model.SceneModel;
+import com.olmatix.model.SpinnerObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.fragments.BackConfirmationFragment;
@@ -34,289 +58,171 @@ import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
  * Created by Rahman on 1/13/2017.
  */
 
-public class ScheduleActivity extends AppCompatActivity implements VerticalStepperForm {
-    
-    public static final String NEW_SCHEDULE_ADDED = "new_schedule_added";
+public class ScheduleActivity extends AppCompatActivity {
 
-    // Information about the steps/fields of the form
-    private static final int TITLE_STEP_NUM = 0;
-    private static final int DESCRIPTION_STEP_NUM = 1;
-    private static final int TIME_STEP_NUM = 2;
-    private static final int DAYS_STEP_NUM = 3;
-
-    // Title step
-    private EditText titleEditText;
-    private static final int MIN_CHARACTERS_TITLE = 3;
-    public static final String STATE_TITLE = "title";
-
-    // Description step
-    private EditText descriptionEditText;
-    public static final String STATE_DESCRIPTION = "description";
-
-    // Time step
-    private TextView timeTextView;
-    private TimePickerDialog timePicker;
-    private Pair<Integer, Integer> time;
-    public static final String STATE_TIME_HOUR = "time_hour";
-    public static final String STATE_TIME_MINUTES = "time_minutes";
-
-    // Week days step
     private boolean[] weekDays;
-    private LinearLayout daysStepContent;
-    public static final String STATE_WEEK_DAYS = "week_days";
-
-    private boolean confirmBack = true;
-    private ProgressDialog progressDialog;
-    private VerticalStepperFormLayout verticalStepperForm;
+    private TimePickerDialog mTimePicker;
+    private Pair<Integer, Integer> time;
+    private Activity mActivity;
+    private Context mContext;
+    private View mInflater;
+    private TextView mTimeTxt, mSceneMode;
+    private Toolbar mToolbar;
+    private String mSceneData;
+    private int mSceneIdData = 0;
     private Intent mIntent;
-    private LayoutInflater mInflater;
-    private TextView mTitle;
+    private dbNodeRepo mDbNodeRepo;
+    private SceneModel mSceneModel;
+    private DetailNodeModel mDetailNodeModel;
+    private SceneDetailModel mSceneDetailModel;
+    private LinearLayout mDayLayout, mTimeDayLayout;
+    private View mViewDash;
+    private MaterialSpinner mSpinNode;
+    ArrayList<SceneDetailModel> sceneDetailList;
+    private ImageButton btnAdd;
+    private SceneDetailAdapter mSceneDetailAdapter;
+    private ListView listSceneDetailData;
+    private HorizontalListView mDayRv;
+    private DayAdapter mDayAdapter;
+    private LinearLayoutManager dayLinearManager;
+    private ArrayList<String> mDayList;
+    String mDayValue = null;
+    public boolean stateChanged = false;
+    private int mSelectedPosition= -1;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.schedule_activity);
+        mActivity = this;
+        runThread();
 
-        initializeActivity();
-        String s = getIntent().getStringExtra("scene");
-        mTitle.setText(s);
+        initView();
+        setupToolbar();
+
+        setClickListeners();
+        setupDatabases();
+        mLoadSpinnerData();
+
+
+
     }
 
-    private void initializeActivity() {
 
-        // Time step vars
+
+    private void initView() {
         time = new Pair<>(8, 30);
         setTimePicker(8, 30);
 
-        // Week days step vars
-        weekDays = new boolean[7];
-
-        mTitle = (TextView) findViewById(R.id.mTitle);
-
-        // Vertical Stepper form vars
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
-        String[] stepsTitles = getResources().getStringArray(R.array.steps_schedule_titles);
-        //String[] stepsSubtitles = getResources().getStringArray(R.array.steps_subtitles);
-
-        // Here we find and initialize the form
-        verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form_schedule);
-        VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, stepsTitles, this, this)
-                //.stepsSubtitles(stepsSubtitles)
-                //.materialDesignInDisabledSteps(true) // false by default
-                //.showVerticalLineWhenStepsAreCollapsed(true) // false by default
-                .primaryColor(colorPrimary)
-                .primaryDarkColor(colorPrimaryDark)
-                .displayBottomNavigation(true)
-                .init();
+        mTimeTxt = (TextView) findViewById(R.id.time);
+        mViewDash = (View) findViewById(R.id.view_dash1);
+        mTimeDayLayout = (LinearLayout) findViewById(R.id.label_layout);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mSpinNode = (MaterialSpinner) findViewById(R.id.spin_node);
+        btnAdd = (ImageButton) findViewById(R.id.img_add);
+        mSceneMode = (TextView) findViewById(R.id.txt_sceneid);
+        listSceneDetailData = (ListView) findViewById(R.id.listData);
+        mDayRv= (HorizontalListView) findViewById(R.id.listview);
+        mDayAdapter = new DayAdapter(this);
+        mDayRv.setAdapter(mDayAdapter);
+        mDayAdapter.notifyDataSetChanged();
 
     }
 
-    // METHODS THAT HAVE TO BE IMPLEMENTED TO MAKE THE LIBRARY WORK
-    // (Implementation of the interface "VerticalStepperForm")
 
-    @Override
-    public View createStepContentView(int stepNumber) {
-        // Here we generate the content view of the correspondent step and we return it so it gets
-        // automatically added to the step layout (AKA stepContent)
-        View view = null;
-        switch (stepNumber) {
-            case TITLE_STEP_NUM:
-                view = createAlarmTitleStep();
-                break;
-            case DESCRIPTION_STEP_NUM:
-                view = createAlarmDescriptionStep();
-                break;
-            case TIME_STEP_NUM:
-                view = createAlarmTimeStep();
-                break;
-            case DAYS_STEP_NUM:
-                view = createAlarmDaysStep();
-                break;
+
+
+
+    private void setupToolbar() {
+        setSupportActionBar(mToolbar);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        return view;
     }
 
-    @Override
-    public void onStepOpening(int stepNumber) {
-        switch (stepNumber) {
-            case TITLE_STEP_NUM:
-                // When this step is open, we check that the title is correct
-                checkTitleStep(titleEditText.getText().toString());
-                break;
-            case DESCRIPTION_STEP_NUM:
-            case TIME_STEP_NUM:
-                // As soon as they are open, these two steps are marked as completed because they
-                // have default values
-                verticalStepperForm.setStepAsCompleted(stepNumber);
-                // In this case, the instruction above is equivalent to:
-                // verticalStepperForm.setActiveStepAsCompleted();
-                break;
-            case DAYS_STEP_NUM:
-                // When this step is open, we check the days to verify that at least one is selected
-                checkDays();
-                break;
+    private void setupDatabases() {
+        mDbNodeRepo = new dbNodeRepo(mActivity);
+        mSceneModel = new SceneModel();
+        mDetailNodeModel = new DetailNodeModel();
+        mSceneDetailModel = new SceneDetailModel();
+    }
+
+    private void mLoadSpinnerData() {
+        List<SpinnerObject> nodeLabel = mDbNodeRepo.getAllLabels();
+        if (mSpinNode != null) {
+            MaterialDialog.Builder mBuilderSpin = new MaterialDialog.Builder(mActivity);
+            mBuilderSpin.title("Warning");
+            mBuilderSpin.iconRes(R.drawable.ic_warning);
+            mBuilderSpin.limitIconToDefaultSize();
+            mBuilderSpin.content("We dont found any node in here. Please add some node!!");
+            mBuilderSpin.positiveText("OK");
+            mBuilderSpin.show();
+        } else {
+            mSpinNode.setItems(nodeLabel);
+            Log.d("DEBUG", "loadSpinnerData: " + nodeLabel.toArray());
         }
     }
 
     @Override
-    public void sendData() {
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(true);
-        progressDialog.show();
-        progressDialog.setMessage(getString(R.string.vertical_form_stepper_form_sending_data_message));
-        executeDataSending();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //onBackPressed();
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
-    // OTHER METHODS USED TO MAKE THIS EXAMPLE WORK
+    private void runThread() {
 
-    private void executeDataSending() {
-
-        // TODO Use here the data of the form as you wish
-
-        // Fake data sending effect
-        new Thread(new Runnable() {
-            @Override
+        new Thread() {
             public void run() {
                 try {
-                    Thread.sleep(1000);
-                    mIntent = getIntent();
-                    setResult(RESULT_OK, mIntent);
-                    mIntent.putExtra(NEW_SCHEDULE_ADDED, true);
-                    mIntent.putExtra(STATE_TITLE, titleEditText.getText().toString());
-                    mIntent.putExtra(STATE_DESCRIPTION, descriptionEditText.getText().toString());
-                    mIntent.putExtra(STATE_TIME_HOUR, time.first);
-                    mIntent.putExtra(STATE_TIME_MINUTES, time.second);
-                    mIntent.putExtra(STATE_WEEK_DAYS, weekDays);
-                    // You must set confirmBack to false before calling finish() to avoid the confirmation dialog
-                    confirmBack = false;
-                    finish();
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            initLoadDb();
+                            initIntent();
+                        }
+                    });
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-        }).start(); // You should delete this code and add yours
+        }.start();
     }
 
-    private View createAlarmTitleStep() {
-        // This step view is generated programmatically
-        titleEditText = new EditText(this);
-        titleEditText.setHint(R.string.form_hint_title);
-        titleEditText.setSingleLine(true);
-        titleEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+    private void initIntent() {
+        mSceneData = getIntent().getStringExtra("SCENETYPE");
+        mSceneIdData = getIntent().getIntExtra("SCENEID", 0);
+        mSceneMode.setText("Scene Name :" + mSceneData + " - " + mSceneIdData);
+        if (mSceneIdData != 0) {
+            mDayLayout.setVisibility(View.GONE);
+            mTimeDayLayout.setVisibility(View.GONE);
+            mViewDash.setVisibility(View.GONE);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkTitleStep(s.toString());
-            }
-
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-        titleEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(checkTitleStep(v.getText().toString())) {
-                    verticalStepperForm.goToNextStep();
-                }
-                return false;
-            }
-        });
-        return titleEditText;
-    }
-
-    private View createAlarmDescriptionStep() {
-        descriptionEditText = new EditText(this);
-        descriptionEditText.setHint(R.string.form_hint_description);
-        descriptionEditText.setSingleLine(true);
-        descriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                verticalStepperForm.goToNextStep();
-                return false;
-            }
-        });
-        return descriptionEditText;
-    }
-
-    private View createAlarmTimeStep() {
-        // This step view is generated by inflating a layout XML file
-        mInflater = LayoutInflater.from(getBaseContext());
-        LinearLayout timeStepContent = (LinearLayout) mInflater.inflate(R.layout.step_time_layout, null, false);
-        timeTextView = (TextView) timeStepContent.findViewById(R.id.time);
-        timeTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                timePicker.show();
-            }
-        });
-        return timeStepContent;
-    }
-
-    private View createAlarmDaysStep() {
-        LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-        daysStepContent = (LinearLayout) inflater.inflate(
-                R.layout.step_days_of_week_layout, null, false);
-
-        String[] weekDays = getResources().getStringArray(R.array.week_days);
-        for(int i = 0; i < weekDays.length; i++) {
-            final int index = i;
-            final LinearLayout dayLayout = getDayLayout(index);
-            if(index < 5) {
-                activateDay(index, dayLayout, false);
-            } else {
-                deactivateDay(index, dayLayout, false);
-            }
-
-            dayLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if((boolean)v.getTag()) {
-                        deactivateDay(index, dayLayout, true);
-                    } else {
-                        activateDay(index, dayLayout, true);
-                    }
-                }
-            });
-
-            final TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
-            dayText.setText(weekDays[index]);
         }
-        return daysStepContent;
+    }
+
+    private void initLoadDb() {
+        mDbNodeRepo = new dbNodeRepo(mActivity);
+        mSceneModel = new SceneModel();
+        mDetailNodeModel = new DetailNodeModel();
+        mSceneDetailModel = new SceneDetailModel();
     }
 
     private void setTimePicker(int hour, int minutes) {
-        timePicker = new TimePickerDialog(this,
+        mTimePicker = new TimePickerDialog(this,
                 new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         setTime(hourOfDay, minute);
                     }
                 }, hour, minutes, true);
-    }
-
-    private boolean checkTitleStep(String title) {
-        boolean titleIsCorrect = false;
-
-        if(title.length() >= MIN_CHARACTERS_TITLE) {
-            titleIsCorrect = true;
-
-            verticalStepperForm.setActiveStepAsCompleted();
-            // Equivalent to: verticalStepperForm.setStepAsCompleted(TITLE_STEP_NUM);
-
-        } else {
-            String titleErrorString = getResources().getString(R.string.error_title_min_characters);
-            String titleError = String.format(titleErrorString, MIN_CHARACTERS_TITLE);
-
-            verticalStepperForm.setActiveStepAsUncompleted(titleError);
-            // Equivalent to: verticalStepperForm.setStepAsUncompleted(TITLE_STEP_NUM, titleError);
-
-        }
-
-        return titleIsCorrect;
     }
 
     private void setTime(int hour, int minutes) {
@@ -326,198 +232,197 @@ public class ScheduleActivity extends AppCompatActivity implements VerticalStepp
         String minutesString = ((time.second > 9) ?
                 String.valueOf(time.second) : ("0" + time.second));
         String time = hourString + ":" + minutesString;
-        timeTextView.setText(time);
+        mTimeTxt.setText(time);
     }
 
-    private void activateDay(int index, LinearLayout dayLayout, boolean check) {
-        weekDays[index] = true;
 
-        dayLayout.setTag(true);
+    public void reloadSceneData() {
+        Thread thread = new Thread(null, loadSceneData);
+        thread.start();
+        this.setClickListeners();
 
-        Drawable bg = ContextCompat.getDrawable(getBaseContext(),
-                ernestoyaquello.com.verticalstepperform.R.drawable.circle_step_done);
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        bg.setColorFilter(new PorterDuffColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN));
-        dayLayout.setBackground(bg);
-
-        TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
-        dayText.setTextColor(Color.rgb(255, 255, 255));
-
-        if(check) {
-            checkDays();
-        }
     }
 
-    private void deactivateDay(int index, LinearLayout dayLayout, boolean check) {
-        weekDays[index] = false;
 
-        dayLayout.setTag(false);
 
-        dayLayout.setBackgroundResource(0);
+    private void setClickListeners() {
+        btnAdd.setOnClickListener(addBtnClickListener());
+        mTimeTxt.setOnClickListener(mTimeClickListener());
+        mDayRv.registerListItemClickListener(mItemClickListener());
 
-        TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
-        int colour = ContextCompat.getColor(getBaseContext(), R.color.colorPrimary);
-        dayText.setTextColor(colour);
-
-        if(check) {
-            checkDays();
-        }
     }
 
-    private boolean checkDays() {
-        boolean thereIsAtLeastOneDaySelected = false;
-        for(int i = 0; i < weekDays.length && !thereIsAtLeastOneDaySelected; i++) {
-            if(weekDays[i]) {
-                verticalStepperForm.setStepAsCompleted(DAYS_STEP_NUM);
-                thereIsAtLeastOneDaySelected = true;
+    private HorizontalListView.OnListItemClickListener mItemClickListener() {
+        return (v, position) -> {
+            Log.d("TAG", "onClick: " + v +"\n\n"+ position);
+            v.setSelected(true);
+            if (position == 0){
+                mSceneModel.setSunday("1");
+            } else if (position == 1){
+                mSceneModel.setMonday("1");
+            }else if (position == 2){
+                mSceneModel.setTuesday("1");
+            }else if (position == 3){
+                mSceneModel.setWednesday("1");
+            }else if (position == 4){
+                mSceneModel.setThursday("1");
+            }else if (position == 5){
+                mSceneModel.setFriday("1");
+            }else if (position == 6){
+                mSceneModel.setSaturday("1");
+            }else{
+                v.setSelected(false);
+                mSceneModel.setSunday("");
+                mSceneModel.setMonday("");
+                mSceneModel.setTuesday("");
+                mSceneModel.setWednesday("");
+                mSceneModel.setThursday("");
+                mSceneModel.setFriday("");
+                mSceneModel.setSaturday("");
             }
-        }
-        if(!thereIsAtLeastOneDaySelected) {
-            verticalStepperForm.setStepAsUncompleted(DAYS_STEP_NUM, null);
-        }
-
-        return thereIsAtLeastOneDaySelected;
+        };
     }
 
-    private LinearLayout getDayLayout(int i) {
-        int id = daysStepContent.getResources().getIdentifier(
-                "day_" + i, "id", getPackageName());
-        return (LinearLayout) daysStepContent.findViewById(id);
+
+    private View.OnClickListener mTimeClickListener() {
+
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mTimePicker.show();
+            }
+        };
     }
 
-    // CONFIRMATION DIALOG WHEN USER TRIES TO LEAVE WITHOUT SUBMITTING
 
-    private void confirmBack() {
-        if(confirmBack && verticalStepperForm.isAnyStepCompleted()) {
-            BackConfirmationFragment backConfirmation = new BackConfirmationFragment();
-            backConfirmation.setOnConfirmBack(new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    confirmBack = true;
-                }
-            });
-            backConfirmation.setOnNotConfirmBack(new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    confirmBack = false;
-                    finish();
-                }
-            });
-            backConfirmation.show(getSupportFragmentManager(), null);
+    private View.OnClickListener addBtnClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setDataScene();
+                //mDbNodeRepo.addWaris(waris);
+                //Log.d("DEBUG", "Waris ADDED");
+                //reloadWaris();
+                //clearWarisInputForm();
+            }
+        };
+    }
+
+    private void setDataScene() {
+        //mSceneModel = new SceneModel();
+        mSceneModel.setSceneName(mSceneData);
+        mSceneModel.setSceneType(mSceneIdData);
+        //
+
+        if (mSceneIdData == 0) {
+            String timeData = mTimeTxt.getText().toString();
+            String[] outputTime = timeData.split(":");
+            mSceneModel.setHour(Integer.parseInt(outputTime[0]));
+            mSceneModel.setMin(Integer.parseInt(outputTime[1]));
+            mSceneModel.setLocation("");
+            mSceneModel.setSensor("");
+            mDbNodeRepo.insertDbScene(mSceneModel);
+
         } else {
-            confirmBack = false;
-            finish();
+            mSceneModel.setHour(00);
+            mSceneModel.setMin(00);
+
+            mSceneModel.setLocation("");
+            mSceneModel.setSensor("");
+            mSceneModel.setLocation("Null");
+            mSceneModel.setSensor("Null");
+            mDbNodeRepo.insertDbScene(mSceneModel);
         }
+
     }
 
-    private void dismissDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
+
+    private Runnable loadSceneData = new Runnable() {
+
+        @Override
+        public void run() {
+            try {
+                sceneDetailList = mDbNodeRepo.getSceneDetailList();
+                Log.d("DEBUG", "DATA WARIS COUNT=" + String.valueOf(sceneDetailList.size()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            runOnUiThread(updateListView);
         }
-        progressDialog = null;
-    }
+    };
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home && confirmBack) {
-            confirmBack();
-            return true;
-        }
-        return false;
-    }
 
-    @Override
-    public void onBackPressed(){
-        confirmBack();
-    }
+    private Runnable updateListView = new Runnable() {
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        dismissDialog();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        dismissDialog();
-    }
-
-    // SAVING AND RESTORING THE STATE
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-
-        // Saving title field
-        if(titleEditText != null) {
-            savedInstanceState.putString(STATE_TITLE, titleEditText.getText().toString());
+        @Override
+        public void run() {
+            mSceneDetailAdapter = new SceneDetailAdapter(mActivity, sceneDetailList);
+            listSceneDetailData.setAdapter(mSceneDetailAdapter);
+            mSceneDetailAdapter.notifyDataSetChanged();
+            listSceneDetailData.requestFocus();
         }
 
-        // Saving description field
-        if(descriptionEditText != null) {
-            savedInstanceState.putString(STATE_DESCRIPTION, descriptionEditText.getText().toString());
-        }
+    };
 
-        // Saving time field
-        if(time != null) {
-            savedInstanceState.putInt(STATE_TIME_HOUR, time.first);
-            savedInstanceState.putInt(STATE_TIME_MINUTES, time.second);
-        }
+    /*public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayHolder> {
 
-        // Saving week days field
-        if(weekDays != null) {
-            savedInstanceState.putBooleanArray(STATE_WEEK_DAYS, weekDays);
-        }
+        private List<String> dayList;
 
-        // The call to super method must be at the end here
-        super.onSaveInstanceState(savedInstanceState);
-    }
+        public class DayHolder extends RecyclerView.ViewHolder {
+            public TextView mDayText;
 
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
+            public DayHolder(View view) {
+                super(view);
+                mDayText = (TextView) view.findViewById(R.id.day);
 
-        // Restoration of title field
-        if(savedInstanceState.containsKey(STATE_TITLE)) {
-            String title = savedInstanceState.getString(STATE_TITLE);
-            titleEditText.setText(title);
-        }
-
-        // Restoration of description field
-        if(savedInstanceState.containsKey(STATE_DESCRIPTION)) {
-            String description = savedInstanceState.getString(STATE_DESCRIPTION);
-            descriptionEditText.setText(description);
-        }
-
-        // Restoration of time field
-        if(savedInstanceState.containsKey(STATE_TIME_HOUR)
-                && savedInstanceState.containsKey(STATE_TIME_MINUTES)) {
-            int hour = savedInstanceState.getInt(STATE_TIME_HOUR);
-            int minutes = savedInstanceState.getInt(STATE_TIME_MINUTES);
-            time = new Pair<>(hour, minutes);
-            setTime(hour, minutes);
-            if(timePicker == null) {
-                setTimePicker(hour, minutes);
-            } else {
-                timePicker.updateTime(hour, minutes);
             }
         }
 
-        // Restoration of week days field
-        if(savedInstanceState.containsKey(STATE_WEEK_DAYS)) {
-            weekDays = savedInstanceState.getBooleanArray(STATE_WEEK_DAYS);
-            if (weekDays != null) {
-                for (int i = 0; i < weekDays.length; i++) {
-                    LinearLayout dayLayout = getDayLayout(i);
-                    if (weekDays[i]) {
-                        activateDay(i, dayLayout, false);
+
+        public DayAdapter(List<String> dayList) {
+            this.dayList = dayList;
+        }
+
+        @Override
+        public DayHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.days, parent, false);
+
+            return new DayHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(DayHolder holder, int position) {
+
+            holder.mDayText.setText(mDayList.get(position));
+
+
+
+
+            holder.mDayText.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                   // Toast.makeText(MainActivity.this,holder.txtView.getText().toString(),Toast.LENGTH_SHORT).show();
+                    if(stateChanged){
+                        holder.mDayText.setBackgroundResource(0);
+                        //mDayValue = "1";
                     } else {
-                        deactivateDay(i, dayLayout, false);
+
+                        holder.mDayText.setBackgroundResource(R.drawable.ic_check);
+                        //mDayValue = null;
                     }
+                    stateChanged = !stateChanged;
+                    Log.d("TAG", "onClick: " + stateChanged);
+                    mClickEvent(stateChanged);
+
                 }
-            }
+            });
         }
 
-        // The call to super method must be at the end here
-        super.onRestoreInstanceState(savedInstanceState);
-    }
+        @Override
+        public int getItemCount() {
+            return dayList.size();
+        }
+    }*/
 }

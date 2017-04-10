@@ -1,7 +1,12 @@
 package com.olmatix.database;
 
 /**
- * Created by Lesjaw on 05/12/2016.
+ * Created              : Lesjaw on 05/12/2016.
+ * Date Created         : 05/12/2016 / 3:50 PM.
+ * ===================================================
+ * Package              : com.olmatix.database.
+ * Project Name         : Olmatix.
+ * Copyright            : Copyright @ 2017 Olmatix.
  */
 
 import android.content.ContentValues;
@@ -21,50 +26,7 @@ import com.olmatix.model.SpinnerObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.olmatix.database.dbNode.KEY_ADDING;
-import static com.olmatix.database.dbNode.KEY_ARRIVE;
-import static com.olmatix.database.dbNode.KEY_CHANNEL;
-import static com.olmatix.database.dbNode.KEY_COMMAND;
-import static com.olmatix.database.dbNode.KEY_DURATION;
-import static com.olmatix.database.dbNode.KEY_FWNAME;
-import static com.olmatix.database.dbNode.KEY_FWVERSION;
-import static com.olmatix.database.dbNode.KEY_ICON;
-import static com.olmatix.database.dbNode.KEY_ID;
-import static com.olmatix.database.dbNode.KEY_ID_NODE_DETAIL;
-import static com.olmatix.database.dbNode.KEY_LEAVE;
-import static com.olmatix.database.dbNode.KEY_LOCALIP;
-import static com.olmatix.database.dbNode.KEY_LOG;
-import static com.olmatix.database.dbNode.KEY_MESSAGE;
-import static com.olmatix.database.dbNode.KEY_NAME;
-import static com.olmatix.database.dbNode.KEY_NICE_NAME_D;
-import static com.olmatix.database.dbNode.KEY_NICE_NAME_N;
-import static com.olmatix.database.dbNode.KEY_NODES;
-import static com.olmatix.database.dbNode.KEY_NODE_ID;
-import static com.olmatix.database.dbNode.KEY_ONLINE;
-import static com.olmatix.database.dbNode.KEY_OTA;
-import static com.olmatix.database.dbNode.KEY_PATH;
-import static com.olmatix.database.dbNode.KEY_RESET;
-import static com.olmatix.database.dbNode.KEY_SCENE_ID;
-import static com.olmatix.database.dbNode.KEY_SCENE_NAME;
-import static com.olmatix.database.dbNode.KEY_SCENE_TYPE;
-import static com.olmatix.database.dbNode.KEY_SCHEDULE;
-import static com.olmatix.database.dbNode.KEY_SENSOR;
-import static com.olmatix.database.dbNode.KEY_SIGNAL;
-import static com.olmatix.database.dbNode.KEY_STATUS;
-import static com.olmatix.database.dbNode.KEY_STATUS_SENSOR;
-import static com.olmatix.database.dbNode.KEY_STATUS_THEFT;
-import static com.olmatix.database.dbNode.KEY_TIMESTAMPS_OFF;
-import static com.olmatix.database.dbNode.KEY_TIMESTAMPS_ON;
-import static com.olmatix.database.dbNode.KEY_TOPIC;
-import static com.olmatix.database.dbNode.KEY_UPTIME;
-import static com.olmatix.database.dbNode.TABLE;
-import static com.olmatix.database.dbNode.TABLE_FAV;
-import static com.olmatix.database.dbNode.TABLE_LOG;
-import static com.olmatix.database.dbNode.TABLE_MQTT;
-import static com.olmatix.database.dbNode.TABLE_NODE;
-import static com.olmatix.database.dbNode.TABLE_NODE_DURATION;
-import static com.olmatix.database.dbNode.TABLE_SCENE;
-import static com.olmatix.database.dbNode.TABLE_SCENE_DETAIL;
+import static com.olmatix.database.dbNode.*;
 
 public class dbNodeRepo {
     private com.olmatix.database.dbHelper dbHelper;
@@ -151,9 +113,17 @@ public class dbNodeRepo {
         ContentValues values = new ContentValues();
         values.put(KEY_SCENE_NAME, sceneModel.getSceneName());
         values.put(KEY_SCENE_TYPE, sceneModel.getSceneType());
-        values.put(KEY_SCHEDULE, sceneModel.getSchedule());
-        values.put(KEY_ARRIVE, sceneModel.getArrived());
-        values.put(KEY_LEAVE, sceneModel.getLeave());
+        values.put(KEY_HOURS, sceneModel.getHour());
+        values.put(KEY_MINS, sceneModel.getMin());
+        values.put(KEY_MON, sceneModel.getMonday());
+        values.put(KEY_SUN, sceneModel.getSunday());
+        values.put(KEY_TUE, sceneModel.getTuesday());
+        values.put(KEY_WED, sceneModel.getWednesday());
+        values.put(KEY_THUR, sceneModel.getThursday());
+        values.put(KEY_FRI, sceneModel.getFriday());
+        values.put(KEY_SAT, sceneModel.getSaturday());
+        values.put(KEY_LOCATION, sceneModel.getLocation());
+        values.put(KEY_SENSOR, sceneModel.getSensor());
 
         long Id = db.insert(TABLE_SCENE, null, values);
         db.close(); // Closing database connection
@@ -174,9 +144,17 @@ public class dbNodeRepo {
 
                 node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
                 node.setSceneType(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
-                node.setSchedule(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCHEDULE)));
-                node.setArrived(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ARRIVE)));
-                node.setLeave(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LEAVE)));
+                node.setHour(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_HOURS)));
+                node.setMin(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_MINS)));
+                node.setMonday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_MON)));
+                node.setSunday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SUN)));
+                node.setTuesday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TUE)));
+                node.setWednesday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_WED)));
+                node.setThursday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_THUR)));
+                node.setFriday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FRI)));
+                node.setSaturday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SAT)));
+                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setLocation(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCATION)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());
@@ -319,8 +297,10 @@ public class dbNodeRepo {
         db.delete(TABLE_NODE, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
-        db.delete(TABLE_FAV, dbNode.KEY_NODE_ID + "= ?", new String[]{
+        db.delete(TABLE_FAV, dbNode.KEY_ID_NODE_DETAIL + "= ?", new String[]{
                 String.valueOf(node_Id)});
+
+        Log.d("DEBUG", "deleteNode: " + String.valueOf(node_Id));
 
         db.close(); // Closing database connection
     }
@@ -331,6 +311,7 @@ public class dbNodeRepo {
         // It's a good practice to use parameter ?, instead of concatenate string
         db.delete(TABLE_FAV, dbNode.KEY_ID_NODE_DETAIL + "= ?", new String[]{
                 String.valueOf(node_Id)});
+
 
         db.close(); // Closing database connection
     }
@@ -453,7 +434,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_sensor() != null) {
             values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+            //Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -474,7 +455,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_theft() != null) {
             values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
-            Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
+            //Log.d("DEBUG", "updateDetail Status Theft : " +detailNodeModel.getStatus_theft());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -568,8 +549,8 @@ public class dbNodeRepo {
         if (cursor.moveToFirst()) {
             do {
                 //labels.add(cursor.getString(0)+","+ cursor.getString(3));
-                labels.add(new SpinnerObject(cursor.getInt(0), cursor.getString(3)));
-                //labels.add(cursor.getString(1));
+                labels.add(new SpinnerObject(cursor.getInt(0),cursor.getString(3)));
+                //labels.add(cursor.getString(2));
                 //labels.add(cursor.getString(3));
 
             } while (cursor.moveToNext());
@@ -1014,28 +995,7 @@ public class dbNodeRepo {
 
         if (cursor.moveToFirst()) {
             do {
-                nodeList.add(cursor.getString(1)+ "\n"+ cursor.getString(2));
-
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
-        return nodeList;
-    }
-
-    public List<dbNode> getLogStatus() {
-        List<dbNode> nodeList = new ArrayList<>();
-
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+10;
-
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-
-
+                nodeList.add(cursor.getString(1)+ " , "+ cursor.getString(2));
 
             } while (cursor.moveToNext());
         }

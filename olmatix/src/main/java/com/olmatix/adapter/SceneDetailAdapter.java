@@ -14,12 +14,17 @@ import android.widget.TextView;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.SceneDetailModel;
-import com.olmatix.ui.activity.SceneInput;
+import com.olmatix.ui.activity.scene.ScheduleActivity;
 
 import java.util.ArrayList;
 
 /**
- * Created by Rahman on 1/5/2017.
+ * Created              : Rahman on 1/5/2017.
+ * Date Created         : 1/5/2017 / 3:51 PM.
+ * ===================================================
+ * Package              : ${PACKAGE_NAME}.
+ * Project Name         : Olmatix.
+ * Copyright            : Copyright @ 2017 Olmatix.
  */
 
 public class SceneDetailAdapter extends BaseAdapter {
@@ -31,13 +36,13 @@ public class SceneDetailAdapter extends BaseAdapter {
     private TextView mId,mTypicalName, sceneCmd;
     private AlertDialog.Builder mDialog;
 
-    private SceneInput mSceneInput;
+    private ScheduleActivity mSceneInput;
 
 
     public SceneDetailAdapter(Activity context, ArrayList<SceneDetailModel> listSceneData){
         this.mContext = context;
         this.sceneDetailData = listSceneData;
-        this.mSceneInput = (SceneInput) context;
+        this.mSceneInput = (ScheduleActivity) context;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -89,7 +94,7 @@ public class SceneDetailAdapter extends BaseAdapter {
 
                         dbNodeRepo mDbNodeRepo = new dbNodeRepo(mContext);
                         mDbNodeRepo.deleteSceneDetailList(sceneDetailItem);
-                        mSceneInput.reloadSceneDetail();
+                        mSceneInput.reloadSceneData();
                         dialog.dismiss();
 
                     }

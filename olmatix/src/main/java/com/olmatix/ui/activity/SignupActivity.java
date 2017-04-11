@@ -23,9 +23,7 @@ import android.widget.Toast;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.androidadvance.topsnackbar.TSnackbar;
@@ -38,16 +36,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
+    Button _signupButton;
+    EditText _nameText,_emailText,_passwordText;
+    TextView _loginLink;
 
-    @InjectView(R.id.input_name) EditText _nameText;
+    /*@InjectView(R.id.input_name) EditText _nameText;
     @InjectView(R.id.input_email) EditText _emailText;
-    @InjectView(R.id.input_password) EditText _passwordText;
-    @InjectView(R.id.btn_signup) Button _signupButton;
-    @InjectView(R.id.link_login) TextView _loginLink;
+    @InjectView(R.id.input_password) EditText _passwordText;*/
+    //@InjectView(R.id.btn_signup) Button _signupButton;
+    //@InjectView(R.id.link_login) TextView _loginLink;
     String name, email, password;
     ProgressDialog progressDialog;
     CoordinatorLayout coordinatorLayout;
@@ -59,22 +59,20 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
         ButterKnife.inject(this);
 
+        _nameText = (EditText)findViewById(R.id.input_name);
+        _emailText = (EditText)findViewById(R.id.input_email);
+        _passwordText = (EditText)findViewById(R.id.input_password);
+        _signupButton = (Button)findViewById(R.id.btn_signup);
+        _loginLink = (TextView) findViewById(R.id.link_login);
+
         coordinatorLayout=(CoordinatorLayout)findViewById(R.id.main_content);
 
 
-        _signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signup();
-            }
-        });
+        _signupButton.setOnClickListener(v -> signup());
 
-        _loginLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Finish the registration screen and return to the Login activity
-                finish();
-            }
+        _loginLink.setOnClickListener(v -> {
+            // Finish the registration screen and return to the Login activity
+            finish();
         });
     }
 
@@ -146,29 +144,21 @@ public class SignupActivity extends AppCompatActivity {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
 
 
-            String url = "http://olmatix.com/api/register";
-            StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d(TAG, "onResponse: "+response);
-                        parsingJson(response);
-                }
-            }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse: "+error);
-                }
-            }) {
+            String url = "http://cloud.olmatix.com/rest/insert_sent.php";
+            StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, response -> {
+                Log.d(TAG, "onResponse: "+response);
+                    parsingJson(response);
+            }, error -> Log.d(TAG, "onErrorResponse: "+error)) {
                 protected Map<String, String> getParams() {
                     Map<String, String> MyData = new HashMap<String, String>();
                     MyData.put("name", name); //Add the data you'd like to send to the server.
                     MyData.put("email", email);
-                    MyData.put("pass", password);
+                    MyData.put("password", password);
                     return MyData;
                 }
             };
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        int socketTimeout = 60000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         MyStringRequest.setRetryPolicy(policy);
         MyRequestQueue.add(MyStringRequest);
@@ -179,7 +169,7 @@ public class SignupActivity extends AppCompatActivity {
     public void parsingJson(String json) {
         try {
             JSONObject jObject = new JSONObject(json);
-            String msg = jObject.getString("error_msg");
+            String msg = jObject.optString("error_msg");
             Log.d(TAG, "parsingJson: "+msg);
             TSnackbar snackbar = TSnackbar.make(coordinatorLayout,msg,TSnackbar.LENGTH_INDEFINITE);
             View snackbarView = snackbar.getView();
@@ -193,7 +183,7 @@ public class SignupActivity extends AppCompatActivity {
             snackbar.show();
             progressDialogShow(1);
 
-            if (msg.equals("Sign up succcess, We need process your registration, please wait our confirmation on your email")) {
+            if (msg.equals("Sign up success, please wait for email confirmation")) {
                 _signupButton.setEnabled(false);
             }
 

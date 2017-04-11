@@ -1,21 +1,16 @@
 package com.olmatix.ui.activity;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -25,7 +20,6 @@ import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.service.OlmatixService;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 /**
  * Created by Lesjaw on 07/01/2017.
@@ -35,12 +29,15 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
     private static final String loginResult = "";
+    Button _loginButton;
+    TextView _signupLink;
+    EditText _emailText,_passwordText;
     ProgressDialog progressDialog;
 
-    @InjectView(R.id.input_email) EditText _emailText;
-    @InjectView(R.id.input_password) EditText _passwordText;
-    @InjectView(R.id.btn_login) Button _loginButton;
-    @InjectView(R.id.link_signup) TextView _signupLink;
+    //@InjectView(R.id.input_email) EditText _emailText;
+    //@InjectView(R.id.input_password) EditText _passwordText;
+    //@InjectView(R.id.btn_login) Button _loginButton;
+    //@InjectView(R.id.link_signup) TextView _signupLink;
     //@InjectView(R.id.labelolmatix) TextView _labelOlmatix;
 
     @Override
@@ -49,32 +46,27 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
 
-        askForPermission(Manifest.permission.ACCESS_FINE_LOCATION,0x1);
-        askForPermission(Manifest.permission.ACCESS_COARSE_LOCATION,0x2);
+        _loginButton = (Button) findViewById(R.id.btn_login);
+        _signupLink = (TextView) findViewById(R.id.link_signup);
+        _emailText = (EditText)findViewById(R.id.input_email);
+        _passwordText = (EditText)findViewById(R.id.input_password);
+
+       /* askForPermission(Manifest.permission.ACCESS_FINE_LOCATION,0x1);
+        askForPermission(Manifest.permission.ACCESS_COARSE_LOCATION,0x2);*/
 
 
         //_labelOlmatix.setSelected(true);
 
-        _loginButton.setOnClickListener(new View.OnClickListener() {
+        _loginButton.setOnClickListener(v -> login());
 
-            @Override
-            public void onClick(View v) {
-                login();
-            }
-        });
-
-        _signupLink.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // Start the Signup activity
-                Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
-                startActivityForResult(intent, REQUEST_SIGNUP);
-            }
+        _signupLink.setOnClickListener(v -> {
+            // Start the Signup activity
+            Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
+            startActivityForResult(intent, REQUEST_SIGNUP);
         });
     }
 
-    private void askForPermission(String permission, Integer requestCode) {
+    /*private void askForPermission(String permission, Integer requestCode) {
         if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
 
             // Should we show an explanation?
@@ -91,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 
 
     public void login() {

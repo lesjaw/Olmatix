@@ -162,7 +162,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     class load extends AsyncTask<Void, Integer, String> {
 
         protected void onPreExecute (){
-           /* nDialog = new ProgressDialog(getContext());
+           /* nDialog = new ProgressDialog(getActivity());
             nDialog.setMessage("Loading Nodes, Please wait..");
             nDialog.setIndeterminate(true);
             nDialog.setCancelable(false);

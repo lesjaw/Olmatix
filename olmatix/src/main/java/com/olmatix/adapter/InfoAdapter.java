@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.LineChart;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -140,11 +139,10 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ViewHolder> im
     }
 
     public class ButtonInfoHolder extends ViewHolder {
-        public LineChart mChart;
 
         public ButtonInfoHolder(View view) {
             super(view);
-            mChart = (LineChart) view.findViewById(R.id.chart);
+
 
         }
     }

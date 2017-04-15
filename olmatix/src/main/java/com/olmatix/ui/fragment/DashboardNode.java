@@ -144,7 +144,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mSpinner.setOnItemSelectedListener(new SpinnerListener());
-                                int databaseId = Integer.parseInt(String.valueOf(((SpinnerObject) mSpinner.getSelectedItem()).getId()));
+                                int databaseId = Integer.parseInt(String.valueOf(((SpinnerObject) mSpinner.getSelectedItem()).getDatabaseId()));
                                 Log.d("DEBUG", "onClick: "+String.valueOf(databaseId));
                                 dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                 mDbNodeRepo.insertFavNode(dashboardNodeModel);
@@ -197,7 +197,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         mSpinner.setOnItemSelectedListener(new SpinnerListener());
-                                        int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getId ()));
+                                        int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObject) mSpinner.getSelectedItem () ).getDatabaseId ()));
                                         dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                         mDbNodeRepo.insertFavNode(dashboardNodeModel);
                                         setRefresh();

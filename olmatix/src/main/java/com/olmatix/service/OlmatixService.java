@@ -1,6 +1,7 @@
 package com.olmatix.service;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -24,11 +25,13 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -44,6 +47,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.androidadvance.topsnackbar.TSnackbar;
+import com.gun0912.tedpermission.PermissionListener;
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
@@ -138,8 +142,22 @@ public class OlmatixService extends Service {
     boolean hasConnectivity = false;
     boolean hasChanged = false;
     SharedPreferences sharedPref;
-    Boolean mStatusServer, doCon, noNotif=true;
+    Boolean mStatusServer, doCon, noNotif = true;
     dbNode dbnode;
+
+    PermissionListener permissionlistener = new PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            Toast.makeText(getApplicationContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+            Toast.makeText(getApplicationContext(), "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+        }
+
+
+    };
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -158,12 +176,12 @@ public class OlmatixService extends Service {
                 }
             }
 
-            hasConnectivity = hasWifi||hasMmobile;
+            hasConnectivity = hasWifi || hasMmobile;
 
-            if (alarmService==null){
+            if (alarmService == null) {
                 if (!hasConnectivity) {
                     final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                            "Internet connection avalaible",TSnackbar.LENGTH_LONG);
+                            "Internet connection avalaible", TSnackbar.LENGTH_LONG);
                     snackbarWrapper.setAction("Olmatix",
                             new View.OnClickListener() {
                                 @Override
@@ -177,7 +195,7 @@ public class OlmatixService extends Service {
                 } else {
                     if (add_NodeID == null) {
                         final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                                "Your device Offline, trying to connect now",TSnackbar.LENGTH_LONG);
+                                "Your device Offline, trying to connect now", TSnackbar.LENGTH_LONG);
                         snackbarWrapper.setAction("Olmatix",
                                 new View.OnClickListener() {
                                     @Override
@@ -188,16 +206,17 @@ public class OlmatixService extends Service {
                                 });
 
                         snackbarWrapper.show();
-                        if(!doCon) {
-                            Log.d(TAG, "Alarm Service: "+doCon);
+                        if (!doCon) {
+                            Log.d(TAG, "Alarm Service: " + doCon);
                             doConnect();
-                        }                    }
+                        }
+                    }
                 }
             }
 
             if (alarmService != null) {
                 if (alarmService.equals("login")) {
-                    doCon=false;
+                    doCon = false;
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     SharedPreferences.Editor editor = sharedPref.edit();
@@ -215,10 +234,10 @@ public class OlmatixService extends Service {
                     editor.putBoolean("conStatus", false);
                     editor.apply
 */
-                    Log.d(TAG, "Alarm Service: "+doCon);
+                    Log.d(TAG, "Alarm Service: " + doCon);
 
-                    if(!doCon) {
-                        Log.d(TAG, "Alarm Service: "+doCon);
+                    if (!doCon) {
+                        Log.d(TAG, "Alarm Service: " + doCon);
                         doConnect();
                     }
                 }
@@ -250,7 +269,7 @@ public class OlmatixService extends Service {
             } else {
                 //Not Connected info
                 final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                        "No Internet connection",TSnackbar.LENGTH_LONG);
+                        "No Internet connection", TSnackbar.LENGTH_LONG);
                 snackbarWrapper.setAction("Olmatix",
                         new View.OnClickListener() {
                             @Override
@@ -263,7 +282,7 @@ public class OlmatixService extends Service {
                 snackbarWrapper.show();
                 text = "Disconnected";
                 flagConn = false;
-                doCon=false;
+                doCon = false;
                 hasMmobile = false;
                 hasWifi = false;
                 sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -275,11 +294,11 @@ public class OlmatixService extends Service {
             }
 
             hasConnectivity = hasMmobile || hasWifi;
-            Log.d(TAG, "hasConn: " + hasConnectivity + " hasChange: " + hasChanged );
+            Log.d(TAG, "hasConn: " + hasConnectivity + " hasChange: " + hasChanged);
 
             if (hasConnectivity && hasChanged) {
                 if (mqttClient != null) {
-                    Log.d(TAG, "Pref Status con at receive: "+mStatusServer);
+                    Log.d(TAG, "Pref Status con at receive: " + mStatusServer);
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (!mStatusServer) {
@@ -310,8 +329,8 @@ public class OlmatixService extends Service {
         Log.d(TAG, "login: " + mUserName + " : " + mPassword);
 
         final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
-        Log.d(TAG, "doConnect status connection: "+mStatusServer);
-        doCon=true;
+        Log.d(TAG, "doConnect status connection: " + mStatusServer);
+        doCon = true;
         if (!mStatusServer) {
 
             final MqttConnectOptions options = new MqttConnectOptions();
@@ -328,7 +347,7 @@ public class OlmatixService extends Service {
 
             Log.d(TAG, "doConnect: " + count);
             dbnode.setTopic("Connecting to server");
-            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+            dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertDbMqtt(dbnode);
             sendMessageDetail();
 
@@ -359,14 +378,14 @@ public class OlmatixService extends Service {
                         flagConn = true;
                         sendMessage();
                         if (!mSwitch_conn) {
-                                Log.d(TAG, "Doing subscribe nodes");
-                                doSubAll();
+                            Log.d(TAG, "Doing subscribe nodes");
+                            doSubAll();
                             //new OlmatixService.load().execute();
 
                         }
 
                         dbnode.setTopic("Connected to server");
-                        dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
                         mDbNodeRepo.insertDbMqtt(dbnode);
                         sendMessageDetail();
 
@@ -375,7 +394,7 @@ public class OlmatixService extends Service {
                             String payload = "true";
                             byte[] encodedPayload = new byte[0];
                             try {
-                                if (mqttClient!=null) {
+                                if (mqttClient != null) {
                                     encodedPayload = payload.getBytes("UTF-8");
                                     MqttMessage message = new MqttMessage(encodedPayload);
                                     message.setQos(1);
@@ -413,7 +432,7 @@ public class OlmatixService extends Service {
                             flagConn = false;
                             sendMessage();
                             dbnode.setTopic("Failed to subscribe");
-                            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                            dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
                             mDbNodeRepo.insertDbMqtt(dbnode);
                             sendMessageDetail();
 
@@ -427,7 +446,7 @@ public class OlmatixService extends Service {
                         editor.putBoolean("conStatus", false);
                         editor.apply();
                         String me = exception.toString();
-                        if (me.equals("Not authorized to connect (5)")){
+                        if (me.equals("Not authorized to connect (5)")) {
                             connectionResult = "NotAuth";
                             text = "Not Connected - Bad login";
                         }
@@ -435,7 +454,7 @@ public class OlmatixService extends Service {
                         sendMessage();
                         showNotification();
                         dbnode.setTopic((String) text);
-                        dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
                         mDbNodeRepo.insertDbMqtt(dbnode);
                         sendMessageDetail();
                     }
@@ -447,7 +466,7 @@ public class OlmatixService extends Service {
         }
         sendMessage();
         showNotification();
-        noNotif=true;
+        noNotif = true;
         setFlagSub();
 
     }
@@ -474,7 +493,7 @@ public class OlmatixService extends Service {
                 Log.d(TAG, "setFlagSub run: ");
                 flagSub = true;
                 checkActivityForeground();
-                noNotif=false;
+                noNotif = false;
                 unSubIfnotForeground();
             }
         }, 10000);
@@ -510,6 +529,7 @@ public class OlmatixService extends Service {
         notifications.clear();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -517,7 +537,7 @@ public class OlmatixService extends Service {
 
         checkActivityForeground();
 
-        noNotif=true;
+        noNotif = true;
         if (!flagStart) {
             flagStart = true;
             sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -531,21 +551,22 @@ public class OlmatixService extends Service {
             OlmatixAlarmReceiver alarmCheckConn = new OlmatixAlarmReceiver();
 
             alarmCheckConn.setAlarm(this);
-            if (alarmCheckConn==null) {
+            if (alarmCheckConn == null) {
                 alarmCheckConn.setAlarm(this);
-                Log.d("DEBUG", "Alarm set "+alarmCheckConn);
+                Log.d("DEBUG", "Alarm set " + alarmCheckConn);
             }
         }
 
         sendMessage();
 
         listener = new MyLocationListener();
+      /*  if ((ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) && (ActivityCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {*/
 
-        if (ActivityCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
                         OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
             } else {
@@ -553,36 +574,39 @@ public class OlmatixService extends Service {
                         OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
             }
 
-                Location mLocation = locationManager.getLastKnownLocation(mProvider);
-                if (mLocation == null) {
-                    mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                } else if (mLocation == null) {
-                    mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                } else {
-                    mLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-                }
-                if (mLocation!=null) {
-                    lat = mLocation.getLatitude();
-                    lng = mLocation.getLongitude();
-                    locationDistance();
-                    PreferenceHelper mPrefHelper = new PreferenceHelper(this.getApplicationContext());
-                    double homeLat = mPrefHelper.getHomeLatitude();
-                    double homelng = mPrefHelper.getHomeLongitude();
-                    long thres = mPrefHelper.getHomeThresholdDistance();
-                    Log.d("DEBUG", "proximity: " + homeLat + " | " + homelng + ":" + thres);
-                    String proximityIntentAction = "com.olmatix.lesjaw.olmatix.ProximityAlert";
-                    Intent i = new Intent(proximityIntentAction);
-                    PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
-                    locationManager.addProximityAlert(homeLat, homelng, thres, -1, pi);
-
-                    filter = new IntentFilter(proximityIntentAction);
-                    registerReceiver(new OlmatixReceiver(), filter);
-                } else {
-
-                }
+            Location mLocation = locationManager.getLastKnownLocation(mProvider);
+            if (mLocation == null) {
+                mLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            } else if (mLocation == null) {
+                mLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            } else {
+                mLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
             }
-        return START_STICKY;
+            if (mLocation != null) {
+                lat = mLocation.getLatitude();
+                lng = mLocation.getLongitude();
+                locationDistance();
+                PreferenceHelper mPrefHelper = new PreferenceHelper(this.getApplicationContext());
+                double homeLat = mPrefHelper.getHomeLatitude();
+                double homelng = mPrefHelper.getHomeLongitude();
+                long thres = mPrefHelper.getHomeThresholdDistance();
+                Log.d("DEBUG", "proximity: " + homeLat + " | " + homelng + ":" + thres);
+                String proximityIntentAction = "com.olmatix.lesjaw.olmatix.ProximityAlert";
+                Intent i = new Intent(proximityIntentAction);
+                PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
+                locationManager.addProximityAlert(homeLat, homelng, thres, -1, pi);
+
+                filter = new IntentFilter(proximityIntentAction);
+                registerReceiver(new OlmatixReceiver(), filter);
+            } else {
+
+            }
+
+            }
+            return START_STICKY;
+
     }
+
 
     private void unSubIfnotForeground() {
 
@@ -690,7 +714,7 @@ public class OlmatixService extends Service {
 
     private void setClientID() {
         // Context mContext;
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         deviceId = "OlmatixApp-" + wInfo.getMacAddress();
 

@@ -540,16 +540,22 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-    public List<SpinnerObject> getAllLabels() {
-        List<SpinnerObject> labels = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + TABLE_NODE;
+    public ArrayList<SpinnerObject> getAllLabels() {
+        ArrayList<SpinnerObject> labels = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selectQuery = "SELECT  * FROM " + TABLE_NODE;
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
+                SpinnerObject node = new SpinnerObject();
+
                 //labels.add(cursor.getString(0)+","+ cursor.getString(3));
-                labels.add(new SpinnerObject(cursor.getInt(0),cursor.getString(3)));
+                node.setDatabaseId(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setDatabaseValue(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                labels.add(node);
+
                 //labels.add(cursor.getString(2));
                 //labels.add(cursor.getString(3));
 
@@ -561,6 +567,7 @@ public class dbNodeRepo {
 
         return labels;
     }
+
 
     public ArrayList<DetailNodeModel> getNodeDetail(String node_id, String Channel) {
 

@@ -17,9 +17,14 @@ import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.service.OlmatixService;
+
+import java.util.ArrayList;
 
 /**
  * Created by Lesjaw on 04/12/2016.
@@ -31,18 +36,38 @@ public class SplashActivity extends Activity {
     Boolean mStatusServer;
 
 
+    PermissionListener permissionlistener = new PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            Toast.makeText(SplashActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+            Toast.makeText(SplashActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+        }
+
+
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
+
+
+        new TedPermission(this)
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+                .check();
 
         ImageView imgSplash = (ImageView) findViewById(R.id.splash);
         Animation animConn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink);
 
         imgSplash.startAnimation(animConn);
 
-        askForPermission(Manifest.permission.ACCESS_FINE_LOCATION,0x1);
-        askForPermission(Manifest.permission.ACCESS_COARSE_LOCATION,0x2);
+
 
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -60,23 +85,6 @@ public class SplashActivity extends Activity {
 
     }
 
-    private void askForPermission(String permission, Integer requestCode) {
-        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-
-                //This is called if user has denied the permission before
-                //In this case I am just asking the permission again
-                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
-
-            } else {
-
-                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
-            }
-        } else {
-        }
-    }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override

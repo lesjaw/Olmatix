@@ -117,6 +117,7 @@ public class ScheduleActivity extends AppCompatActivity {
         mTimeTxt = (TextView) findViewById(R.id.time);
         mViewDash = (View) findViewById(R.id.view_dash1);
         mTimeDayLayout = (LinearLayout) findViewById(R.id.label_layout);
+        mDayLayout = (LinearLayout) findViewById(R.id.dayLayout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mSpinNode = (MaterialSpinner) findViewById(R.id.spin_node);
         btnAdd = (ImageButton) findViewById(R.id.img_add);
@@ -148,8 +149,15 @@ public class ScheduleActivity extends AppCompatActivity {
     }
 
     private void mLoadSpinnerData() {
-        List<SpinnerObject> nodeLabel = mDbNodeRepo.getAllLabels();
-        if (mSpinNode != null) {
+        ArrayList<SpinnerObject> nodeLabel = mDbNodeRepo.getAllLabels();
+        ArrayList<String> arrayList= new ArrayList<>();;
+        for(int i=0; i<nodeLabel.size(); i++)
+        {
+            arrayList.add(nodeLabel.get(i).getDatabaseValue());
+        }
+        Log.e("array List",arrayList+"");
+
+        if (arrayList.isEmpty()) {
             MaterialDialog.Builder mBuilderSpin = new MaterialDialog.Builder(mActivity);
             mBuilderSpin.title("Warning");
             mBuilderSpin.iconRes(R.drawable.ic_warning);
@@ -158,7 +166,7 @@ public class ScheduleActivity extends AppCompatActivity {
             mBuilderSpin.positiveText("OK");
             mBuilderSpin.show();
         } else {
-            mSpinNode.setItems(nodeLabel);
+            mSpinNode.setItems(arrayList);
             Log.d("DEBUG", "loadSpinnerData: " + nodeLabel.toArray());
         }
     }

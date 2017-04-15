@@ -6,25 +6,31 @@ package com.olmatix.model;
 
 public class SpinnerObject {
 
-    private  int databaseId;
+    private  String databaseId;
     private String databaseValue;
 
-    public SpinnerObject ( int databaseId , String databaseValue ) {
+    public SpinnerObject(String databaseId, String databaseValue) {
         this.databaseId = databaseId;
         this.databaseValue = databaseValue;
     }
 
-    public int getId () {
+    public SpinnerObject() {
+
+    }
+
+    public String getDatabaseId() {
         return databaseId;
     }
 
-    public String getValue () {
+    public void setDatabaseId(String databaseId) {
+        this.databaseId = databaseId;
+    }
+
+    public String getDatabaseValue() {
         return databaseValue;
     }
 
-    @Override
-    public String toString () {
-        return databaseValue;
+    public void setDatabaseValue(String databaseValue) {
+        this.databaseValue = databaseValue;
     }
-
 }

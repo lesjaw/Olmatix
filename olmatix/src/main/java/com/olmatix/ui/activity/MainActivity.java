@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
 
         mOlmatixAdapter.addFrag(new DashboardNode(), "Dashboard");
-        mOlmatixAdapter.addFrag(new Scene(), "Scenes");
+        mOlmatixAdapter.addFrag(new Scene(), "Scene");
         mOlmatixAdapter.addFrag(new InstalledNode(), "Nodes");
         viewPager.setAdapter(mOlmatixAdapter);
     }

@@ -200,6 +200,7 @@ public class dbNodeRepo {
                 SceneModel node = new SceneModel();
                 node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
                 node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
+                node.setSceneType(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

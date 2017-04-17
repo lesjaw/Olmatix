@@ -86,7 +86,10 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-
+        <activity
+            android:name="com.olmatix.ui.activity.scene.ScheduleDetailActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <service android:name="com.olmatix.service.OlmatixService"/>
         <service android:name="com.olmatix.service.OlmatixAlarmService"/>

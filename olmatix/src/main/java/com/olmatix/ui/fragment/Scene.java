@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -63,10 +64,7 @@ public class Scene extends Fragment implements OnStartDragListener {
     private Paint p = new Paint();
     Context scene_node;
     public static final int NEW_ALARM = 1;
-    private ListView mListScenetype;
-    private Intent mIntent;
-    private String sceneType;
-    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
+
     private Boolean isFabOpen = false;
     CoordinatorLayout coordinatorLayout;
 
@@ -215,10 +213,11 @@ public class Scene extends Fragment implements OnStartDragListener {
                 data.addAll(dbNodeRepo.getScene());
             }
         });
+        Log.e("data",data.size()+"");
         adapter = new SceneAdapter(data,scene_node,this);
         mRecycleView.setAdapter(adapter);
 
-        initSwipe();
+        //initSwipe();
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
@@ -261,6 +260,8 @@ public class Scene extends Fragment implements OnStartDragListener {
 
         mSwipeRefreshLayout.setRefreshing(false);
     }
+
+
 
     private void initSwipe() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -364,6 +365,14 @@ public class Scene extends Fragment implements OnStartDragListener {
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
 
     }
+
+  /*  @Override
+    public void onResume() {
+        super.onResume();
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(this).attach(this).commit();
+    }*/
 
     @Override
     public void onStart() {

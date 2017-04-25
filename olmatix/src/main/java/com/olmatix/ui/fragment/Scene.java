@@ -41,11 +41,13 @@ import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.AllSceneModel;
 import com.olmatix.model.SceneModel;
 import com.olmatix.ui.activity.scene.ScheduleActivity;
 
 import java.util.ArrayList;
 
+import static com.olmatix.lesjaw.olmatix.R.id.all;
 import static com.olmatix.lesjaw.olmatix.R.id.fab;
 
 /**
@@ -55,7 +57,7 @@ public class Scene extends Fragment implements OnStartDragListener {
 
     private static String TAG = Scene.class.getSimpleName();
     public static dbNodeRepo dbNodeRepo;
-    private static ArrayList<SceneModel> data;
+    private static ArrayList<AllSceneModel> data;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private View mView;
     private FloatingActionButton mFab, fab1,fab2,fab3,fab4;
@@ -90,8 +92,7 @@ public class Scene extends Fragment implements OnStartDragListener {
         onClickListener();
         //onTouchListener();
 
-        mRecycleView.addOnItemTouchListener(new Scene.RecyclerTouchListener(getActivity(),
-                mRecycleView, new Scene.ClickListener() {
+        mRecycleView.addOnItemTouchListener(new Scene.RecyclerTouchListener(getActivity(), mRecycleView, new Scene.ClickListener() {
 
 
             @Override
@@ -176,11 +177,18 @@ public class Scene extends Fragment implements OnStartDragListener {
                                         @Override
                                         public void onInput(@NonNull MaterialDialog dialog, CharSequence inputVals) {
                                             //showToast("Hello, " + input.toString() + "!");
-                                            Intent intent = new Intent(getActivity(), ScheduleActivity.class);
+                                            AllSceneModel allSceneModel = new AllSceneModel();
+                                            allSceneModel.setSceneName(inputVals.toString());
+                                            allSceneModel.setSceneType(which);
+                                            allSceneModel.setSensor("Null");
+
+                                            dbNodeRepo.insertScene(allSceneModel);
+                                            updatelist();
+                                           /* Intent intent = new Intent(getActivity(), ScheduleActivity.class);
                                             intent.putExtra("SCENETYPE", inputVals.toString());
                                             intent.putExtra("SCENEID", which);
                                             Log.d(TAG, "onInput: " + inputVals.toString());
-                                            startActivity(intent);
+                                            startActivity(intent);*/
                                         }
                                     })
                                     .show();
@@ -199,7 +207,7 @@ public class Scene extends Fragment implements OnStartDragListener {
         mRecycleView = (RecyclerView) mView.findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
 
-        mFab = (FloatingActionButton) mView.findViewById(fab);
+        mFab = (FloatingActionButton) mView.findViewById(R.id.fab);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
@@ -249,13 +257,30 @@ public class Scene extends Fragment implements OnStartDragListener {
             }
         });
     }
-    private void setAdapter(){
+
+    private void updatelist (){
+        adapter.notifyDataSetChanged();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                data.clear();
+                data.addAll(dbNodeRepo.getScene());
+            }
+        });
+        if(adapter != null) {
+            adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        }
+        assert adapter != null;
+
+    }
+
+    /*private void setAdapter(){
         data.clear();
         data.addAll(dbNodeRepo.getScene());
         adapter = new SceneAdapter(data,scene_node,this);
         mRecycleView.setAdapter(adapter);
 
-    }
+    }*/
     private void setRefresh() {
 
         mSwipeRefreshLayout.setRefreshing(false);

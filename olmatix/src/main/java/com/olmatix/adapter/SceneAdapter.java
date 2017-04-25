@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.AllSceneModel;
 import com.olmatix.model.SceneModel;
 import com.olmatix.ui.activity.scene.ScheduleActivity;
 
@@ -27,13 +28,13 @@ import java.util.ArrayList;
 public class SceneAdapter extends RecyclerView.Adapter<SceneAdapter.SceneHolder> implements ItemTouchHelperAdapter {
 
     private final OnStartDragListener mDragStartListener;
-    ArrayList<SceneModel> nodeList;
+    ArrayList<AllSceneModel> nodeList;
     private Animation animConn;
     Context context;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
 
-    public SceneAdapter(ArrayList<SceneModel> data, Context scene_node, OnStartDragListener dragStartListener) {
+    public SceneAdapter(ArrayList<AllSceneModel> data, Context scene_node, OnStartDragListener dragStartListener) {
         this.nodeList = data;
         mDragStartListener = dragStartListener;
         this.context = scene_node;
@@ -52,7 +53,7 @@ public class SceneAdapter extends RecyclerView.Adapter<SceneAdapter.SceneHolder>
     @Override
     public void onBindViewHolder( final SceneHolder holder, int position) {
 
-        final SceneModel mSceneModel = nodeList.get(position);
+        final AllSceneModel mSceneModel = nodeList.get(position);
         holder.fwName.setText(mSceneModel.getSceneName());
         if(mSceneModel.getSceneType() == 0)
         {

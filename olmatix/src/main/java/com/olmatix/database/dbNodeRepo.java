@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.olmatix.model.AllSceneModel;
 import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.DurationModel;
@@ -131,6 +132,19 @@ public class dbNodeRepo {
         return (int) Id;
     }
 
+    public int insertScene(AllSceneModel sceneModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_SCENE_NAME, sceneModel.getSceneName());
+        values.put(KEY_SCENE_TYPE, sceneModel.getSceneType());
+        values.put(KEY_SENSOR, sceneModel.getSensor());
+
+        long Id = db.insert(TABLE_SCENE, null, values);
+        db.close(); // Closing database connection
+        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        return (int) Id;
+    }
+
     public ArrayList<SceneModel> getAllSceneList() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_SCENE;
@@ -186,21 +200,23 @@ public class dbNodeRepo {
         return nodeList;
     }
 
-    public ArrayList<SceneModel> getScene() {
+    public ArrayList<AllSceneModel> getScene() {
 
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_SCENE ;
 
-        ArrayList<SceneModel> nodeList = new ArrayList<SceneModel>();
+        ArrayList<AllSceneModel> nodeList = new ArrayList<AllSceneModel>();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                SceneModel node = new SceneModel();
+                AllSceneModel node = new AllSceneModel();
                 node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
                 node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
                 node.setSceneType(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
+                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

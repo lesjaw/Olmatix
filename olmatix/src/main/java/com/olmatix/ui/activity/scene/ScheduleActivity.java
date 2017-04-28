@@ -12,8 +12,10 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -368,7 +370,8 @@ public class ScheduleActivity extends AppCompatActivity {
         };
     }
 
-    public void forday(int week,int hour,int minuts) {
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void forday(int week, int hour, int minuts) {
         Intent myIntent = new Intent(ScheduleActivity.this, AlarmReceiver.class);
 
         // A PendingIntent specifies an action to take in the
@@ -381,8 +384,8 @@ public class ScheduleActivity extends AppCompatActivity {
         calSet.set(Calendar.MILLISECOND, 0);
         pendingIntent = PendingIntent.getBroadcast(ScheduleActivity.this, week, myIntent,  PendingIntent.FLAG_UPDATE_CURRENT);
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                calSet.getTimeInMillis(),AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP,
+                calSet.getTimeInMillis(), pendingIntent);
     }
 
     private void setDataScene() {

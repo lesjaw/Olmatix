@@ -318,6 +318,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
     private View.OnClickListener addBtnClickListener() {
         return new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 setDataScene();

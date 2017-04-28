@@ -111,7 +111,15 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+        <service
 
+            android:name="com.olmatix.service.AlarmService"
+
+            android:enabled="true" />
+
+
+
+        <receiver android:name="com.olmatix.service.AlarmReceiver" />
 
     </application>
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <include layout="@layout/toolbar_detail" />
 
     <LinearLayout
@@ -92,12 +92,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <com.jaredrummler.materialspinner.MaterialSpinner
+            <Spinner
                 android:id="@+id/spin_node"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
+                android:dropDownSelector="@color/black"
+
                 android:layout_weight="1"/>
 
             <TextView

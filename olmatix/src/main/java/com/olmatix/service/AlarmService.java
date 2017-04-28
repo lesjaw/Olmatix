@@ -1,0 +1,73 @@
+package com.olmatix.service;
+
+import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v7.app.NotificationCompat;
+
+import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.ui.activity.SplashActivity;
+
+/**
+ * Created by android on 4/28/2017.
+ */
+
+public class AlarmService extends IntentService {
+
+    private NotificationManager alarmNotificationManager;
+
+    public AlarmService() {
+
+        super("AlarmService");
+
+    }
+
+    @Override
+
+    public void onHandleIntent(Intent intent) {
+
+        sendNotification("Time Schedual Alaram");
+
+    }
+
+    private void sendNotification(String msg) {
+
+        // NotificationManager class to notify the user of events            // that happen. This is how you tell the user that something           //   has   happened in the background.
+
+        alarmNotificationManager = (NotificationManager) this
+
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+
+                new Intent(this, SplashActivity.class), 0);
+
+
+
+        // set icon, title and message for notification
+
+        NotificationCompat.Builder alamNotificationBuilder = (NotificationCompat.Builder) new   NotificationCompat.Builder(
+
+                this).setContentTitle("Time Alaram")
+
+                .setSmallIcon(R.mipmap.olmatixlogo)
+
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
+
+                .setContentText(msg);
+
+
+
+        alamNotificationBuilder.setContentIntent(contentIntent);
+
+        alarmNotificationManager.notify(1, alamNotificationBuilder. build());
+
+
+
+    }
+
+}

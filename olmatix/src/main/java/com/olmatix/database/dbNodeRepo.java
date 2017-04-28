@@ -109,27 +109,48 @@ public class dbNodeRepo {
         return;
     }
 
-    public int insertDbScene(SceneModel sceneModel) {
+    public void insertDbScene(SceneModel sceneModel) {
+
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_SCENE_NAME, sceneModel.getSceneName());
-        values.put(KEY_SCENE_TYPE, sceneModel.getSceneType());
-        values.put(KEY_HOURS, sceneModel.getHour());
-        values.put(KEY_MINS, sceneModel.getMin());
-        values.put(KEY_MON, sceneModel.getMonday());
-        values.put(KEY_SUN, sceneModel.getSunday());
-        values.put(KEY_TUE, sceneModel.getTuesday());
-        values.put(KEY_WED, sceneModel.getWednesday());
-        values.put(KEY_THUR, sceneModel.getThursday());
-        values.put(KEY_FRI, sceneModel.getFriday());
-        values.put(KEY_SAT, sceneModel.getSaturday());
-        values.put(KEY_LOCATION, sceneModel.getLocation());
-        values.put(KEY_SENSOR, sceneModel.getSensor());
 
-        long Id = db.insert(TABLE_SCENE, null, values);
-        db.close(); // Closing database connection
-        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
-        return (int) Id;
+        values.put(KEY_SCENE_NAME, sceneModel.getSceneName());
+        if (sceneModel.getHour() != 0) {
+            values.put(KEY_HOURS, sceneModel.getHour());
+        }
+        if (sceneModel.getMin() != 0) {
+            values.put(KEY_MINS, sceneModel.getMin());
+        }
+        if (sceneModel.getMonday() != null) {
+            values.put(KEY_MON, sceneModel.getMonday());
+        }
+        if (sceneModel.getSunday() != null) {
+            values.put(KEY_SUN, sceneModel.getSunday());
+        }
+        if (sceneModel.getTuesday() != null) {
+            values.put(KEY_TUE, sceneModel.getTuesday());
+            //Log.d("DEBUG", "updateNode: " +installedNodeModel.getFwName());
+        }
+        if (sceneModel.getWednesday() != null) {
+            values.put(KEY_WED, sceneModel.getWednesday());
+        }
+        if (sceneModel.getThursday() != null) {
+            values.put(KEY_THUR, sceneModel.getThursday());
+
+        }
+        if (sceneModel.getFriday() != null) {
+            values.put(KEY_FRI, sceneModel.getFriday());
+        }
+        if (sceneModel.getSaturday() != null) {
+            values.put(KEY_SAT, sceneModel.getSaturday());
+        }
+
+        db.update(TABLE_SCENE, values, dbNode.KEY_SCENE_NAME + "= ?", new String[]{
+                String.valueOf(sceneModel.getSceneName())
+        });
+        db.close();
+
     }
 
     public int insertScene(AllSceneModel sceneModel) {

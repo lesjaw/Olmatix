@@ -1,6 +1,8 @@
 package com.olmatix.ui.activity.scene;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -27,10 +29,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -46,13 +50,17 @@ import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.SceneDetailModel;
 import com.olmatix.model.SceneModel;
 import com.olmatix.model.SpinnerObject;
+import com.olmatix.service.AlarmReceiver;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.fragments.BackConfirmationFragment;
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Created by Rahman on 1/13/2017.
@@ -77,7 +85,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private SceneDetailModel mSceneDetailModel;
     private LinearLayout mDayLayout, mTimeDayLayout;
     private View mViewDash;
-    private MaterialSpinner mSpinNode;
+    private Spinner mSpinNode;
     ArrayList<SceneDetailModel> sceneDetailList;
     private ImageButton btnAdd;
     private SceneDetailAdapter mSceneDetailAdapter;
@@ -89,19 +97,21 @@ public class ScheduleActivity extends AppCompatActivity {
     String mDayValue = null;
     public boolean stateChanged = false;
     private int mSelectedPosition= -1;
+    AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.schedule_activity);
         mActivity = this;
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         runThread();
+        setupDatabases();
 
         initView();
         setupToolbar();
-
         setClickListeners();
-        setupDatabases();
         mLoadSpinnerData();
 
 
@@ -119,7 +129,7 @@ public class ScheduleActivity extends AppCompatActivity {
         mTimeDayLayout = (LinearLayout) findViewById(R.id.label_layout);
         mDayLayout = (LinearLayout) findViewById(R.id.dayLayout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mSpinNode = (MaterialSpinner) findViewById(R.id.spin_node);
+        mSpinNode = (Spinner) findViewById(R.id.spin_node);
         btnAdd = (ImageButton) findViewById(R.id.img_add);
         mSceneMode = (TextView) findViewById(R.id.txt_sceneid);
         listSceneDetailData = (ListView) findViewById(R.id.listData);
@@ -129,9 +139,6 @@ public class ScheduleActivity extends AppCompatActivity {
         mDayAdapter.notifyDataSetChanged();
 
     }
-
-
-
 
 
     private void setupToolbar() {
@@ -156,7 +163,6 @@ public class ScheduleActivity extends AppCompatActivity {
             arrayList.add(nodeLabel.get(i).getDatabaseValue());
         }
         Log.e("array List",arrayList+"");
-
         if (arrayList.isEmpty()) {
             MaterialDialog.Builder mBuilderSpin = new MaterialDialog.Builder(mActivity);
             mBuilderSpin.title("Warning");
@@ -166,7 +172,11 @@ public class ScheduleActivity extends AppCompatActivity {
             mBuilderSpin.positiveText("OK");
             mBuilderSpin.show();
         } else {
-            mSpinNode.setItems(arrayList);
+            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(ScheduleActivity.this, android.R.layout.simple_list_item_1, arrayList); //selected item will look like a spinner set from XML
+            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            mSpinNode.setAdapter(spinnerArrayAdapter);
+            mSpinNode.setSelection(0,true);
             Log.d("DEBUG", "loadSpinnerData: " + nodeLabel.toArray());
         }
     }
@@ -264,6 +274,7 @@ public class ScheduleActivity extends AppCompatActivity {
         return (v, position) -> {
             Log.d("TAG", "onClick: " + v +"\n\n"+ position);
             v.setSelected(true);
+
             if (position == 0){
                 mSceneModel.setSunday("1");
             } else if (position == 1){
@@ -308,19 +319,77 @@ public class ScheduleActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setDataScene();
-                //mDbNodeRepo.addWaris(waris);
-                //Log.d("DEBUG", "Waris ADDED");
-                //reloadWaris();
-                //clearWarisInputForm();
+
+
+                for(int i=0; i<mDbNodeRepo.getAllSceneList().size(); i++) {
+                    if (mSceneModel.getMonday() != null) {
+                        if (mSceneModel.getMonday().equals("1")) {
+                            forday(Calendar.MONDAY, mSceneModel.getHour(), mSceneModel.getMin());
+                        }
+                    }
+                    if (mSceneModel.getThursday() != null) {
+                        if (mSceneModel.getThursday().equals("1")) {
+                            forday(Calendar.THURSDAY, mSceneModel.getHour(), mSceneModel.getMin());
+                        }
+                    }
+                    if (mSceneModel.getWednesday() != null) {
+                        if (mSceneModel.getWednesday().equals("1")) {
+                            forday(Calendar.WEDNESDAY, mSceneModel.getHour(), mSceneModel.getMin());
+                        }
+                    }
+                    if (mSceneModel.getTuesday() != null)
+                    {
+                    if (mSceneModel.getTuesday().equals("1")) {
+                        forday(Calendar.TUESDAY, mSceneModel.getHour(), mSceneModel.getMin());
+                    }
+                    }
+                    if(mSceneModel.getFriday() != null)
+                    {
+                    if (mSceneModel.getFriday().equals("1")) {
+                        forday(Calendar.FRIDAY, mSceneModel.getHour(), mSceneModel.getMin());
+                    }
+                    }
+                    if(mSceneModel.getSaturday() != null) {
+                        if (mSceneModel.getSaturday().equals("1")) {
+                            forday(Calendar.SATURDAY, mSceneModel.getHour(), mSceneModel.getMin());
+                        }
+                    }
+                    if(mSceneModel.getSunday() != null) {
+                        if (mSceneModel.getSunday().equals("1")) {
+                            forday(Calendar.SUNDAY, mSceneModel.getHour(), mSceneModel.getMin());
+                        }
+                    }
+                }
+                Toast.makeText(getApplicationContext(),"Alram set successfull !",Toast.LENGTH_LONG).show();
+
+                   // alarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
+
             }
         };
+    }
+
+    public void forday(int week,int hour,int minuts) {
+        Intent myIntent = new Intent(ScheduleActivity.this, AlarmReceiver.class);
+
+        // A PendingIntent specifies an action to take in the
+        // future
+        pendingIntent = PendingIntent.getBroadcast(ScheduleActivity.this, 0, myIntent, 0);
+        Calendar calSet = Calendar.getInstance();
+        calSet.set(Calendar.DAY_OF_WEEK, week);
+        calSet.set(Calendar.HOUR_OF_DAY, hour);
+        calSet.set(Calendar.MINUTE, minuts);
+        calSet.set(Calendar.SECOND, 0);
+        calSet.set(Calendar.MILLISECOND, 0);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                calSet.getTimeInMillis(),1 * 24 * 60 * 60 * 1000, pendingIntent);
     }
 
     private void setDataScene() {
         //mSceneModel = new SceneModel();
         mSceneModel.setSceneName(mSceneData);
         mSceneModel.setSceneType(mSceneIdData);
-        //
+        mSceneModel.setNode_id(mSpinNode.getSelectedItem().toString());
 
         if (mSceneIdData == 0) {
             String timeData = mTimeTxt.getText().toString();

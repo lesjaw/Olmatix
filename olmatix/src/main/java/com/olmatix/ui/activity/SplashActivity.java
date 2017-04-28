@@ -39,7 +39,7 @@ public class SplashActivity extends Activity {
     PermissionListener permissionlistener = new PermissionListener() {
         @Override
         public void onPermissionGranted() {
-            Toast.makeText(SplashActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(SplashActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
         }
 
         @Override

@@ -106,8 +106,8 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
         weekDays = new boolean[7];
 
         // Vertical Stepper form vars
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.light_blue);
-        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
+        int colorPrimary = getResources().getColor(R.color.light_blue);
+        int colorPrimaryDark =  getResources().getColor(R.color.colorPrimaryDark);
         String[] stepsTitles = getResources().getStringArray(R.array.steps_scene_titles);
         //String[] stepsSubtitles = getResources().getStringArray(R.array.steps_subtitles);
 
@@ -394,9 +394,9 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
 
         dayLayout.setTag(true);
 
-        Drawable bg = ContextCompat.getDrawable(getBaseContext(),
+        Drawable bg = getResources().getDrawable(
                 ernestoyaquello.com.verticalstepperform.R.drawable.circle_step_done);
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        int colorPrimary = getResources().getColor( R.color.colorPrimary);
         bg.setColorFilter(new PorterDuffColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN));
         dayLayout.setBackground(bg);
 
@@ -416,7 +416,7 @@ public class SceneActivity extends AppCompatActivity implements VerticalStepperF
         dayLayout.setBackgroundResource(0);
 
         TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
-        int colour = ContextCompat.getColor(getBaseContext(), R.color.colorPrimary);
+        int colour = getResources().getColor(R.color.colorPrimary);
         dayText.setTextColor(colour);
 
         if(check) {

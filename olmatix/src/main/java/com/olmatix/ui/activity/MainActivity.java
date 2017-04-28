@@ -230,8 +230,6 @@ public class MainActivity extends AppCompatActivity {
         aboutLabel = (TextView) findViewById(R.id.aboutLabel);
         recentLabel = (TextView) findViewById(R.id.recentchangelabel);
         logText = (CheckedTextView) findViewById(R.id.loglabel);
-
-
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);

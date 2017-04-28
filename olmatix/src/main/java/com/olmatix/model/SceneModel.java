@@ -7,8 +7,16 @@ package com.olmatix.model;
 public class SceneModel {
 
     private int id, sceneType, hour, min,scene_id;
-    private String sceneName,sensor, sunday, monday, tuesday, wednesday, thursday, friday, saturday, location;
+    private String sceneName,sensor, sunday, monday, tuesday, wednesday, thursday, friday, saturday, location,node_id;
 
+
+    public String getNode_id() {
+        return node_id;
+    }
+
+    public void setNode_id(String node_id) {
+        this.node_id = node_id;
+    }
 
     public int getScene_id() {
         return scene_id;

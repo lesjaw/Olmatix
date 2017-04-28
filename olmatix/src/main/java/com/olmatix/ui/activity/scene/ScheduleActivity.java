@@ -373,16 +373,16 @@ public class ScheduleActivity extends AppCompatActivity {
 
         // A PendingIntent specifies an action to take in the
         // future
-        pendingIntent = PendingIntent.getBroadcast(ScheduleActivity.this, 0, myIntent, 0);
         Calendar calSet = Calendar.getInstance();
         calSet.set(Calendar.DAY_OF_WEEK, week);
         calSet.set(Calendar.HOUR_OF_DAY, hour);
         calSet.set(Calendar.MINUTE, minuts);
         calSet.set(Calendar.SECOND, 0);
         calSet.set(Calendar.MILLISECOND, 0);
+        pendingIntent = PendingIntent.getBroadcast(ScheduleActivity.this, week, myIntent,  PendingIntent.FLAG_UPDATE_CURRENT);
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                calSet.getTimeInMillis(),1 * 24 * 60 * 60 * 1000, pendingIntent);
+                calSet.getTimeInMillis(),AlarmManager.INTERVAL_DAY * 7, pendingIntent);
     }
 
     private void setDataScene() {

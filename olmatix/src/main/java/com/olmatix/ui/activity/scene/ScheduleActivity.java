@@ -377,16 +377,18 @@ public class ScheduleActivity extends AppCompatActivity {
 
         // A PendingIntent specifies an action to take in the
         // future
+        int interval = 1000 * 60 * 60 * 24;
         Calendar calSet = Calendar.getInstance();
         calSet.set(Calendar.DAY_OF_WEEK, week);
         calSet.set(Calendar.HOUR_OF_DAY, hour);
         calSet.set(Calendar.MINUTE, minuts);
-        calSet.set(Calendar.SECOND, 0);
-        calSet.set(Calendar.MILLISECOND, 0);
+        // Check if the Calendar 7pm is in the past
+        if (calSet.getTimeInMillis() < System.currentTimeMillis())
+            calSet.add(Calendar.DAY_OF_YEAR, 1); // It is so tell it to run tomorrow instead
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calSet.getTimeInMillis(), interval, pendingIntent);
         pendingIntent = PendingIntent.getBroadcast(ScheduleActivity.this, week, myIntent,  PendingIntent.FLAG_UPDATE_CURRENT);
 
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                calSet.getTimeInMillis(), pendingIntent);
     }
 
     private void setDataScene() {

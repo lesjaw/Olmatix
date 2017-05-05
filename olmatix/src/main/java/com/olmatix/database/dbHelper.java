@@ -97,8 +97,20 @@ public class dbHelper extends SQLiteOpenHelper {
 
         String CREATE_TABLE_SCENE_DETAIL = "CREATE TABLE " + dbNode.TABLE_SCENE_DETAIL  + "("
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + dbNode.KEY_SCENE_ID + " TEXT,"
+                + dbNode.KEY_SCENE_NAME + " TEXT, "
+                + dbNode.KEY_SCENE_TYPE + " TEXT, "
                 + dbNode.KEY_PATH + " TEXT,"
+                + dbNode.KEY_HOURS + " TEXT, "
+                + dbNode.KEY_MINS + " TEXT, "
+                + dbNode.KEY_SUN + " TEXT, "
+                + dbNode.KEY_MON + " TEXT, "
+                + dbNode.KEY_TUE + " TEXT, "
+                + dbNode.KEY_WED + " TEXT, "
+                + dbNode.KEY_THUR + " TEXT, "
+                + dbNode.KEY_FRI + " TEXT, "
+                + dbNode.KEY_SAT + " TEXT, "
+                + dbNode.KEY_NODE_ID + " TEXT, "
+                + dbNode.KEY_LOCATION + " TEXT, "
                 + dbNode.KEY_COMMAND + " TEXT) ";
 
         String CREATE_TABLE_INFO = "CREATE TABLE " + dbNode.TABLE_INFO  + "("

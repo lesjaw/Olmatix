@@ -51,7 +51,7 @@ public class ScheduleDetailActivity extends AppCompatActivity {
     private int mSceneIdData = 0;
     private Intent mIntent;
     private dbNodeRepo mDbNodeRepo;
-    private SceneModel mSceneModel;
+    private SceneDetailModel mSceneModel;
     private DetailNodeModel mDetailNodeModel;
     private SceneDetailModel mSceneDetailModel;
     private LinearLayout mDayLayout, mTimeDayLayout;
@@ -122,7 +122,7 @@ public class ScheduleDetailActivity extends AppCompatActivity {
 
     private void setupDatabases() {
         mDbNodeRepo = new dbNodeRepo(mActivity);
-        mSceneModel = new SceneModel();
+        mSceneModel = new SceneDetailModel();
         mDetailNodeModel = new DetailNodeModel();
         mSceneDetailModel = new SceneDetailModel();
         reloadSceneData();
@@ -199,7 +199,7 @@ public class ScheduleDetailActivity extends AppCompatActivity {
 
     private void initLoadDb() {
         mDbNodeRepo = new dbNodeRepo(mActivity);
-        mSceneModel = new SceneModel();
+        mSceneModel = new SceneDetailModel();
         mDetailNodeModel = new DetailNodeModel();
         mSceneDetailModel = new SceneDetailModel();
     }

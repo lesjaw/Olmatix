@@ -109,7 +109,7 @@ public class dbNodeRepo {
         return;
     }
 
-    public void insertDbScene(SceneModel sceneModel) {
+    public void insertDbScene(SceneDetailModel sceneModel) {
 
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -145,8 +145,11 @@ public class dbNodeRepo {
         if (sceneModel.getSaturday() != null) {
             values.put(KEY_SAT, sceneModel.getSaturday());
         }
+        if (sceneModel.getNode_id() != null) {
+            values.put(KEY_NODE_ID, sceneModel.getNode_id());
+        }
 
-        db.update(TABLE_SCENE, values, dbNode.KEY_SCENE_NAME + "= ?", new String[]{
+        db.update(TABLE_SCENE_DETAIL, values, dbNode.KEY_SCENE_NAME + "= ?", new String[]{
                 String.valueOf(sceneModel.getSceneName())
         });
         db.close();
@@ -166,16 +169,16 @@ public class dbNodeRepo {
         return (int) Id;
     }
 
-    public ArrayList<SceneModel> getAllSceneList() {
+    public ArrayList<SceneDetailModel> getAllSceneList() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_SCENE;
+        String selectQuery = "SELECT * FROM " + dbNode.TABLE_SCENE_DETAIL;
 
-        ArrayList<SceneModel> nodeList = new ArrayList<SceneModel>();
+        ArrayList<SceneDetailModel> nodeList = new ArrayList<SceneDetailModel>();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                SceneModel node = new SceneModel();
+                SceneDetailModel node = new SceneDetailModel();
 
                 node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
                 node.setSceneType(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
@@ -188,8 +191,9 @@ public class dbNodeRepo {
                 node.setThursday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_THUR)));
                 node.setFriday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FRI)));
                 node.setSaturday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SAT)));
-                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
                 node.setLocation(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCATION)));
+                node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+
                 nodeList.add(node);
 
             } while (cursor.moveToNext());
@@ -250,10 +254,28 @@ public class dbNodeRepo {
     public int insertSceneDetail(SceneDetailModel sceneDetailModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_SCENE_ID, sceneDetailModel.getSceneid());
+        values.put(KEY_ID, sceneDetailModel.getScene_id());
+
         values.put(KEY_PATH, sceneDetailModel.getPath());
         values.put(KEY_COMMAND, sceneDetailModel.getCommand());
+        values.put(KEY_SCENE_NAME,sceneDetailModel.getSceneType());
+
+        values.put(KEY_SCENE_TYPE,sceneDetailModel.getSceneType());
+        values.put(dbNode.KEY_HOURS,sceneDetailModel.getHour());
+        values.put(dbNode.KEY_MINS,sceneDetailModel.getMin());
+        values.put(dbNode.KEY_MON,sceneDetailModel.getMonday());
+        values.put(dbNode.KEY_SUN,sceneDetailModel.getSunday());
+        values.put(dbNode.KEY_TUE,sceneDetailModel.getTuesday());
+        values.put(dbNode.KEY_WED,sceneDetailModel.getWednesday());
+        values.put(dbNode.KEY_THUR,sceneDetailModel.getThursday());
+        values.put(dbNode.KEY_FRI,sceneDetailModel.getFriday());
+        values.put(dbNode.KEY_SAT,sceneDetailModel.getSaturday());
+        values.put(dbNode.KEY_LOCATION,sceneDetailModel.getLocation());
+        values.put(dbNode.KEY_NODE_ID,sceneDetailModel.getNode_id());
+
         long Id = db.insert(TABLE_SCENE_DETAIL, null, values);
+
+
         db.close();
         Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
@@ -271,7 +293,7 @@ public class dbNodeRepo {
         if (cursor.moveToFirst()) {
             do {
                 SceneDetailModel node = new SceneDetailModel();
-                node.setSceneid(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_ID)));
+                node.setScene_id(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_ID)));
                 node.setPath(cursor.getString(cursor.getColumnIndex(dbNode.KEY_PATH)));
                 node.setCommand(cursor.getString(cursor.getColumnIndex(dbNode.KEY_COMMAND)));
                 nodeList.add(node);
@@ -288,18 +310,20 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
 
-        return db.delete(TABLE_SCENE_DETAIL,  dbNode.KEY_SCENE_ID + " = ?", new String[] { String.valueOf(sceneDetailModel.getSceneid()) });
+        return db.delete(TABLE_SCENE_DETAIL,  dbNode.KEY_SCENE_ID + " = ?", new String[] { String.valueOf(sceneDetailModel.getScene_id()) });
     }
 
     public ArrayList<SceneDetailModel> getAllScene() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery = "SELECT "+ TABLE_SCENE_DETAIL + ".*, "+TABLE_NODE+"."
                 + dbNode.KEY_NODE_ID +","+TABLE_NODE+"."
-                + dbNode.KEY_NICE_NAME_D +","+TABLE_NODE+"."+dbNode.KEY_CHANNEL+", "+TABLE_SCENE+"."+ dbNode.KEY_SCENE_NAME+" FROM " + TABLE_SCENE_DETAIL
+                + dbNode.KEY_NICE_NAME_D +","+TABLE_NODE+"."+dbNode.KEY_CHANNEL+", "+TABLE_SCENE+"."
+                + dbNode.KEY_SCENE_NAME+" FROM " + TABLE_SCENE_DETAIL
                 +" JOIN " + TABLE_NODE
                 +" ON " + TABLE_SCENE_DETAIL+"."+ dbNode.KEY_PATH +" = "+ TABLE_NODE+"." + dbNode.KEY_NODE_ID
                 +" JOIN " + TABLE_SCENE
                 +" ON " + TABLE_SCENE_DETAIL+"."+ dbNode.KEY_SCENE_ID +" = "+ TABLE_SCENE+"." + dbNode.KEY_SCENE_TYPE;
+
         //Log.d("DEBUG", "getAllScene: " + selectQuery);
 
         ArrayList<SceneDetailModel> nodeList = new ArrayList<SceneDetailModel>();
@@ -309,13 +333,13 @@ public class dbNodeRepo {
             do {
                 SceneDetailModel node = new SceneDetailModel();
 
-                node.setSceneid(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_ID)));
+                node.setScene_id(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_ID)));
                 node.setPath(cursor.getString(cursor.getColumnIndex(dbNode.KEY_PATH)));
                 node.setCommand(cursor.getString(cursor.getColumnIndex(dbNode.KEY_COMMAND)));
                 node.setNodeId(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNiceName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
                 node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
-                node.setSceneType(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
+                node.setSceneType(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_TYPE)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

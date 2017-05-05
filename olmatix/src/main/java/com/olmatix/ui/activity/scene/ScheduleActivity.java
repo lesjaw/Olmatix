@@ -82,7 +82,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private int mSceneIdData = 0;
     private Intent mIntent;
     private dbNodeRepo mDbNodeRepo;
-    private SceneModel mSceneModel;
+    private SceneDetailModel mSceneModel;
     private DetailNodeModel mDetailNodeModel;
     private SceneDetailModel mSceneDetailModel;
     private LinearLayout mDayLayout, mTimeDayLayout;
@@ -116,11 +116,7 @@ public class ScheduleActivity extends AppCompatActivity {
         setClickListeners();
         mLoadSpinnerData();
 
-
-
     }
-
-
 
     private void initView() {
         time = new Pair<>(8, 30);
@@ -140,6 +136,12 @@ public class ScheduleActivity extends AppCompatActivity {
         mDayRv.setAdapter(mDayAdapter);
         mDayAdapter.notifyDataSetChanged();
 
+        sceneDetailList.addAll(mDbNodeRepo.getSceneDetailList());
+
+        mSceneDetailAdapter = new SceneDetailAdapter(mActivity, sceneDetailList);
+        listSceneDetailData.setAdapter(mSceneDetailAdapter);
+        mSceneDetailAdapter.notifyDataSetChanged();
+
     }
 
 
@@ -152,7 +154,8 @@ public class ScheduleActivity extends AppCompatActivity {
 
     private void setupDatabases() {
         mDbNodeRepo = new dbNodeRepo(mActivity);
-        mSceneModel = new SceneModel();
+        mSceneModel = new SceneDetailModel();
+        sceneDetailList = new ArrayList<>();
         mDetailNodeModel = new DetailNodeModel();
         mSceneDetailModel = new SceneDetailModel();
     }
@@ -219,7 +222,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private void initIntent() {
         mSceneData = getIntent().getStringExtra("SCENETYPE");
         mSceneIdData = getIntent().getIntExtra("SCENEID", 0);
-        mSceneMode.setText("Scene Name :" + mSceneData + " - " + mSceneIdData);
+        mSceneMode.setText("Scene Name : " + mSceneData);
         if (mSceneIdData != 0) {
             mDayLayout.setVisibility(View.GONE);
             mTimeDayLayout.setVisibility(View.GONE);
@@ -230,7 +233,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
     private void initLoadDb() {
         mDbNodeRepo = new dbNodeRepo(mActivity);
-        mSceneModel = new SceneModel();
+        mSceneModel = new SceneDetailModel();
         mDetailNodeModel = new DetailNodeModel();
         mSceneDetailModel = new SceneDetailModel();
     }
@@ -321,6 +324,11 @@ public class ScheduleActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
+                if(mTimeTxt.getText().toString().equals("--:--"))
+                {
+                    Toast.makeText(getApplicationContext(),"Please enter correct time",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 setDataScene();
 
 
@@ -404,7 +412,7 @@ public class ScheduleActivity extends AppCompatActivity {
             mSceneModel.setMin(Integer.parseInt(outputTime[1]));
             mSceneModel.setLocation("");
             mSceneModel.setSensor("");
-            mDbNodeRepo.insertDbScene(mSceneModel);
+//            mDbNodeRepo.insertDbScene(mSceneModel);
 
         } else {
             mSceneModel.setHour(00);
@@ -414,7 +422,33 @@ public class ScheduleActivity extends AppCompatActivity {
             mSceneModel.setSensor("");
             mSceneModel.setLocation("Null");
             mSceneModel.setSensor("Null");
-            mDbNodeRepo.insertDbScene(mSceneModel);
+        }
+
+        boolean isExist = false;
+        ArrayList<SceneDetailModel> getAllRecord= new ArrayList<>();
+        getAllRecord.addAll(mDbNodeRepo.getAllSceneList());
+        if(!getAllRecord.isEmpty()) {
+            for (int i = 0; i <getAllRecord.size(); i++) {
+                if (getAllRecord.get(i).getNode_id().equals(mSpinNode.getSelectedItem().toString()))
+                {
+                    isExist = true;
+                }
+            }
+        }
+        if(isExist) {
+                mDbNodeRepo.insertDbScene(mSceneModel);
+            }
+
+        else
+        {
+                mDbNodeRepo.insertSceneDetail(mSceneModel);
+
+                sceneDetailList.clear();
+                sceneDetailList.addAll(mDbNodeRepo.getSceneDetailList());
+
+                mSceneDetailAdapter = new SceneDetailAdapter(mActivity, sceneDetailList);
+                listSceneDetailData.setAdapter(mSceneDetailAdapter);
+                mSceneDetailAdapter.notifyDataSetChanged();
         }
 
     }

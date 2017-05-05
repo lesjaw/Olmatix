@@ -255,23 +255,20 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_ID, sceneDetailModel.getScene_id());
-
         values.put(KEY_PATH, sceneDetailModel.getPath());
         values.put(KEY_COMMAND, sceneDetailModel.getCommand());
         values.put(KEY_SCENE_NAME,sceneDetailModel.getSceneType());
-
-        values.put(KEY_SCENE_TYPE,sceneDetailModel.getSceneType());
-        values.put(dbNode.KEY_HOURS,sceneDetailModel.getHour());
-        values.put(dbNode.KEY_MINS,sceneDetailModel.getMin());
-        values.put(dbNode.KEY_MON,sceneDetailModel.getMonday());
-        values.put(dbNode.KEY_SUN,sceneDetailModel.getSunday());
-        values.put(dbNode.KEY_TUE,sceneDetailModel.getTuesday());
-        values.put(dbNode.KEY_WED,sceneDetailModel.getWednesday());
-        values.put(dbNode.KEY_THUR,sceneDetailModel.getThursday());
-        values.put(dbNode.KEY_FRI,sceneDetailModel.getFriday());
-        values.put(dbNode.KEY_SAT,sceneDetailModel.getSaturday());
-        values.put(dbNode.KEY_LOCATION,sceneDetailModel.getLocation());
-        values.put(dbNode.KEY_NODE_ID,sceneDetailModel.getNode_id());
+        values.put(KEY_HOURS,sceneDetailModel.getHour());
+        values.put(KEY_MINS,sceneDetailModel.getMin());
+        values.put(KEY_MON,sceneDetailModel.getMonday());
+        values.put(KEY_SUN,sceneDetailModel.getSunday());
+        values.put(KEY_TUE,sceneDetailModel.getTuesday());
+        values.put(KEY_WED,sceneDetailModel.getWednesday());
+        values.put(KEY_THUR,sceneDetailModel.getThursday());
+        values.put(KEY_FRI,sceneDetailModel.getFriday());
+        values.put(KEY_SAT,sceneDetailModel.getSaturday());
+        values.put(KEY_LOCATION,sceneDetailModel.getLocation());
+        values.put(KEY_NODE_ID,sceneDetailModel.getNode_id());
 
         long Id = db.insert(TABLE_SCENE_DETAIL, null, values);
 

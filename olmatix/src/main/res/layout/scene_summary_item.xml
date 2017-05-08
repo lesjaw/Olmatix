@@ -2,11 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:weightSum="4">
 
         <TextView
             android:id="@+id/txId"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/txGen"
@@ -17,7 +18,7 @@
 
         <TextView
             android:id="@+id/typicalName"
-            android:layout_width="64dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
@@ -27,8 +28,8 @@
             android:layout_weight="1"/>
 
         <TextView
-            android:id="@+id/scene_command"
-            android:layout_width="60dp"
+            android:id="@+id/scene_node"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:gravity="center_vertical|center_horizontal"
             android:text="Scene Command"
@@ -37,7 +38,7 @@
 
         <ImageButton
             android:id="@+id/imgActions"
-            android:layout_width="30dp"
+            android:layout_width="0dp"
             android:layout_height="40dp"
             android:gravity="right|center_horizontal"
             android:onClick="onClick"

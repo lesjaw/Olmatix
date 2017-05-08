@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.olmatix.database.dbNodeRepo;
@@ -32,8 +33,6 @@ public class SceneDetailAdapter extends BaseAdapter {
     int layoutResId;
     ArrayList<SceneDetailModel> sceneDetailData;
     private static LayoutInflater inflater=null;
-    private ImageButton mImgRemove;
-    private TextView mId,mTypicalName, sceneCmd;
     private AlertDialog.Builder mDialog;
 
     private ScheduleActivity mSceneInput;
@@ -60,28 +59,35 @@ public class SceneDetailAdapter extends BaseAdapter {
         return position;
     }
 
+    class ViewHolder {
+        TextView mId,mTypicalName,scene_node;
+        ImageView mImgRemove;
+    }
     public View getView(final int position, View convertView, ViewGroup parent) {
-        View vi=convertView;
-        if(convertView == null)
-            vi = inflater.inflate(R.layout.scene_summary_item, null);
+        final ViewHolder holder;
+        if(convertView == null) {
+            convertView = inflater.inflate(R.layout.scene_summary_item, null);
 
-
-        mId             = (TextView) convertView.findViewById(R.id.txId);
-        mTypicalName    = (TextView) convertView.findViewById(R.id.typicalName);
-        sceneCmd        = (TextView) convertView.findViewById(R.id.scene_command);
-        mImgRemove      = (ImageButton) convertView.findViewById(R.id.imgActions);
-
-
+            holder = new ViewHolder();
+            holder.mId = (TextView) convertView.findViewById(R.id.txId);
+            holder.mTypicalName = (TextView) convertView.findViewById(R.id.typicalName);
+            holder.scene_node = (TextView) convertView.findViewById(R.id.scene_node);
+            holder.mImgRemove = (ImageButton) convertView.findViewById(R.id.imgActions);
+            convertView.setTag(holder);
+        }
+        else {
+            holder = (ViewHolder) convertView.getTag();
+        }
         final SceneDetailModel sceneDetailItem = sceneDetailData.get(position);
 
-        for (int i=0; i > sceneDetailData.size(); i++){
-            mId.setText(i);
-        }
+      /*  for (int i=0; i > sceneDetailData.size(); i++){
+            holder.mId.setText(i);
+        }*/
+        holder.mId.setText("Scene ID :" +sceneDetailItem.getScene_id()+"");
+        holder.mTypicalName.setText(sceneDetailItem.getSceneName());
+        holder.scene_node.setText(sceneDetailItem.getNode_id());
 
-        mTypicalName.setText(sceneDetailItem.getNiceName());
-        sceneCmd.setText(sceneDetailItem.getCommand());
-
-        mImgRemove.setOnClickListener(new View.OnClickListener() {
+        holder.mImgRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mDialog  = new AlertDialog.Builder(v.getContext());
@@ -108,6 +114,6 @@ public class SceneDetailAdapter extends BaseAdapter {
                 mDialog.show();
             }
         });
-        return vi;
+        return convertView;
     }
 }

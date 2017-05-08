@@ -61,7 +61,7 @@ public class SceneSummaryAdapter extends BaseAdapter {
             mView = mInflater.inflate(R.layout.scene_summary_item, null);
         mId             = (TextView) mView.findViewById(R.id.txId);
         mTypicalName    = (TextView) mView.findViewById(R.id.typicalName);
-        sceneCmd        = (TextView) mView.findViewById(R.id.scene_command);
+        sceneCmd        = (TextView) mView.findViewById(R.id.scene_node);
 
         mSceneDetail= mSceneDetailData.get(position);
         for (int i=0; i > mSceneDetailData.size(); i++){

@@ -100,6 +100,7 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_SCENE_NAME + " TEXT, "
                 + dbNode.KEY_SCENE_TYPE + " TEXT, "
                 + dbNode.KEY_PATH + " TEXT,"
+                + dbNode.KEY_SCENE_ID + " TEXT,"
                 + dbNode.KEY_HOURS + " TEXT, "
                 + dbNode.KEY_MINS + " TEXT, "
                 + dbNode.KEY_SUN + " TEXT, "

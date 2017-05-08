@@ -371,7 +371,7 @@ public class ScheduleActivity extends AppCompatActivity {
                         }
                     }
                 }
-                Toast.makeText(getApplicationContext(),"Alram set successfull !",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Alram update successfull !",Toast.LENGTH_LONG).show();
 
                    // alarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
 

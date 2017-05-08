@@ -192,7 +192,7 @@ public class dbNodeRepo {
                 node.setFriday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_FRI)));
                 node.setSaturday(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SAT)));
                 node.setLocation(cursor.getString(cursor.getColumnIndex(dbNode.KEY_LOCATION)));
-                node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setNode_id(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
 
                 nodeList.add(node);
 
@@ -257,7 +257,7 @@ public class dbNodeRepo {
         values.put(KEY_ID, sceneDetailModel.getScene_id());
         values.put(KEY_PATH, sceneDetailModel.getPath());
         values.put(KEY_COMMAND, sceneDetailModel.getCommand());
-        values.put(KEY_SCENE_NAME,sceneDetailModel.getSceneType());
+        values.put(KEY_SCENE_NAME,sceneDetailModel.getSceneName());
         values.put(KEY_HOURS,sceneDetailModel.getHour());
         values.put(KEY_MINS,sceneDetailModel.getMin());
         values.put(KEY_MON,sceneDetailModel.getMonday());
@@ -291,8 +291,8 @@ public class dbNodeRepo {
             do {
                 SceneDetailModel node = new SceneDetailModel();
                 node.setScene_id(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_SCENE_ID)));
-                node.setPath(cursor.getString(cursor.getColumnIndex(dbNode.KEY_PATH)));
-                node.setCommand(cursor.getString(cursor.getColumnIndex(dbNode.KEY_COMMAND)));
+                node.setSceneName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SCENE_NAME)));
+                node.setNode_id(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

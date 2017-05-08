@@ -118,7 +118,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("ON");
-                holder.status.setTextColor(ContextCompat.getColor(context, R.color.green));
+                holder.status.setTextColor(Color.GREEN);
+                //holder.status.setTextColor(ContextCompat.getColor(context, R.color.green));
                 holder.btn_on.setEnabled(false);
                 holder.btn_off.setEnabled(true);
 
@@ -126,7 +127,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.imgNode.setImageResource(R.mipmap.offlamp);
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("OFF");
-                holder.status.setTextColor(ContextCompat.getColor(context, R.color.red));
+                holder.status.setTextColor(Color.RED);
                 holder.btn_on.setEnabled(true);
                 holder.btn_off.setEnabled(false);
 
@@ -236,7 +237,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             if (mInstalledNodeModel.getStatus_theft().equals("true")) {
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("ALARM!!");
-                holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                holder.status.setTextColor(Color.MAGENTA);
                 holder.status.setTypeface(null, Typeface.BOLD);
             }
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
@@ -341,7 +342,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             if (mInstalledNodeModel.getStatus_theft().equals("true")) {
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("ALARM!!");
-                holder.status.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                holder.status.setTextColor(Color.MAGENTA);
                 holder.status.setTypeface(null, Typeface.BOLD);
             }
             holder.btn_on.setOnClickListener(new View.OnClickListener() {

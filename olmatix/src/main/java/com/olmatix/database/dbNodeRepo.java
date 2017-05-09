@@ -23,6 +23,7 @@ import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.model.SceneDetailModel;
 import com.olmatix.model.SceneModel;
 import com.olmatix.model.SpinnerObject;
+import com.olmatix.model.SpinnerObjectDash;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -663,6 +664,34 @@ public class dbNodeRepo {
         return labels;
     }
 
+    public ArrayList<SpinnerObjectDash> getAllLabelsDash() {
+        List<SpinnerObjectDash> labelsDash = new ArrayList<>();
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_NODE;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+
+
+        if (cursor.moveToFirst()) {
+            do {
+                //labels.add(cursor.getString(0)+","+ cursor.getString(3));
+                labelsDash.add ( new SpinnerObjectDash ( cursor.getInt(0) , cursor.getString(3) ) );
+                //labels.add(cursor.getString(1));
+                //labels.add(cursor.getString(3));
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return (ArrayList<SpinnerObjectDash>) labelsDash;
+    }
+
 
     public ArrayList<DetailNodeModel> getNodeDetail(String node_id, String Channel) {
 
@@ -1100,7 +1129,7 @@ public class dbNodeRepo {
 
         if (cursor.moveToFirst()) {
             do {
-                nodeList.add(cursor.getString(1)+ "\n"+ cursor.getString(2));
+                nodeList.add(cursor.getString(1)+ "\n "+ cursor.getString(2));
 
             } while (cursor.moveToNext());
         }

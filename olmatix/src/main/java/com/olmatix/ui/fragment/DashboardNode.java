@@ -43,6 +43,7 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.model.SpinnerObject;
+import com.olmatix.model.SpinnerObjectDash;
 import com.olmatix.utils.GridSpacesItemDecoration;
 import com.olmatix.utils.OlmatixUtils;
 import com.olmatix.utils.SpinnerListener;
@@ -131,8 +132,8 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
             public void onClick(View v) {
                 onTouchListener(0);
                 mSpinner = new Spinner(getActivity());
-                List<SpinnerObject> lables = mDbNodeRepo.getAllLabels();
-                ArrayAdapter<SpinnerObject> dataAdapter = new ArrayAdapter<>(getActivity(),
+                List<SpinnerObjectDash> lables = mDbNodeRepo.getAllLabelsDash();
+                ArrayAdapter<SpinnerObjectDash> dataAdapter = new ArrayAdapter<>(getActivity(),
                         android.R.layout.simple_spinner_item,lables);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 mSpinner.setAdapter(dataAdapter);
@@ -144,8 +145,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mSpinner.setOnItemSelectedListener(new SpinnerListener());
-                                int databaseId = Integer.parseInt(String.valueOf(((SpinnerObject) mSpinner.getSelectedItem()).getDatabaseId()));
-                                Log.d("DEBUG", "onClick: "+String.valueOf(databaseId));
+                                int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObjectDash) mSpinner.getSelectedItem ()).getId()));                                Log.d("DEBUG", "onClick: "+String.valueOf(databaseId));
                                 dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
                                 mDbNodeRepo.insertFavNode(dashboardNodeModel);
                                 setRefresh();

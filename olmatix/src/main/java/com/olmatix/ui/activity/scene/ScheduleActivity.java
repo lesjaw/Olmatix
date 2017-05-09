@@ -163,8 +163,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private void mLoadSpinnerData() {
         ArrayList<SpinnerObject> nodeLabel = mDbNodeRepo.getAllLabels();
         ArrayList<String> arrayList= new ArrayList<>();;
-        for(int i=0; i<nodeLabel.size(); i++)
-        {
+        for(int i=0; i<nodeLabel.size(); i++) {
             arrayList.add(nodeLabel.get(i).getDatabaseValue());
         }
         Log.e("array List",arrayList+"");

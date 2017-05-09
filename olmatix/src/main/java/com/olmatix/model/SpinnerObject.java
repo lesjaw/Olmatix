@@ -6,17 +6,14 @@ package com.olmatix.model;
 
 public class SpinnerObject {
 
-    private  String databaseId;
+    private String databaseId;
     private String databaseValue;
 
-    public SpinnerObject(String databaseId, String databaseValue) {
+    public SpinnerObject() {
         this.databaseId = databaseId;
         this.databaseValue = databaseValue;
     }
 
-    public SpinnerObject() {
-
-    }
 
     public String getDatabaseId() {
         return databaseId;
@@ -33,4 +30,6 @@ public class SpinnerObject {
     public void setDatabaseValue(String databaseValue) {
         this.databaseValue = databaseValue;
     }
+
+
 }

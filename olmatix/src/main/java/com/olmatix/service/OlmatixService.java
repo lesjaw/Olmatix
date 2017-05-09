@@ -1687,6 +1687,9 @@ public class OlmatixService extends Service {
             dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertDbMqtt(dbnode);
             sendMessageDetail();
+            Intent intent = new Intent("addNode");
+            intent.putExtra("Connect", "con");
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
 
         @Override

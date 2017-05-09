@@ -1093,14 +1093,14 @@ public class dbNodeRepo {
         List<String> nodeList = new ArrayList<>();
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+10;
+        String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+30;
 
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                nodeList.add(cursor.getString(1)+ " , "+ cursor.getString(2));
+                nodeList.add(cursor.getString(1)+ "\n"+ cursor.getString(2));
 
             } while (cursor.moveToNext());
         }

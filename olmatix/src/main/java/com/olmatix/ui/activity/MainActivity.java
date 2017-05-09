@@ -280,7 +280,16 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
 */
+        imgStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent("addNode");
+                intent.putExtra("Connect", "con");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            }
+        });
         recentLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -540,7 +549,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         int tabpos = tabLayout.getSelectedTabPosition();
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
     if (tabpos==2){

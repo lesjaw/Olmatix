@@ -44,8 +44,6 @@ dependencies {
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
     compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.0'
-    //compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
-    //compile 'com.azoft.carousellayoutmanager:carousel:1.2.0'
     compile files('libs/merlin-core-v0.4.1.jar')
     compile 'com.afollestad.material-dialogs:commons:0.9.2.3'
     compile 'com.jaredrummler:material-spinner:1.1.0'

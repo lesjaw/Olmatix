@@ -85,6 +85,8 @@ public class dbNodeRepo {
         values.put(KEY_SENSOR, detailNodeModel.getSensor());
         values.put(KEY_STATUS_SENSOR, detailNodeModel.getStatus_sensor());
         values.put(KEY_STATUS_THEFT, detailNodeModel.getStatus_theft());
+        values.put(KEY_STATUS_TEMP, detailNodeModel.getStatus_temp());
+        values.put(KEY_STATUS_HUM, detailNodeModel.getStatus_hum());
 
         long node_Id = db.insert(TABLE_NODE, null, values);
         db.close(); // Closing database connection
@@ -501,9 +503,6 @@ public class dbNodeRepo {
                 String.valueOf(detailNodeModel.getChannel())
         });
         db.close(); // Closing database connection
-        //Log.d("DEBUG", "updateDetailSensor: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
-        //String.valueOf(detailNodeModel.getChannel()));
-
     }
 
     public void update_detailSensorTheft(DetailNodeModel detailNodeModel) {
@@ -526,6 +525,43 @@ public class dbNodeRepo {
         //String.valueOf(detailNodeModel.getChannel()));
 
     }
+
+    public void update_detailSensorTemp(DetailNodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
+
+        if (detailNodeModel.getStatus_temp() != null) {
+            values.put(KEY_STATUS_TEMP, detailNodeModel.getStatus_temp());
+            //Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+        }
+
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel())
+        });
+        db.close(); // Closing database connection
+    }
+
+    public void update_detailSensorHum(DetailNodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
+
+        if (detailNodeModel.getStatus_hum() != null) {
+            values.put(KEY_STATUS_HUM, detailNodeModel.getStatus_hum());
+            //Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+        }
+
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel())
+        });
+        db.close(); // Closing database connection
+    }
+
 
     public ArrayList<InstalledNodeModel> getNodeList() {
 

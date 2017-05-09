@@ -50,6 +50,8 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_STATUS + " TEXT, "
                 + dbNode.KEY_STATUS_SENSOR + " TEXT, "
                 + dbNode.KEY_STATUS_THEFT + " TEXT, "
+                + dbNode.KEY_STATUS_TEMP + " TEXT, "
+                + dbNode.KEY_STATUS_HUM + " TEXT, "
                 + dbNode.KEY_SENSOR + " TEXT )";
 
         String CREATE_TABLE_FAVORITE = "CREATE TABLE " + dbNode.TABLE_FAV  + "("

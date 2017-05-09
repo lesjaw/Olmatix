@@ -7,7 +7,7 @@ package com.olmatix.model;
 public class DetailNodeModel {
 
     private  int id;
-    private String node_id,channel, status, nice_name_d,uptime, name, sensor, status_sensor, fwName, status_theft, duration;
+    private String node_id,channel, status, nice_name_d,uptime, name, sensor, status_sensor, fwName, status_theft, duration, status_temp, status_hum;
 
 
     public int getId() {
@@ -104,5 +104,21 @@ public class DetailNodeModel {
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    public String getStatus_temp() {
+        return status_temp;
+    }
+
+    public void setStatus_temp(String status_temp) {
+        this.status_temp = status_temp;
+    }
+
+    public String getStatus_hum() {
+        return status_hum;
+    }
+
+    public void setStatus_hum(String status_hum) {
+        this.status_hum = status_hum;
     }
 }

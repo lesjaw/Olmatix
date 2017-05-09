@@ -84,6 +84,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import static com.olmatix.lesjaw.olmatix.R.drawable;
 import static com.olmatix.lesjaw.olmatix.R.string;
@@ -499,6 +500,17 @@ public class OlmatixService extends Service {
         }, 10000);
     }
 
+    private void connLose() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent("addNode");
+                intent.putExtra("Connect", "con");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            }
+        }, 5000);
+    }
+
     @Override
     public void onCreate() {
 
@@ -713,10 +725,26 @@ public class OlmatixService extends Service {
     }
 
     private void setClientID() {
-        // Context mContext;
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        String uniqueID = null;
+        final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
+
+
+            if (uniqueID == null) {
+                SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(
+                        PREF_UNIQUE_ID, Context.MODE_PRIVATE);
+                uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
+                if (uniqueID == null) {
+                    uniqueID = UUID.randomUUID().toString();
+                    SharedPreferences.Editor editor = sharedPrefs.edit();
+                    editor.putString(PREF_UNIQUE_ID, uniqueID);
+                    editor.commit();
+                }
+             }
+       /* WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
-        deviceId = "OlmatixApp-" + wInfo.getMacAddress();
+        deviceId = "OlmatixApp-" + wInfo.getMacAddress();*/
+        deviceId = "OlmatixApp-" +uniqueID;
 
         if (deviceId == null) {
             deviceId = MqttAsyncClient.generateClientId();
@@ -1687,9 +1715,8 @@ public class OlmatixService extends Service {
             dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
             mDbNodeRepo.insertDbMqtt(dbnode);
             sendMessageDetail();
-            Intent intent = new Intent("addNode");
-            intent.putExtra("Connect", "con");
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            connLose();
+
         }
 
         @Override

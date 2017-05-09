@@ -194,7 +194,7 @@ public class OlmatixService extends Service {
                     snackbarWrapper.show();
                 } else {
                     if (add_NodeID == null) {
-                        final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                        /*final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
                                 "Your device Offline, trying to connect now", TSnackbar.LENGTH_LONG);
                         snackbarWrapper.setAction("Olmatix",
                                 new View.OnClickListener() {
@@ -205,7 +205,7 @@ public class OlmatixService extends Service {
                                     }
                                 });
 
-                        snackbarWrapper.show();
+                        snackbarWrapper.show();*/
                         if (!doCon) {
                             Log.d(TAG, "Alarm Service: " + doCon);
                             doConnect();
@@ -354,7 +354,7 @@ public class OlmatixService extends Service {
             String topic = "status/" + deviceId + "/$online";
             byte[] payload = "false".getBytes();
             options.setWill(topic, payload, 1, true);
-            options.setKeepAliveInterval(300);
+            options.setKeepAliveInterval(30);
             Connection.setClient(mqttClient);
 
             text = "Connecting to server..";
@@ -1013,6 +1013,7 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_temp(mMessage);
+            Log.d(TAG, "UpdateSensorTemp: "+mMessage);
             mDbNodeRepo.update_detailSensorTemp(detailNodeModel);
 
             mChange = "2";
@@ -1026,6 +1027,8 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_hum(mMessage);
+            Log.d(TAG, "UpdateSensorHum: "+mMessage);
+
             mDbNodeRepo.update_detailSensorHum(detailNodeModel);
 
             mChange = "2";
@@ -1293,7 +1296,6 @@ public class OlmatixService extends Service {
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel("0");
                     durationModel.setTimeStampOn((long) 0);
-                    durationModel.setTimeStampOff((long) 0);
                     durationModel.setDuration((long) 0);
 
                     mDbNodeRepo.insertDurationNode(durationModel);
@@ -1708,13 +1710,13 @@ public class OlmatixService extends Service {
                 }
 
             } else if (mNodeID.contains("temperature/degrees")) {
-                if (mMessage.equals("true")) {
+
                     UpdateSensorTemp();
-                }
+
             }else if (mNodeID.contains("humidity/percent")) {
-                if (mMessage.equals("true")) {
+
                     UpdateSensorHum();
-                }
+
             } else {
                 updateDetail();
             }

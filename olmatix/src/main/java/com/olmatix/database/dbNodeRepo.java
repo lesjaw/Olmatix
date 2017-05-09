@@ -534,7 +534,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_temp() != null) {
             values.put(KEY_STATUS_TEMP, detailNodeModel.getStatus_temp());
-            //Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_temp());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -552,7 +552,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_hum() != null) {
             values.put(KEY_STATUS_HUM, detailNodeModel.getStatus_hum());
-            //Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_sensor());
+            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_hum());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -1014,8 +1014,9 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery = "SELECT node_installed." + KEY_NODE_ID + ", node_installed." + KEY_CHANNEL +
                 ", node_installed." + KEY_NICE_NAME_D + ", node_installed." + KEY_STATUS +
-                ", node_installed." + KEY_STATUS_SENSOR + ", node_installed." + KEY_STATUS_THEFT + ", node_installed." + KEY_SENSOR +
-                ", SUM(duration_node." + KEY_DURATION + ") as totaldur" +
+                ", node_installed." + KEY_STATUS_SENSOR + ", node_installed." + KEY_STATUS_THEFT + ", node_installed." + KEY_SENSOR  +
+                ", node_installed." + KEY_STATUS_TEMP + ", node_installed." + KEY_STATUS_HUM +
+                ", SUM(duration_node." + KEY_DURATION + ") as totaldur"  +
                 " FROM node_installed " + TABLE_NODE + " INNER JOIN " + TABLE_NODE_DURATION +
                 " duration_node ON node_installed." + KEY_NODE_ID + " = duration_node." + KEY_NODE_ID +
                 " AND node_installed." + KEY_CHANNEL + " = duration_node." + KEY_CHANNEL + " WHERE duration_node." + KEY_NODE_ID + "=?" +
@@ -1038,7 +1039,9 @@ public class dbNodeRepo {
                 node.setStatus_sensor(cursor.getString(4));
                 node.setStatus_theft(cursor.getString(5));
                 node.setSensor(cursor.getString(6));
-                node.setDuration(cursor.getString(7));
+                node.setStatus_temp(cursor.getString(7));
+                node.setStatus_hum(cursor.getString(8));
+                node.setDuration(cursor.getString(9));
 
                 nodeList.add(node);
 

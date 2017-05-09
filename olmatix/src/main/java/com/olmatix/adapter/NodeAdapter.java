@@ -357,7 +357,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     public void removeItem(int position) {
 
         String mNodeID = nodeList.get(position).getNodesID();
-        for (int a=0; a < 12 ;a++) {
+        for (int a=0; a < 16 ;a++) {
             if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
             if (a == 1) {topic = "devices/" + mNodeID + "/$fwname";}
             if (a == 2) {topic = "devices/" + mNodeID + "/$signal";}
@@ -370,7 +370,10 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             if (a == 9) {topic = "devices/" + mNodeID + "/light/3";}
             if (a == 10) {topic = "devices/" + mNodeID + "/door/close";}
             if (a == 11) {topic = "devices/" + mNodeID + "/door/theft";}
-
+            if (a == 12) {topic = "devices/" + mNodeID + "/motion/motion";}
+            if (a == 13) {topic = "devices/" + mNodeID + "/motion/theft";}
+            if (a == 14) {topic = "devices/" + mNodeID + "/temperature/degrees";}
+            if (a == 15) {topic = "devices/" + mNodeID + "/humidity/percent";}
             try {
                 Connection.getClient().unsubscribe(topic);
             } catch (MqttException e) {

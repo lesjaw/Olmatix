@@ -31,6 +31,7 @@ import com.olmatix.utils.OlmatixUtils;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.util.Strings;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -88,7 +89,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_sensor_temp, parent, false);
 
-            return new OlmatixSensorMotionHolder(itemView);
+            return new OlmatixHolder(itemView);
         }
 
         return null;
@@ -421,48 +422,68 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             });
 
         } else if (fw_name.equals("smartsensortemp")) {
-            final OlmatixSensorMotionHolder holder = (OlmatixSensorMotionHolder) viewHolder;
+            final OlmatixHolder holder = (OlmatixHolder) viewHolder;
 
+            holder.fwName.setText(mInstalledNodeModel.getNode_id());
             holder.imgNode.setImageResource(R.drawable.olmatixmed);
+            if(mInstalledNodeModel.getDuration()!=null) {
+                holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
+            }
             if (mInstalledNodeModel.getNice_name_d() != null) {
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            } else {
+            } else
                 holder.node_name.setText(mInstalledNodeModel.getName());
-            }
-            holder.fwName.setText(mInstalledNodeModel.getNode_id());
-            holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
-            if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
-                holder.sensorStatus.setText("Motion detected!");
-                holder.imgSensor.setImageResource(R.drawable.motion);
-            } else {
-                holder.sensorStatus.setText("No Motion detected!");
-                holder.imgSensor.setImageResource(R.drawable.no_motion);
-            }
+
+            //holder.upTime.setText("Uptime: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
+
+            holder.status.setText(mInstalledNodeModel.getStatus());
+
             if (mInstalledNodeModel.getStatus().equals("true")) {
-                holder.imgNode.setImageResource(R.mipmap.armed);
+                holder.imgNode.setImageResource(R.mipmap.onlamp);
                 holder.statuslabel.setText("Status:");
-                holder.status.setText("ARMED");
-
+                holder.status.setText("ON");
+                holder.status.setTextColor(Color.GREEN);
+                //holder.status.setTextColor(ContextCompat.getColor(context, R.color.green));
+                holder.btn_on.setEnabled(false);
+                holder.btn_off.setEnabled(true);
 
             } else {
-                holder.imgNode.setImageResource(R.mipmap.not_armed);
+                holder.imgNode.setImageResource(R.mipmap.offlamp);
                 holder.statuslabel.setText("Status:");
-                holder.status.setText("NOT ARMED");
+                holder.status.setText("OFF");
+                holder.status.setTextColor(Color.RED);
+                holder.btn_on.setEnabled(true);
+                holder.btn_off.setEnabled(false);
+
+
             }
-            if (mInstalledNodeModel.getStatus_theft().equals("true")) {
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("ALARM!!");
-                holder.status.setTextColor(Color.MAGENTA);
-                holder.status.setTypeface(null, Typeface.BOLD);
+            String t=mInstalledNodeModel.getStatus_temp();
+            if (t !=null) {
+                String t1 = t.substring(0, 2);
+                int t2 = Integer.parseInt(t1.replaceAll("[\\D]", ""));
+                holder.temp.setText(t2 - 7 + " °C");
+                String h = mInstalledNodeModel.getStatus_hum();
+                String h1 = h.substring(0, 2);
+                int h2 = Integer.parseInt(h1.replaceAll("[\\D]", ""));
+                holder.hum.setText(h2 + " %");
             }
+
+
+            holder.imgNode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showAlertDialog();
+                }
+            });
+
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
                         String payload = "ON";
                         byte[] encodedPayload = new byte[0];
                         try {
@@ -472,16 +493,13 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
                             holder.statuslabel.setText("Sending");
-                            holder.status.setText(" ARMED");
-
+                            holder.status.setText(" ON");
+                            holder.status.setSingleLine();
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
                         }
                     } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent("addNode");
                         intent.putExtra("Connect", "con");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -495,9 +513,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 public void onClick(View view) {
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
                         String payload = "OFF";
                         byte[] encodedPayload = new byte[0];
                         try {
@@ -507,16 +524,13 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                             message.setRetained(true);
                             Connection.getClient().publish(topic, message);
                             holder.statuslabel.setText("Sending");
-                            holder.status.setText(" NOT ARMED");
+                            holder.status.setText(" OFF");
 
                         } catch (UnsupportedEncodingException | MqttException e) {
                             e.printStackTrace();
                         }
                     } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent("addNode");
                         intent.putExtra("Connect", "con");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -549,7 +563,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
     public class OlmatixHolder extends ViewHolder {
-        public TextView node_name, upTime, status, fwName, statuslabel, duration;
+        public TextView node_name, upTime, status, fwName, statuslabel, duration, temp, hum;
         public ImageView imgNode;
         Button btn_off, btn_on;
 
@@ -564,6 +578,9 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             upTime = (TextView) view.findViewById(R.id.uptime);
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);
+            temp = (TextView) view.findViewById(R.id.temp);
+            hum = (TextView) view.findViewById(R.id.hum);
+
 
         }
     }

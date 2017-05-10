@@ -2,16 +2,22 @@ package com.olmatix.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.olmatix.helper.DayInterface;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.SceneDetailModel;
 
 import java.util.ArrayList;
+
+import static com.olmatix.lesjaw.olmatix.R.drawable.circle_step_done;
 
 /**
  * Created              : Rahman on 2/18/2017.
@@ -21,20 +27,21 @@ import java.util.ArrayList;
  * Project Name         : Olmatix.
  * Copyright            : Copyright @ 2017 Olmatix.
  */
-public class DayAdapter extends BaseAdapter  {
+public class DayAdapter extends BaseAdapter {
     private String TAG = "DayListViewAdapter";
     private Context mContext = null;
     String[] mDayArray = {"S","M", "T", "W", "T", "F", "S"};
-    public TextView mDayText;
     private boolean stateChanged;
-    LayoutInflater inflater;
-    private int mSelectedPosition = -1;
+    public static LayoutInflater inflater;
+    ArrayList<SceneDetailModel> sceneDetailData;
+    public static ArrayList<TextView> textDays;
 
-    public DayAdapter(Context context) {
+
+    public DayAdapter(Context context, ArrayList<SceneDetailModel> listSceneData) {
         mContext = context;
-        inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        this.sceneDetailData = listSceneData;
+        textDays = new ArrayList<>();
+        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -60,18 +67,28 @@ public class DayAdapter extends BaseAdapter  {
             mView = inflater.inflate(R.layout.days, null);
             mHolder = new Holder();
             mHolder.mDayText = (TextView) mView.findViewById(R.id.day);
+            textDays.add(mHolder.mDayText = (TextView) mView.findViewById(R.id.day));
+
             mView.setTag(mHolder);
 
         }else {
             mHolder = (Holder) mView.getTag();
         }
+
         mHolder.mDayText.setText(mDayArray[position]);
+
+
+
+
+
         mView.setLayoutParams(new ViewGroup.LayoutParams(110, 100));
 
         return mView;
     }
 
-    class Holder{
+
+
+    class Holder {
         TextView mDayText;
     }
 }

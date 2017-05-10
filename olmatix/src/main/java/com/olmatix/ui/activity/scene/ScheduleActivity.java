@@ -46,6 +46,7 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.olmatix.adapter.DayAdapter;
 import com.olmatix.adapter.SceneDetailAdapter;
 import com.olmatix.database.dbNodeRepo;
+import com.olmatix.helper.DayInterface;
 import com.olmatix.helper.HorizontalListView;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
@@ -101,6 +102,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private int mSelectedPosition= -1;
     AlarmManager alarmManager;
     private PendingIntent pendingIntent;
+    private DayInterface dayInterface;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -132,16 +134,68 @@ public class ScheduleActivity extends AppCompatActivity {
         mSceneMode = (TextView) findViewById(R.id.txt_sceneid);
         listSceneDetailData = (ListView) findViewById(R.id.listData);
         mDayRv= (HorizontalListView) findViewById(R.id.listview);
-        mDayAdapter = new DayAdapter(this);
+
+        sceneDetailList.addAll(mDbNodeRepo.getSceneDetailList());
+
+        mDayAdapter = new DayAdapter(mActivity, mDbNodeRepo.getAllSceneList());
         mDayRv.setAdapter(mDayAdapter);
         mDayAdapter.notifyDataSetChanged();
 
-        sceneDetailList.addAll(mDbNodeRepo.getSceneDetailList());
+
+        int position1 = mDbNodeRepo.getAllSceneList().size() - 1;
+
+
+        if(mDbNodeRepo.getAllSceneList().get(position1).getSunday() != null && mDbNodeRepo.getAllSceneList().get(position1).getSunday().equals("1"))
+        {
+            DayAdapter.textDays.get(0).setSelected(true);
+
+        }
+        if(mDbNodeRepo.getAllSceneList().get(position1).getMonday() != null && mDbNodeRepo.getAllSceneList().get(position1).getMonday().equals("1"))
+        {
+            DayAdapter.textDays.get(1).setSelected(true);
+
+        }
+        if(mDbNodeRepo.getAllSceneList().get(position1).getThursday() != null && mDbNodeRepo.getAllSceneList().get(position1).getThursday().equals("1")) {
+
+            DayAdapter.textDays.get(2).setSelected(true);
+        }
+        if(mDbNodeRepo.getAllSceneList().get(position1).getWednesday() != null && mDbNodeRepo.getAllSceneList().get(position1).getWednesday().equals("1"))
+        {
+
+            DayAdapter.textDays.get(3).setSelected(true);
+        }
+        if(mDbNodeRepo.getAllSceneList().get(position1).getTuesday() != null && mDbNodeRepo.getAllSceneList().get(position1).getTuesday().equals("1"))
+        {
+
+            DayAdapter.textDays.get(4).setSelected(true);
+        }
+        if(mDbNodeRepo.getAllSceneList().get(position1).getFriday() != null && mDbNodeRepo.getAllSceneList().get(position1).getFriday().equals("1"))
+        {
+
+            DayAdapter.textDays.get(5).setSelected(true);
+        }
+
+        if(mDbNodeRepo.getAllSceneList().get(position1).getSaturday()!= null && mDbNodeRepo.getAllSceneList().get(position1).getSaturday().equals("1"))
+        {
+
+            DayAdapter.textDays.get(6).setSelected(true);
+        }
 
         mSceneDetailAdapter = new SceneDetailAdapter(mActivity, sceneDetailList);
         listSceneDetailData.setAdapter(mSceneDetailAdapter);
         mSceneDetailAdapter.notifyDataSetChanged();
 
+        if(mDbNodeRepo.getAllSceneList() != null && mDbNodeRepo.getAllSceneList().size() != 0)
+        {
+            int position=mDbNodeRepo.getAllSceneList().size()-1;
+            int minute = mDbNodeRepo.getAllSceneList().get(position).getMin();
+            int hour = mDbNodeRepo.getAllSceneList().get(position).getHour();
+            String time1 = hour + ":" + minute;
+            mTimeTxt.setText(time1);
+
+            time = new Pair<>(hour, minute);
+            setTimePicker(hour, minute);
+        }
     }
 
 
@@ -158,6 +212,7 @@ public class ScheduleActivity extends AppCompatActivity {
         sceneDetailList = new ArrayList<>();
         mDetailNodeModel = new DetailNodeModel();
         mSceneDetailModel = new SceneDetailModel();
+
     }
 
     private void mLoadSpinnerData() {
@@ -277,21 +332,29 @@ public class ScheduleActivity extends AppCompatActivity {
     private HorizontalListView.OnListItemClickListener mItemClickListener() {
         return (v, position) -> {
             Log.d("TAG", "onClick: " + v +"\n\n"+ position);
-            v.setSelected(true);
 
-            if (position == 0){
+            if(v.isSelected())
+            {
+                v.setSelected(false);
+            }else
+            {
+                v.setSelected(true);
+            }
+            //v.setSelected(true);
+
+            if (position == 0 && v.isSelected()){
                 mSceneModel.setSunday("1");
-            } else if (position == 1){
+            } else if (position == 1 && v.isSelected()){
                 mSceneModel.setMonday("1");
-            }else if (position == 2){
+            }else if (position == 2 && v.isSelected()){
                 mSceneModel.setTuesday("1");
-            }else if (position == 3){
+            }else if (position == 3 && v.isSelected()){
                 mSceneModel.setWednesday("1");
-            }else if (position == 4){
+            }else if (position == 4 && v.isSelected()){
                 mSceneModel.setThursday("1");
-            }else if (position == 5){
+            }else if (position == 5 && v.isSelected()){
                 mSceneModel.setFriday("1");
-            }else if (position == 6){
+            }else if (position == 6 && v.isSelected()){
                 mSceneModel.setSaturday("1");
             }else{
                 v.setSelected(false);

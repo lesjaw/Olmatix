@@ -103,9 +103,9 @@ public class ScheduleDetailActivity extends AppCompatActivity {
         mSceneMode = (TextView) findViewById(R.id.txt_sceneid);
         listSceneDetailData = (ListView) findViewById(R.id.listData);
         mDayRv= (HorizontalListView) findViewById(R.id.listview);
-        mDayAdapter = new DayAdapter(this);
+       /* mDayAdapter = new DayAdapter(this);
         mDayRv.setAdapter(mDayAdapter);
-        mDayAdapter.notifyDataSetChanged();
+        mDayAdapter.notifyDataSetChanged();*/
 
     }
 

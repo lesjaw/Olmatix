@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:background="@drawable/selector"
         android:gravity="center"
+        android:background="@drawable/selector"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/white"/>
 </LinearLayout>

@@ -456,7 +456,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.btn_on.setEnabled(true);
                 holder.btn_off.setEnabled(false);
 
-
             }
             String t=mInstalledNodeModel.getStatus_temp();
             if (t !=null) {

@@ -17,6 +17,8 @@ public class DashboardNodeModel {
     private String online;
     private String onduration;
     private String id_node_detail;
+    private String temp;
+    private String hum;
 
     public int getId() {
         return id;
@@ -104,5 +106,21 @@ public class DashboardNodeModel {
 
     public void setId_node_detail(String id_node_detail) {
         this.id_node_detail = id_node_detail;
+    }
+
+    public String getTemp() {
+        return temp;
+    }
+
+    public void setTemp(String temp) {
+        this.temp = temp;
+    }
+
+    public String getHum() {
+        return hum;
+    }
+
+    public void setHum(String hum) {
+        this.hum = hum;
     }
 }

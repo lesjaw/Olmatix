@@ -95,11 +95,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private ListView listSceneDetailData;
     private HorizontalListView mDayRv;
     private DayAdapter mDayAdapter;
-    private LinearLayoutManager dayLinearManager;
-    private ArrayList<String> mDayList;
-    String mDayValue = null;
-    public boolean stateChanged = false;
-    private int mSelectedPosition= -1;
+
     AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private DayInterface dayInterface;
@@ -142,43 +138,39 @@ public class ScheduleActivity extends AppCompatActivity {
         mDayAdapter.notifyDataSetChanged();
 
 
-        int position1 = mDbNodeRepo.getAllSceneList().size() - 1;
+        if(mDbNodeRepo.getAllSceneList().size() != 0 && mDbNodeRepo.getAllSceneList() != null) {
+            int position1 = mDbNodeRepo.getAllSceneList().size() - 1;
 
 
-        if(mDbNodeRepo.getAllSceneList().get(position1).getSunday() != null && mDbNodeRepo.getAllSceneList().get(position1).getSunday().equals("1"))
-        {
-            DayAdapter.textDays.get(0).setSelected(true);
+            if (mDbNodeRepo.getAllSceneList().get(position1).getSunday() != null && mDbNodeRepo.getAllSceneList().get(position1).getSunday().equals("1")) {
+                DayAdapter.textDays.get(0).setSelected(true);
 
-        }
-        if(mDbNodeRepo.getAllSceneList().get(position1).getMonday() != null && mDbNodeRepo.getAllSceneList().get(position1).getMonday().equals("1"))
-        {
-            DayAdapter.textDays.get(1).setSelected(true);
+            }
+            if (mDbNodeRepo.getAllSceneList().get(position1).getMonday() != null && mDbNodeRepo.getAllSceneList().get(position1).getMonday().equals("1")) {
+                DayAdapter.textDays.get(1).setSelected(true);
 
-        }
-        if(mDbNodeRepo.getAllSceneList().get(position1).getThursday() != null && mDbNodeRepo.getAllSceneList().get(position1).getThursday().equals("1")) {
+            }
+            if (mDbNodeRepo.getAllSceneList().get(position1).getThursday() != null && mDbNodeRepo.getAllSceneList().get(position1).getThursday().equals("1")) {
 
-            DayAdapter.textDays.get(2).setSelected(true);
-        }
-        if(mDbNodeRepo.getAllSceneList().get(position1).getWednesday() != null && mDbNodeRepo.getAllSceneList().get(position1).getWednesday().equals("1"))
-        {
+                DayAdapter.textDays.get(2).setSelected(true);
+            }
+            if (mDbNodeRepo.getAllSceneList().get(position1).getWednesday() != null && mDbNodeRepo.getAllSceneList().get(position1).getWednesday().equals("1")) {
 
-            DayAdapter.textDays.get(3).setSelected(true);
-        }
-        if(mDbNodeRepo.getAllSceneList().get(position1).getTuesday() != null && mDbNodeRepo.getAllSceneList().get(position1).getTuesday().equals("1"))
-        {
+                DayAdapter.textDays.get(3).setSelected(true);
+            }
+            if (mDbNodeRepo.getAllSceneList().get(position1).getTuesday() != null && mDbNodeRepo.getAllSceneList().get(position1).getTuesday().equals("1")) {
 
-            DayAdapter.textDays.get(4).setSelected(true);
-        }
-        if(mDbNodeRepo.getAllSceneList().get(position1).getFriday() != null && mDbNodeRepo.getAllSceneList().get(position1).getFriday().equals("1"))
-        {
+                DayAdapter.textDays.get(4).setSelected(true);
+            }
+            if (mDbNodeRepo.getAllSceneList().get(position1).getFriday() != null && mDbNodeRepo.getAllSceneList().get(position1).getFriday().equals("1")) {
 
-            DayAdapter.textDays.get(5).setSelected(true);
-        }
+                DayAdapter.textDays.get(5).setSelected(true);
+            }
 
-        if(mDbNodeRepo.getAllSceneList().get(position1).getSaturday()!= null && mDbNodeRepo.getAllSceneList().get(position1).getSaturday().equals("1"))
-        {
+            if (mDbNodeRepo.getAllSceneList().get(position1).getSaturday() != null && mDbNodeRepo.getAllSceneList().get(position1).getSaturday().equals("1")) {
 
-            DayAdapter.textDays.get(6).setSelected(true);
+                DayAdapter.textDays.get(6).setSelected(true);
+            }
         }
 
         mSceneDetailAdapter = new SceneDetailAdapter(mActivity, sceneDetailList);
@@ -217,7 +209,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
     private void mLoadSpinnerData() {
         ArrayList<SpinnerObject> nodeLabel = mDbNodeRepo.getAllLabels();
-        ArrayList<String> arrayList= new ArrayList<>();;
+        ArrayList<String> arrayList= new ArrayList<>();
         for(int i=0; i<nodeLabel.size(); i++) {
             arrayList.add(nodeLabel.get(i).getDatabaseValue());
         }

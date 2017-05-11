@@ -61,6 +61,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
         } else if ((nodeList.get(position).getSensor().trim()).equals("close")||(nodeList.get(position).getSensor().trim()).equals("motion")) {
             viewType = 1;
+
+        }else if ((nodeList.get(position).getSensor().trim()).equals("temp")) {
+            viewType = 2;
         }
 
         return viewType;
@@ -100,6 +103,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         .inflate(R.layout.frag_dash_status, viewGroup, false);
 
                 return new StatusHolder(v);
+            case 2:
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.frag_dash_temp, viewGroup, false);
+
+                return new TempHolder(v);
             default:
         }
 
@@ -256,41 +264,49 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     }
                 }
             });
-        } else if ((mFavoriteModel.getSensor().trim()).equals("close")) {
+        } else if ((mFavoriteModel.getSensor().trim()).equals("temp")) {
 
-            final StatusHolder holder = (StatusHolder) viewHolder;
+            final TempHolder holder = (TempHolder) viewHolder;
 
-            holder.node_names.setText(mFavoriteModel.getNice_name_d());
+            holder.node_name.setText(mFavoriteModel.getNice_name_d());
 
-            if ((mFavoriteModel.getStatus().trim()).equals("true")) {
-                holder.imgNodesBut.setImageResource(R.drawable.onsec);
-
-            } else {
-                holder.imgNodesBut.setImageResource(R.drawable.offsec);
+            String t = mFavoriteModel.getTemp();
+            if (t !=null) {
+                String t1 = t.substring(0, 2);
+                int t2 = Integer.parseInt(t1.replaceAll("[\\D]", ""));
+                holder.temp.setText(t2 - 7 + "°C");
             }
 
+            String h = mFavoriteModel.getHum();
+            if (h !=null) {
+                String h1 = h.substring(0, 2);
+                int h2 = Integer.parseInt(h1.replaceAll("[\\D]", ""));
+                holder.hum.setText(h2 + "%");
+            }
+
+            if (mFavoriteModel.getStatus().trim().equals("false")) {
+                holder.imgNode.setImageResource(R.drawable.offlamp1);
+                holder.imgSending.setVisibility(View.GONE);
+
+            } else {
+                holder.imgNode.setImageResource(R.drawable.onlamp1);
+                holder.imgSending.setVisibility(View.GONE);
+
+            }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
             } else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
             }
 
-
-            if ((mFavoriteModel.getStatus_sensor().trim().equals("true"))) {
-                holder.imgNodes.setImageResource(R.drawable.door_close);
-            } else {
-                holder.imgNodes.setImageResource(R.drawable.door_open);
-
-            }
-            holder.imgNodesBut.setOnClickListener(new View.OnClickListener() {
+            holder.imgNode.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String payload1;
+                    String payload1 = "ON";
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
                         if (mFavoriteModel.getOnline().trim().equals("true")) {
-
                             String topic = "devices/" + mFavoriteModel.getNodeid() + "/light/" + mFavoriteModel.getChannel() + "/set";
                             if (mFavoriteModel.getStatus().trim().equals("false")) {
                                 payload1 = "ON";
@@ -305,11 +321,16 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 message.setQos(1);
                                 message.setRetained(true);
                                 Connection.getClient().publish(topic, message);
+                                holder.imgSending.setVisibility(View.VISIBLE);
+                                holder.imgSending.startAnimation(animConn);
+
+
                             } catch (UnsupportedEncodingException | MqttException e) {
                                 e.printStackTrace();
                             }
-                        } else {
+                        } else{
                             TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
+                            snackbar.setActionTextColor(Color.BLACK);
                             View snackbarView = snackbar.getView();
                             snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
@@ -320,7 +341,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                         Intent intent = new Intent("addNode");
-                        intent.putExtra("Conn", "Conn1");
+                        intent.putExtra("Connect", "con");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
                 }
@@ -372,6 +393,22 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             node_names = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
 
+        }
+    }
+
+    public class TempHolder extends ViewHolder {
+        public TextView node_name, status, temp, hum;
+        public ImageView imgOnline, imgSending;
+        public ImageButton imgNode;
+
+        public TempHolder(View view) {
+            super(view);
+            imgNode = (ImageButton) view.findViewById(R.id.icon_node);
+            node_name = (TextView) view.findViewById(R.id.node_name);
+            imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
+            imgSending = (ImageView) view.findViewById(R.id.icon_sending);
+            temp = (TextView) view.findViewById(R.id.temp);
+            hum = (TextView) view.findViewById(R.id.hum);
         }
     }
 

@@ -462,11 +462,11 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             if (t !=null) {
                 String t1 = t.substring(0, 2);
                 int t2 = Integer.parseInt(t1.replaceAll("[\\D]", ""));
-                holder.temp.setText(t2 - 7 + " °C");
+                holder.temp.setText(t2 - 7 + "°C");
                 String h = mInstalledNodeModel.getStatus_hum();
                 String h1 = h.substring(0, 2);
                 int h2 = Integer.parseInt(h1.replaceAll("[\\D]", ""));
-                holder.hum.setText(h2 + " %");
+                holder.hum.setText(h2 + "%");
             }
 
 

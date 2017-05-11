@@ -824,6 +824,8 @@ public class dbNodeRepo {
                 node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
                 node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
                 node.setOnline(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.setTemp(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_TEMP)));
+                node.setHum(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_HUM)));
                 nodeList.add(node);
 
             } while (cursor.moveToNext());

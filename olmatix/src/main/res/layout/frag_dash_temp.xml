@@ -74,8 +74,9 @@
                 android:id="@+id/temp"
                 android:text="30 C"
                 android:textSize="15dp"
-                android:layout_marginLeft="5sp"
-                android:layout_marginTop="55sp"
+                android:layout_marginRight="5sp"
+                android:layout_marginTop="40sp"
+                android:layout_alignParentRight="true"
                 android:maxLines="1"
                 android:textAlignment="center" />
 
@@ -85,7 +86,7 @@
                 android:id="@+id/hum"
                 android:text="50%"
                 android:textSize="15dp"
-                android:layout_marginTop="55sp"
+                android:layout_marginTop="22sp"
                 android:layout_marginRight="5sp"
                 android:layout_alignParentRight="true"
                 android:maxLines="1"

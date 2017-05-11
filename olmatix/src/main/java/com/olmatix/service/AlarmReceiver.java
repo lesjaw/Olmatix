@@ -26,56 +26,34 @@ import java.util.Date;
  * Created by android on 4/28/2017.
  */
 
-public class AlarmReceiver extends WakefulBroadcastReceiver // BroadcastReceiver
-
-{
+public class AlarmReceiver extends WakefulBroadcastReceiver{
 
     @Override
-
     public void onReceive(final Context context, Intent intent) {
-
         // this will update the UI with message
-
         try {
 
             Uri alarmUri = RingtoneManager
-
                     .getDefaultUri(RingtoneManager.TYPE_ALARM);
 
             if (alarmUri == null) {
-
                 alarmUri = RingtoneManager
-
                         .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
             }
 
             Ringtone ringtone = RingtoneManager.getRingtone(context, alarmUri);
-
             ringtone.play();
-
-
 
             // this will send a notification message
 
             ComponentName comp = new ComponentName(context.getPackageName(),
-
                     AlarmService.class.getName());
-
             intent.setComponent(comp);
 
-
-
             // If extended by BroadcastReceiver class then comment this code
-
             startWakefulService(context, (intent.setComponent(comp)));
-
-
             setResultCode(Activity.RESULT_OK);
-
         } catch (Exception ex) {
-
-
 
         }
 

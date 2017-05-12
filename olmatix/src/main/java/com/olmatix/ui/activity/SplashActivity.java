@@ -106,7 +106,7 @@ public class SplashActivity extends Activity {
                     if (message.equals("AuthOK")) {
                         Intent i = new Intent(getApplication(), MainActivity.class);
                         startActivity(i);
-                        Log.d("DEBUG", "onReceive2: " + message);
+                        Log.d("DEBUG", "onReceive3: " + message);
                         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
                         finish();
                     }

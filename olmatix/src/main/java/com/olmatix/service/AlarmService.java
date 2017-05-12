@@ -31,6 +31,7 @@ public class AlarmService extends IntentService {
         //but if you have better way just do it..
         //this is currently the logic i can think of for this moment..
         //thank you dear.. btw tommorow i send olmatix device to gujarat..
+
     }
 
     private void sendNotification(String msg) {

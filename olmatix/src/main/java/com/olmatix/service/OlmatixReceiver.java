@@ -6,7 +6,9 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.olmatix.database.dbNode;
@@ -81,18 +83,22 @@ public class OlmatixReceiver extends BroadcastReceiver {
                  dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
                  mDbNodeRepo.insertDbMqtt(dbnode);
 
-                 Notification notification = new Notification.Builder(context)
-                         .setSmallIcon(R.drawable.ic_location_red)  // the status icon
-                         .setTicker(textNode)  // the status text
-                         .setWhen(System.currentTimeMillis())  // the time stamp
-                         .setContentTitle("Olmatix location Alert!")  // the label of the entry
-                         .setContentText(textNode)  // the contents of the entry
-                         .setContentIntent(pendingIntent)  // The intent to send when the entry is clicked
-                         .setAutoCancel(true)
-                         .build();
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                final Boolean mSwitch_Notif = sharedPref.getBoolean("switch_loc", true);
+                if (mSwitch_Notif) {
 
-                 notificationManager.notify(7, notification);
+                    Notification notification = new Notification.Builder(context)
+                            .setSmallIcon(R.drawable.ic_location_red)  // the status icon
+                            .setTicker(textNode)  // the status text
+                            .setWhen(System.currentTimeMillis())  // the time stamp
+                            .setContentTitle("Olmatix location Alert!")  // the label of the entry
+                            .setContentText(textNode)  // the contents of the entry
+                            .setContentIntent(pendingIntent)  // The intent to send when the entry is clicked
+                            .setAutoCancel(true)
+                            .build();
 
+                    notificationManager.notify(7, notification);
+                }
              }
          }
     }

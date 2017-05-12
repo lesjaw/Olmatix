@@ -355,18 +355,16 @@ public class OlmatixService extends Service {
             String topic = "status/" + deviceId + "/$online";
             byte[] payload = "false".getBytes();
             options.setWill(topic, payload, 1, true);
-            options.setKeepAliveInterval(30);
+            options.setKeepAliveInterval(300);
             Connection.setClient(mqttClient);
 
             text = "Connecting to server..";
             showNotification();
             Log.d(TAG, "doConnect: " + deviceId);
-
             try {
-
+                Log.d(TAG, "trying connect ");
                 IMqttToken token = mqttClient.connect(options);
                 token.setActionCallback(new IMqttActionListener() {
-
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
                         mqttClient.setCallback(new MqttEventCallback());
@@ -376,20 +374,19 @@ public class OlmatixService extends Service {
                         editor.putBoolean("conStatus", true);
                         editor.apply();
                         connectionResult = "AuthOK";
+                        Log.d(TAG, "onSuccess: "+connectionResult);
                         flagConn = true;
                         sendMessage();
                         if (!mSwitch_conn) {
                             Log.d(TAG, "Doing subscribe nodes");
                             doSubAll();
                             //new OlmatixService.load().execute();
-
                         }
 
                         dbnode.setTopic("Connected to server");
                         dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
                         mDbNodeRepo.insertDbMqtt(dbnode);
                         sendMessageDetail();
-
                         try {
                             String topic = "status/" + deviceId + "/$online";
                             String payload = "true";
@@ -560,13 +557,13 @@ public class OlmatixService extends Service {
             Log.d(TAG, "onStartCommand status connection: " + mStatusServer);
             doConnect();
 
-            OlmatixAlarmReceiver alarmCheckConn = new OlmatixAlarmReceiver();
+            /*OlmatixAlarmReceiver alarmCheckConn = new OlmatixAlarmReceiver();
 
             alarmCheckConn.setAlarm(this);
             if (alarmCheckConn == null) {
                 alarmCheckConn.setAlarm(this);
                 Log.d("DEBUG", "Alarm set " + alarmCheckConn);
-            }
+            }*/
         }
 
         sendMessage();
@@ -576,15 +573,18 @@ public class OlmatixService extends Service {
                 == PackageManager.PERMISSION_GRANTED) && (ActivityCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {*/
 
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
-                        OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
-            } else {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
-                        OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                            OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+                } else {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, OlmatixUtils.POSITION_UPDATE_INTERVAL,
+                            OlmatixUtils.POSITION_UPDATE_MIN_DIST, listener);
+                }
             }
+        }
 
             Location mLocation = locationManager.getLastKnownLocation(mProvider);
             if (mLocation == null) {
@@ -614,7 +614,7 @@ public class OlmatixService extends Service {
 
             }
 
-            }
+
             return START_STICKY;
 
     }
@@ -681,47 +681,51 @@ public class OlmatixService extends Service {
     }
 
     private void showNotificationNode() {
+        final Boolean mSwitch_NotifStatus = sharedPref.getBoolean("switch_notif", true);
+        Log.d(TAG, "showNotificationNode: "+mSwitch_NotifStatus);
+        if (mSwitch_NotifStatus) {
+            Log.d(TAG, "showNotificationNode: ");
+            numMessages++;
 
-        numMessages++;
+            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
 
-        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
+            notifications.add(numMessages + ". " + String.valueOf(titleNode) + " : " + String.valueOf(textNode) + " at " + timeformat.format(System.currentTimeMillis()));
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        notifications.add(numMessages +". "+String.valueOf(titleNode) + " : "+String.valueOf(textNode)+ " at " +timeformat.format(System.currentTimeMillis()));
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+            mBuilder.setContentTitle("New Olmatix status");
+            mBuilder.setContentText("You've received new status..");
+            mBuilder.setTicker("Olmatix status alert!");
+            mBuilder.setAutoCancel(true);
+            mBuilder.setWhen(System.currentTimeMillis());
+            mBuilder.setNumber(numMessages);
+            //mBuilder.setGroup(GROUP_KEY_NOTIF);
+            //mBuilder.setGroupSummary(true);
+            mBuilder.setSound(defaultSoundUri);
+            mBuilder.setSmallIcon(R.drawable.ic_lightbulb);
+            mBuilder.setPriority(Notification.PRIORITY_MAX);
 
-        NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setContentTitle("New Olmatix status");
-        mBuilder.setContentText("You've received new status..");
-        mBuilder.setTicker("Olmatix status alert!");
-        mBuilder.setAutoCancel(true);
-        mBuilder.setWhen(System.currentTimeMillis());
-        mBuilder.setNumber(numMessages);
-        //mBuilder.setGroup(GROUP_KEY_NOTIF);
-        //mBuilder.setGroupSummary(true);
-        mBuilder.setSound(defaultSoundUri);
-        mBuilder.setSmallIcon(R.drawable.ic_lightbulb);
-        mBuilder.setPriority(Notification.PRIORITY_MAX);
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+            inboxStyle.setBigContentTitle("Olmatix status");
+            Collections.sort(notifications, Collections.reverseOrder());
+            for (int i = 0; i < notifications.size(); i++) {
+                inboxStyle.addLine(notifications.get(i));
+            }
 
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        inboxStyle.setBigContentTitle("Olmatix status");
-        Collections.sort(notifications,Collections.reverseOrder());
-        for (int i=0; i < notifications.size(); i++) {
-            inboxStyle.addLine(notifications.get(i));
+            mBuilder.setStyle(inboxStyle);
+
+            Intent resultIntent = new Intent(this, MainActivity.class);
+
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            stackBuilder.addParentStack(MainActivity.class);
+
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            mBuilder.setContentIntent(resultPendingIntent);
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            notificationManager.notify(15, mBuilder.build());
         }
-
-        mBuilder.setStyle(inboxStyle);
-
-        Intent resultIntent = new Intent(this, MainActivity.class);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
-
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(15,mBuilder.build());
     }
 
     private void setClientID() {
@@ -764,6 +768,7 @@ public class OlmatixService extends Service {
         Intent intent = new Intent("MQTTStatus");
         intent.putExtra("MqttStatus", flagConn);
         intent.putExtra("ConnectionStatus", connectionResult);
+        //Log.d(TAG, "sendMessage: "+connectionResult);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -1923,22 +1928,26 @@ public class OlmatixService extends Service {
 
     private  void showNotificationLoc(){
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), 0);
+        final Boolean mSwitch_Notif = sharedPref.getBoolean("switch_loc", true);
+        Log.d(TAG, "showNotificationLoc: "+mSwitch_Notif);
+        if (mSwitch_Notif) {
+            PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                    new Intent(this, MainActivity.class), 0);
 
-        // Set the info for the views that show in the notification panel.
-        Notification notification = new Notification.Builder(this)
-                .setSmallIcon(drawable.ic_location_red)  // the status icon
-                .setTicker(textNode)  // the status text
-                .setWhen(System.currentTimeMillis())  // the time stamp
-                .setContentTitle(getText(string.local_service_label_loc))  // the label of the entry
-                .setContentText(textNode)  // the contents of the entry
-                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
-                .setAutoCancel(true)
-                .build();
-        // Add as notification
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(5, notification);
+            // Set the info for the views that show in the notification panel.
+            Notification notification = new Notification.Builder(this)
+                    .setSmallIcon(drawable.ic_location_red)  // the status icon
+                    .setTicker(textNode)  // the status text
+                    .setWhen(System.currentTimeMillis())  // the time stamp
+                    .setContentTitle(getText(string.local_service_label_loc))  // the label of the entry
+                    .setContentText(textNode)  // the contents of the entry
+                    .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
+                    .setAutoCancel(true)
+                    .build();
+            // Add as notification
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.notify(5, notification);
+        }
     }
 
     public String getLocationCityName(double lat, double lon){

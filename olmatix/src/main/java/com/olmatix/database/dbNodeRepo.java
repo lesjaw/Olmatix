@@ -362,6 +362,9 @@ public class dbNodeRepo {
         db.delete(TABLE_FAV, dbNode.KEY_ID_NODE_DETAIL + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
+        db.delete(TABLE_NODE_DURATION, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(node_Id)});
+
         Log.d("DEBUG", "deleteNode: " + String.valueOf(node_Id));
 
         db.close(); // Closing database connection
@@ -943,7 +946,9 @@ public class dbNodeRepo {
         values.put(KEY_CHANNEL, durationModel.getChannel());
         values.put(KEY_STATUS, durationModel.getStatus());
         values.put(KEY_TIMESTAMPS_ON, String.valueOf(durationModel.getTimeStampOn()));
+        Log.d("DEBUG", "insertDurationNode: "+durationModel.getTimeStampOn());
         values.put(KEY_TIMESTAMPS_OFF, String.valueOf(durationModel.getTimeStampOff()));
+        Log.d("DEBUG", "insertDurationNode: "+durationModel.getTimeStampOff());
         values.put(KEY_DURATION, String.valueOf(durationModel.getDuration()));
 
 
@@ -956,21 +961,67 @@ public class dbNodeRepo {
     public void updateOff(DurationModel durationModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-
+        values.put(KEY_NODE_ID, durationModel.getNodeId());
+        values.put(KEY_CHANNEL, durationModel.getChannel());
+        values.put(KEY_STATUS, durationModel.getStatus());
         values.put(KEY_TIMESTAMPS_OFF, durationModel.getTimeStampOff());
         values.put(KEY_DURATION, durationModel.getDuration());
-
+        Log.d("DEBUG", "updateOff: "+durationModel.getDuration());
         db.update(TABLE_NODE_DURATION, values, dbNode.KEY_NODE_ID + "=? AND "
                 + dbNode.KEY_CHANNEL + "=? AND "
-                + dbNode.KEY_TIMESTAMPS_OFF + "=?", new String[]{
+                + dbNode.KEY_STATUS + "=?", new String[]{
                 String.valueOf(durationModel.getNodeId()),
                 String.valueOf(durationModel.getChannel()),
-                String.valueOf(0)
+                String.valueOf("true")
         });
         db.close(); // Closing database connection
-        //Log.d("DEBUG", "updateDetail: " + String.valueOf(detailNodeModel.getNode_id()) +" : "+
-        //        String.valueOf(detailNodeModel.getChannel()));
 
+    }
+
+    public void updateOffbyID(DurationModel durationModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NODE_ID, durationModel.getNodeId());
+        values.put(KEY_CHANNEL, durationModel.getChannel());
+        values.put(KEY_STATUS, durationModel.getStatus());
+        values.put(KEY_TIMESTAMPS_OFF, durationModel.getTimeStampOff());
+        values.put(KEY_DURATION, durationModel.getDuration());
+        Log.d("DEBUG", "updateOff: "+durationModel.getDuration());
+        db.update(TABLE_NODE_DURATION, values, dbNode.KEY_ID + "=?", new String[]{
+                String.valueOf(durationModel.getId())
+        });
+        db.close(); // Closing database connection
+
+    }
+
+    public ArrayList<DurationModel> getNodeUpdateZero() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + dbNode.TABLE_NODE_DURATION +
+                " WHERE " + dbNode.KEY_DURATION + " IS NULL";
+
+
+        ArrayList<DurationModel> nodeList = new ArrayList<>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                DurationModel node = new DurationModel();
+                node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setNodeId(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setTimeStampOn(cursor.getLong(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_ON)));
+                node.setTimeStampOff(cursor.getLong(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_OFF)));
+                node.setDuration(cursor.getLong(cursor.getColumnIndex(dbNode.KEY_DURATION)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        return nodeList;
     }
 
     public ArrayList<DurationModel> getNodeDurationList() {

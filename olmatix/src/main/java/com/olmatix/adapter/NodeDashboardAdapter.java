@@ -137,6 +137,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
             } else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+                holder.node_name.setBackgroundColor(Color.GRAY);
             }
 
             holder.imgNode.setOnClickListener(new View.OnClickListener() {

@@ -16,5 +16,5 @@
         android:gravity="center"
         android:background="@drawable/selector"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/white"/>
+        android:textColor="@color/black"/>
 </LinearLayout>

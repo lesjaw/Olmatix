@@ -112,6 +112,7 @@ public class OlmatixService extends Service {
     CharSequence text, textNode, titleNode;
     ArrayList<DetailNodeModel> data1;
     ArrayList<InstalledNodeModel> data2;
+    ArrayList<DurationModel> data3;
     String add_NodeID;
     boolean flagSub = true;
     boolean flagNode = false;
@@ -520,6 +521,7 @@ public class OlmatixService extends Service {
         data = new ArrayList<>();
         data1 = new ArrayList<>();
         data2 = new ArrayList<>();
+        data3 = new ArrayList<>();
         notifications = new ArrayList<>();
         dbnode = new dbNode();
 
@@ -1037,6 +1039,56 @@ public class OlmatixService extends Service {
 
             mChange = "2";
             sendMessageDetail();
+
+            data1.addAll(mDbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
+            int countDB = mDbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    if (data1.get(i).getNice_name_d() != null) {
+                        mNiceName = data1.get(i).getNice_name_d();
+                    } else {
+                        mNiceName = data1.get(i).getName();
+                    }
+                }
+            }
+            if (mNodeID.contains("door/close")) {
+                if (mMessage.equals("true")) {
+                    titleNode = mNiceName;
+                    textNode = "Closed";
+                    showNotificationNode();
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dbnode.setTopic(mNiceName + " is " + textNode);
+                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                    mDbNodeRepo.insertDbMqtt(dbnode);
+                } else if (mMessage.equals("false")) {
+                    titleNode = mNiceName;
+                    textNode = "Open";
+                    showNotificationNode();
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dbnode.setTopic(mNiceName + " is " + textNode);
+                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                    mDbNodeRepo.insertDbMqtt(dbnode);
+                }
+            } else if (mNodeID.contains("motion/motion")) {
+                if (mMessage.equals("true")) {
+                    titleNode = mNiceName;
+                    textNode = "Motion";
+                    showNotificationNode();
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dbnode.setTopic(mNiceName + " is " + textNode);
+                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                    mDbNodeRepo.insertDbMqtt(dbnode);
+                } else if (mMessage.equals("false")) {
+                    titleNode = mNiceName;
+                    textNode = "No Motion";
+                    showNotificationNode();
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dbnode.setTopic(mNiceName + " is " + textNode);
+                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                    mDbNodeRepo.insertDbMqtt(dbnode);
+                }
+            }
+            data1.clear();
         }
     }
 
@@ -1135,6 +1187,8 @@ public class OlmatixService extends Service {
                     durationModel.setChannel("0");
                     durationModel.setStatus("false");
                     durationModel.setTimeStampOn((long) 0);
+                    durationModel.setTimeStampOff((long) 0);
+
                     durationModel.setDuration((long) 0);
 
                     mDbNodeRepo.insertDurationNode(durationModel);
@@ -1501,7 +1555,8 @@ public class OlmatixService extends Service {
 
             @Override
             public void run() {
-                //Log.d(TAG, "run OFF: "+Channel);
+                long dura;
+                Log.d(TAG, "run OFF: "+NodeID+" "+Channel);
                 durationModel.setNodeId(NodeID);
                 durationModel.setChannel(Channel);
                 durationModel.setStatus(mMessage);
@@ -1510,10 +1565,35 @@ public class OlmatixService extends Service {
                 now.getTimeInMillis();
                 durationModel.setTimeStampOff(now.getTimeInMillis());
                 if(durationModel.getTimeStampOn()!=null) {
-                    //Log.d(TAG, "run: " + Long.valueOf(durationModel.getTimeStampOn()));
-                    durationModel.setDuration((now.getTimeInMillis() - durationModel.getTimeStampOn())/1000);
+
+                    dura = (now.getTimeInMillis() - durationModel.getTimeStampOn())/1000;
+                    if (dura<25292000) {
+                        durationModel.setDuration(dura);
+                    } else {
+                        durationModel.setDuration(Long.valueOf(0));
+                    }
+
                 }
                 mDbNodeRepo.updateOff(durationModel);
+
+                data3.addAll(mDbNodeRepo.getNodeUpdateZero());
+                int countDB = mDbNodeRepo.getNodeUpdateZero().size();
+                Log.d(TAG, "Duration NUll: "+countDB);
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        if (data3.get(i).getTimeStampOn() != null) {
+                            dura = data3.get(i).getTimeStampOff()-data3.get(i).getTimeStampOn();
+                            int id = data3.get(i).getId();
+                            durationModel.setId(id);
+                            durationModel.setDuration(dura/1000);
+                            Log.d(TAG, "id: "+data3.get(i).getId());
+
+                            mDbNodeRepo.updateOffbyID(durationModel);
+
+                        }
+                    }
+                }
+                data3.clear();
             }
         });
     }

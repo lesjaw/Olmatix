@@ -83,11 +83,7 @@ public class ScheduleDetailActivity extends AppCompatActivity {
         setupDatabases();
         mLoadSpinnerData();
 
-
-
     }
-
-
 
     private void initView() {
         time = new Pair<>(8, 30);
@@ -108,9 +104,6 @@ public class ScheduleDetailActivity extends AppCompatActivity {
         mDayAdapter.notifyDataSetChanged();*/
 
     }
-
-
-
 
 
     private void setupToolbar() {
@@ -231,8 +224,6 @@ public class ScheduleDetailActivity extends AppCompatActivity {
         this.setClickListeners();
 
     }
-
-
 
     private void setClickListeners() {
         btnAdd.setOnClickListener(addBtnClickListener());

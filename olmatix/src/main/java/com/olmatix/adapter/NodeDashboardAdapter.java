@@ -59,7 +59,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         if ((nodeList.get(position).getSensor().trim()).equals("light")) {
             viewType = 0;
 
-        } else if ((nodeList.get(position).getSensor().trim()).equals("close")||(nodeList.get(position).getSensor().trim()).equals("motion")) {
+        } else if ((nodeList.get(position).getSensor().trim()).equals("close")
+                ||(nodeList.get(position).getSensor().trim()).equals("motion")
+                ||(nodeList.get(position).getSensor().trim()).equals("prox")) {
             viewType = 1;
 
         }else if ((nodeList.get(position).getSensor().trim()).equals("temp")) {
@@ -188,7 +190,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 }
             });
 
-        } else if ((mFavoriteModel.getSensor().trim()).equals("close")||(mFavoriteModel.getSensor().trim()).equals("motion")) {
+        } else if ((mFavoriteModel.getSensor().trim()).equals("close")||(mFavoriteModel.getSensor().trim()).equals("motion")||(mFavoriteModel.getSensor().trim()).equals("prox")) {
 
             final StatusHolder holder = (StatusHolder) viewHolder;
 
@@ -211,14 +213,18 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             if ((mFavoriteModel.getStatus_sensor().trim().equals("true"))) {
                 if ((mFavoriteModel.getSensor().trim()).equals("close")) {
                     holder.imgNodes.setImageResource(R.drawable.door_close);
-                } else {
+                } else if ((mFavoriteModel.getSensor().trim()).equals("motion")){
                     holder.imgNodes.setImageResource(R.drawable.motion);
+                } else if ((mFavoriteModel.getSensor().trim()).equals("prox")){
+                    holder.imgNodes.setImageResource(R.drawable.proximityon);
                 }
             } else {
                 if ((mFavoriteModel.getSensor().trim()).equals("close")) {
                     holder.imgNodes.setImageResource(R.drawable.door_open);
-                } else {
+                } else if ((mFavoriteModel.getSensor().trim()).equals("motion")) {
                     holder.imgNodes.setImageResource(R.drawable.no_motion);
+                }else if ((mFavoriteModel.getSensor().trim()).equals("prox")) {
+                    holder.imgNodes.setImageResource(R.drawable.proximityoff);
                 }
 
             }

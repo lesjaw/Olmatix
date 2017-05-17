@@ -141,6 +141,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                 holder.imgNode.setImageResource(R.mipmap.ic_motion);
             }else if (mInstalledNodeModel.getFwName().equals("smartsensortemp")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_adapter);
+            }else if (mInstalledNodeModel.getFwName().equals("smartsensorprox")) {
+                holder.imgNode.setImageResource(R.mipmap.door);
             }
         }
         holder.imgStatus.setOnTouchListener(new View.OnTouchListener() {
@@ -357,7 +359,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     public void removeItem(int position) {
 
         String mNodeID = nodeList.get(position).getNodesID();
-        for (int a=0; a < 16 ;a++) {
+        for (int a=0; a < 18 ;a++) {
             if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
             if (a == 1) {topic = "devices/" + mNodeID + "/$fwname";}
             if (a == 2) {topic = "devices/" + mNodeID + "/$signal";}
@@ -374,6 +376,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             if (a == 13) {topic = "devices/" + mNodeID + "/motion/theft";}
             if (a == 14) {topic = "devices/" + mNodeID + "/temperature/degrees";}
             if (a == 15) {topic = "devices/" + mNodeID + "/humidity/percent";}
+            if (a == 16) {topic = "devices/" + mNodeID + "/prox/status";}
+            if (a == 17) {topic = "devices/" + mNodeID + "/prox/theft";}
             try {
                 Connection.getClient().unsubscribe(topic);
             } catch (MqttException e) {

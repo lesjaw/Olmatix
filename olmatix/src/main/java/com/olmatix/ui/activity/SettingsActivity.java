@@ -445,7 +445,7 @@ public class SettingsActivity extends SettingsFragment {
         private Preference setLocation;
         String loc = null;
         private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
-        private CheckBoxPreference pref,pref1;
+        private CheckBoxPreference pref,pref1,pref2,pref3,pref4;
 
 
         @Override
@@ -458,9 +458,17 @@ public class SettingsActivity extends SettingsFragment {
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             final Boolean mswitch_loc = sharedPref.getBoolean("switch_loc", true);
             final Boolean mswitch_notif = sharedPref.getBoolean("switch_notif", true);
+            final Boolean mswitch_sensor_door = sharedPref.getBoolean("switch_sensor_door", true);
+            final Boolean mswitch_sensor_motion = sharedPref.getBoolean("switch_sensor_motion", true);
+            final Boolean mswitch_sensor_prox = sharedPref.getBoolean("switch_sensor_prox", true);
+
 
             pref = (CheckBoxPreference) findPreference("switch_loc");
             pref1 = (CheckBoxPreference) findPreference("switch_notif");
+            pref2 = (CheckBoxPreference) findPreference("switch_sensor_door");
+            pref3 = (CheckBoxPreference) findPreference("switch_sensor_motion");
+            pref4 = (CheckBoxPreference) findPreference("switch_sensor_prox");
+
 
 
             if (!mswitch_loc) {
@@ -473,6 +481,24 @@ public class SettingsActivity extends SettingsFragment {
                 pref1.setTitle(R.string.switch_notif);
             } else if (mswitch_notif){
                 pref1.setTitle(R.string.switch_notifDisable);
+            }
+
+            if (!mswitch_sensor_door) {
+                pref2.setTitle(R.string.switch_sensor_door);
+            } else if (mswitch_sensor_door){
+                pref2.setTitle(R.string.switch_sensorDoorDisable);
+            }
+
+            if (!mswitch_sensor_motion) {
+                pref3.setTitle(R.string.switch_sensor_motion);
+            } else if (mswitch_sensor_motion){
+                pref3.setTitle(R.string.switch_sensorMotionDisable);
+            }
+
+            if (!mswitch_sensor_prox) {
+                pref3.setTitle(R.string.switch_sensor_prox);
+            } else if (mswitch_sensor_prox){
+                pref3.setTitle(R.string.switch_sensorProxDisable);
             }
 
             initLocationPref();

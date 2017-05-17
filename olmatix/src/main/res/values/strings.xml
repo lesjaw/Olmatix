@@ -82,6 +82,10 @@
     <string name="switch_notif">Enable status notification?</string>
     <string name="opt_loc_notif">Location will update if you move</string>
     <string name="opt_loc_notif1">Notify me if device status change</string>
+    <string name="opt_loc_notif2">Notify me if sensor door change</string>
+    <string name="opt_loc_notif3">Notify me if sensor motion change</string>
+    <string name="opt_loc_notif4">Notify me if sensor proximity change</string>
+
     <string name="switch_sum">Persistence connection to server</string>
     <string name="switch_locDisable">Disable location notification</string>
     <string name="switch_notifDisable">Disable status notification</string>
@@ -141,5 +145,11 @@
     <string name="label_alarm_service_conn">Request connect</string>
     <string name="label_alarm_service_at">"at "</string>
     <string name="label_setup_sending">Sending configuration data to device, please wait..</string>
+    <string name="switch_sensor_door">Notify Sensor Door/Window</string>
+    <string name="switch_sensorDoorDisable">Disable notify sensor Door status</string>
+    <string name="switch_sensor_motion">Notify Sensor Motion</string>
+    <string name="switch_sensorMotionDisable">Disable notify sensor Motion status</string>
+    <string name="switch_sensor_prox">Notify Sensor Proximity</string>
+    <string name="switch_sensorProxDisable">Disable notify sensor Proximity status</string>
 
 </resources>

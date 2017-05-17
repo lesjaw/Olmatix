@@ -37,6 +37,26 @@
             android:summary="@string/opt_loc_notif1">
         </CheckBoxPreference>
 
+        <CheckBoxPreference
+            android:title="@string/switch_sensor_door"
+            android:key="switch_sensor_door"
+            android:defaultValue="true"
+            android:summary="@string/opt_loc_notif2">
+        </CheckBoxPreference>
+
+        <CheckBoxPreference
+            android:title="@string/switch_sensor_motion"
+            android:key="switch_sensor_motion"
+            android:defaultValue="true"
+            android:summary="@string/opt_loc_notif3">
+        </CheckBoxPreference>
+
+        <CheckBoxPreference
+            android:title="@string/switch_sensor_prox"
+            android:key="switch_sensor_prox"
+            android:defaultValue="true"
+            android:summary="@string/opt_loc_notif4">
+        </CheckBoxPreference>
 
 
 

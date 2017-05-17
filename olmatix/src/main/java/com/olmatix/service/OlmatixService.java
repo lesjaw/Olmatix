@@ -1051,41 +1051,50 @@ public class OlmatixService extends Service {
                     }
                 }
             }
-            if (mNodeID.contains("door/close")) {
-                if (mMessage.equals("true")) {
-                    titleNode = mNiceName;
-                    textNode = "Closed";
-                    showNotificationNode();
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dbnode.setTopic(mNiceName + " is " + textNode);
-                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                    mDbNodeRepo.insertDbMqtt(dbnode);
-                } else if (mMessage.equals("false")) {
-                    titleNode = mNiceName;
-                    textNode = "Open";
-                    showNotificationNode();
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dbnode.setTopic(mNiceName + " is " + textNode);
-                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                    mDbNodeRepo.insertDbMqtt(dbnode);
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            final Boolean mSwitch_NotifStatus_door = sharedPref.getBoolean("switch_sensor_door", true);
+            if (mSwitch_NotifStatus_door) {
+                if (mNodeID.contains("door/close")) {
+                    if (mMessage.equals("true")) {
+                        titleNode = mNiceName;
+                        textNode = "Closed";
+                        showNotificationNode();
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dbnode.setTopic(mNiceName + " is " + textNode);
+                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                        mDbNodeRepo.insertDbMqtt(dbnode);
+                    } else if (mMessage.equals("false")) {
+                        titleNode = mNiceName;
+                        textNode = "Open";
+                        showNotificationNode();
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dbnode.setTopic(mNiceName + " is " + textNode);
+                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                        mDbNodeRepo.insertDbMqtt(dbnode);
+                    }
                 }
-            } else if (mNodeID.contains("motion/motion")) {
-                if (mMessage.equals("true")) {
-                    titleNode = mNiceName;
-                    textNode = "Motion";
-                    showNotificationNode();
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dbnode.setTopic(mNiceName + " is " + textNode);
-                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                    mDbNodeRepo.insertDbMqtt(dbnode);
-                } else if (mMessage.equals("false")) {
-                    titleNode = mNiceName;
-                    textNode = "No Motion";
-                    showNotificationNode();
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dbnode.setTopic(mNiceName + " is " + textNode);
-                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                    mDbNodeRepo.insertDbMqtt(dbnode);
+            }
+
+            final Boolean mSwitch_NotifStatus_motion = sharedPref.getBoolean("switch_sensor_motion", true);
+            if (mSwitch_NotifStatus_motion) {
+                if (mNodeID.contains("motion/motion")) {
+                    if (mMessage.equals("true")) {
+                        titleNode = mNiceName;
+                        textNode = "Motion";
+                        showNotificationNode();
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dbnode.setTopic(mNiceName + " is " + textNode);
+                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                        mDbNodeRepo.insertDbMqtt(dbnode);
+                    } else if (mMessage.equals("false")) {
+                        titleNode = mNiceName;
+                        textNode = "No Motion";
+                        showNotificationNode();
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dbnode.setTopic(mNiceName + " is " + textNode);
+                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                        mDbNodeRepo.insertDbMqtt(dbnode);
+                    }
                 }
             }
             data1.clear();
@@ -1398,6 +1407,57 @@ public class OlmatixService extends Service {
                         if (a == 2) {
                             topic1 = "devices/" + NodeID + "/humidity/percent";
                         }
+
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeSensor", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }else if (installedNodeModel.getFwName().equals("smartsensorprox")) {
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel("0");
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
+                } else {
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel("0");
+                    detailNodeModel.setSensor("prox");
+                    detailNodeModel.setStatus("false");
+                    detailNodeModel.setStatus_sensor("false");
+                    detailNodeModel.setStatus_theft("false");
+                    detailNodeModel.setNice_name_d(NodeID);
+
+                    mDbNodeRepo.insertInstalledNode(detailNodeModel);
+
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel("0");
+                    durationModel.setTimeStampOn((long) 0);
+                    durationModel.setDuration((long) 0);
+
+                    mDbNodeRepo.insertDurationNode(durationModel);
+
+                        for (int a = 0; a < 3; a++) {
+                            if (a == 0) {
+                                topic1 = "devices/" + NodeID + "/light/0";
+                            }
+                            if (a == 1) {
+                                topic1 = "devices/" + NodeID + "/prox/status";
+                            }
+                            if (a == 2) {
+                                topic1 = "devices/" + NodeID + "/prox/theft";
+                            }
 
                         int qos = 2;
                         try {
@@ -1771,6 +1831,62 @@ public class OlmatixService extends Service {
                             }
 
                         }
+                        if (mSensorT != null && mSensorT.equals("temp")) {
+                            for (int a = 0; a < 2; a++) {
+                                if (a == 0) {
+                                    topic1 = "devices/" + mNodeID1 + "/temperature/degrees";
+                                }
+                                if (a == 1) {
+                                    topic1 = "devices/" + mNodeID1 + "/humidity/percent";
+                                }
+
+                                int qos = 2;
+                                try {
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                                    subToken.setActionCallback(new IMqttActionListener() {
+                                        @Override
+                                        public void onSuccess(IMqttToken asyncActionToken) {
+                                            //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                        }
+
+                                        @Override
+                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        }
+                                    });
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
+                        if (mSensorT != null && mSensorT.equals("prox")) {
+                            for (int a = 0; a < 2; a++) {
+                                if (a == 0) {
+                                    topic1 = "devices/" + mNodeID1 + "/prox/status";
+                                }
+                                if (a == 1) {
+                                    topic1 = "devices/" + mNodeID1 + "/prox/theft";
+                                }
+
+                                int qos = 2;
+                                try {
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                                    subToken.setActionCallback(new IMqttActionListener() {
+                                        @Override
+                                        public void onSuccess(IMqttToken asyncActionToken) {
+                                            //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                        }
+
+                                        @Override
+                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        }
+                                    });
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
                     }
                     flagSub = false;
                     data1.clear();
@@ -1816,7 +1932,7 @@ public class OlmatixService extends Service {
 
             if (mNodeID.contains("$")) {
                 addNode();
-            } else if (mNodeID.contains("door/close")||mNodeID.contains("motion/motion")) {
+            } else if (mNodeID.contains("door/close")||mNodeID.contains("motion/motion")||mNodeID.contains("prox/status")) {
                 updateSensorDoor();
 
             } else if (mNodeID.contains("theft")) {
@@ -1828,7 +1944,7 @@ public class OlmatixService extends Service {
 
                     UpdateSensorTemp();
 
-            }else if (mNodeID.contains("humidity/percent")) {
+            } else if (mNodeID.contains("humidity/percent")) {
 
                     UpdateSensorHum();
 

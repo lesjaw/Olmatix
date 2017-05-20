@@ -50,6 +50,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     String fw_name;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
+    String jar;
 
     public NodeDetailAdapter(List<DetailNodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
 
@@ -74,7 +75,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     .inflate(R.layout.frag_node_button, parent, false);
 
             return new OlmatixHolder(itemView);
-
         } else if (fw_name.equals("smartsensordoor")) {
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_sensor_door, parent, false);
@@ -94,7 +94,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_sensor_prox, parent, false);
 
-            return new OlmatixSensorMotionHolder(itemView);
+            return new OlmatixSensorProxHolder(itemView);
         }
 
         return null;
@@ -544,7 +544,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             });
         } else if (fw_name.equals("smartsensorprox")) {
-            final OlmatixSensorMotionHolder holder = (OlmatixSensorMotionHolder) viewHolder;
+            final OlmatixSensorProxHolder holder = (OlmatixSensorProxHolder) viewHolder;
 
             holder.imgNode.setImageResource(R.drawable.olmatixmed);
             if (mInstalledNodeModel.getNice_name_d() != null) {
@@ -556,10 +556,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
-                holder.sensorStatus.setText("Motion detected!");
+                holder.sensorStatus.setText("Block detected!");
                 holder.imgSensor.setImageResource(R.drawable.proximityon);
             } else {
-                holder.sensorStatus.setText("No Motion detected!");
+                holder.sensorStatus.setText("Empty");
                 holder.imgSensor.setImageResource(R.drawable.proximityoff);
             }
             if (mInstalledNodeModel.getStatus().equals("true")) {
@@ -579,6 +579,19 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.status.setTextColor(Color.MAGENTA);
                 holder.status.setTypeface(null, Typeface.BOLD);
             }
+
+            if (mInstalledNodeModel.getStatus_jarak()!=null) {
+                holder.jarak.setText(mInstalledNodeModel.getStatus_jarak());
+                float convert = Integer.parseInt(mInstalledNodeModel.getStatus_jarak());
+                if (convert < 100) {
+                    jar = convert + " cm";
+                } else {
+                    convert = convert / 100;
+                    jar = convert + " m";
+                }
+                holder.jarak.setText(jar);
+            }
+
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -731,6 +744,27 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);
             imgSensor = (ImageView) view.findViewById(R.id.door);
+        }
+    }
+
+    public class OlmatixSensorProxHolder extends ViewHolder {
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, jarak;
+        public ImageView imgNode, imgSensor;
+        Button btn_off, btn_on;
+
+        public OlmatixSensorProxHolder(View view) {
+            super(view);
+            imgNode = (ImageView) view.findViewById(R.id.icon_node);
+            node_name = (TextView) view.findViewById(R.id.node_name);
+            fwName = (TextView) view.findViewById(R.id.fw_name);
+            sensorStatus = (TextView) view.findViewById(R.id.sensorstatus);
+            status = (TextView) view.findViewById(R.id.status);
+            statuslabel = (TextView) view.findViewById(R.id.statuslabel);
+            upTime = (TextView) view.findViewById(R.id.uptime);
+            btn_off = (Button) view.findViewById(R.id.btn_off);
+            btn_on = (Button) view.findViewById(R.id.btn_on);
+            imgSensor = (ImageView) view.findViewById(R.id.door);
+            jarak =(TextView) view.findViewById(R.id.jarak);
         }
     }
 

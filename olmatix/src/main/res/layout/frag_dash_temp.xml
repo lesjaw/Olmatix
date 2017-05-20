@@ -17,6 +17,13 @@
         <RelativeLayout
             android:layout_width="100sp"
             android:layout_height="100sp">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/icon_stat"
+                android:background="@color/grey"
+                android:visibility="gone"
+                />
 
             <ImageButton
                 android:id="@+id/icon_node"

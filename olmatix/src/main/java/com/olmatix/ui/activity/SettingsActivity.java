@@ -496,9 +496,9 @@ public class SettingsActivity extends SettingsFragment {
             }
 
             if (!mswitch_sensor_prox) {
-                pref3.setTitle(R.string.switch_sensor_prox);
+                pref4.setTitle(R.string.switch_sensor_prox);
             } else if (mswitch_sensor_prox){
-                pref3.setTitle(R.string.switch_sensorProxDisable);
+                pref4.setTitle(R.string.switch_sensorProxDisable);
             }
 
             initLocationPref();

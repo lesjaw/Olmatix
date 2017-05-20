@@ -1097,6 +1097,29 @@ public class OlmatixService extends Service {
                     }
                 }
             }
+
+            final Boolean mSwitch_NotifStatus_prox = sharedPref.getBoolean("switch_sensor_prox", true);
+            if (mSwitch_NotifStatus_prox) {
+                if (mNodeID.contains("prox/status")) {
+                    if (mMessage.equals("true")) {
+                        titleNode = mNiceName;
+                        textNode = "Detected";
+                        showNotificationNode();
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dbnode.setTopic(mNiceName + " is " + textNode);
+                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                        mDbNodeRepo.insertDbMqtt(dbnode);
+                    } else if (mMessage.equals("false")) {
+                        titleNode = mNiceName;
+                        textNode = "Empty";
+                        showNotificationNode();
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dbnode.setTopic(mNiceName + " is " + textNode);
+                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                        mDbNodeRepo.insertDbMqtt(dbnode);
+                    }
+                }
+            }
             data1.clear();
         }
     }
@@ -1124,6 +1147,21 @@ public class OlmatixService extends Service {
             Log.d(TAG, "UpdateSensorHum: "+mMessage);
 
             mDbNodeRepo.update_detailSensorHum(detailNodeModel);
+
+            mChange = "2";
+            sendMessageDetail();
+        }
+    }
+
+    private void UpdateSensorJarak() {
+
+        if (!mNodeID.contains("light")) {
+            detailNodeModel.setNode_id(NodeIDSensor);
+            detailNodeModel.setChannel("0");
+            detailNodeModel.setStatus_jarak(mMessage);
+            Log.d(TAG, "UpdateSensorJarak: "+mMessage);
+
+            mDbNodeRepo.update_detailSensorJarak(detailNodeModel);
 
             mChange = "2";
             sendMessageDetail();
@@ -1448,7 +1486,7 @@ public class OlmatixService extends Service {
 
                     mDbNodeRepo.insertDurationNode(durationModel);
 
-                        for (int a = 0; a < 3; a++) {
+                        for (int a = 0; a < 4; a++) {
                             if (a == 0) {
                                 topic1 = "devices/" + NodeID + "/light/0";
                             }
@@ -1457,6 +1495,9 @@ public class OlmatixService extends Service {
                             }
                             if (a == 2) {
                                 topic1 = "devices/" + NodeID + "/prox/theft";
+                            }
+                            if (a == 3) {
+                                topic1 = "devices/" + NodeID + "/prox/jarak";
                             }
 
                         int qos = 2;
@@ -1860,13 +1901,17 @@ public class OlmatixService extends Service {
 
                         }
                         if (mSensorT != null && mSensorT.equals("prox")) {
-                            for (int a = 0; a < 2; a++) {
+                            for (int a = 0; a < 3; a++) {
                                 if (a == 0) {
                                     topic1 = "devices/" + mNodeID1 + "/prox/status";
                                 }
                                 if (a == 1) {
                                     topic1 = "devices/" + mNodeID1 + "/prox/theft";
                                 }
+                                if (a == 2) {
+                                    topic1 = "devices/" + mNodeID1 + "/prox/jarak";
+                                }
+
 
                                 int qos = 2;
                                 try {
@@ -1947,6 +1992,10 @@ public class OlmatixService extends Service {
             } else if (mNodeID.contains("humidity/percent")) {
 
                     UpdateSensorHum();
+
+            }else if (mNodeID.contains("prox/jarak")) {
+
+                UpdateSensorJarak();
 
             } else {
                 updateDetail();

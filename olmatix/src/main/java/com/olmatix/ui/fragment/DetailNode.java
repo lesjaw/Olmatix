@@ -329,6 +329,52 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
 
                 }
             }
+            doAllsubDetailSensorProx();
+        }
+        data1.clear();
+    }
+
+    private void doAllsubDetailSensorProx() {
+        data1.clear();
+        int countDB = mDbNodeRepo.getNodeDetailList().size();
+        Log.d("DEBUG", "Count list Sensor: " + countDB);
+        data1.addAll(mDbNodeRepo.getNodeDetailList());
+        countDB = mDbNodeRepo.getNodeDetailList().size();
+        String topic1 = "";
+        if (countDB != 0) {
+            for (int i = 0; i < countDB; i++) {
+                final String mNodeID1 = data1.get(i).getNode_id();
+                final String mSensorT = data1.get(i).getSensor();
+                Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                if (mSensorT != null&&mSensorT.equals("prox")) {
+                    for (int a = 0; a < 2; a++) {
+                        if (a == 0) {
+                            topic1 = "devices/" + mNodeID1 + "/prox/status";
+                        }
+                        if (a == 1) {
+                            topic1 = "devices/" + mNodeID1 + "/prox/jarak";
+                        }
+
+                        int qos = 1;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeSensor", " device = " + mNodeID1);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
         }
         data1.clear();
     }

@@ -137,9 +137,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                holder.imgNode.setBackgroundColor(Color.WHITE);
+                holder.iconstat.setVisibility(View.GONE);
+
             } else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
-                holder.node_name.setBackgroundColor(Color.GRAY);
+                holder.imgNode.setBackgroundColor(Color.parseColor("#A9A9A9"));
+                holder.iconstat.setVisibility(View.VISIBLE);
             }
 
             holder.imgNode.setOnClickListener(new View.OnClickListener() {
@@ -205,8 +209,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                holder.imgNodesBut.setBackgroundColor(Color.WHITE);
+                holder.iconstat.setVisibility(View.GONE);
             } else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+                holder.imgNodesBut.setBackgroundColor(Color.parseColor("#A9A9A9"));
+                holder.iconstat.setVisibility(View.VISIBLE);
             }
 
 
@@ -302,8 +310,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                holder.imgNode.setBackgroundColor(Color.WHITE);
+                holder.iconstat.setVisibility(View.GONE);
             } else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+                holder.imgNode.setBackgroundColor(Color.parseColor("#A9A9A9"));
+                holder.iconstat.setVisibility(View.VISIBLE);
             }
 
             holder.imgNode.setOnClickListener(new View.OnClickListener() {
@@ -378,6 +390,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         public TextView node_name, status;
         public ImageView imgOnline, imgSending;
         public ImageButton imgNode;
+        public ImageView iconstat;
 
         public ButtonHolder(View view) {
             super(view);
@@ -385,12 +398,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             node_name = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
             imgSending = (ImageView) view.findViewById(R.id.icon_sending);
+            iconstat = (ImageView) view.findViewById(R.id.icon_stat);
         }
     }
 
     public class StatusHolder extends ViewHolder {
         public TextView node_names, status;
-        public ImageView imgNodes, imgOnline;
+        public ImageView imgNodes, imgOnline,iconstat;
         public ImageButton imgNodesBut;
 
         public StatusHolder(View view) {
@@ -399,13 +413,15 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             imgNodesBut = (ImageButton) view.findViewById(R.id.icon_node_button);
             node_names = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
+            iconstat = (ImageView) view.findViewById(R.id.icon_stat);
+
 
         }
     }
 
     public class TempHolder extends ViewHolder {
         public TextView node_name, status, temp, hum;
-        public ImageView imgOnline, imgSending;
+        public ImageView imgOnline, imgSending,iconstat;
         public ImageButton imgNode;
 
         public TempHolder(View view) {
@@ -416,6 +432,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             imgSending = (ImageView) view.findViewById(R.id.icon_sending);
             temp = (TextView) view.findViewById(R.id.temp);
             hum = (TextView) view.findViewById(R.id.hum);
+            iconstat = (ImageView) view.findViewById(R.id.icon_stat);
+
         }
     }
 

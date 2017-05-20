@@ -104,6 +104,15 @@
                 android:textSize="20sp"
                 android:theme="@style/AppTheme.Button_on"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/jarak"
+                android:textSize="25sp"
+                android:text="2 meter"
+                android:layout_marginTop="185sp"
+                android:gravity="center"/>
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -112,7 +121,7 @@
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@+id/btn_on"
-                android:src="@drawable/door_close"
+                android:src="@drawable/proximityon"
                 android:paddingTop="0sp"
                 />
 
@@ -126,6 +135,8 @@
                 android:layout_marginLeft="20sp"
                 android:layout_below="@+id/icon_node"
                  />
+
+
 
 
         </RelativeLayout>

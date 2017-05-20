@@ -566,6 +566,24 @@ public class dbNodeRepo {
         db.close(); // Closing database connection
     }
 
+    public void update_detailSensorJarak(DetailNodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
+
+        if (detailNodeModel.getStatus_jarak() != null) {
+            values.put(KEY_STATUS_JARAK, detailNodeModel.getStatus_jarak());
+            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_jarak());
+        }
+
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel())
+        });
+        db.close(); // Closing database connection
+    }
+
 
     public ArrayList<InstalledNodeModel> getNodeList() {
 
@@ -694,7 +712,6 @@ public class dbNodeRepo {
 
         return (ArrayList<SpinnerObjectDash>) labelsDash;
     }
-
 
     public ArrayList<DetailNodeModel> getNodeDetail(String node_id, String Channel) {
 
@@ -1097,15 +1114,12 @@ public class dbNodeRepo {
         String selectQuery = "SELECT node_installed." + KEY_NODE_ID + ", node_installed." + KEY_CHANNEL +
                 ", node_installed." + KEY_NICE_NAME_D + ", node_installed." + KEY_STATUS +
                 ", node_installed." + KEY_STATUS_SENSOR + ", node_installed." + KEY_STATUS_THEFT + ", node_installed." + KEY_SENSOR  +
-                ", node_installed." + KEY_STATUS_TEMP + ", node_installed." + KEY_STATUS_HUM +
+                ", node_installed." + KEY_STATUS_TEMP + ", node_installed." + KEY_STATUS_HUM + ", node_installed." + KEY_STATUS_JARAK +
                 ", SUM(duration_node." + KEY_DURATION + ") as totaldur"  +
                 " FROM node_installed " + TABLE_NODE + " INNER JOIN " + TABLE_NODE_DURATION +
                 " duration_node ON node_installed." + KEY_NODE_ID + " = duration_node." + KEY_NODE_ID +
                 " AND node_installed." + KEY_CHANNEL + " = duration_node." + KEY_CHANNEL + " WHERE duration_node." + KEY_NODE_ID + "=?" +
                 " GROUP BY node_installed." + KEY_NICE_NAME_D;
-
-
-        //Log.d("DEBUG", "getNodeDetailAll: "+selectQuery);
 
         ArrayList<DetailNodeModel> nodeList = new ArrayList<DetailNodeModel>();
         Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(node_id)});
@@ -1123,7 +1137,8 @@ public class dbNodeRepo {
                 node.setSensor(cursor.getString(6));
                 node.setStatus_temp(cursor.getString(7));
                 node.setStatus_hum(cursor.getString(8));
-                node.setDuration(cursor.getString(9));
+                node.setStatus_jarak(cursor.getString(9));
+                node.setDuration(cursor.getString(10));
 
                 nodeList.add(node);
 
@@ -1175,7 +1190,7 @@ public class dbNodeRepo {
         List<String> nodeList = new ArrayList<>();
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+30;
+        String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+100;
 
 
         Cursor cursor = db.rawQuery(selectQuery, null);

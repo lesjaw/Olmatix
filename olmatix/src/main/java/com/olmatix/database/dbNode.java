@@ -44,6 +44,7 @@ public class dbNode {
     public static final String KEY_STATUS_TEMP  = "status_temp" ;
     public static final String KEY_STATUS_HUM  = "status_hum" ;
     public static final String KEY_STATUS_JARAK  = "status_jarak" ;
+    public static final String KEY_STATUS_RANGE  = "status_range" ;
 
 
     public static final String KEY_TOPIC  = "topic" ;

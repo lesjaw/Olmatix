@@ -584,6 +584,24 @@ public class dbNodeRepo {
         db.close(); // Closing database connection
     }
 
+    public void update_detailSensorRange(DetailNodeModel detailNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
+
+        if (detailNodeModel.getStatus_range() != null) {
+            values.put(KEY_STATUS_RANGE, detailNodeModel.getStatus_range());
+            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_range());
+        }
+
+        db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
+                String.valueOf(detailNodeModel.getNode_id()),
+                String.valueOf(detailNodeModel.getChannel())
+        });
+        db.close(); // Closing database connection
+    }
+
 
     public ArrayList<InstalledNodeModel> getNodeList() {
 
@@ -1114,7 +1132,8 @@ public class dbNodeRepo {
         String selectQuery = "SELECT node_installed." + KEY_NODE_ID + ", node_installed." + KEY_CHANNEL +
                 ", node_installed." + KEY_NICE_NAME_D + ", node_installed." + KEY_STATUS +
                 ", node_installed." + KEY_STATUS_SENSOR + ", node_installed." + KEY_STATUS_THEFT + ", node_installed." + KEY_SENSOR  +
-                ", node_installed." + KEY_STATUS_TEMP + ", node_installed." + KEY_STATUS_HUM + ", node_installed." + KEY_STATUS_JARAK +
+                ", node_installed." + KEY_STATUS_TEMP + ", node_installed." + KEY_STATUS_HUM +     ", node_installed." + KEY_STATUS_JARAK +
+                ", node_installed." + KEY_STATUS_RANGE +
                 ", SUM(duration_node." + KEY_DURATION + ") as totaldur"  +
                 " FROM node_installed " + TABLE_NODE + " INNER JOIN " + TABLE_NODE_DURATION +
                 " duration_node ON node_installed." + KEY_NODE_ID + " = duration_node." + KEY_NODE_ID +
@@ -1138,7 +1157,8 @@ public class dbNodeRepo {
                 node.setStatus_temp(cursor.getString(7));
                 node.setStatus_hum(cursor.getString(8));
                 node.setStatus_jarak(cursor.getString(9));
-                node.setDuration(cursor.getString(10));
+                node.setStatus_range(cursor.getString(10));
+                node.setDuration(cursor.getString(11));
 
                 nodeList.add(node);
 

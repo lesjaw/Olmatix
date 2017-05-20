@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +52,9 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     SharedPreferences sharedPref;
     Boolean mStatusServer;
     String jar;
+    int step = 50;
+    int max = 200;
+    int min = 50;
 
     public NodeDetailAdapter(List<DetailNodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
 
@@ -661,6 +665,51 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 }
 
             });
+            holder.setrange.setText(mInstalledNodeModel.getStatus_range()+ " cm");
+            holder.seekRange.setMax( (max - min) / step );
+           /* int steppos = Integer.parseInt(mInstalledNodeModel.getStatus_range());
+
+            if (steppos == 200) {
+                holder.seekRange.setProgress(4);
+            } else if (steppos == 150) {
+                holder.seekRange.setProgress(3);
+            } else if (steppos == 100) {
+                holder.seekRange.setProgress(2);
+            }else if (steppos == 50) {
+                holder.seekRange.setProgress(1);
+            }*/
+
+            holder.seekRange.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int value = min + (progress * step);
+                    Log.d("DEBUG", "onProgressChanged: "+value);
+                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dist/range/set";
+                    String payload = String.valueOf(value);
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
         }
 
 
@@ -748,8 +797,9 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
     public class OlmatixSensorProxHolder extends ViewHolder {
-        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, jarak;
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, jarak, setrange;
         public ImageView imgNode, imgSensor;
+        public SeekBar seekRange;
         Button btn_off, btn_on;
 
         public OlmatixSensorProxHolder(View view) {
@@ -765,6 +815,9 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             btn_on = (Button) view.findViewById(R.id.btn_on);
             imgSensor = (ImageView) view.findViewById(R.id.door);
             jarak =(TextView) view.findViewById(R.id.jarak);
+            seekRange = (SeekBar)view.findViewById(R.id.seek_range);
+            setrange = (TextView) view.findViewById(R.id.set_range_text);
+
         }
     }
 

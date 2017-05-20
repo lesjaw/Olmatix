@@ -621,7 +621,6 @@ public class OlmatixService extends Service {
 
     }
 
-
     private void unSubIfnotForeground() {
 
         Log.d("Unsubscribe", " uptime and signal "+flagOnForeground+" : "+noNotif);
@@ -1168,6 +1167,21 @@ public class OlmatixService extends Service {
         }
     }
 
+    private void UpdateSensorRange() {
+
+        if (!mNodeID.contains("light")) {
+            detailNodeModel.setNode_id(NodeIDSensor);
+            detailNodeModel.setChannel("0");
+            detailNodeModel.setStatus_range(mMessage);
+            Log.d(TAG, "UpdateSensorRange: "+mMessage);
+
+            mDbNodeRepo.update_detailSensorRange(detailNodeModel);
+
+            mChange = "2";
+            sendMessageDetail();
+        }
+    }
+
     private void updateSensorTheft() {
         if (!mNodeID.contains("light")) {
             detailNodeModel.setNode_id(NodeIDSensor);
@@ -1518,6 +1532,21 @@ public class OlmatixService extends Service {
                         }
                     }
                 }
+
+                String topic = "devices/" + NodeID + "/dist/range/set";
+                String payload = "50";
+                byte[] encodedPayload = new byte[0];
+                try {
+                    encodedPayload = payload.getBytes("UTF-8");
+                    MqttMessage message = new MqttMessage(encodedPayload);
+                    message.setQos(1);
+                    message.setRetained(true);
+                    Connection.getClient().publish(topic, message);
+
+
+                } catch (UnsupportedEncodingException | MqttException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -1722,6 +1751,29 @@ public class OlmatixService extends Service {
         flagNode = true;
     }
 
+    private void setJarakRange() {
+        String topic = "devices/" + add_NodeID + "/$online";
+        int qos = 2;
+        try {
+            if (mqttClient!=null) {
+                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                subToken.setActionCallback(new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d("Subscribe", " device = " + NodeID);
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    }
+                });
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void doSubAll() {
                 int countDB = mDbNodeRepo.getNodeList().size();
                 Log.d("DEBUG", "Count list Node: " + countDB);
@@ -1901,7 +1953,7 @@ public class OlmatixService extends Service {
 
                         }
                         if (mSensorT != null && mSensorT.equals("prox")) {
-                            for (int a = 0; a < 3; a++) {
+                            for (int a = 0; a < 4; a++) {
                                 if (a == 0) {
                                     topic1 = "devices/" + mNodeID1 + "/prox/status";
                                 }
@@ -1911,7 +1963,9 @@ public class OlmatixService extends Service {
                                 if (a == 2) {
                                     topic1 = "devices/" + mNodeID1 + "/prox/jarak";
                                 }
-
+                                if (a == 3) {
+                                    topic1 = "devices/" + mNodeID1 + "/dist/range";
+                                }
 
                                 int qos = 2;
                                 try {
@@ -1993,9 +2047,13 @@ public class OlmatixService extends Service {
 
                     UpdateSensorHum();
 
-            }else if (mNodeID.contains("prox/jarak")) {
+            } else if (mNodeID.contains("prox/jarak")) {
 
                 UpdateSensorJarak();
+
+            } else if (mNodeID.contains("dist/range")) {
+
+                UpdateSensorRange();
 
             } else {
                 updateDetail();

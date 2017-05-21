@@ -151,5 +151,6 @@
     <string name="switch_sensorMotionDisable">Disable notify sensor Motion status</string>
     <string name="switch_sensor_prox">Notify Sensor Proximity</string>
     <string name="switch_sensorProxDisable">Disable notify sensor Proximity status</string>
+    <string name="button_ok">OK</string>
 
 </resources>

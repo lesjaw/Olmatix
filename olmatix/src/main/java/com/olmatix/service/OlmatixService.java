@@ -489,7 +489,6 @@ public class OlmatixService extends Service {
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "setFlagSub run: ");
                 flagSub = true;
                 checkActivityForeground();
                 noNotif = false;
@@ -623,10 +622,8 @@ public class OlmatixService extends Service {
 
     private void unSubIfnotForeground() {
 
-        Log.d("Unsubscribe", " uptime and signal "+flagOnForeground+" : "+noNotif);
         if (!flagOnForeground||!noNotif) {
             int countDB = mDbNodeRepo.getNodeList().size();
-            Log.d("DEBUG", "Count list Node: " + countDB);
             data.addAll(mDbNodeRepo.getNodeList());
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
@@ -1168,18 +1165,16 @@ public class OlmatixService extends Service {
     }
 
     private void UpdateSensorRange() {
-
         if (!mNodeID.contains("light")) {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_range(mMessage);
-            Log.d(TAG, "UpdateSensorRange: "+mMessage);
-
             mDbNodeRepo.update_detailSensorRange(detailNodeModel);
 
             mChange = "2";
             sendMessageDetail();
         }
+
     }
 
     private void updateSensorTheft() {
@@ -1500,7 +1495,7 @@ public class OlmatixService extends Service {
 
                     mDbNodeRepo.insertDurationNode(durationModel);
 
-                        for (int a = 0; a < 4; a++) {
+                        for (int a = 0; a < 5; a++) {
                             if (a == 0) {
                                 topic1 = "devices/" + NodeID + "/light/0";
                             }
@@ -1512,6 +1507,9 @@ public class OlmatixService extends Service {
                             }
                             if (a == 3) {
                                 topic1 = "devices/" + NodeID + "/prox/jarak";
+                            }
+                            if (a == 4) {
+                                topic1 = "devices/" + NodeID + "/dist/range";
                             }
 
                         int qos = 2;
@@ -1533,8 +1531,8 @@ public class OlmatixService extends Service {
                     }
                 }
 
-                String topic = "devices/" + NodeID + "/dist/range/set";
-                String payload = "50";
+                /*String topic = "devices/" + NodeID + "/dist/range/set";
+                String payload = "100";
                 byte[] encodedPayload = new byte[0];
                 try {
                     encodedPayload = payload.getBytes("UTF-8");
@@ -1546,7 +1544,7 @@ public class OlmatixService extends Service {
 
                 } catch (UnsupportedEncodingException | MqttException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         }
     }
@@ -1586,10 +1584,16 @@ public class OlmatixService extends Service {
                         if (mMessage.equals("true")) {
                             titleNode = mNiceNameN;
                             textNode = "ONLINE";
+                            installedNodeModel.setOnline(messageReceive.get("online"));
+                            mDbNodeRepo.updateOnline(installedNodeModel);
+
 
                         } else {
                             titleNode = mNiceNameN;
                             textNode = "OFFLINE";
+                            installedNodeModel.setOnline(messageReceive.get("online"));
+                            mDbNodeRepo.updateOnline(installedNodeModel);
+
                         }
                         if (!flagOnForeground) {
                             if (!noNotif) {
@@ -1634,7 +1638,8 @@ public class OlmatixService extends Service {
             @Override
             public void run() {*/
 
-                if (!mNodeID.contains("door/close")||!mNodeID.contains("motion/motion")) {
+                if (!mNodeID.contains("door/close")||!mNodeID.contains("motion/motion")||
+                        !mNodeID.contains("prox/status")) {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel(Channel);
                     if (mMessage.equals("true")) {
@@ -1751,32 +1756,8 @@ public class OlmatixService extends Service {
         flagNode = true;
     }
 
-    private void setJarakRange() {
-        String topic = "devices/" + add_NodeID + "/$online";
-        int qos = 2;
-        try {
-            if (mqttClient!=null) {
-                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                subToken.setActionCallback(new IMqttActionListener() {
-                    @Override
-                    public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.d("Subscribe", " device = " + NodeID);
-                    }
-
-                    @Override
-                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    }
-                });
-            }
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     private void doSubAll() {
                 int countDB = mDbNodeRepo.getNodeList().size();
-                Log.d("DEBUG", "Count list Node: " + countDB);
                 data.addAll(mDbNodeRepo.getNodeList());
                 if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
@@ -2031,6 +2012,7 @@ public class OlmatixService extends Service {
 
             if (mNodeID.contains("$")) {
                 addNode();
+
             } else if (mNodeID.contains("door/close")||mNodeID.contains("motion/motion")||mNodeID.contains("prox/status")) {
                 updateSensorDoor();
 
@@ -2040,22 +2022,18 @@ public class OlmatixService extends Service {
                 }
 
             } else if (mNodeID.contains("temperature/degrees")) {
-
                     UpdateSensorTemp();
 
             } else if (mNodeID.contains("humidity/percent")) {
-
                     UpdateSensorHum();
 
             } else if (mNodeID.contains("prox/jarak")) {
-
                 UpdateSensorJarak();
 
             } else if (mNodeID.contains("dist/range")) {
-
                 UpdateSensorRange();
 
-            } else {
+            }else {
                 updateDetail();
             }
 

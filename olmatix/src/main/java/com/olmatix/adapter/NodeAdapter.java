@@ -13,6 +13,7 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -359,7 +360,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     public void removeItem(int position) {
 
         String mNodeID = nodeList.get(position).getNodesID();
-        for (int a=0; a < 19 ;a++) {
+        for (int a=0; a < 20 ;a++) {
             if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
             if (a == 1) {topic = "devices/" + mNodeID + "/$fwname";}
             if (a == 2) {topic = "devices/" + mNodeID + "/$signal";}
@@ -379,6 +380,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             if (a == 16) {topic = "devices/" + mNodeID + "/prox/status";}
             if (a == 17) {topic = "devices/" + mNodeID + "/prox/theft";}
             if (a == 18) {topic = "devices/" + mNodeID + "/prox/jarak";}
+            if (a == 19) {topic = "devices/" + mNodeID + "/dist/range";}
+
             try {
                 Connection.getClient().unsubscribe(topic);
             } catch (MqttException e) {

@@ -24,6 +24,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
@@ -48,7 +50,6 @@ import java.util.Locale;
  */
 
 public class SettingsActivity extends SettingsFragment {
-
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener
             = new Preference.OnPreferenceChangeListener() {
@@ -359,10 +360,10 @@ public class SettingsActivity extends SettingsFragment {
                     if (mSensorT != null && mSensorT.equals("motion")) {
                         for (int a = 0; a < 2; a++) {
                             if (a == 0) {
-                                topic = "devices/" + mNodeID1 + "/door/close";
+                                topic = "devices/" + mNodeID1 + "/motion/motion";
                             }
                             if (a == 1) {
-                                topic = "devices/" + mNodeID1 + "/door/theft";
+                                topic = "devices/" + mNodeID1 + "/motion/theft";
                             }
 
                             int qos = 2;
@@ -404,10 +405,10 @@ public class SettingsActivity extends SettingsFragment {
                     if (mSensorT != null && mSensorT.equals("temp")) {
                         for (int a = 0; a < 2; a++) {
                             if (a == 0) {
-                                topic = "devices/" + mNodeID1 + "/door/close";
+                                topic = "devices/" + mNodeID1 + "/temperature/degrees";
                             }
                             if (a == 1) {
-                                topic = "devices/" + mNodeID1 + "/door/theft";
+                                topic = "devices/" + mNodeID1 + "/humidity/percent";
                             }
 
                             int qos = 2;
@@ -446,6 +447,22 @@ public class SettingsActivity extends SettingsFragment {
         String loc = null;
         private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
         private CheckBoxPreference pref,pref1,pref2,pref3,pref4;
+        int permis;
+
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Toast.makeText(getActivity(), "Permission Granted", Toast.LENGTH_SHORT).show();
+                permis =1;
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Toast.makeText(getActivity(), "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+                permis =2;
+            }
+
+        };
 
 
         @Override
@@ -501,6 +518,12 @@ public class SettingsActivity extends SettingsFragment {
                 pref4.setTitle(R.string.switch_sensorProxDisable);
             }
 
+            new TedPermission(getActivity())
+                    .setPermissionListener(permissionlistener)
+                    .setDeniedMessage("If you reject permission, you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                    .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+                    .check();
+
             initLocationPref();
 
             //-- preference change listener
@@ -541,14 +564,18 @@ public class SettingsActivity extends SettingsFragment {
         private Preference.OnPreferenceClickListener LocationClickListener() {
 
             return new Preference.OnPreferenceClickListener() {
+
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     final PreferenceHelper mPrefHelper;
                     try {
 
-                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                        /*if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                                 != PackageManager.PERMISSION_GRANTED ) {
-                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0x1);
+                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0x1);*/
+                        if (permis ==2){
+                            Toast.makeText(getActivity(), "Permission Denied\n", Toast.LENGTH_SHORT).show();
+
                         } else {
                             mProvider = mLocationMgr.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
                             Location mLocation = mLocationMgr.getLastKnownLocation(mProvider);
@@ -631,7 +658,6 @@ public class SettingsActivity extends SettingsFragment {
         }
 
     }
-
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class AboutPreferenceFragment extends PreferenceFragment {

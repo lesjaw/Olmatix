@@ -1,5 +1,7 @@
 package com.olmatix.ui.activity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,16 +10,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -28,6 +35,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -40,12 +48,19 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.androidadvance.topsnackbar.TSnackbar;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
+import com.olmatix.database.dbNodeRepo;
+import com.olmatix.helper.SnackbarWrapper;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.InstalledNodeModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
@@ -55,6 +70,7 @@ import static com.olmatix.lesjaw.olmatix.R.array;
 import static com.olmatix.lesjaw.olmatix.R.color;
 import static com.olmatix.lesjaw.olmatix.R.id;
 import static com.olmatix.lesjaw.olmatix.R.layout;
+import static com.olmatix.lesjaw.olmatix.R.string.ssid;
 
 /**
  * Created by Lesjaw on 11/01/2017.
@@ -78,7 +94,24 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     private ProgressDialog progressDialog;
     private IntentFilter mIntentFilter;
     private CoordinatorLayout coordinatorLayout;
+    private InstalledNodeModel installedNodeModel;
+    public static dbNodeRepo mDbNodeRepo;
 
+
+
+
+    PermissionListener permissionlistener = new PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            Toast.makeText(SetupProduct.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+            Toast.makeText(SetupProduct.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+        }
+
+    };
 
 
     @Override
@@ -87,6 +120,25 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         setContentView(layout.setup_product);
 
         coordinatorLayout=(CoordinatorLayout)findViewById(R.id.main_content);
+
+        new TedPermission(this)
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+                .check();
+
+        installedNodeModel = new InstalledNodeModel();
+        mDbNodeRepo = new dbNodeRepo(getApplicationContext());
+
+        if (canGetLocation() == true) {
+
+            //DO SOMETHING USEFUL HERE. ALL GPS PROVIDERS ARE CURRENTLY ENABLED
+        } else {
+
+            //SHOW OUR SETTINGS ALERT, AND LET THE USE TURN ON ALL THE GPS PROVIDERS
+            showSettingsAlert();
+
+        }
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
@@ -109,8 +161,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     private void initializeActivity() {
 
         // Vertical Stepper form vars
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), color.light_blue);
-        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), color.colorPrimaryDark);
         String[] stepsTitles = getResources().getStringArray(array.steps_titles);
         //String[] stepsSubtitles = getResources().getStringArray(R.array.steps_subtitles);
 
@@ -120,8 +170,8 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 //.stepsSubtitles(stepsSubtitles)
                 //.materialDesignInDisabledSteps(true) // false by default
                 //.showVerticalLineWhenStepsAreCollapsed(true) // false by default
-                .primaryColor(colorPrimary)
-                .primaryDarkColor(colorPrimaryDark)
+                .primaryColor(color.light_blue)
+                .primaryDarkColor(color.colorPrimaryDark)
                 .stepNumberTextColor(color.black)
                 .stepSubtitleTextColor(color.white)
                 .buttonBackgroundColor(color.bg_button)
@@ -198,8 +248,8 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     }
 
     private View createConnectTitleStep() {
-        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        mainWifi.setWifiEnabled(true);
+        mainWifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        //mainWifi.setWifiEnabled(true);
         listWifiDetails = new ListView(this);
 
         mainWifi.startScan();
@@ -232,11 +282,8 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         listProduct.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                                    long arg3) {
-                // TODO Auto-generated method stub
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 String text = (String) listProduct.getItemAtPosition(arg2);
-
                 int iend = text.indexOf("|");
                 if (iend != -1) {
                     Wifi = text.substring(0, iend);
@@ -245,14 +292,23 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                         Wificut = Wifi.substring(0, iend1);
                     }
                     Password = Wifi.substring(Wifi.lastIndexOf("-") + 1);
-
                     arg1.setSelected(true);
+                    Log.d("DEBUG", "Selected item: " + Wificut);
 
                     if (Wificut.equals("Olmatix")) {
-
-                        createAPConfiguration(Wifi, Password,"PSK");
                         textProgres = getString(R.string.label_setup_connecting);
                         progressDialogShow(0);
+
+                        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+                        for( WifiConfiguration i : list ) {
+                            wifiManager.removeNetwork(i.networkId);
+                            wifiManager.saveConfiguration();
+                        }
+
+                        createAPConfiguration(Wifi, Password,"PSK");
+
+
                     } else {
                         Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), R.string.labe_setup_pick
                                 ,Snackbar.LENGTH_LONG);
@@ -268,8 +324,12 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     }
 
     private View createChooseTitleStep() {
-        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        mainWifi.setWifiEnabled(true);
+        mainWifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if(!mainWifi.isWifiEnabled()) {
+            mainWifi.setWifiEnabled(true);
+        }
+        //mainWifi.setWifiEnabled(true);
         listWifiDetails = new ListView(this);
 
         mainWifi.startScan();
@@ -332,7 +392,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             // Equivalent to: verticalStepperForm.setStepAsCompleted(TITLE_STEP_NUM);
 
         } else {
-            String titleErrorString = getResources().getString(R.string.error_wifi_pick);
             String titleError = getResources().getString(R.string.error_wifi_pick);
 
             verticalStepperForm.setActiveStepAsUncompleted(titleError);
@@ -470,11 +529,19 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                             Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), R.string.label_setup_success
                                     ,Snackbar.LENGTH_INDEFINITE);
                             View snackbarView = snackbar.getView();
-                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                                        snackbarView.setBackgroundColor(Color.BLACK);
+
+                            addnode();
+                            snackbar.setAction("OK", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    finish();
+                                }
+                            });
+
                             snackbar.show();
                             progressDialogShow(1);
 
-                            finish();
 
                         }
                     }
@@ -482,7 +549,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("VOLLEY", error.toString());
-                        Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), "Failed. tryig another address, please wait.."
+                        Snackbar snackbar = Snackbar.make((getWindow().getDecorView()), "Fail, trying another address, please wait.."
                                 ,Snackbar.LENGTH_INDEFINITE);
                         View snackbarView = snackbar.getView();
                         snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
@@ -529,6 +596,43 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         }
     }
 
+    private void addnode(){
+        installedNodeModel.setNodesID(deviceID);
+        if (mDbNodeRepo.hasObject(installedNodeModel)) {
+            final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
+                    "Checking this Node ID : " + deviceID + ", its exist, please refresh Nodes", TSnackbar.LENGTH_LONG);
+            snackbarWrapper.setAction("Olmatix",
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getApplicationContext(), "Action",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            snackbarWrapper.show();
+
+        } else {
+
+            installedNodeModel.setNodesID(deviceID);
+            installedNodeModel.setFwName("fwname");
+            installedNodeModel.setLocalip("localip");
+            installedNodeModel.setSignal("signal");
+            installedNodeModel.setUptime("uptime");
+
+            mDbNodeRepo.insertDb(installedNodeModel);
+        }
+
+/*
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent("addNode");
+                intent.putExtra("NodeID", deviceID);
+                LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
+            }
+        }, 50000);*/
+
+    }
     public void sendJson1() {
         try {
 
@@ -616,11 +720,12 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         }
     }
 
-
-
     private WifiConfiguration createAPConfiguration(String networkSSID, String networkPasskey, String securityMode) {
 
+        Log.d("DEBUG", "createAPConfiguration: ");
+
         WifiConfiguration wifiConfiguration = new WifiConfiguration();
+        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         wifiConfiguration.SSID =String.format("\"%s\"", networkSSID.trim());
 
@@ -635,16 +740,34 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
             wifiConfiguration.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
 
-        WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
         int networkId = wifi.addNetwork(wifiConfiguration);
         wifi.disconnect();
-        wifi.setWifiEnabled(true);
+        //wifi.setWifiEnabled(true);
         wifi.enableNetwork(networkId, true);
         wifi.reconnect();
 
         return wifiConfiguration;
     }
+
+    private WifiConfiguration createAPConfigurationM(String networkSSID, String networkPasskey, String securityMode) {
+
+        WifiConfiguration wifiConfiguration = new WifiConfiguration();
+
+        wifiConfiguration.SSID =String.format("\"%s\"", networkSSID.trim());
+
+        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+
+        int networkId = wifi.addNetwork(wifiConfiguration);
+        wifi.disconnect();
+        //wifi.setWifiEnabled(true);
+        wifi.enableNetwork(networkId, true);
+        wifi.reconnect();
+
+        return wifiConfiguration;
+    }
+
 
     private void progressDialogShow (int what){
         if (what==0) {
@@ -669,7 +792,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
             if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
 
-                final WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+                final WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
                 String wifiInfo = "";
                 WifiInfo info = wifi.getConnectionInfo();
@@ -693,5 +816,57 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
         }
     };
+
+    public boolean canGetLocation() {
+        boolean result = true;
+        LocationManager lm;
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+            lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        // exceptions will be thrown if provider is not permitted.
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception ex) {
+
+        }
+        try {
+            network_enabled = lm
+                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception ex) {
+        }
+        if (gps_enabled == false || network_enabled == false) {
+            result = false;
+        } else {
+            result = true;
+        }
+
+        return result;
+    }
+
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+        // Setting Dialog Title
+        alertDialog.setTitle("Location Error!");
+
+        // Setting Dialog Message
+        alertDialog.setMessage("Please, enable location setting to read any SSID/WiFi, after you enable it go " +
+                "back to setup product setting");
+
+        // On pressing Settings button
+        alertDialog.setPositiveButton(
+                getResources().getString(R.string.button_ok),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(
+                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(intent);
+                    }
+                });
+
+        alertDialog.show();
+    }
 
 }

@@ -175,11 +175,12 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             if (mStatusServer) {
                 final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
                 if (!mSwitch_conn) {
+                    Log.d(TAG, "1: ");
                     int countDB = dbNodeRepo.getNodeList().size();
                     data.addAll(dbNodeRepo.getNodeList());
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data.get(i).getNodesID();
-                        for (int a = 0; a < 4; a++) {
+                        for (int a = 0; a < 5; a++) {
                             String topic = "";
                             if (a == 0) {
                                 topic = "devices/" + mNodeID + "/$online";
@@ -191,6 +192,9 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                                 topic = "devices/" + mNodeID + "/$uptime";
                             }
                             if (a == 3) {
+                                topic = "devices/" + mNodeID + "/$fwname";
+                            }
+                            if (a == 4) {
                                 topic = "devices/" + mNodeID + "/$localip";
                             }
                             int qos = 2;
@@ -212,11 +216,13 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     }
                     data.clear();
                 } else {
+                    Log.d(TAG, "2: ");
+
                     int countDB = dbNodeRepo.getNodeList().size();
                     data.addAll(dbNodeRepo.getNodeList());
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data.get(i).getNodesID();
-                        for (int a = 0; a < 3; a++) {
+                        for (int a = 0; a < 5; a++) {
                             String topic = "";
                             if (a == 0) {
                                 topic = "devices/" + mNodeID + "/$online";
@@ -224,8 +230,14 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             if (a == 1) {
                                 topic = "devices/" + mNodeID + "/$signal";
                             }
-                            if (a == 1) {
+                            if (a == 2) {
                                 topic = "devices/" + mNodeID + "/$uptime";
+                            }
+                            if (a == 3) {
+                                topic = "devices/" + mNodeID + "/$fwname";
+                            }
+                            if (a == 4) {
+                                topic = "devices/" + mNodeID + "/$localip";
                             }
 
                             int qos = 2;
@@ -246,7 +258,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         }
                     }
                     data.clear();
-
                 }
             }
 

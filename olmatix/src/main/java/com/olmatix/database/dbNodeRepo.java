@@ -395,19 +395,17 @@ public class dbNodeRepo {
         if (installedNodeModel.getNice_name_n() != null) {
             values.put(KEY_NICE_NAME_N, installedNodeModel.getNice_name_n());
         }
-        if (installedNodeModel.getLocalip() != null) {
+        if (installedNodeModel.getLocalip() != null || installedNodeModel.getLocalip().equals("localip")) {
             values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
         }
-        if (installedNodeModel.getFwName() != null) {
+        if (installedNodeModel.getFwName() != null || installedNodeModel.getFwName().equals("fwname")) {
             values.put(KEY_FWNAME, installedNodeModel.getFwName());
-            //Log.d("DEBUG", "updateNode: " +installedNodeModel.getFwName());
         }
         if (installedNodeModel.getFwVersion() != null) {
             values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
         }
         if (installedNodeModel.getOnline() != null) {
             values.put(KEY_ONLINE, installedNodeModel.getOnline());
-
         }
         if (installedNodeModel.getNodesID() != null) {
             values.put(KEY_ICON, installedNodeModel.getIcon());
@@ -415,10 +413,10 @@ public class dbNodeRepo {
         if (Long.valueOf(installedNodeModel.getAdding()) != null) {
             values.put(KEY_ADDING, Long.valueOf(installedNodeModel.getAdding()));
         }
-        if (installedNodeModel.getSignal() != null) {
+        if (installedNodeModel.getSignal() != null || installedNodeModel.getSignal().equals("signal")) {
             values.put(KEY_SIGNAL, installedNodeModel.getSignal());
         }
-        if (installedNodeModel.getUptime() != null) {
+        if (installedNodeModel.getUptime() != null || installedNodeModel.getUptime().equals("uptime") ) {
             values.put(KEY_UPTIME, installedNodeModel.getUptime());
         }
         if (installedNodeModel.getReset() != null) {
@@ -427,6 +425,22 @@ public class dbNodeRepo {
         if (installedNodeModel.getOta() != null) {
             values.put(KEY_OTA, installedNodeModel.getOta());
         }
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close();
+
+    }
+
+    public void updateOnline(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+
+        if (installedNodeModel.getOnline() != null) {
+            values.put(KEY_ONLINE, installedNodeModel.getOnline());
+        }
+
         db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(installedNodeModel.getNodesID())
         });
@@ -574,7 +588,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_jarak() != null) {
             values.put(KEY_STATUS_JARAK, detailNodeModel.getStatus_jarak());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_jarak());
+            Log.d("DEBUG", "updateDetail Status Jarak : " +detailNodeModel.getStatus_jarak());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -588,11 +602,10 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODE_ID, detailNodeModel.getNode_id());
 
         if (detailNodeModel.getStatus_range() != null) {
             values.put(KEY_STATUS_RANGE, detailNodeModel.getStatus_range());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_range());
+            Log.d("DEBUG", "updateDetail Status Range : " +detailNodeModel.getStatus_range());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -601,7 +614,6 @@ public class dbNodeRepo {
         });
         db.close(); // Closing database connection
     }
-
 
     public ArrayList<InstalledNodeModel> getNodeList() {
 

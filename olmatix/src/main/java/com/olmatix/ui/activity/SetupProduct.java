@@ -38,10 +38,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
@@ -329,7 +331,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         if(!mainWifi.isWifiEnabled()) {
             mainWifi.setWifiEnabled(true);
         }
-        //mainWifi.setWifiEnabled(true);
         listWifiDetails = new ListView(this);
 
         mainWifi.startScan();
@@ -426,7 +427,12 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 }
         );
 
+        int socketTimeout = 60000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        getRequest.setRetryPolicy(policy);
         requestQueue.add(getRequest);
+
+        //requestQueue.add(getRequest);
     }
 
     public void requestInfo1() {
@@ -451,7 +457,11 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                 }
         );
 
+        int socketTimeout = 60000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        getRequest.setRetryPolicy(policy);
         requestQueue.add(getRequest);
+        //requestQueue.add(getRequest);
 
     }
 

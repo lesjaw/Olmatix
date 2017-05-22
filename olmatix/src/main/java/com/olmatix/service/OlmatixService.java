@@ -166,8 +166,7 @@ public class OlmatixService extends Service {
         public void onReceive(Context context, Intent intent) {
             add_NodeID = intent.getStringExtra("NodeID");
             String alarmService = intent.getStringExtra("Conn");
-            Log.d("DEBUG", "onReceive1: " + add_NodeID);
-            Log.d("DEBUG", "onReceive2: " + alarmService);
+
 
             NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
             if (nInfo != null) {
@@ -209,7 +208,6 @@ public class OlmatixService extends Service {
 
                         snackbarWrapper.show();*/
                         if (!doCon) {
-                            Log.d(TAG, "Alarm Service: " + doCon);
                             doConnect();
                         }
                     }
@@ -236,10 +234,7 @@ public class OlmatixService extends Service {
                     editor.putBoolean("conStatus", false);
                     editor.apply
 */
-                    Log.d(TAG, "Alarm Service: " + doCon);
-
                     if (!doCon) {
-                        Log.d(TAG, "Alarm Service: " + doCon);
                         doConnect();
                     }
                 }
@@ -1677,7 +1672,6 @@ public class OlmatixService extends Service {
             @Override
             public void run() {
                 long dura;
-                Log.d(TAG, "run OFF: "+NodeID+" "+Channel);
                 durationModel.setNodeId(NodeID);
                 durationModel.setChannel(Channel);
                 durationModel.setStatus(mMessage);
@@ -1699,7 +1693,6 @@ public class OlmatixService extends Service {
 
                 data3.addAll(mDbNodeRepo.getNodeUpdateZero());
                 int countDB = mDbNodeRepo.getNodeUpdateZero().size();
-                Log.d(TAG, "Duration NUll: "+countDB);
                 if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         if (data3.get(i).getTimeStampOn() != null) {
@@ -1707,8 +1700,6 @@ public class OlmatixService extends Service {
                             int id = data3.get(i).getId();
                             durationModel.setId(id);
                             durationModel.setDuration(dura/1000);
-                            Log.d(TAG, "id: "+data3.get(i).getId());
-
                             mDbNodeRepo.updateOffbyID(durationModel);
 
                         }
@@ -1728,7 +1719,6 @@ public class OlmatixService extends Service {
                 subToken.setActionCallback(new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.d("Subscribe", " device = " + NodeID);
                     }
 
                     @Override
@@ -1792,7 +1782,6 @@ public class OlmatixService extends Service {
 
     private void doSubAllDetail() {
                 int countDB = mDbNodeRepo.getNodeDetailList().size();
-                Log.d("DEBUG", "Count list Detail: " + countDB);
                 data1.addAll(mDbNodeRepo.getNodeDetailList());
                 countDB = mDbNodeRepo.getNodeDetailList().size();
                 if (countDB != 0) {
@@ -1827,7 +1816,6 @@ public class OlmatixService extends Service {
     private void doAllsubDetailSensor() {
 
                 int countDB = mDbNodeRepo.getNodeDetailList().size();
-                Log.d("DEBUG", "Count list Sensor: " + countDB);
                 data1.addAll(mDbNodeRepo.getNodeDetailList());
                 countDB = mDbNodeRepo.getNodeDetailList().size();
                 if (countDB != 0) {
@@ -2196,7 +2184,6 @@ public class OlmatixService extends Service {
     private  void showNotificationLoc(){
 
         final Boolean mSwitch_Notif = sharedPref.getBoolean("switch_loc", true);
-        Log.d(TAG, "showNotificationLoc: "+mSwitch_Notif);
         if (mSwitch_Notif) {
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                     new Intent(this, MainActivity.class), 0);

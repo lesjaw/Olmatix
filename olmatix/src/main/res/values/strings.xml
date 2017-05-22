@@ -152,5 +152,7 @@
     <string name="switch_sensor_prox">Notify Sensor Proximity</string>
     <string name="switch_sensorProxDisable">Disable notify sensor Proximity status</string>
     <string name="button_ok">OK</string>
+    <string name="app_ver">1.19</string>
+    <string name="pref_ver">Version</string>
 
 </resources>

@@ -398,25 +398,25 @@ public class dbNodeRepo {
         if (installedNodeModel.getLocalip() != null || installedNodeModel.getLocalip().equals("localip")) {
             values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
         }
-        if (installedNodeModel.getFwName() != null || installedNodeModel.getFwName().equals("fwname")) {
+        if (installedNodeModel.getFwName() != null || installedNodeModel.getFwName().equals("Waiting data")) {
             values.put(KEY_FWNAME, installedNodeModel.getFwName());
         }
         if (installedNodeModel.getFwVersion() != null) {
             values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
         }
-        if (installedNodeModel.getOnline() != null) {
+        /*if (installedNodeModel.getOnline() != null) {
             values.put(KEY_ONLINE, installedNodeModel.getOnline());
-        }
+        }*/
         if (installedNodeModel.getNodesID() != null) {
             values.put(KEY_ICON, installedNodeModel.getIcon());
         }
         if (Long.valueOf(installedNodeModel.getAdding()) != null) {
             values.put(KEY_ADDING, Long.valueOf(installedNodeModel.getAdding()));
         }
-        if (installedNodeModel.getSignal() != null || installedNodeModel.getSignal().equals("signal")) {
+        if (installedNodeModel.getSignal() != null || installedNodeModel.getSignal().equals("0")) {
             values.put(KEY_SIGNAL, installedNodeModel.getSignal());
         }
-        if (installedNodeModel.getUptime() != null || installedNodeModel.getUptime().equals("uptime") ) {
+        if (installedNodeModel.getUptime() != null || installedNodeModel.getUptime().equals("0") ) {
             values.put(KEY_UPTIME, installedNodeModel.getUptime());
         }
         if (installedNodeModel.getReset() != null) {
@@ -436,9 +436,9 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-
         if (installedNodeModel.getOnline() != null) {
             values.put(KEY_ONLINE, installedNodeModel.getOnline());
+            Log.d("DEBUG", "updateOnline: "+installedNodeModel.getOnline());
         }
 
         db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
@@ -588,7 +588,6 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_jarak() != null) {
             values.put(KEY_STATUS_JARAK, detailNodeModel.getStatus_jarak());
-            Log.d("DEBUG", "updateDetail Status Jarak : " +detailNodeModel.getStatus_jarak());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -605,7 +604,6 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_range() != null) {
             values.put(KEY_STATUS_RANGE, detailNodeModel.getStatus_range());
-            Log.d("DEBUG", "updateDetail Status Range : " +detailNodeModel.getStatus_range());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{

@@ -105,7 +105,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     PermissionListener permissionlistener = new PermissionListener() {
         @Override
         public void onPermissionGranted() {
-            Toast.makeText(SetupProduct.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(SetupProduct.this, "Permission Granted", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -295,7 +295,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                     }
                     Password = Wifi.substring(Wifi.lastIndexOf("-") + 1);
                     arg1.setSelected(true);
-                    Log.d("DEBUG", "Selected item: " + Wificut);
 
                     if (Wificut.equals("Olmatix")) {
                         textProgres = getString(R.string.label_setup_connecting);
@@ -335,7 +334,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
         mainWifi.startScan();
         wifiList = mainWifi.getScanResults();
-        Log.d("DEBUG", "createConnectTitleStep: " + wifiList.size());
 
         listHome = new ListView(this);
         statesList = new String[wifiList.size()];
@@ -367,7 +365,6 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                                     long arg3) {
                 // TODO Auto-generated method stub
                 textHomeWifi = (String) listHome.getItemAtPosition(arg2);
-                Log.d("DEBUG", "Selected item: " + textHomeWifi);
                 arg1.setSelected(true);
                 verticalStepperForm.goToNextStep();
             }
@@ -545,7 +542,15 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
                             snackbar.setAction("OK", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    finish();
+                                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            finish();
+
+                                        }
+                                    }, 50000);
+
                                 }
                             });
 
@@ -624,25 +629,20 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         } else {
 
             installedNodeModel.setNodesID(deviceID);
-            installedNodeModel.setFwName("fwname");
+            installedNodeModel.setFwName("Rename Me!");
             installedNodeModel.setLocalip("localip");
-            installedNodeModel.setSignal("signal");
-            installedNodeModel.setUptime("uptime");
+            installedNodeModel.setSignal("0");
+            installedNodeModel.setUptime("0");
 
             mDbNodeRepo.insertDb(installedNodeModel);
         }
 
-/*
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
                 Intent intent = new Intent("addNode");
                 intent.putExtra("NodeID", deviceID);
                 LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
-            }
-        }, 50000);*/
 
     }
+
     public void sendJson1() {
         try {
 
@@ -752,32 +752,17 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
 
         int networkId = wifi.addNetwork(wifiConfiguration);
+
+        /*if(mainWifi.isWifiEnabled()) {
+            mainWifi.setWifiEnabled(false);
+        }
+        wifi.setWifiEnabled(true);*/
         wifi.disconnect();
-        //wifi.setWifiEnabled(true);
         wifi.enableNetwork(networkId, true);
         wifi.reconnect();
 
         return wifiConfiguration;
     }
-
-    private WifiConfiguration createAPConfigurationM(String networkSSID, String networkPasskey, String securityMode) {
-
-        WifiConfiguration wifiConfiguration = new WifiConfiguration();
-
-        wifiConfiguration.SSID =String.format("\"%s\"", networkSSID.trim());
-
-        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
-
-        int networkId = wifi.addNetwork(wifiConfiguration);
-        wifi.disconnect();
-        //wifi.setWifiEnabled(true);
-        wifi.enableNetwork(networkId, true);
-        wifi.reconnect();
-
-        return wifiConfiguration;
-    }
-
 
     private void progressDialogShow (int what){
         if (what==0) {

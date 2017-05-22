@@ -175,7 +175,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             if (mStatusServer) {
                 final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
                 if (!mSwitch_conn) {
-                    Log.d(TAG, "1: ");
                     int countDB = dbNodeRepo.getNodeList().size();
                     data.addAll(dbNodeRepo.getNodeList());
                     for (int i = 0; i < countDB; i++) {
@@ -216,7 +215,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     }
                     data.clear();
                 } else {
-                    Log.d(TAG, "2: ");
 
                     int countDB = dbNodeRepo.getNodeList().size();
                     data.addAll(dbNodeRepo.getNodeList());

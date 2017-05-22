@@ -139,7 +139,7 @@
     <string name="label_setup_pass_home_wifi">"Type your home WiFi password "</string>
     <string name="label_setup_connect_to">"You are connected to "</string>
     <string name="label_product">" product"</string>
-    <string name="label_setup_success">Setting Olmatix success</string>
+    <string name="label_setup_success">Olmatix setup success, close app and reopen please..</string>
     <string name="label_setup_choose_wifi">You need to choose Home WiFi, Cancel setup!</string>
     <string name="label_setup_signal">" || Signal "</string>
     <string name="label_alarm_service_conn">Request connect</string>

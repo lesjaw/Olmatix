@@ -452,7 +452,7 @@ public class SettingsActivity extends SettingsFragment {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                Toast.makeText(getActivity(), "Permission Granted", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Permission Granted", Toast.LENGTH_SHORT).show();
                 permis =1;
             }
 

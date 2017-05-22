@@ -1008,7 +1008,6 @@ public class OlmatixService extends Service {
                     activityInForeground();
                     return;
                 }
-                Log.d(TAG, "No activity did catch the broadcast.");
                 noActivityInForeground();
             }
         }, null, Activity.RESULT_CANCELED, null, null);
@@ -1155,7 +1154,6 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_jarak(mMessage);
-            Log.d(TAG, "UpdateSensorJarak: "+mMessage);
 
             mDbNodeRepo.update_detailSensorJarak(detailNodeModel);
 
@@ -1530,21 +1528,6 @@ public class OlmatixService extends Service {
                         }
                     }
                 }
-
-                /*String topic = "devices/" + NodeID + "/dist/range/set";
-                String payload = "100";
-                byte[] encodedPayload = new byte[0];
-                try {
-                    encodedPayload = payload.getBytes("UTF-8");
-                    MqttMessage message = new MqttMessage(encodedPayload);
-                    message.setQos(1);
-                    message.setRetained(true);
-                    Connection.getClient().publish(topic, message);
-
-
-                } catch (UnsupportedEncodingException | MqttException e) {
-                    e.printStackTrace();
-                }*/
             }
         }
     }
@@ -1564,7 +1547,7 @@ public class OlmatixService extends Service {
         if (installedNodeModel.getFwName() != null) {
             addNodeDetail();
         }
-        installedNodeModel.setOnline(messageReceive.get("online"));
+        //installedNodeModel.setOnline(messageReceive.get("online"));
         if (messageReceive.containsKey("online")) {
             checkActivityForeground();
             installedNodeModel.setNodesID(NodeID);
@@ -1584,14 +1567,17 @@ public class OlmatixService extends Service {
                         if (mMessage.equals("true")) {
                             titleNode = mNiceNameN;
                             textNode = "ONLINE";
-                            installedNodeModel.setOnline(messageReceive.get("online"));
+                            installedNodeModel.setOnline("true");
+                            //installedNodeModel.setOnline(messageReceive.get("online"));
+                            installedNodeModel.setNodesID(NodeID);
                             mDbNodeRepo.updateOnline(installedNodeModel);
 
-
-                        } else {
+                        } else  if (mMessage.equals("false")) {
                             titleNode = mNiceNameN;
                             textNode = "OFFLINE";
-                            installedNodeModel.setOnline(messageReceive.get("online"));
+                            installedNodeModel.setOnline("false");
+                            //installedNodeModel.setOnline(messageReceive.get("online"));
+                            installedNodeModel.setNodesID(NodeID);
                             mDbNodeRepo.updateOnline(installedNodeModel);
 
                         }

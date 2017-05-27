@@ -39,6 +39,7 @@ import com.olmatix.adapter.InfoAdapter;
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.OnStartDragListener;
+import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
@@ -73,6 +74,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
     private String Distance;
     private String dist;
     CoordinatorLayout coordinatorLayout;
+    int mNoOfColumns;
 
 
     @Nullable
@@ -94,7 +96,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         mDbNodeRepo = new dbNodeRepo(getActivity());
         dashboardNodeModel= new DashboardNodeModel();
         dashboardnode=getActivity();
-        mDbNodeRepo.getAllScene();
+        //mDbNodeRepo.getAllScene();
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
@@ -111,13 +113,33 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
 
             @Override
             public void onLongClick(View view, int position) {
-                adapter.removeItem(position);
-                TSnackbar snackbar = TSnackbar.make((coordinatorLayout),"Dashboard item deleted"
-                        ,TSnackbar.LENGTH_LONG);
-                View snackbarView = snackbar.getView();
-                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                snackbar.show();
-                setRefresh();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Delete this Node?");
+                builder.setMessage(data.get(position).getNice_name_d());
+                String nice_name = data.get(position).getNice_name_d();
+
+                builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.removeItem(position);
+                        TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " Node deleted",TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                        setRefresh();
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
             }
         }));
     }
@@ -239,9 +261,35 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         mRecycleView.setHasFixedSize(true);
         mRecycleViewInfo.setHasFixedSize(true);
 
-        int mNoOfColumns = OlmatixUtils.calculateNoOfColumns(getActivity());
+        final PreferenceHelper mPrefHelper = new PreferenceHelper(getActivity().getApplicationContext());
 
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), mNoOfColumns);
+
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mRecycleViewInfo.setVisibility(View.GONE);
+            mViewDash1.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            p.addRule(RelativeLayout.BELOW, R.id.view_dash1);
+            mRecycleView.setLayoutParams(p);
+
+            float colom = mPrefHelper.getLength();
+            mNoOfColumns = Math.round(colom);
+
+
+        }
+        else {
+            mRecycleViewInfo.setVisibility(View.VISIBLE);
+            float colomw = mPrefHelper.getWidht();
+
+            mNoOfColumns = Math.round(colomw);
+
+
+        }
+
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(),mNoOfColumns);
 
         mRecycleView.setLayoutManager(layoutManager);
         mRecycleView.addItemDecoration(new GridSpacesItemDecoration(OlmatixUtils.dpToPx(2),true));
@@ -283,22 +331,7 @@ public class DashboardNode extends Fragment implements OnStartDragListener {
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
-        int currentOrientation = getResources().getConfiguration().orientation;
-        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mRecycleViewInfo.setVisibility(View.GONE);
-            mViewDash1.setVisibility(View.GONE);
 
-            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            p.addRule(RelativeLayout.BELOW, R.id.view_dash1);
-            mRecycleView.setLayoutParams(p);
-
-        }
-        else {
-            mRecycleViewInfo.setVisibility(View.VISIBLE);
-
-        }
 
         mFab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

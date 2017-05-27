@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,8 +23,10 @@ import android.widget.Toast;
 
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.service.OlmatixService;
+import com.olmatix.utils.OlmatixUtils;
 
 import java.util.ArrayList;
 
@@ -34,6 +38,7 @@ public class SplashActivity extends Activity {
     private static final int TAG_CODE_PERMISSION_LOCATION = 1;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
+    int count;
 
 
     PermissionListener permissionlistener = new PermissionListener() {
@@ -67,10 +72,9 @@ public class SplashActivity extends Activity {
 
         imgSplash.startAnimation(animConn);
 
-
-
-
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+
 
         String mUserName = sharedPref.getString("user_name", "olmatix1");
         if (mUserName.equals("olmatix1")){
@@ -82,9 +86,31 @@ public class SplashActivity extends Activity {
             Intent i = new Intent(this, OlmatixService.class);
             startService(i);
         }
-
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+        if (mStatusServer) {
+            Intent i = new Intent(getApplication(), MainActivity.class);
+            startActivity(i);
+            finish();
+
+        } else {
+            Toast.makeText(SplashActivity.this, "  No reply from server, exiting now..  ", Toast.LENGTH_LONG).show();
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                    System.exit(0);
+                }
+            }, 5000);
+        }
+
+            OlmatixUtils.calculateNoOfColumns(this);
+
+    }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -94,23 +120,41 @@ public class SplashActivity extends Activity {
             Log.d("DEBUG", "onReceive1: "+message);
 
                 if (message!=null) {
-                    Log.d("DEBUG", "onReceive2: " + message);
 
                     if (message.equals("NotAuth")) {
                         Intent i = new Intent(getApplication(), LoginActivity.class);
                         startActivity(i);
-                        Log.d("DEBUG", "onReceive2: " + message);
                         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
                         finish();
                     }
                     if (message.equals("AuthOK")) {
                         Intent i = new Intent(getApplication(), MainActivity.class);
                         startActivity(i);
-                        Log.d("DEBUG", "onReceive3: " + message);
                         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
                         finish();
                     }
+
+
                 }
+            if (message==null){
+                count++;
+                if (count<3){
+                    Intent i = new Intent(getApplication(), OlmatixService.class);
+                    startService(i);
+
+                }
+                if (count==3){
+
+                    Toast.makeText(SplashActivity.this, "  No reply from server, exiting now..  ", Toast.LENGTH_LONG).show();
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    }, 5000);
+
+                }
+            }
         }
     };
 
@@ -118,7 +162,7 @@ public class SplashActivity extends Activity {
     protected void onPostResume() {
         super.onPostResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("MQTTStatus"));
+                mMessageReceiver, new IntentFilter("splashauth"));
     }
 
     @Override

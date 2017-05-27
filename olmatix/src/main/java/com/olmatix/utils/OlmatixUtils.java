@@ -1,10 +1,14 @@
 package com.olmatix.utils;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.Criteria;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
+import android.util.Log;
+
+import com.olmatix.helper.PreferenceHelper;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -102,10 +106,29 @@ public class OlmatixUtils {
     public static int dpToPx(final float dp) {
         return Math.round(dp * (Resources.getSystem().getDisplayMetrics().xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
+
     public static int calculateNoOfColumns(Context context) {
+        int noOfColumns;
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (dpWidth / 100);
+        float dpLength = displayMetrics.heightPixels / displayMetrics.density;
+
+
+        if (dpWidth==600) {
+            noOfColumns = (int) (dpWidth / 100) - 2;
+        } else if (dpWidth==1024) {
+            noOfColumns = (int) (dpWidth / 100) - 2;
+        }else {
+            noOfColumns = (int) (dpWidth / 100);
+        }
+
+        final PreferenceHelper mPrefHelper = new PreferenceHelper(context.getApplicationContext());
+            mPrefHelper.setWidht(Math.round(noOfColumns));
+        Log.d("DEBUD", "calculateNoOfColumns: "+mPrefHelper.getWidht());
+            int l = Math.round(noOfColumns);
+            mPrefHelper.setLength(l+l);
+        Log.d("DEBUD", "calculateNoOfColumns: "+mPrefHelper.getLength());
+
         return noOfColumns;
     }
 

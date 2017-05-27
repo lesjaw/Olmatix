@@ -148,9 +148,9 @@
                 android:fitsSystemWindows="true"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@+id/btn_on"
+                android:layout_below="@+id/seek_range"
                 android:src="@drawable/proximityon"
-                android:paddingTop="0sp"
+                android:paddingTop="15sp"
                 />
 
             <TextView

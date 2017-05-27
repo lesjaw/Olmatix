@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <supports-screens
         android:anyDensity="true"
@@ -112,12 +113,11 @@
             </intent-filter>
         </receiver>
         <service
-
             android:name="com.olmatix.service.AlarmService"
-
             android:enabled="true" />
-
-
+        <service
+            android:name="com.olmatix.service.RingtonePlayingService"
+            android:enabled="true" />
 
         <receiver android:name="com.olmatix.service.AlarmReceiver" />
 

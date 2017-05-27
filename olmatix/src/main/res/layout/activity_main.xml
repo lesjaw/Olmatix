@@ -182,19 +182,39 @@
                 android:padding="5sp"
                 />
             <TextView
-                android:id="@+id/aboutLabel"
+            android:id="@+id/aboutLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="About"
+            android:padding="10sp"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:layout_below="@+id/imgSetting"
+            android:layout_toRightOf="@+id/imgABout"
+            android:layout_toEndOf="@+id/imgABout"
+            android:background="@drawable/selected_item"/>
+
+            <ImageView
+                android:id="@+id/imgExit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_delete"
+                android:layout_below="@+id/imgABout"
+                android:padding="5sp"
+                />
+
+            <TextView
+                android:id="@+id/exitLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="About"
+                android:text="Exit Olmatix"
                 android:padding="10sp"
                 android:textStyle="bold"
                 android:textSize="15sp"
-                android:layout_below="@+id/imgSetting"
-                android:layout_toRightOf="@+id/imgABout"
-                android:layout_toEndOf="@+id/imgABout"
+                android:layout_below="@+id/aboutLabel"
+                android:layout_toRightOf="@+id/imgExit"
+                android:layout_toEndOf="@+id/imgExit"
                 android:background="@drawable/selected_item"/>
-
-
 
         </RelativeLayout>
 

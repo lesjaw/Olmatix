@@ -16,6 +16,8 @@ public class dbNode {
     public static final String TABLE_SCENE_DETAIL = "scene_detail";
     public static final String  TABLE_INFO          = "info_data";
     public static final String  TABLE_LOG          = "log_alarm";
+    public static final String  TABLE_GROUP          = "group_dash";
+
 
 
 
@@ -45,6 +47,8 @@ public class dbNode {
     public static final String KEY_STATUS_HUM  = "status_hum" ;
     public static final String KEY_STATUS_JARAK  = "status_jarak" ;
     public static final String KEY_STATUS_RANGE  = "status_range" ;
+    public static final String KEY_GROUP_NAME  = "group_name" ;
+    public static final String KEY_GROUP_ID  = "group_id" ;
 
 
     public static final String KEY_TOPIC  = "topic" ;

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.renderscript.Matrix2f;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -126,14 +127,18 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
 
-            if (mFavoriteModel.getStatus().trim().equals("false")) {
-                holder.imgNode.setImageResource(R.drawable.offlamp1);
-                holder.imgSending.setVisibility(View.GONE);
+            String lastval=mFavoriteModel.getStatus();
 
-            } else {
-                holder.imgNode.setImageResource(R.drawable.onlamp1);
-                holder.imgSending.setVisibility(View.GONE);
+            if (lastval!=null && !lastval.equals("")) {
+                if (mFavoriteModel.getStatus().trim().equals("false")) {
+                    holder.imgNode.setImageResource(R.drawable.offlamp1);
+                    holder.imgSending.setVisibility(View.GONE);
 
+                } else {
+                    holder.imgNode.setImageResource(R.drawable.onlamp1);
+                    holder.imgSending.setVisibility(View.GONE);
+
+                }
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
@@ -207,16 +212,23 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 holder.imgNodesBut.setImageResource(R.drawable.offsec);
             }
 
-            if (mFavoriteModel.getOnline().trim().equals("true")) {
-                holder.imgOnline.setImageResource(R.drawable.ic_check_green);
-                holder.imgNodesBut.setBackgroundColor(Color.WHITE);
-                holder.iconstat.setVisibility(View.GONE);
-            } else {
-                holder.imgOnline.setImageResource(R.drawable.ic_check_red);
-                holder.imgNodesBut.setBackgroundColor(Color.parseColor("#A9A9A9"));
-                holder.iconstat.setVisibility(View.VISIBLE);
+            String theft = mFavoriteModel.getStatus_theft();
+            if (theft.equals("true")){
+                holder.imgNodesBut.setImageResource(R.drawable.theft);
             }
 
+            String lastval=mFavoriteModel.getOnline();
+            if (lastval!=null && !lastval.equals("")) {
+                if (mFavoriteModel.getOnline().trim().equals("true")) {
+                    holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                    holder.imgNodesBut.setBackgroundColor(Color.WHITE);
+                    holder.iconstat.setVisibility(View.GONE);
+                } else {
+                    holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+                    holder.imgNodesBut.setBackgroundColor(Color.parseColor("#A9A9A9"));
+                    holder.iconstat.setVisibility(View.VISIBLE);
+                }
+            }
 
             if ((mFavoriteModel.getStatus_sensor().trim().equals("true"))) {
                 if ((mFavoriteModel.getSensor().trim()).equals("close")) {
@@ -236,6 +248,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 }
 
             }
+
+
+
             holder.imgNodesBut.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

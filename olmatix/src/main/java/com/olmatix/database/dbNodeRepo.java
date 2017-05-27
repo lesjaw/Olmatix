@@ -552,7 +552,6 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_temp() != null) {
             values.put(KEY_STATUS_TEMP, detailNodeModel.getStatus_temp());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_temp());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -570,7 +569,6 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getStatus_hum() != null) {
             values.put(KEY_STATUS_HUM, detailNodeModel.getStatus_hum());
-            Log.d("DEBUG", "updateDetail Status Sensor : " +detailNodeModel.getStatus_hum());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -991,9 +989,9 @@ public class dbNodeRepo {
         values.put(KEY_CHANNEL, durationModel.getChannel());
         values.put(KEY_STATUS, durationModel.getStatus());
         values.put(KEY_TIMESTAMPS_ON, String.valueOf(durationModel.getTimeStampOn()));
-        Log.d("DEBUG", "insertDurationNode: "+durationModel.getTimeStampOn());
+        //Log.d("DEBUG", "insertDurationNode: "+durationModel.getTimeStampOn());
         values.put(KEY_TIMESTAMPS_OFF, String.valueOf(durationModel.getTimeStampOff()));
-        Log.d("DEBUG", "insertDurationNode: "+durationModel.getTimeStampOff());
+        //Log.d("DEBUG", "insertDurationNode: "+durationModel.getTimeStampOff());
         values.put(KEY_DURATION, String.valueOf(durationModel.getDuration()));
 
 
@@ -1011,7 +1009,6 @@ public class dbNodeRepo {
         values.put(KEY_STATUS, durationModel.getStatus());
         values.put(KEY_TIMESTAMPS_OFF, durationModel.getTimeStampOff());
         values.put(KEY_DURATION, durationModel.getDuration());
-        Log.d("DEBUG", "updateOff: "+durationModel.getDuration());
         db.update(TABLE_NODE_DURATION, values, dbNode.KEY_NODE_ID + "=? AND "
                 + dbNode.KEY_CHANNEL + "=? AND "
                 + dbNode.KEY_STATUS + "=?", new String[]{
@@ -1031,7 +1028,6 @@ public class dbNodeRepo {
         values.put(KEY_STATUS, durationModel.getStatus());
         values.put(KEY_TIMESTAMPS_OFF, durationModel.getTimeStampOff());
         values.put(KEY_DURATION, durationModel.getDuration());
-        Log.d("DEBUG", "updateOff: "+durationModel.getDuration());
         db.update(TABLE_NODE_DURATION, values, dbNode.KEY_ID + "=?", new String[]{
                 String.valueOf(durationModel.getId())
         });

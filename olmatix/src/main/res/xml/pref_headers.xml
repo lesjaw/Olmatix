@@ -5,17 +5,20 @@
     <header
         android:fragment="com.olmatix.ui.activity.SettingsActivity$NetworkPreferenceFragment"
         android:icon="@drawable/ic_network_black"
-        android:title="@string/pref_network" />
+        android:title="@string/pref_network"
+        android:summary="@string/network_setting"/>
 
     <header
         android:fragment="com.olmatix.ui.activity.SettingsActivity$MiscPreferenceFragment"
         android:icon="@drawable/ic_settings_black"
-        android:title="@string/pref_misc" />
+        android:title="@string/pref_misc"
+        android:summary="@string/misc"/>
 
     <header
         android:id="@+id/setup"
         android:icon="@drawable/ic_setup_black"
-        android:title="@string/pref_setup" />
+        android:title="@string/pref_setup"
+        android:summary="@string/setup_product"/>
 
     <header
         android:id="@+id/about"

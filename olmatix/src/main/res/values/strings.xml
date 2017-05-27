@@ -152,7 +152,10 @@
     <string name="switch_sensor_prox">Notify Sensor Proximity</string>
     <string name="switch_sensorProxDisable">Disable notify sensor Proximity status</string>
     <string name="button_ok">OK</string>
-    <string name="app_ver">1.19</string>
+    <string name="app_ver">1.22</string>
     <string name="pref_ver">Version</string>
+    <string name="network_setting">Configure network manually</string>
+    <string name="misc">GPS Location, Notification etc</string>
+    <string name="setup_product">Configure Olmatix device</string>
 
 </resources>

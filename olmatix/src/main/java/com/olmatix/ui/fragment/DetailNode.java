@@ -104,7 +104,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(UE_ACTION)) {
-                Log.d("Olmatix", "i'm in the foreground");
+                //Log.d("Olmatix", "i'm in the foreground");
                 this.setResultCode(Activity.RESULT_OK);
             }
         }
@@ -199,15 +199,12 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
     private void doAllsubDetailSensor() {
         data1.clear();
         int countDB = mDbNodeRepo.getNodeDetailList().size();
-        Log.d("DEBUG", "Count list Sensor: " + countDB);
         data1.addAll(mDbNodeRepo.getNodeDetailList());
-        countDB = mDbNodeRepo.getNodeDetailList().size();
         String topic1 = "";
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
                 final String mNodeID1 = data1.get(i).getNode_id();
                 final String mSensorT = data1.get(i).getSensor();
-                Log.d("DEBUG", "Count list Sensor: " + mSensorT);
                 if (mSensorT != null&&mSensorT.equals("close")) {
                     for (int a = 0; a < 2; a++) {
                         if (a == 0) {
@@ -245,9 +242,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
     private void doAllsubDetailSensorMotion() {
         data1.clear();
         int countDB = mDbNodeRepo.getNodeDetailList().size();
-        Log.d("DEBUG", "Count list Sensor: " + countDB);
         data1.addAll(mDbNodeRepo.getNodeDetailList());
-        countDB = mDbNodeRepo.getNodeDetailList().size();
         String topic1 = "";
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
@@ -291,9 +286,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
     private void doAllsubDetailSensorTemp() {
         data1.clear();
         int countDB = mDbNodeRepo.getNodeDetailList().size();
-        Log.d("DEBUG", "Count list Sensor: " + countDB);
         data1.addAll(mDbNodeRepo.getNodeDetailList());
-        countDB = mDbNodeRepo.getNodeDetailList().size();
         String topic1 = "";
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {
@@ -337,9 +330,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
     private void doAllsubDetailSensorProx() {
         data1.clear();
         int countDB = mDbNodeRepo.getNodeDetailList().size();
-        Log.d("DEBUG", "Count list Sensor: " + countDB);
         data1.addAll(mDbNodeRepo.getNodeDetailList());
-        countDB = mDbNodeRepo.getNodeDetailList().size();
         String topic1 = "";
         if (countDB != 0) {
             for (int i = 0; i < countDB; i++) {

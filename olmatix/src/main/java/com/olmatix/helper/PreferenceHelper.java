@@ -63,14 +63,30 @@ public class PreferenceHelper {
         return Integer.parseInt(customCachedPrefs.getString("homecurrent", "0"));
     }
 
+    public void setWidht (int current){
+        SharedPreferences.Editor mEditor = customCachedPrefs.edit();
+        mEditor.putString("widht", String.valueOf(current));
+        mEditor.apply();
+    }
+    public float getWidht() { return Float.parseFloat(customCachedPrefs.getString("widht", "0"));
+    }
+
+    public void setLength (int current){
+        SharedPreferences.Editor mEditor = customCachedPrefs.edit();
+        mEditor.putString("length", String.valueOf(current));
+        mEditor.apply();
+    }
+    public float getLength() { return Float.parseFloat(customCachedPrefs.getString("length", "0"));
+    }
+
     public void setHome (int current){
         SharedPreferences.Editor mEditor = customCachedPrefs.edit();
         mEditor.putString("home", String.valueOf(current));
         mEditor.apply();
     }
-
     public int getHome() {
         return Integer.parseInt(customCachedPrefs.getString("home", "0"));
+
     }
 
     public void initializePrefs() {

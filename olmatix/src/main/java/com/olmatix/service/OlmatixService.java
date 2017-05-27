@@ -19,6 +19,9 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -36,6 +39,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -146,6 +150,9 @@ public class OlmatixService extends Service {
     SharedPreferences sharedPref;
     Boolean mStatusServer, doCon, noNotif = true;
     dbNode dbnode;
+    int alarm;
+    String lastValue;
+
 
     PermissionListener permissionlistener = new PermissionListener() {
         @Override
@@ -195,18 +202,6 @@ public class OlmatixService extends Service {
                     snackbarWrapper.show();
                 } else {
                     if (add_NodeID == null) {
-                        /*final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                                "Your device Offline, trying to connect now", TSnackbar.LENGTH_LONG);
-                        snackbarWrapper.setAction("Olmatix",
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Toast.makeText(getApplicationContext(), "Action",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-
-                        snackbarWrapper.show();*/
                         if (!doCon) {
                             doConnect();
                         }
@@ -223,17 +218,8 @@ public class OlmatixService extends Service {
                     editor.putBoolean("conStatus", false);
                     editor.apply();
                     doConnect();
-
-
                 }
                 if (alarmService.equals("con")) {
-/*
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putBoolean("conStatus", false);
-                    editor.apply
-*/
                     if (!doCon) {
                         doConnect();
                     }
@@ -245,7 +231,6 @@ public class OlmatixService extends Service {
             if (add_NodeID != null) {
                 doAddNodeSub();
             }
-
         }
     };
 
@@ -291,15 +276,12 @@ public class OlmatixService extends Service {
             }
 
             hasConnectivity = hasMmobile || hasWifi;
-            Log.d(TAG, "hasConn: " + hasConnectivity + " hasChange: " + hasChanged);
 
             if (hasConnectivity && hasChanged) {
                 if (mqttClient != null) {
-                    Log.d(TAG, "Pref Status con at receive: " + mStatusServer);
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (!mStatusServer) {
-                        Log.d(TAG, "doCon at receive: " + doCon);
                         if (!doCon) {
                             doConnect();
                         }
@@ -323,7 +305,7 @@ public class OlmatixService extends Service {
         String mPassword = sharedPref.getString("password", "olmatix");
         mStatusServer = sharedPref.getBoolean("conStatus", false);
 
-        Log.d(TAG, "login: " + mUserName + " : " + mPassword);
+        Log.d(TAG, mServerURL +" login: " + mUserName + " : " + mPassword);
 
         final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
         Log.d(TAG, "doConnect status connection: " + mStatusServer);
@@ -373,6 +355,7 @@ public class OlmatixService extends Service {
                         Log.d(TAG, "onSuccess: "+connectionResult);
                         flagConn = true;
                         sendMessage();
+                        sendMessageSplash();
                         if (!mSwitch_conn) {
                             Log.d(TAG, "Doing subscribe nodes");
                             doSubAll();
@@ -446,6 +429,7 @@ public class OlmatixService extends Service {
                         }
                         flagConn = false;
                         sendMessage();
+                        sendMessageSplash();
                         showNotification();
                         dbnode.setTopic((String) text);
                         dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
@@ -459,6 +443,7 @@ public class OlmatixService extends Service {
             }
         }
         sendMessage();
+        sendMessageSplash();
         showNotification();
         noNotif = true;
         setFlagSub();
@@ -489,7 +474,7 @@ public class OlmatixService extends Service {
                 noNotif = false;
                 unSubIfnotForeground();
             }
-        }, 10000);
+        }, 20000);
     }
 
     private void connLose() {
@@ -598,12 +583,11 @@ public class OlmatixService extends Service {
                 double homeLat = mPrefHelper.getHomeLatitude();
                 double homelng = mPrefHelper.getHomeLongitude();
                 long thres = mPrefHelper.getHomeThresholdDistance();
-                Log.d("DEBUG", "proximity: " + homeLat + " | " + homelng + ":" + thres);
+                //Log.d("DEBUG", "proximity: " + homeLat + " | " + homelng + ":" + thres);
                 String proximityIntentAction = "com.olmatix.lesjaw.olmatix.ProximityAlert";
                 Intent i = new Intent(proximityIntentAction);
                 PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, i, 0);
                 locationManager.addProximityAlert(homeLat, homelng, thres, -1, pi);
-
                 filter = new IntentFilter(proximityIntentAction);
                 registerReceiver(new OlmatixReceiver(), filter);
             } else {
@@ -675,9 +659,8 @@ public class OlmatixService extends Service {
 
     private void showNotificationNode() {
         final Boolean mSwitch_NotifStatus = sharedPref.getBoolean("switch_notif", true);
-        Log.d(TAG, "showNotificationNode: "+mSwitch_NotifStatus);
-        if (mSwitch_NotifStatus) {
-            Log.d(TAG, "showNotificationNode: ");
+        if (mSwitch_NotifStatus && !noNotif) {
+            //Log.d(TAG, "showNotificationNode: ");
             numMessages++;
 
             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm");
@@ -686,9 +669,9 @@ public class OlmatixService extends Service {
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-            mBuilder.setContentTitle("New Olmatix status");
+            mBuilder.setContentTitle("New "+ getText(string.app_name) +" status");
             mBuilder.setContentText("You've received new status..");
-            mBuilder.setTicker("Olmatix status alert!");
+            mBuilder.setTicker(getText(string.app_name)+" status alert!");
             mBuilder.setAutoCancel(true);
             mBuilder.setWhen(System.currentTimeMillis());
             mBuilder.setNumber(numMessages);
@@ -699,7 +682,7 @@ public class OlmatixService extends Service {
             mBuilder.setPriority(Notification.PRIORITY_MAX);
 
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-            inboxStyle.setBigContentTitle("Olmatix status");
+            inboxStyle.setBigContentTitle(getText(string.app_name)+" status");
             Collections.sort(notifications, Collections.reverseOrder());
             for (int i = 0; i < notifications.size(); i++) {
                 inboxStyle.addLine(notifications.get(i));
@@ -760,8 +743,15 @@ public class OlmatixService extends Service {
     private void sendMessage() {
         Intent intent = new Intent("MQTTStatus");
         intent.putExtra("MqttStatus", flagConn);
-        intent.putExtra("ConnectionStatus", connectionResult);
+        //intent.putExtra("ConnectionStatus", connectionResult);
         //Log.d(TAG, "sendMessage: "+connectionResult);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendMessageSplash() {
+        Intent intent = new Intent("splashauth");
+        intent.putExtra("ConnectionStatus", connectionResult);
+        Log.d(TAG, "sendMessage: "+connectionResult);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -798,6 +788,76 @@ public class OlmatixService extends Service {
         String mNodeIdSplit = mNodeID;
         mNodeIdSplit = mNodeIdSplit.substring(mNodeIdSplit.indexOf("$") + 1, mNodeIdSplit.length());
         messageReceive.put(mNodeIdSplit, mMessage);
+        String online = outputDevices[2];
+
+        if (online.equals("$online")){
+            //Log.d(TAG, "Online : "+online +"="+mMessage);
+            checkActivityForeground();
+            installedNodeModel.setNodesID(NodeID);
+            data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
+            int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    if (data2.get(i).getNice_name_n() != null) {
+                        mNiceNameN = data2.get(i).getNice_name_n();
+                    } else {
+                        mNiceNameN = data2.get(i).getFwName();
+                    }
+
+                    lastValue = data2.get(i).getOnline();
+
+                    if (TextUtils.isEmpty(lastValue)){
+                        lastValue = "false";
+                    }
+
+                    if (mMessage.equals("true")) {
+                        Log.d(TAG, "addNode: "+lastValue);
+                        if (lastValue.equals("false")) {
+                            titleNode = mNiceNameN;
+                            textNode = "ONLINE";
+                            installedNodeModel.setOnline("true");
+                            //installedNodeModel.setOnline(messageReceive.get("online"));
+                            installedNodeModel.setNodesID(NodeID);
+                            mDbNodeRepo.updateOnline(installedNodeModel);
+
+                            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                            dbnode.setTopic(mNiceNameN + " is " + textNode);
+                            dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                            mDbNodeRepo.insertDbMqtt(dbnode);
+
+                            mChange = "2";
+                            sendMessageDetail();
+                        }
+
+                    } else  if (mMessage.equals("false")) {
+                        if (lastValue.equals("true")) {
+                            titleNode = mNiceNameN;
+                            textNode = "OFFLINE";
+                            installedNodeModel.setOnline("false");
+                            //installedNodeModel.setOnline(messageReceive.get("online"));
+                            installedNodeModel.setNodesID(NodeID);
+                            mDbNodeRepo.updateOnline(installedNodeModel);
+
+                            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                            dbnode.setTopic(mNiceNameN + " is " + textNode);
+                            dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                            mDbNodeRepo.insertDbMqtt(dbnode);
+
+                            mChange = "2";
+                            sendMessageDetail();
+                        }
+
+                    }
+                    if (!flagOnForeground) {
+                        if (!noNotif) {
+                            showNotificationNode();
+                        }
+                    }
+                }
+            }
+            data2.clear();
+            lastValue="";
+        }
         checkValidation();
     }
 
@@ -933,7 +993,7 @@ public class OlmatixService extends Service {
         messageReceive.clear();
     }
 
-    private void toastAndNotif() {
+    private void toastAndNotif1() {
 
         checkActivityForeground();
         String state = "";
@@ -953,6 +1013,7 @@ public class OlmatixService extends Service {
         }
 
         if (state.equals("true") || state.equals("ON")) {
+
             state = "ON";
         }
         if (state.equals("false") || state.equals("OFF")) {
@@ -1020,15 +1081,15 @@ public class OlmatixService extends Service {
     }
 
     private void updateSensorDoor() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final Boolean mSwitch_NotifStatus_door = sharedPref.getBoolean("switch_sensor_door", true);
+        final Boolean mSwitch_NotifStatus_motion = sharedPref.getBoolean("switch_sensor_motion", true);
+        final Boolean mSwitch_NotifStatus_prox = sharedPref.getBoolean("switch_sensor_prox", true);
 
+        checkActivityForeground();
         if (!mNodeID.contains("light")) {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
-            detailNodeModel.setStatus_sensor(mMessage);
-            mDbNodeRepo.update_detailSensor(detailNodeModel);
-
-            mChange = "2";
-            sendMessageDetail();
 
             data1.addAll(mDbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
             int countDB = mDbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
@@ -1039,78 +1100,126 @@ public class OlmatixService extends Service {
                     } else {
                         mNiceName = data1.get(i).getName();
                     }
-                }
-            }
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            final Boolean mSwitch_NotifStatus_door = sharedPref.getBoolean("switch_sensor_door", true);
-            if (mSwitch_NotifStatus_door) {
-                if (mNodeID.contains("door/close")) {
-                    if (mMessage.equals("true")) {
-                        titleNode = mNiceName;
-                        textNode = "Closed";
-                        showNotificationNode();
-                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                        dbnode.setTopic(mNiceName + " is " + textNode);
-                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                        mDbNodeRepo.insertDbMqtt(dbnode);
-                    } else if (mMessage.equals("false")) {
-                        titleNode = mNiceName;
-                        textNode = "Open";
-                        showNotificationNode();
-                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                        dbnode.setTopic(mNiceName + " is " + textNode);
-                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                        mDbNodeRepo.insertDbMqtt(dbnode);
+                    lastValue = data1.get(i).getStatus_sensor();
+                    if (!lastValue.equals(mMessage) ) {
+                        if (mSwitch_NotifStatus_door) {
+                            if (mNodeID.contains("door/close")) {
+                                if (mMessage.equals("true")) {
+                                    titleNode = mNiceName;
+                                    textNode = "Closed";
+                                    showNotificationNode();
+
+                                    detailNodeModel.setStatus_sensor(mMessage);
+                                    mDbNodeRepo.update_detailSensor(detailNodeModel);
+
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName + " is " + textNode);
+                                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+
+                                    mChange = "2";
+                                    sendMessageDetail();
+
+                                } else if (mMessage.equals("false")) {
+                                    titleNode = mNiceName;
+                                    textNode = "Open";
+                                    showNotificationNode();
+
+                                    detailNodeModel.setStatus_sensor(mMessage);
+                                    mDbNodeRepo.update_detailSensor(detailNodeModel);
+
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName + " is " + textNode);
+                                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+
+                                    mChange = "2";
+                                    sendMessageDetail();
+                                }
+
+                            }
+                        }
+
+
+                        if (mSwitch_NotifStatus_motion) {
+                            if (mNodeID.contains("motion/motion")) {
+                                if (mMessage.equals("true")) {
+                                    titleNode = mNiceName;
+                                    textNode = "Motion";
+                                    showNotificationNode();
+
+                                    detailNodeModel.setStatus_sensor(mMessage);
+                                    mDbNodeRepo.update_detailSensor(detailNodeModel);
+
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName + " is " + textNode);
+                                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+
+                                    mChange = "2";
+                                    sendMessageDetail();
+                                } else if (mMessage.equals("false")) {
+                                    titleNode = mNiceName;
+                                    textNode = "No Motion";
+                                    showNotificationNode();
+
+                                    detailNodeModel.setStatus_sensor(mMessage);
+                                    mDbNodeRepo.update_detailSensor(detailNodeModel);
+
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName + " is " + textNode);
+                                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+
+                                    mChange = "2";
+                                    sendMessageDetail();
+                                }
+                            }
+                        }
+
+
+                        if (mSwitch_NotifStatus_prox) {
+                            if (mNodeID.contains("prox/status")) {
+                                if (mMessage.equals("true")) {
+                                    titleNode = mNiceName;
+                                    textNode = "Detected";
+                                    showNotificationNode();
+
+                                    detailNodeModel.setStatus_sensor(mMessage);
+                                    mDbNodeRepo.update_detailSensor(detailNodeModel);
+
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName + " is " + textNode);
+                                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+
+                                    mChange = "2";
+                                    sendMessageDetail();
+                                } else if (mMessage.equals("false")) {
+                                    titleNode = mNiceName;
+                                    textNode = "Empty";
+                                    showNotificationNode();
+
+                                    detailNodeModel.setStatus_sensor(mMessage);
+                                    mDbNodeRepo.update_detailSensor(detailNodeModel);
+
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName + " is " + textNode);
+                                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+
+                                    mChange = "2";
+                                    sendMessageDetail();
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            final Boolean mSwitch_NotifStatus_motion = sharedPref.getBoolean("switch_sensor_motion", true);
-            if (mSwitch_NotifStatus_motion) {
-                if (mNodeID.contains("motion/motion")) {
-                    if (mMessage.equals("true")) {
-                        titleNode = mNiceName;
-                        textNode = "Motion";
-                        showNotificationNode();
-                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                        dbnode.setTopic(mNiceName + " is " + textNode);
-                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                        mDbNodeRepo.insertDbMqtt(dbnode);
-                    } else if (mMessage.equals("false")) {
-                        titleNode = mNiceName;
-                        textNode = "No Motion";
-                        showNotificationNode();
-                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                        dbnode.setTopic(mNiceName + " is " + textNode);
-                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                        mDbNodeRepo.insertDbMqtt(dbnode);
-                    }
-                }
-            }
 
-            final Boolean mSwitch_NotifStatus_prox = sharedPref.getBoolean("switch_sensor_prox", true);
-            if (mSwitch_NotifStatus_prox) {
-                if (mNodeID.contains("prox/status")) {
-                    if (mMessage.equals("true")) {
-                        titleNode = mNiceName;
-                        textNode = "Detected";
-                        showNotificationNode();
-                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                        dbnode.setTopic(mNiceName + " is " + textNode);
-                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                        mDbNodeRepo.insertDbMqtt(dbnode);
-                    } else if (mMessage.equals("false")) {
-                        titleNode = mNiceName;
-                        textNode = "Empty";
-                        showNotificationNode();
-                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                        dbnode.setTopic(mNiceName + " is " + textNode);
-                        dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                        mDbNodeRepo.insertDbMqtt(dbnode);
-                    }
-                }
-            }
             data1.clear();
+            lastValue="";
         }
     }
 
@@ -1120,7 +1229,6 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_temp(mMessage);
-            Log.d(TAG, "UpdateSensorTemp: "+mMessage);
             mDbNodeRepo.update_detailSensorTemp(detailNodeModel);
 
             mChange = "2";
@@ -1134,8 +1242,6 @@ public class OlmatixService extends Service {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
             detailNodeModel.setStatus_hum(mMessage);
-            Log.d(TAG, "UpdateSensorHum: "+mMessage);
-
             mDbNodeRepo.update_detailSensorHum(detailNodeModel);
 
             mChange = "2";
@@ -1174,12 +1280,7 @@ public class OlmatixService extends Service {
         if (!mNodeID.contains("light")) {
             detailNodeModel.setNode_id(NodeIDSensor);
             detailNodeModel.setChannel("0");
-            if (mMessage.equals("true")) {
-                detailNodeModel.setStatus_theft(mMessage);
 
-                mDbNodeRepo.update_detailSensorTheft(detailNodeModel);
-                mChange = "2";
-                sendMessageDetail();
                 data1.addAll(mDbNodeRepo.getNodeDetail(NodeIDSensor, "0"));
                 int countDB = mDbNodeRepo.getNodeDetail(NodeIDSensor, "0").size();
                 if (countDB != 0) {
@@ -1189,18 +1290,63 @@ public class OlmatixService extends Service {
                         } else {
                             mNiceName = data1.get(i).getName();
                         }
+                        lastValue = data1.get(i).getStatus_theft();
+
+                        if (!lastValue.equals(mMessage)) {
+                            if (mMessage.equals("true")) {
+
+                                detailNodeModel.setStatus_theft(mMessage);
+                                mDbNodeRepo.update_detailSensorTheft(detailNodeModel);
+                                mChange = "2";
+                                sendMessageDetail();
+
+                                if (alarm == 0) {
+                                    titleNode = mNiceName;
+                                    textNode = "ALARM!!";
+                                    showNotificationNode();
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName + " is " + textNode);
+                                    dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+                                    alarm = 1;
+
+                                    //playAlarm(1);
+                                    checkActivityForeground();
+                                    if (!flagOnForeground){
+                                        Intent iA = new Intent(getApplicationContext(), RingtonePlayingService.class);
+                                        startService(iA);
+                                    }
+
+
+                                }
+                            }
+                        }
                     }
                 }
-                if (mMessage.equals("true")) {
-                    titleNode = mNiceName;
-                    textNode = "ALARM!!";
-                    showNotificationNode();
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dbnode.setTopic(mNiceName+" is "+textNode);
-                    dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
-                    mDbNodeRepo.insertDbMqtt(dbnode);
-                }
+
                 data1.clear();
+
+        }
+    }
+
+    private void playAlarm (int code){
+        Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Ringtone ringtoneSound = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
+        if (code==1) {
+            if (ringtoneSound != null) {
+                ringtoneSound.play();
+                Log.d(TAG, "playAlarm: ");
+            }
+        } else {
+            if (ringtoneSound.isPlaying()){
+                ringtoneSound.stop();
+            }
+
+            if (ringtoneSound != null) {
+                ringtoneSound.stop();
+
+                Log.d(TAG, "stopAlarm: ");
+
             }
         }
     }
@@ -1211,7 +1357,7 @@ public class OlmatixService extends Service {
         Channel = outputDevices[3];
         message_topic.put(Channel, mMessage);
         saveDatabase_Detail();
-        toastAndNotif();
+        //toastAndNotif();
     }
 
     private void addNodeDetail() {
@@ -1544,51 +1690,9 @@ public class OlmatixService extends Service {
         }
         //installedNodeModel.setOnline(messageReceive.get("online"));
         if (messageReceive.containsKey("online")) {
-            checkActivityForeground();
-            installedNodeModel.setNodesID(NodeID);
-            data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
-            int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
+            //Log.d(TAG, "ONLINE : "+messageReceive);
 
-            if (countDB != 0) {
-                    for (int i = 0; i < countDB; i++) {
-                        if (data2.get(i).getNice_name_n() != null) {
-                            mNiceNameN = data2.get(i).getNice_name_n();
-                        } else {
-                            mNiceNameN = data2.get(i).getFwName();
 
-                        }
-                        int id = Integer.parseInt(NodeID.replaceAll("[\\D]", ""));
-                        notifyID = id + 2;
-                        if (mMessage.equals("true")) {
-                            titleNode = mNiceNameN;
-                            textNode = "ONLINE";
-                            installedNodeModel.setOnline("true");
-                            //installedNodeModel.setOnline(messageReceive.get("online"));
-                            installedNodeModel.setNodesID(NodeID);
-                            mDbNodeRepo.updateOnline(installedNodeModel);
-
-                        } else  if (mMessage.equals("false")) {
-                            titleNode = mNiceNameN;
-                            textNode = "OFFLINE";
-                            installedNodeModel.setOnline("false");
-                            //installedNodeModel.setOnline(messageReceive.get("online"));
-                            installedNodeModel.setNodesID(NodeID);
-                            mDbNodeRepo.updateOnline(installedNodeModel);
-
-                        }
-                        if (!flagOnForeground) {
-                            if (!noNotif) {
-                                showNotificationNode();
-                            }
-                        }
-                    }
-                }
-
-            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-            dbnode.setTopic(mNiceNameN+" is "+textNode);
-            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
-            mDbNodeRepo.insertDbMqtt(dbnode);
-            data2.clear();
         }
 
         installedNodeModel.setSignal(messageReceive.get("signal"));
@@ -1618,28 +1722,85 @@ public class OlmatixService extends Service {
         /*new Thread(new Runnable() {
             @Override
             public void run() {*/
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final Boolean mSwitch_NotifStatus = sharedPref.getBoolean("switch_notif", true);
 
                 if (!mNodeID.contains("door/close")||!mNodeID.contains("motion/motion")||
                         !mNodeID.contains("prox/status")) {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel(Channel);
-                    if (mMessage.equals("true")) {
-                        detailNodeModel.setStatus(mMessage);
 
-                        saveOnTime();
+                    data1.addAll(mDbNodeRepo.getNodeDetail(NodeID, Channel));
+                    int countDB = mDbNodeRepo.getNodeDetail(NodeID, Channel).size();
+                    if (countDB != 0) {
+                        for (int i = 0; i < countDB; i++) {
+                            if (data1.get(i).getNice_name_d() != null) {
+                                mNiceName = data1.get(i).getNice_name_d();
+                            } else {
+                                mNiceName = data1.get(i).getName();
+                            }
+                            lastValue = data1.get(i).getStatus();
 
-                    } else if (mMessage.equals("false")) {
-                        detailNodeModel.setStatus(mMessage);
+                            if (TextUtils.isEmpty(lastValue)){
+                               lastValue = "false";
+                            }
 
-                            detailNodeModel.setStatus_theft("false");
-                            mDbNodeRepo.update_detailSensorTheft(detailNodeModel);
+                            if (mMessage.equals("true")) {
+                                if (lastValue.equals("false")) {
+                                    detailNodeModel.setStatus(mMessage);
+                                    saveOnTime();
+                                    titleNode = mNiceName;
+                                    textNode = "ON";
+                                    if (mSwitch_NotifStatus) {
+                                        if (!flagOnForeground) {
+                                            if (!noNotif) {
+                                                showNotificationNode();
+                                            }
+                                        }
+                                    }
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName+" is "+textNode);
+                                    dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+                                    mDbNodeRepo.update_detail(detailNodeModel);
+                                    mChange = "2";
+                                    sendMessageDetail();
+                                    lastValue="";
+                                }
 
-                        saveOffTime();
+                            } else if (mMessage.equals("false")) {
+                                if (lastValue.equals("true")) {
+                                    detailNodeModel.setStatus(mMessage);
+                                    titleNode = mNiceName;
+                                    textNode = "OFF";
+                                    saveOffTime();
+                                    if (mSwitch_NotifStatus) {
+                                        if (!flagOnForeground) {
+                                            if (!noNotif) {
+
+                                                showNotificationNode();
+                                            }
+                                        }
+                                    }
+                                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                                    dbnode.setTopic(mNiceName+" is "+textNode);
+                                    dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                                    mDbNodeRepo.insertDbMqtt(dbnode);
+                                    mDbNodeRepo.update_detail(detailNodeModel);
+                                    mChange = "2";
+                                    sendMessageDetail();
+                                    lastValue="";
+                                    detailNodeModel.setStatus_theft("false");
+                                    mDbNodeRepo.update_detailSensorTheft(detailNodeModel);
+
+                                    alarm=0;
+
+                                    //playAlarm(0);
+                                }
+                            }
+                        }
                     }
 
-                    mDbNodeRepo.update_detail(detailNodeModel);
-                    mChange = "2";
-                    sendMessageDetail();
                     data1.clear();
                 }
            /* }
@@ -1783,7 +1944,6 @@ public class OlmatixService extends Service {
     private void doSubAllDetail() {
                 int countDB = mDbNodeRepo.getNodeDetailList().size();
                 data1.addAll(mDbNodeRepo.getNodeDetailList());
-                countDB = mDbNodeRepo.getNodeDetailList().size();
                 if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data1.get(i).getNode_id();
@@ -1817,7 +1977,6 @@ public class OlmatixService extends Service {
 
                 int countDB = mDbNodeRepo.getNodeDetailList().size();
                 data1.addAll(mDbNodeRepo.getNodeDetailList());
-                countDB = mDbNodeRepo.getNodeDetailList().size();
                 if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID1 = data1.get(i).getNode_id();
@@ -2007,10 +2166,9 @@ public class OlmatixService extends Service {
             } else if (mNodeID.contains("dist/range")) {
                 UpdateSensorRange();
 
-            }else {
+            } else   {
                 updateDetail();
             }
-
         }
 
         @Override

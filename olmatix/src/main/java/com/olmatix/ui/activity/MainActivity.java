@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
@@ -41,6 +44,7 @@ import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.service.OlmatixService;
+import com.olmatix.service.RingtonePlayingService;
 import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.ui.fragment.Scene;
@@ -69,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton butRecent, deleteRecent;
     private Animation animConn;
     private Toolbar mToolbar;
-    private TextView settingLabel, aboutLabel, recentLabel;
+    private TextView settingLabel, aboutLabel, recentLabel, exitLabel;
     private CheckedTextView logText;
     public static final String UE_ACTION = "com.olmatix.ui.activity.inforeground";
     private IntentFilter mIntentFilter;
@@ -193,6 +197,9 @@ public class MainActivity extends AppCompatActivity {
         setupToolbar();
         setupTabs();
 
+        Intent iA = new Intent(getApplicationContext(), RingtonePlayingService.class);
+        stopService(iA);
+
 
     }
 
@@ -233,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         mOlmatixAdapter = new OlmatixPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
-
+        exitLabel = (TextView) findViewById(R.id.exitLabel);
         rotate_forward = AnimationUtils.loadAnimation(this, R.anim.rotate_forward90);
         rotate_backward = AnimationUtils.loadAnimation(this,R.anim.rotate_backward90);
 
@@ -333,6 +340,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        exitLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                System.exit(0);
+            }
+        });
     }
 
     private void setupToolbar() {
@@ -368,6 +383,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
     }
 
     @Override

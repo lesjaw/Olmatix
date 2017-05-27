@@ -144,7 +144,7 @@ public class SignupActivity extends AppCompatActivity {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
 
 
-            String url = "http://cloud.olmatix.com/rest/insert_sent.php";
+            String url = "http://103.43.47.61/rest/insert_sent.php";
             StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, response -> {
                 Log.d(TAG, "onResponse: "+response);
                     parsingJson(response);

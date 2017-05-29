@@ -199,9 +199,11 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             int qos = 2;
                             try {
                                 IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                int finalA = a;
                                 subToken.setActionCallback(new IMqttActionListener() {
                                     @Override
                                     public void onSuccess(IMqttToken asyncActionToken) {
+                                        Log.d(TAG, "onSuccess: " + finalA);
                                     }
 
                                     @Override

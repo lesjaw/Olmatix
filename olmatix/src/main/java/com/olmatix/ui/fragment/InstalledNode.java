@@ -172,9 +172,11 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         protected String doInBackground(Void...arg0) {
             sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             mStatusServer = sharedPref.getBoolean("conStatus", false);
+            Log.d(TAG, "doInBackground: "+mStatusServer);
             if (mStatusServer) {
                 final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
                 if (!mSwitch_conn) {
+                    Log.d(TAG, "doInBackground: "+mSwitch_conn);
                     int countDB = dbNodeRepo.getNodeList().size();
                     data.addAll(dbNodeRepo.getNodeList());
                     for (int i = 0; i < countDB; i++) {
@@ -217,6 +219,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     }
                     data.clear();
                 } else {
+                    Log.d(TAG, "doInBackground: "+mSwitch_conn);
 
                     int countDB = dbNodeRepo.getNodeList().size();
                     data.addAll(dbNodeRepo.getNodeList());
@@ -243,9 +246,12 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             int qos = 2;
                             try {
                                 IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                int finalA = a;
                                 subToken.setActionCallback(new IMqttActionListener() {
                                     @Override
                                     public void onSuccess(IMqttToken asyncActionToken) {
+                                        Log.d(TAG, "onSuccess: " + finalA);
+
                                     }
 
                                     @Override

@@ -1696,10 +1696,12 @@ public class OlmatixService extends Service {
         }
 
         installedNodeModel.setSignal(messageReceive.get("signal"));
+
         installedNodeModel.setUptime(messageReceive.get("uptime"));
         if (messageReceive.containsKey("uptime")) {
             if (mMessage != null) {
                 installedNodeModel.setOnline("true");
+                mDbNodeRepo.updateOnline(installedNodeModel);
             }
         }
         Calendar now = Calendar.getInstance();

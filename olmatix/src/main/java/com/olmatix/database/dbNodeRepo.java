@@ -24,6 +24,7 @@ import com.olmatix.model.SceneDetailModel;
 import com.olmatix.model.SceneModel;
 import com.olmatix.model.SpinnerObject;
 import com.olmatix.model.SpinnerObjectDash;
+import com.olmatix.model.groupModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,9 +104,24 @@ public class dbNodeRepo {
 
         values.put(KEY_ID_NODE_DETAIL, dashboardNodeModel.getNice_name_d());
         values.put(KEY_NODE_ID, dashboardNodeModel.getNodeid());
+        values.put(KEY_GROUP_ID, dashboardNodeModel.getGroupid());
 
 
         db.insert(TABLE_FAV, null, values);
+
+        db.close(); // Closing database connection
+
+        return;
+    }
+
+    public void insertgroup(groupModel groupModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_GROUP_NAME, groupModel.getGroupName());
+
+        db.insert(TABLE_GROUP, null, values);
 
         db.close(); // Closing database connection
 
@@ -647,6 +663,31 @@ public class dbNodeRepo {
         return nodeList;
     }
 
+    public ArrayList<groupModel> getGroupList() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_GROUP;
+
+        ArrayList<groupModel> nodeList = new ArrayList<groupModel>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                groupModel node = new groupModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setGroupid(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setGroupName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_GROUP_NAME)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        //Log.d("getlist", "getNodeList: " +cursor.getCount());
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
     public ArrayList<InstalledNodeModel> getNodeListReset(String nodesID) {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -857,6 +898,46 @@ public class dbNodeRepo {
 
         ArrayList<DashboardNodeModel> nodeList = new ArrayList<>();
         Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                DashboardNodeModel node = new DashboardNodeModel();
+                node.setId(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setId_node_detail(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ID_NODE_DETAIL)));
+                node.setNice_name_d(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NICE_NAME_D)));
+                node.setSensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_SENSOR)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setNodeid(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setStatus_sensor(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_SENSOR)));
+                node.setStatus_theft(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_THEFT)));
+                node.setOnline(cursor.getString(cursor.getColumnIndex(dbNode.KEY_ONLINE)));
+                node.setTemp(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_TEMP)));
+                node.setHum(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS_HUM)));
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        return nodeList;
+
+    }
+
+    public ArrayList<DashboardNodeModel> getNodeDetailDashNew(String node_id) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_FAV +
+                " favorite_node INNER JOIN " + TABLE_NODE +
+                " detail_node ON favorite_node." + KEY_ID_NODE_DETAIL+ " = detail_node." + KEY_ID +
+                " INNER JOIN " + TABLE +
+                " installed_node ON installed_node." + KEY_NODE_ID + " = detail_node." + KEY_NODE_ID +
+                " WHERE favorite_node." + KEY_GROUP_ID + "=?";
+
+
+        ArrayList<DashboardNodeModel> nodeList = new ArrayList<>();
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(node_id)});
+
         if (cursor.moveToFirst()) {
             do {
                 DashboardNodeModel node = new DashboardNodeModel();

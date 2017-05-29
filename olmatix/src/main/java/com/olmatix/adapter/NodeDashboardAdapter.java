@@ -1,12 +1,13 @@
 package com.olmatix.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
-import android.renderscript.Matrix2f;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.ui.fragment.DashboardNode;
+import com.olmatix.ui.fragment.DashboardNode2;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -40,16 +42,16 @@ import java.util.List;
 
 public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdapter.ViewHolder> implements ItemTouchHelperAdapter {
 
-    private final OnStartDragListener mDragStartListener;
+    //private final OnStartDragListener mDragStartListener;
     List<DashboardNodeModel> nodeList;
     private Animation animConn;
     Context context;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
 
-    public NodeDashboardAdapter(ArrayList<DashboardNodeModel> nodeList, Context dashboardnode, OnStartDragListener dragStartListener) {
+    public NodeDashboardAdapter(ArrayList<DashboardNodeModel> nodeList, Context dashboardnode, groupAdapter groupAdapter) {
         this.nodeList = nodeList;
-        mDragStartListener = dragStartListener;
+        //mDragStartListener = dragStartListener;
         this.context = dashboardnode;
     }
 
@@ -72,6 +74,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         return viewType;
     }
 
+    public void notifyChange() {
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return nodeList.size();
@@ -81,7 +87,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
         String mNodeID = nodeList.get(position).getId_node_detail();
         Log.d("DEBUG", "removeItem: "+mNodeID);
-        DashboardNode.mDbNodeRepo.deleteFav(mNodeID);
+        DashboardNode.mDbNodeRepo.deleteFav(String.valueOf(mNodeID));
         nodeList.remove(position);
 
         notifyItemRemoved(position);
@@ -199,6 +205,33 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 }
             });
 
+            holder.imgNode.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Delete this Node?");
+                    builder.setMessage(mFavoriteModel.getNice_name_d());
+                    String nice_name = mFavoriteModel.getNice_name_d();
+
+                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            removeItem(position);
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+                    return false;
+                }
+            });
+
         } else if ((mFavoriteModel.getSensor().trim()).equals("close")||(mFavoriteModel.getSensor().trim()).equals("motion")||(mFavoriteModel.getSensor().trim()).equals("prox")) {
 
             final StatusHolder holder = (StatusHolder) viewHolder;
@@ -294,6 +327,34 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     }
                 }
             });
+
+            holder.imgNodesBut.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Delete this Node?");
+                    builder.setMessage(mFavoriteModel.getNice_name_d());
+                    String nice_name = mFavoriteModel.getNice_name_d();
+
+                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            removeItem(position);
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+
+                    return false;
+                }
+            });
         } else if ((mFavoriteModel.getSensor().trim()).equals("temp")) {
 
             final TempHolder holder = (TempHolder) viewHolder;
@@ -380,7 +441,36 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     }
                 }
             });
+
+            holder.imgNode.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Delete this Node?");
+                    builder.setMessage(mFavoriteModel.getNice_name_d());
+                    String nice_name = mFavoriteModel.getNice_name_d();
+
+                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            removeItem(position);
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+                    return false;
+                }
+            });
         }
+
+
     }
 
     @Override

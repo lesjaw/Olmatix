@@ -19,6 +19,7 @@ public class DashboardNodeModel {
     private String id_node_detail;
     private String temp;
     private String hum;
+    private String groupid;
 
     public int getId() {
         return id;
@@ -122,5 +123,13 @@ public class DashboardNodeModel {
 
     public void setHum(String hum) {
         this.hum = hum;
+    }
+
+    public String getGroupid() {
+        return groupid;
+    }
+
+    public void setGroupid(String groupid) {
+        this.groupid = groupid;
     }
 }

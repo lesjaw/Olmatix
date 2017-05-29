@@ -239,7 +239,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onPostResume() {
         super.onPostResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter("MQTTStatus"));
+                mMessageReceiver, new IntentFilter("splashauth"));
     }
 
     @Override

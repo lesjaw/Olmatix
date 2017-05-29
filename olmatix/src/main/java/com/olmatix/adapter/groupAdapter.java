@@ -56,7 +56,7 @@ public class groupAdapter extends RecyclerView.Adapter<groupAdapter.ViewHolder> 
     private static ArrayList<DashboardNodeModel> data;
     int currentview=1;
     int mNoOfColumns;
-    String groupi;
+    int broadRegeister;
 
 
 
@@ -137,14 +137,9 @@ public class groupAdapter extends RecyclerView.Adapter<groupAdapter.ViewHolder> 
         mRecycleView.addItemDecoration(new GridSpacesItemDecoration(OlmatixUtils.dpToPx(2),true));
 
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
+            LocalBroadcastManager.getInstance(context).registerReceiver(
+                    mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
 
-        LocalBroadcastManager.getInstance(context).registerReceiver(
-                mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
-
-        //currentview = position;
-        groupid =1;
-
-        //currentview = mGroupModel.getGroupid();
         return new groupHolder(itemView);
 
     }
@@ -159,14 +154,9 @@ public class groupAdapter extends RecyclerView.Adapter<groupAdapter.ViewHolder> 
                 message = "1";
             }
             if (message.equals("2")){
-                //setRefresh();
+                setRefresh();
                 adapter.notifyChange();
-                if (groupid==1){
-                    Log.d("DEBUG", "onReceive: "+groupid);
-                    //setRefresh();
-                }
             }
-
         }
     };
 
@@ -185,36 +175,29 @@ public class groupAdapter extends RecyclerView.Adapter<groupAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
+        viewHolder.itemView.setTag(position);
+
         final groupModel mGroupModel = nodeList.get(position);
         final groupHolder holder = (groupHolder) viewHolder;
 
         holder.group_name.setText(mGroupModel.getGroupName());
         groupid = mGroupModel.getGroupid();
+        Log.d("DEBUG", "onBindViewHolder: "+groupid);
         data.clear();
         data.addAll(mDbNodeRepo.getNodeDetailDashNew(String.valueOf(groupid)));
         adapter = new NodeDashboardAdapter(data, dashboardnode, this);
         mRecycleView.setAdapter(adapter);
-        currentview=2;
-       /* Log.d("DEBUG", "onBindViewHolder: "+groupid);
-        if (groupid==1){
-            Log.d("DEBUG", "onBindViewHolder: "+currentview);
-            if (currentview==1) {
-                Intent intent = new Intent("MQTTStatusDetail");
-                intent.putExtra("NotifyChangeDetail", "3");
-                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                currentview=2;
-            }
-        } else if (groupid==2) {
-            currentview=1;
-        }*/
+
         holder.mFab.setOnClickListener(mFabClickListener());
+
     }
+
 
     private void setRefresh() {
 
         adapter.notifyDataSetChanged();
         data.clear();
-        data.addAll(mDbNodeRepo.getNodeDetailDashNew(String.valueOf(groupid)));
+        data.addAll(mDbNodeRepo.getNodeDetailDashNew(String.valueOf(1)));
         if(adapter != null){
             adapter.notifyItemRangeChanged(0, adapter.getItemCount());
             Log.d("DEBUG", "Group setRefresh: ");

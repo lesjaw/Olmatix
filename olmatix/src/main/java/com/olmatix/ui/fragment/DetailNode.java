@@ -338,7 +338,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
                 final String mSensorT = data1.get(i).getSensor();
                 Log.d("DEBUG", "Count list Sensor: " + mSensorT);
                 if (mSensorT != null&&mSensorT.equals("prox")) {
-                    for (int a = 0; a < 3; a++) {
+                    for (int a = 0; a < 4; a++) {
                         if (a == 0) {
                             topic1 = "devices/" + mNodeID1 + "/prox/status";
                         }
@@ -347,6 +347,9 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
                         }
                         if (a == 2) {
                             topic1 = "devices/" + mNodeID1 + "/dist/range";
+                        }
+                        if (a == 3) {
+                            topic1 = "devices/" + mNodeID1 + "/prox/theft";
                         }
 
                         int qos = 1;

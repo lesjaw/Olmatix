@@ -429,8 +429,59 @@ public class SettingsActivity extends SettingsFragment {
                         }
 
                     }
+                    doAllsubDetailSensorProx();
+
                 }
 
+            }
+        }
+
+        private void doAllsubDetailSensorProx() {
+            int countDB = mDbNodeRepo.getNodeDetailList().size();
+            Log.d("DEBUG", "Count list Sensor: " + countDB);
+            data1.clear();
+            data1.addAll(mDbNodeRepo.getNodeDetailList());
+            countDB = mDbNodeRepo.getNodeDetailList().size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    final String mNodeID1 = data1.get(i).getNode_id();
+                    final String mSensorT = data1.get(i).getSensor();
+                    //Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                    if (mSensorT != null && mSensorT.equals("prox")) {
+                        for (int a = 0; a < 4; a++) {
+                            if (a == 0) {
+                                topic = "devices/" + mNodeID1 + "/prox/status";
+                            }
+                            if (a == 1) {
+                                topic = "devices/" + mNodeID1 + "/prox/theft";
+                            }
+                            if (a == 2) {
+                                topic = "devices/" + mNodeID1 + "/prox/jarak";
+                            }
+                            if (a == 3) {
+                                topic = "devices/" + mNodeID1 + "/dist/range";
+                            }
+
+                            int qos = 2;
+                            try {
+                                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                subToken.setActionCallback(new IMqttActionListener() {
+                                    @Override
+                                    public void onSuccess(IMqttToken asyncActionToken) {
+                                        //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                    }
+
+                                    @Override
+                                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                    }
+                                });
+                            } catch (MqttException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                }
             }
         }
 

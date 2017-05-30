@@ -113,7 +113,6 @@ public class groupAdapterNew extends RecyclerView.Adapter<groupAdapterNew.ViewHo
         itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.group_dash, parent, false);
 
-
         return new groupHolder(itemView);
 
     }
@@ -127,7 +126,6 @@ public class groupAdapterNew extends RecyclerView.Adapter<groupAdapterNew.ViewHo
         public groupHolder(View view) {
             super(view);
             group_name = (Button) view.findViewById(R.id.group_name);
-            //mFab = (FloatingActionButton) view.findViewById(R.id.fab);
         }
     }
 
@@ -138,6 +136,15 @@ public class groupAdapterNew extends RecyclerView.Adapter<groupAdapterNew.ViewHo
         final groupHolder holder = (groupHolder) viewHolder;
 
         holder.group_name.setText(mGroupModel.getGroupName());
+        holder.group_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("DEBUG", "onClick: "+mGroupModel.getGroupid());
+                Intent intent = new Intent("groupid");
+                intent.putExtra("groupid", String.valueOf(mGroupModel.getGroupid()));
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            }
+        });
 
 //        holder.mFab.setOnClickListener(mFabClickListener());
 

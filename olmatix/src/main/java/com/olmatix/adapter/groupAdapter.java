@@ -185,7 +185,7 @@ public class groupAdapter extends RecyclerView.Adapter<groupAdapter.ViewHolder> 
         Log.d("DEBUG", "onBindViewHolder: "+groupid);
         data.clear();
         data.addAll(mDbNodeRepo.getNodeDetailDashNew(String.valueOf(groupid)));
-        adapter = new NodeDashboardAdapter(data, dashboardnode, this);
+        //adapter = new NodeDashboardAdapter(data, dashboardnode, this);
         mRecycleView.setAdapter(adapter);
 
         holder.mFab.setOnClickListener(mFabClickListener());

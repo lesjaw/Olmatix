@@ -17,6 +17,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,8 @@ import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.model.groupModel;
 import com.olmatix.adapter.groupAdapter;
+import com.olmatix.utils.GridSpacesItemDecoration;
+import com.olmatix.utils.OlmatixUtils;
 
 
 import java.util.ArrayList;
@@ -49,12 +52,13 @@ public class DashboardNode extends android.support.v4.app.Fragment {
     private static ArrayList<DashboardNodeModel> data1;
     private Context context;
     Context dashboardnode;
-
-    private RecyclerView mRecycleView;
+    int mNoOfColumns;
+    private RecyclerView mRecycleView,mRecycleView1;
     groupAdapterNew groupAdapter;
     Context group;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     NodeDashboardAdapter adapter;
+    String currentgroupid;
 
 
     @Nullable
@@ -73,9 +77,13 @@ public class DashboardNode extends android.support.v4.app.Fragment {
 
         mDbNodeRepo = new dbNodeRepo(getActivity());
         groupmodel = new groupModel();
-        data = new ArrayList<>();
+
         group = getActivity();
-        dashboardnode=context;
+        dashboardnode=getActivity();
+
+        data = new ArrayList<>();
+        data1 = new ArrayList<>();
+
         setupView();
         onClickListener();
 
@@ -91,29 +99,56 @@ public class DashboardNode extends android.support.v4.app.Fragment {
             groupAdapter.notifyItemRangeChanged(0, groupAdapter.getItemCount());
         }
 
+        adapter.notifyDataSetChanged();
+        data1.clear();
+        data1.addAll(mDbNodeRepo.getNodeDetailDashNew(String.valueOf(currentgroupid)));
+        if(adapter != null){
+            adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        }
         //setRefresh();
     }
 
 
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
+        mRecycleView1    = (RecyclerView) mView.findViewById(R.id.rv1);
+
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
 
-        //mRecycleView.setHasFixedSize(true);
+        mRecycleView.setHasFixedSize(true);
+        mRecycleView1.setHasFixedSize(true);
 
-        //LinearLayoutManager layoutManager= new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, true);
-        mRecycleView.setLayoutManager(
-                new GridLayoutManager(mRecycleView.getContext(), 1, GridLayoutManager.HORIZONTAL, false));
-        //GridLayoutManager layoutManager = new GridLayoutManager(context,10);
+        final PreferenceHelper mPrefHelper = new PreferenceHelper(getActivity().getApplicationContext());
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            float colom = mPrefHelper.getLength();
+            mNoOfColumns = Math.round(colom);
 
-       // mRecycleView.setLayoutManager(layoutManager);
+        }
+        else {
+            float colomw = mPrefHelper.getWidht();
+            mNoOfColumns = Math.round(colomw);
+        }
+
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(),mNoOfColumns);
+
+        mRecycleView1.setLayoutManager(layoutManager);
+        mRecycleView1.addItemDecoration(new GridSpacesItemDecoration(OlmatixUtils.dpToPx(2),true));
 
         LinearLayoutManager horizontalLayoutManagaer
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecycleView.setLayoutManager(horizontalLayoutManagaer);
 
-        //mRecycleView.setItemAnimator(new DefaultItemAnimator());
+        mRecycleView.setItemAnimator(new DefaultItemAnimator());
+        mRecycleView1.setItemAnimator(new DefaultItemAnimator());
+
+        currentgroupid="1";
+
+        data1.clear();
+        data1.addAll(mDbNodeRepo.getNodeDetailDashNew(currentgroupid));
+        adapter = new NodeDashboardAdapter(data1, dashboardnode, this);
+        mRecycleView1.setAdapter(adapter);
 
         data.clear();
         data.addAll(mDbNodeRepo.getGroupList());
@@ -136,6 +171,13 @@ public class DashboardNode extends android.support.v4.app.Fragment {
         groupAdapter = new groupAdapterNew(data,group,this);
         mRecycleView.setAdapter(groupAdapter);
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void setRefresh1(String groupid) {
+        data1.clear();
+        data1.addAll(mDbNodeRepo.getNodeDetailDashNew(groupid));
+        adapter = new NodeDashboardAdapter(data1, dashboardnode, this);
+        mRecycleView1.setAdapter(adapter);
     }
 
     private void onClickListener() {
@@ -175,6 +217,8 @@ public class DashboardNode extends android.support.v4.app.Fragment {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mMessageReceiver, new IntentFilter("groupid"));
         //Log.d("Receiver ", "Dashboard = Starting..");
     }
 
@@ -206,6 +250,12 @@ public class DashboardNode extends android.support.v4.app.Fragment {
                 setRefresh();
             }
 
+            String groupid = intent.getStringExtra("groupid");
+            Log.d("DEBUG", "onReceive: "+groupid);
+            if (groupid!=null) {
+                setRefresh1(groupid);
+                currentgroupid=groupid;
+            }
         }
     };
 }

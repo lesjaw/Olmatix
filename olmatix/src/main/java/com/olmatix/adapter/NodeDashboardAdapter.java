@@ -49,7 +49,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
     SharedPreferences sharedPref;
     Boolean mStatusServer;
 
-    public NodeDashboardAdapter(ArrayList<DashboardNodeModel> nodeList, Context dashboardnode, groupAdapter groupAdapter) {
+    public NodeDashboardAdapter(ArrayList<DashboardNodeModel> nodeList, Context dashboardnode, DashboardNode dashboardNode) {
         this.nodeList = nodeList;
         //mDragStartListener = dragStartListener;
         this.context = dashboardnode;

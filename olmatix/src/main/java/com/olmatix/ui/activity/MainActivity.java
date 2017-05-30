@@ -43,7 +43,6 @@ import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.service.OlmatixService;
 import com.olmatix.service.RingtonePlayingService;
 import com.olmatix.ui.fragment.DashboardNode;
-import com.olmatix.ui.fragment.DashboardNode2;
 import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.ui.fragment.Scene;
 import com.olmatix.utils.Connection;

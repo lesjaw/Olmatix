@@ -340,9 +340,8 @@ public class SettingsActivity extends SettingsFragment {
                         }
 
                     }
-
-                    doAllsubDetailSensorMotion();
                 }
+                doAllsubDetailSensorMotion();
             }
         }
 
@@ -385,8 +384,8 @@ public class SettingsActivity extends SettingsFragment {
                         }
 
                     }
-                    doAllsubDetailSensorTemp();
                 }
+                doAllsubDetailSensorTemp();
             }
         }
 
@@ -429,10 +428,8 @@ public class SettingsActivity extends SettingsFragment {
                         }
 
                     }
-                    doAllsubDetailSensorProx();
-
                 }
-
+                doAllsubDetailSensorProx();
             }
         }
 
@@ -479,7 +476,6 @@ public class SettingsActivity extends SettingsFragment {
                                 e.printStackTrace();
                             }
                         }
-
                     }
                 }
             }

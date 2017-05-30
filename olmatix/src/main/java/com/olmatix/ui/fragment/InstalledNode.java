@@ -218,52 +218,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         }
                     }
                     data.clear();
-                } else {
-                    Log.d(TAG, "doInBackground: "+mSwitch_conn);
-
-                    int countDB = dbNodeRepo.getNodeList().size();
-                    data.addAll(dbNodeRepo.getNodeList());
-                    for (int i = 0; i < countDB; i++) {
-                        final String mNodeID = data.get(i).getNodesID();
-                        for (int a = 0; a < 5; a++) {
-                            String topic = "";
-                            if (a == 0) {
-                                topic = "devices/" + mNodeID + "/$online";
-                            }
-                            if (a == 1) {
-                                topic = "devices/" + mNodeID + "/$signal";
-                            }
-                            if (a == 2) {
-                                topic = "devices/" + mNodeID + "/$uptime";
-                            }
-                            if (a == 3) {
-                                topic = "devices/" + mNodeID + "/$fwname";
-                            }
-                            if (a == 4) {
-                                topic = "devices/" + mNodeID + "/$localip";
-                            }
-
-                            int qos = 2;
-                            try {
-                                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                                int finalA = a;
-                                subToken.setActionCallback(new IMqttActionListener() {
-                                    @Override
-                                    public void onSuccess(IMqttToken asyncActionToken) {
-                                        Log.d(TAG, "onSuccess: " + finalA);
-
-                                    }
-
-                                    @Override
-                                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                                    }
-                                });
-                            } catch (MqttException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    data.clear();
                 }
             }
 
@@ -280,6 +234,62 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
             mFab.show();
             mSwipeRefreshLayout.setRefreshing(false);
         }
+    }
+
+    private void refreshnode(){
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+        Log.d(TAG, "doInBackground: "+mStatusServer);
+        if (mStatusServer) {
+            final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
+            if (!mSwitch_conn) {
+                Log.d(TAG, "doInBackground: "+mSwitch_conn);
+                int countDB = dbNodeRepo.getNodeList().size();
+                data.addAll(dbNodeRepo.getNodeList());
+                for (int i = 0; i < countDB; i++) {
+                    final String mNodeID = data.get(i).getNodesID();
+                    for (int a = 0; a < 5; a++) {
+                        String topic = "";
+                        if (a == 0) {
+                            topic = "devices/" + mNodeID + "/$online";
+                        }
+                        if (a == 1) {
+                            topic = "devices/" + mNodeID + "/$signal";
+                        }
+                        if (a == 2) {
+                            topic = "devices/" + mNodeID + "/$uptime";
+                        }
+                        if (a == 3) {
+                            topic = "devices/" + mNodeID + "/$fwname";
+                        }
+                        if (a == 4) {
+                            topic = "devices/" + mNodeID + "/$localip";
+                        }
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                            int finalA = a;
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d(TAG, "onSuccess: " + finalA +" "+mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                data.clear();
+            }
+        }
+        setAdapter();
+        mFab.show();
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     private void setAdapter(){
@@ -571,6 +581,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     private void setRefresh() {
         onTouchListener(0);
         new load().execute();
+        //refreshnode();
     }
 
     private void initSwipe(){

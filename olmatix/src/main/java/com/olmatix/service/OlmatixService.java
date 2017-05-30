@@ -960,7 +960,7 @@ public class OlmatixService extends Service {
     }
 
     private void doSub() {
-        for (int a = 0; a < 4; a++) {
+        for (int a = 0; a < 5; a++) {
             if (a == 0) {
                 topic = "devices/" + NodeID + "/$fwname";
             }
@@ -972,6 +972,9 @@ public class OlmatixService extends Service {
             }
             if (a == 3) {
                 topic = "devices/" + NodeID + "/$localip";
+            }
+            if (a == 4) {
+                topic = "devices/" + NodeID + "/$online";
             }
             int qos = 2;
             try {
@@ -1674,11 +1677,6 @@ public class OlmatixService extends Service {
     }
 
     private void saveDatabase() {
-
-       /* new Thread(new Runnable() {
-            @Override
-            public void run() {
-*/
         installedNodeModel.setNodesID(NodeID);
         installedNodeModel.setNodes(messageReceive.get("nodes"));
         installedNodeModel.setName(messageReceive.get("name"));
@@ -1700,8 +1698,9 @@ public class OlmatixService extends Service {
         installedNodeModel.setUptime(messageReceive.get("uptime"));
         if (messageReceive.containsKey("uptime")) {
             if (mMessage != null) {
-                installedNodeModel.setOnline("true");
-                mDbNodeRepo.updateOnline(installedNodeModel);
+                /*installedNodeModel.setOnline("true");
+                installedNodeModel.setNodesID(NodeID);
+                mDbNodeRepo.updateOnline(installedNodeModel);*/
             }
         }
         Calendar now = Calendar.getInstance();
@@ -1716,8 +1715,6 @@ public class OlmatixService extends Service {
         sendMessageDetail();
         textNode="";
         titleNode="";
-           /* }
-        }).start();*/
     }
 
     private void saveDatabase_Detail() {
@@ -1896,8 +1893,9 @@ public class OlmatixService extends Service {
     }
 
     private void doSubAll() {
-                int countDB = mDbNodeRepo.getNodeList().size();
-                data.addAll(mDbNodeRepo.getNodeList());
+        int countDB = mDbNodeRepo.getNodeList().size();
+        data.clear();
+        data.addAll(mDbNodeRepo.getNodeList());
                 if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data.get(i).getNodesID();
@@ -1938,14 +1936,14 @@ public class OlmatixService extends Service {
                             }
                         }
                     }
-                    data.clear();
                     doSubAllDetail();
                 }
     }
 
     private void doSubAllDetail() {
-                int countDB = mDbNodeRepo.getNodeDetailList().size();
-                data1.addAll(mDbNodeRepo.getNodeDetailList());
+        int countDB = mDbNodeRepo.getNodeDetailList().size();
+        data1.clear();
+        data1.addAll(mDbNodeRepo.getNodeDetailList());
                 if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data1.get(i).getNode_id();
@@ -1971,14 +1969,14 @@ public class OlmatixService extends Service {
                     }
                     doAllsubDetailSensor();
                 }
-                data1.clear();
 
     }
 
     private void doAllsubDetailSensor() {
 
-                int countDB = mDbNodeRepo.getNodeDetailList().size();
-                data1.addAll(mDbNodeRepo.getNodeDetailList());
+        int countDB = mDbNodeRepo.getNodeDetailList().size();
+        data1.clear();
+        data1.addAll(mDbNodeRepo.getNodeDetailList());
                 if (countDB != 0) {
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID1 = data1.get(i).getNode_id();
@@ -2104,7 +2102,6 @@ public class OlmatixService extends Service {
                         }
                     }
                     flagSub = false;
-                    data1.clear();
                 }
         setFlagSub();
     }

@@ -21,11 +21,9 @@ import android.widget.TextView;
 
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.helper.ItemTouchHelperAdapter;
-import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.ui.fragment.DashboardNode;
-import com.olmatix.ui.fragment.DashboardNode2;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.MqttException;

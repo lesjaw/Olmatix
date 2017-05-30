@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="2dp"
-        card_view:cardElevation="2dp">
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true">
 
         <RelativeLayout
             android:layout_width="100sp"
@@ -82,7 +83,7 @@
                 android:text="30 C"
                 android:textSize="15dp"
                 android:layout_marginRight="5sp"
-                android:layout_marginTop="40sp"
+                android:layout_marginTop="57sp"
                 android:layout_alignParentRight="true"
                 android:maxLines="1"
                 android:textAlignment="center" />
@@ -93,7 +94,7 @@
                 android:id="@+id/hum"
                 android:text="50%"
                 android:textSize="15dp"
-                android:layout_marginTop="22sp"
+                android:layout_marginTop="40sp"
                 android:layout_marginRight="5sp"
                 android:layout_alignParentRight="true"
                 android:maxLines="1"

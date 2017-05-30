@@ -2,41 +2,45 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv"
                 android:layout_width="wrap_content"
-                android:layout_height="50sp"
+                android:layout_height="wrap_content"
                 android:layout_margin="5dp" />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="  Create New Group  "
             android:layout_marginBottom="70sp"
-            android:layout_toLeftOf="@+id/fab"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="-20dp"
+            android:layout_alignParentRight="true"
             android:shadowColor="#A9A9A9"
             android:shadowDx="1.5"
             android:shadowDy="1.3"
             android:shadowRadius="1.6"
             android:textColor="#000000"
-            android:elevation="7dp"
+            android:elevation="10dp"
+            android:layout_marginRight="30sp"
             android:background="@drawable/round_border"/>
+
+    </RelativeLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
@@ -51,5 +55,4 @@
             android:layout_marginRight="20sp"
             android:layout_alignParentRight="true"/>
 
-    </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

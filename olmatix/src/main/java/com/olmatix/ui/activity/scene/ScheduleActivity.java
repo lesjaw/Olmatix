@@ -8,6 +8,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -48,6 +49,7 @@ import com.olmatix.adapter.SceneDetailAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.DayInterface;
 import com.olmatix.helper.HorizontalListView;
+import com.olmatix.helper.SessionManager;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.SceneDetailModel;
@@ -95,7 +97,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private ListView listSceneDetailData;
     private HorizontalListView mDayRv;
     private DayAdapter mDayAdapter;
-
+    SessionManager session;
     AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private DayInterface dayInterface;
@@ -106,6 +108,8 @@ public class ScheduleActivity extends AppCompatActivity {
         setContentView(R.layout.schedule_activity);
         mActivity = this;
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        // Session Manager
+        session = new SessionManager(getApplicationContext());
         runThread();
         setupDatabases();
 
@@ -389,38 +393,46 @@ public class ScheduleActivity extends AppCompatActivity {
                 for(int i=0; i<mDbNodeRepo.getAllSceneList().size(); i++) {
                     if (mSceneModel.getMonday() != null) {
                         if (mSceneModel.getMonday().equals("1")) {
+
+                            session.createNodeSession(mSceneModel.getNode_id());
                             forday(Calendar.MONDAY, mSceneModel.getHour(), mSceneModel.getMin());
                         }
                     }
                     if (mSceneModel.getThursday() != null) {
                         if (mSceneModel.getThursday().equals("1")) {
+                            session.createNodeSession(mSceneModel.getNode_id());
                             forday(Calendar.THURSDAY, mSceneModel.getHour(), mSceneModel.getMin());
                         }
                     }
                     if (mSceneModel.getWednesday() != null) {
                         if (mSceneModel.getWednesday().equals("1")) {
+                            session.createNodeSession(mSceneModel.getNode_id());
                             forday(Calendar.WEDNESDAY, mSceneModel.getHour(), mSceneModel.getMin());
                         }
                     }
                     if (mSceneModel.getTuesday() != null)
                     {
                     if (mSceneModel.getTuesday().equals("1")) {
+                        session.createNodeSession(mSceneModel.getNode_id());
                         forday(Calendar.TUESDAY, mSceneModel.getHour(), mSceneModel.getMin());
                     }
                     }
                     if(mSceneModel.getFriday() != null)
                     {
                     if (mSceneModel.getFriday().equals("1")) {
+                        session.createNodeSession(mSceneModel.getNode_id());
                         forday(Calendar.FRIDAY, mSceneModel.getHour(), mSceneModel.getMin());
                     }
                     }
                     if(mSceneModel.getSaturday() != null) {
                         if (mSceneModel.getSaturday().equals("1")) {
+                            session.createNodeSession(mSceneModel.getNode_id());
                             forday(Calendar.SATURDAY, mSceneModel.getHour(), mSceneModel.getMin());
                         }
                     }
                     if(mSceneModel.getSunday() != null) {
                         if (mSceneModel.getSunday().equals("1")) {
+                            session.createNodeSession(mSceneModel.getNode_id());
                             forday(Calendar.SUNDAY, mSceneModel.getHour(), mSceneModel.getMin());
                         }
                     }
@@ -446,9 +458,9 @@ public class ScheduleActivity extends AppCompatActivity {
         calSet.set(Calendar.MINUTE, minuts);
         // Check if the Calendar 7pm is in the past
         if (calSet.getTimeInMillis() < System.currentTimeMillis())
-            calSet.add(Calendar.DAY_OF_YEAR, 1); // It is so tell it to run tomorrow instead
+            calSet.add(Calendar.DAY_OF_YEAR, 7); // It is so tell it to run tomorrow instead
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calSet.getTimeInMillis(), interval, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calSet.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
         pendingIntent = PendingIntent.getBroadcast(ScheduleActivity.this, week, myIntent,  PendingIntent.FLAG_UPDATE_CURRENT);
 
     }

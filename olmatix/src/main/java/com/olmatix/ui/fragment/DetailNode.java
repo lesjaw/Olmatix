@@ -504,6 +504,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(mRecycleView);
+        itemTouchHelper.attachToRecyclerView(mRecycleView);
     }
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {

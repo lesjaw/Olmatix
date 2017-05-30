@@ -264,7 +264,6 @@ public class DashboardNode extends android.support.v4.app.Fragment {
                 mMessageReceiver, new IntentFilter("MQTTStatusDetail"));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mMessageReceiver, new IntentFilter("groupid"));
-        //Log.d("Receiver ", "Dashboard = Starting..");
     }
 
     @Override
@@ -296,7 +295,6 @@ public class DashboardNode extends android.support.v4.app.Fragment {
             }
 
             String groupid = intent.getStringExtra("groupid");
-            Log.d("DEBUG", "onReceive: "+groupid);
             if (groupid!=null) {
                 setRefresh1(groupid);
                 currentgroupid=groupid;

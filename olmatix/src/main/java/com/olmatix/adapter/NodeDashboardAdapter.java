@@ -247,7 +247,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             String theft = mFavoriteModel.getStatus_theft();
             if (theft.equals("true")){
-                holder.imgNodesBut.setImageResource(R.mipmap.theft);
+                holder.imgNodesBut.setImageResource(R.drawable.theft);
             }
 
             String lastval=mFavoriteModel.getOnline();

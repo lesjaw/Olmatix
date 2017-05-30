@@ -222,6 +222,7 @@ public class SettingsActivity extends SettingsFragment {
 
             int countDB = mDbNodeRepo.getNodeList().size();
             Log.d("DEBUG", "Count list Node: " + countDB);
+            data.clear();
             data.addAll(mDbNodeRepo.getNodeList());
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
@@ -261,7 +262,6 @@ public class SettingsActivity extends SettingsFragment {
                         }
                     }
                 }
-                data.clear();
                 doSubAllDetail();
             }
 
@@ -271,6 +271,7 @@ public class SettingsActivity extends SettingsFragment {
 
             int countDB = mDbNodeRepo.getNodeDetailList().size();
             Log.d("DEBUG", "Count list Detail: " + countDB);
+            data1.clear();
             data1.addAll(mDbNodeRepo.getNodeDetailList());
             countDB = mDbNodeRepo.getNodeDetailList().size();
             if (countDB != 0) {
@@ -298,12 +299,12 @@ public class SettingsActivity extends SettingsFragment {
                 }
                 doAllsubDetailSensor();
             }
-            data.clear();
         }
 
         private void doAllsubDetailSensor() {
             int countDB = mDbNodeRepo.getNodeDetailList().size();
             Log.d("DEBUG", "Count list Sensor: " + countDB);
+            data1.clear();
             data1.addAll(mDbNodeRepo.getNodeDetailList());
             countDB = mDbNodeRepo.getNodeDetailList().size();
             if (countDB != 0) {
@@ -342,14 +343,13 @@ public class SettingsActivity extends SettingsFragment {
 
                     doAllsubDetailSensorMotion();
                 }
-
-                data1.clear();
             }
         }
 
         private void doAllsubDetailSensorMotion() {
             int countDB = mDbNodeRepo.getNodeDetailList().size();
             Log.d("DEBUG", "Count list Sensor: " + countDB);
+            data1.clear();
             data1.addAll(mDbNodeRepo.getNodeDetailList());
             countDB = mDbNodeRepo.getNodeDetailList().size();
             if (countDB != 0) {
@@ -387,14 +387,13 @@ public class SettingsActivity extends SettingsFragment {
                     }
                     doAllsubDetailSensorTemp();
                 }
-
-                data1.clear();
             }
         }
 
         private void doAllsubDetailSensorTemp() {
             int countDB = mDbNodeRepo.getNodeDetailList().size();
             Log.d("DEBUG", "Count list Sensor: " + countDB);
+            data1.clear();
             data1.addAll(mDbNodeRepo.getNodeDetailList());
             countDB = mDbNodeRepo.getNodeDetailList().size();
             if (countDB != 0) {
@@ -432,7 +431,6 @@ public class SettingsActivity extends SettingsFragment {
                     }
                 }
 
-                data1.clear();
             }
         }
 

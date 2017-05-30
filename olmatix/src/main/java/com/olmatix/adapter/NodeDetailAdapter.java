@@ -258,7 +258,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.status.setText("ALARM!!");
                 holder.status.setTextColor(Color.MAGENTA);
                 holder.status.setTypeface(null, Typeface.BOLD);
-                holder.imgNode.setImageResource(R.mipmap.theft);
+                holder.imgNode.setImageResource(R.drawable.theft);
             }
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -364,7 +364,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.status.setText("ALARM!!");
                 holder.status.setTextColor(Color.MAGENTA);
                 holder.status.setTypeface(null, Typeface.BOLD);
-                holder.imgNode.setImageResource(R.mipmap.theft);
+                holder.imgNode.setImageResource(R.drawable.theft);
 
             }
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
@@ -589,7 +589,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.status.setText("ALARM!!");
                 holder.status.setTextColor(Color.MAGENTA);
                 holder.status.setTypeface(null, Typeface.BOLD);
-                holder.imgNode.setImageResource(R.mipmap.theft);
+                holder.imgNode.setImageResource(R.drawable.theft);
 
             }
 

@@ -47,55 +47,8 @@ public class groupAdapterNew extends RecyclerView.Adapter<groupAdapterNew.ViewHo
 
     List<groupModel> nodeList;
     private Context context;
-    Context dashboardnode;
-    Spinner mSpinner;
     public  static dbNodeRepo mDbNodeRepo;
-    private DashboardNodeModel dashboardNodeModel;
-    int groupid;
-    private RecyclerView mRecycleView;
     NodeDashboardAdapter adapter;
-    private static ArrayList<DashboardNodeModel> data;
-    int currentview=1;
-    int mNoOfColumns;
-    int broadRegeister;
-
-
-
-    private View.OnClickListener mFabClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSpinner = new Spinner(context);
-                List<SpinnerObjectDash> lables = mDbNodeRepo.getAllLabelsDash();
-                ArrayAdapter<SpinnerObjectDash> dataAdapter = new ArrayAdapter<>(context,
-                        android.R.layout.simple_spinner_item,lables);
-                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                mSpinner.setAdapter(dataAdapter);
-                new AlertDialog.Builder(context)
-                        .setTitle("Add Node")
-                        .setMessage("Please choose your existing Nodes!")
-                        .setView(mSpinner)
-                        .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mSpinner.setOnItemSelectedListener(new SpinnerListener());
-                                int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObjectDash) mSpinner.getSelectedItem ()).getId()));
-                                // Log.d("DEBUG", "onClick: "+String.valueOf(databaseId));
-                                dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
-
-                                Log.d("DEBUG", "onClickGroup: "+groupid);
-                                dashboardNodeModel.setGroupid(String.valueOf(groupid));
-                                mDbNodeRepo.insertFavNode(dashboardNodeModel);
-                                notifyDataSetChanged();
-                            }
-                        }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    }
-                }).show();
-
-            }
-        };
-    }
 
     public groupAdapterNew(List<groupModel> nodeList, Context group, DashboardNode dashboardNode) {
         this.nodeList = nodeList;
@@ -113,6 +66,9 @@ public class groupAdapterNew extends RecyclerView.Adapter<groupAdapterNew.ViewHo
         itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.group_dash, parent, false);
 
+
+        mDbNodeRepo = new dbNodeRepo(context);
+
         return new groupHolder(itemView);
 
     }
@@ -120,7 +76,6 @@ public class groupAdapterNew extends RecyclerView.Adapter<groupAdapterNew.ViewHo
 
     public class groupHolder extends ViewHolder {
         public Button group_name;
-        private FloatingActionButton mFab;
 
 
         public groupHolder(View view) {
@@ -146,7 +101,36 @@ public class groupAdapterNew extends RecyclerView.Adapter<groupAdapterNew.ViewHo
             }
         });
 
-//        holder.mFab.setOnClickListener(mFabClickListener());
+        holder.group_name.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Delete this Node?");
+                builder.setMessage(mGroupModel.getGroupName());
+
+                builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mDbNodeRepo.deleteGroup(String.valueOf(mGroupModel.getGroupid()));
+                        Intent intent = new Intent("MQTTStatusDetail");
+                        intent.putExtra("NotifyChangeDetail", String.valueOf(2));
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
+
+                return false;
+            }
+        });
 
     }
 

@@ -397,6 +397,20 @@ public class dbNodeRepo {
         db.close(); // Closing database connection
     }
 
+    public void deleteGroup(String node_Id) {
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        // It's a good practice to use parameter ?, instead of concatenate string
+        db.delete(TABLE_GROUP, dbNode.KEY_ID + "= ?", new String[]{
+                String.valueOf(node_Id)});
+
+        db.delete(TABLE_FAV, dbNode.KEY_GROUP_ID + "= ?", new String[]{
+                String.valueOf(node_Id)});
+
+
+        db.close(); // Closing database connection
+    }
+
     public void update(InstalledNodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();

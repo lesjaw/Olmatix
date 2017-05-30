@@ -21,8 +21,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.adapter.groupAdapterNew;
@@ -30,13 +32,16 @@ import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
+import com.olmatix.model.SpinnerObjectDash;
 import com.olmatix.model.groupModel;
 import com.olmatix.adapter.groupAdapter;
 import com.olmatix.utils.GridSpacesItemDecoration;
 import com.olmatix.utils.OlmatixUtils;
+import com.olmatix.utils.SpinnerListener;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by USER on 29/05/2017.
@@ -47,7 +52,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
     CoordinatorLayout coordinatorLayout;
     private groupModel groupmodel;
     public  static dbNodeRepo mDbNodeRepo;
-    private FloatingActionButton mFab;
+    private FloatingActionButton mFab,mFab1;
     private static ArrayList<groupModel> data;
     private static ArrayList<DashboardNodeModel> data1;
     private Context context;
@@ -59,6 +64,9 @@ public class DashboardNode extends android.support.v4.app.Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     NodeDashboardAdapter adapter;
     String currentgroupid;
+    Spinner mSpinner;
+    private DashboardNodeModel dashboardNodeModel;
+
 
 
     @Nullable
@@ -83,6 +91,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
 
         data = new ArrayList<>();
         data1 = new ArrayList<>();
+        dashboardNodeModel= new DashboardNodeModel();
 
         setupView();
         onClickListener();
@@ -114,6 +123,8 @@ public class DashboardNode extends android.support.v4.app.Fragment {
         mRecycleView1    = (RecyclerView) mView.findViewById(R.id.rv1);
 
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
+        mFab1            = (FloatingActionButton) mView.findViewById(R.id.fab1);
+
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
 
         mRecycleView.setHasFixedSize(true);
@@ -134,7 +145,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(),mNoOfColumns);
 
         mRecycleView1.setLayoutManager(layoutManager);
-        mRecycleView1.addItemDecoration(new GridSpacesItemDecoration(OlmatixUtils.dpToPx(2),true));
+        mRecycleView1.addItemDecoration(new GridSpacesItemDecoration(OlmatixUtils.dpToPx(4),true));
 
         LinearLayoutManager horizontalLayoutManagaer
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
@@ -182,6 +193,8 @@ public class DashboardNode extends android.support.v4.app.Fragment {
 
     private void onClickListener() {
         mFab.setOnClickListener(mFabClickListener());
+        mFab1.setOnClickListener(mFab1ClickListener());
+
     }
 
     private View.OnClickListener mFabClickListener() {
@@ -211,7 +224,39 @@ public class DashboardNode extends android.support.v4.app.Fragment {
             }
         };
     }
+    private View.OnClickListener mFab1ClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSpinner = new Spinner(dashboardnode);
+                List<SpinnerObjectDash> lables = mDbNodeRepo.getAllLabelsDash();
+                ArrayAdapter<SpinnerObjectDash> dataAdapter = new ArrayAdapter<>(dashboardnode,
+                        android.R.layout.simple_spinner_item,lables);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                mSpinner.setAdapter(dataAdapter);
+                new AlertDialog.Builder(dashboardnode)
+                        .setTitle("Add Node")
+                        .setMessage("Please choose your existing Nodes!")
+                        .setView(mSpinner)
+                        .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mSpinner.setOnItemSelectedListener(new SpinnerListener());
+                                int databaseId = Integer.parseInt (String.valueOf(( (SpinnerObjectDash) mSpinner.getSelectedItem ()).getId()));
+                                // Log.d("DEBUG", "onClick: "+String.valueOf(databaseId));
+                                dashboardNodeModel.setNice_name_d(String.valueOf(databaseId));
+                                dashboardNodeModel.setGroupid(String.valueOf(currentgroupid));
+                                mDbNodeRepo.insertFavNode(dashboardNodeModel);
+                                updatelist();
+                            }
+                        }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                }).show();
 
+            }
+        };
+    }
     @Override
     public void onResume() {
         super.onResume();

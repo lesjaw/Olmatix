@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
+import com.olmatix.adapter.groupAdapterNew;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
@@ -49,7 +51,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
     Context dashboardnode;
 
     private RecyclerView mRecycleView;
-    groupAdapter groupAdapter;
+    groupAdapterNew groupAdapter;
     Context group;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     NodeDashboardAdapter adapter;
@@ -98,17 +100,24 @@ public class DashboardNode extends android.support.v4.app.Fragment {
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
 
-        mRecycleView.setHasFixedSize(true);
+        //mRecycleView.setHasFixedSize(true);
 
-        LinearLayoutManager layoutManager
+        //LinearLayoutManager layoutManager= new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, true);
+        mRecycleView.setLayoutManager(
+                new GridLayoutManager(mRecycleView.getContext(), 1, GridLayoutManager.HORIZONTAL, false));
+        //GridLayoutManager layoutManager = new GridLayoutManager(context,10);
+
+       // mRecycleView.setLayoutManager(layoutManager);
+
+        LinearLayoutManager horizontalLayoutManagaer
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        mRecycleView.setLayoutManager(horizontalLayoutManagaer);
 
-        mRecycleView.setLayoutManager(layoutManager);
-        mRecycleView.setItemAnimator(new DefaultItemAnimator());
+        //mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
         data.clear();
         data.addAll(mDbNodeRepo.getGroupList());
-        groupAdapter = new groupAdapter(data,group,this);
+        groupAdapter = new groupAdapterNew(data,group,this);
         mRecycleView.setAdapter(groupAdapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -124,7 +133,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
     private void setRefresh() {
         data.clear();
         data.addAll(mDbNodeRepo.getGroupList());
-        groupAdapter = new groupAdapter(data,group,this);
+        groupAdapter = new groupAdapterNew(data,group,this);
         mRecycleView.setAdapter(groupAdapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }

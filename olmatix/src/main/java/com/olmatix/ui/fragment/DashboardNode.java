@@ -25,7 +25,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
-import com.olmatix.adapter.groupAdapterNew;
+import com.olmatix.adapter.groupAdapter;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
@@ -56,7 +56,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
     Context dashboardnode;
     int mNoOfColumns;
     private RecyclerView mRecycleView,mRecycleView1;
-    groupAdapterNew groupAdapter;
+    com.olmatix.adapter.groupAdapter groupAdapter;
     Context group;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     NodeDashboardAdapter adapter;
@@ -160,7 +160,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
 
         data.clear();
         data.addAll(mDbNodeRepo.getGroupList());
-        groupAdapter = new groupAdapterNew(data,group,this);
+        groupAdapter = new groupAdapter(data,group,this);
         mRecycleView.setAdapter(groupAdapter);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -176,7 +176,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
     private void setRefresh() {
         data.clear();
         data.addAll(mDbNodeRepo.getGroupList());
-        groupAdapter = new groupAdapterNew(data,group,this);
+        groupAdapter = new groupAdapter(data,group,this);
         mRecycleView.setAdapter(groupAdapter);
         mSwipeRefreshLayout.setRefreshing(false);
     }

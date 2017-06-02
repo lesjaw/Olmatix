@@ -58,21 +58,26 @@ public class SceneAdapter extends RecyclerView.Adapter<SceneAdapter.SceneHolder>
         if(mSceneModel.getSceneType() == 0)
         {
             holder.fwType.setText("Time Schedule");
+            holder.icon_node.setImageResource(R.drawable.schedule);
 
         }
         else if(mSceneModel.getSceneType() == 1)
         {
-            holder.fwType.setText("Base On Location");
+            holder.fwType.setText("Base on Location");
+            holder.icon_node.setImageResource(R.drawable.location);
+
 
         }
         else if(mSceneModel.getSceneType() == 2)
         {
             holder.fwType.setText("Base on Sensor");
+            holder.icon_node.setImageResource(R.drawable.sensor);
 
         }
         else if(mSceneModel.getSceneType() == 3)
         {
             holder.fwType.setText("Self Trigger");
+            holder.icon_node.setImageResource(R.drawable.selftrigger);
 
         }
 

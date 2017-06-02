@@ -152,7 +152,7 @@
     <string name="switch_sensor_prox">Notify Sensor Proximity</string>
     <string name="switch_sensorProxDisable">Disable notify sensor Proximity status</string>
     <string name="button_ok">OK</string>
-    <string name="app_ver">1.26</string>
+    <string name="app_ver">1.27</string>
     <string name="pref_ver">Version</string>
     <string name="network_setting">Configure network manually</string>
     <string name="misc">GPS Location, Notification etc</string>

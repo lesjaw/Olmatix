@@ -5,4 +5,6 @@ package com.olmatix.ui.activity;
  */
 
 public class CameraActivity {
+
+    //testing
 }

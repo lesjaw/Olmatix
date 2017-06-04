@@ -33,6 +33,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.OlmatixPagerAdapter;
@@ -51,6 +52,8 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.MediaPlayer;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -85,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
     private Animation rotate_forward,rotate_backward;
     ArrayAdapter listAdap;
     ArrayList<String> recentChange;
+    LibVLC mLibVLC = null;
+    MediaPlayer mMediaPlayer = null;
 
 
     public static int[] tabIcons = {
@@ -172,8 +177,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //askForPermission(Manifest.permission.ACCESS_FINE_LOCATION,0x1);
-
+        try {
+            mLibVLC = new LibVLC();
+        } catch(IllegalStateException e) {
+            Toast.makeText(MainActivity.this,
+                    "Error initializing the libVLC multimedia framework!",
+                    Toast.LENGTH_LONG).show();
+            finish();
+        }
         dbNodeRepo = new dbNodeRepo(this);
         dbnode = new dbNode();
 

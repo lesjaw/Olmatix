@@ -7,11 +7,11 @@ android {
         applicationId "com.olmatix.lesjaw.olmatix"
         minSdkVersion 16
         targetSdkVersion 25
-        versionName '1.26'
+        versionName '1.27'
         jackOptions {
             enabled true
         }
-        versionCode 26
+        versionCode 27
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -52,4 +52,5 @@ dependencies {
     compile 'com.androidadvance:topsnackbar:1.1.1'
     compile 'net.cachapa.expandablelayout:expandablelayout:[2.6]'
     compile 'gun0912.ted:tedpermission:1.0.3'
+    compile 'de.mrmaffen:vlc-android-sdk:1.9.8'
 }

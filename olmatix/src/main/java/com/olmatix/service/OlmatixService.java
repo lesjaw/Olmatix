@@ -794,6 +794,7 @@ public class OlmatixService extends Service {
             //Log.d(TAG, "Online : "+online +"="+mMessage);
             checkActivityForeground();
             installedNodeModel.setNodesID(NodeID);
+            data2.clear();
             data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
             if (countDB != 0) {
@@ -827,6 +828,11 @@ public class OlmatixService extends Service {
 
                             mChange = "2";
                             sendMessageDetail();
+                            if (!flagOnForeground) {
+                                if (!noNotif) {
+                                    showNotificationNode();
+                                }
+                            }
                         }
 
                     } else  if (mMessage.equals("false")) {
@@ -845,17 +851,17 @@ public class OlmatixService extends Service {
 
                             mChange = "2";
                             sendMessageDetail();
+                            if (!flagOnForeground) {
+                                if (!noNotif) {
+                                    showNotificationNode();
+                                }
+                            }
                         }
 
                     }
-                    if (!flagOnForeground) {
-                        if (!noNotif) {
-                            showNotificationNode();
-                        }
-                    }
                 }
             }
-            data2.clear();
+
             lastValue="";
         }
         checkValidation();

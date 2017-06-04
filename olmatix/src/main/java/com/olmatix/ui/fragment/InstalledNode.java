@@ -48,6 +48,7 @@ import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.InstalledNodeModel;
+import com.olmatix.ui.activity.CameraActivity;
 import com.olmatix.utils.Connection;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -55,6 +56,8 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -121,21 +124,34 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         fwName = data.get(position).getFwName();
                         nice_name = data.get(position).getNice_name_n();
 
-                        String state = data.get(position).getOnline();
-                        if (state.equals("true")) {
+                        String camid = data.get(position).getFwName();
+                        Log.d(TAG, "onClick: "+camid+" " +fwName);
 
-                            Intent i = new Intent(getActivity(), DetailNode.class);
-                            i.putExtra("node_id", data.get(position).getNodesID());
-                            i.putExtra("node_name", fwName);
-                            i.putExtra("nice_name", nice_name);
+                        if (camid.equals("smartcam")) {
+
+                            Intent i = new Intent(getActivity(), CameraActivity.class);
+                            i.putExtra("nodeid", data.get(position).getLocalip());
+                            i.putExtra("nice_name", fwName);
                             startActivity(i);
+
                         } else {
-                            TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " is OFFLINE!, please check it, " +
-                                    "if led blink something is wrong, slow blink mean no WiFi, " +
-                                    "fast blink mean no Internet",TSnackbar.LENGTH_LONG);
-                            View snackbarView = snackbar.getView();
-                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                            snackbar.show();
+
+                            String state = data.get(position).getOnline();
+                            if (state.equals("true")) {
+
+                                Intent i = new Intent(getActivity(), DetailNode.class);
+                                i.putExtra("node_id", data.get(position).getNodesID());
+                                i.putExtra("node_name", fwName);
+                                i.putExtra("nice_name", nice_name);
+                                startActivity(i);
+                            } else {
+                                TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " is OFFLINE!, please check it, " +
+                                        "if led blink something is wrong, slow blink mean no WiFi, " +
+                                        "fast blink mean no Internet", TSnackbar.LENGTH_LONG);
+                                View snackbarView = snackbar.getView();
+                                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                                snackbar.show();
+                            }
                         }
                     }
                 });
@@ -480,9 +496,16 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                inputResult = mEditText.getText().toString();
-                                sendMessage();
+                                String input = mEditText.getText().toString();
+                                String[] outputDevices = input.split("/");
+                                if (outputDevices[0].equals("cam")){
+                                    addCameNode(outputDevices[1]);
 
+                                } else {
+
+                                    inputResult = input;
+                                    sendMessage();
+                                }
 
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -494,6 +517,20 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
 
         };
+    }
+    private void addCameNode(String mCamid){
+        installedNodeModel.setNodesID(mCamid);
+        installedNodeModel.setOnline("true");
+        installedNodeModel.setFwName("smartcam");
+        installedNodeModel.setSignal("0");
+        installedNodeModel.setLocalip(mCamid);
+        installedNodeModel.setUptime("0");
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        now.getTimeInMillis();
+        installedNodeModel.setAdding(now.getTimeInMillis());
+
+        dbNodeRepo.insertDb(installedNodeModel);
     }
 
     private void setupView() {

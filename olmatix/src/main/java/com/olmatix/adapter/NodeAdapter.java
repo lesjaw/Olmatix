@@ -144,6 +144,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                 holder.imgNode.setImageResource(R.mipmap.ic_adapter);
             }else if (mInstalledNodeModel.getFwName().equals("smartsensorprox")) {
                 holder.imgNode.setImageResource(R.mipmap.door);
+            }else if (mInstalledNodeModel.getFwName().equals("smartcam")) {
+                holder.imgNode.setImageResource(R.mipmap.smartcam);
             }
         }
         holder.imgStatus.setOnTouchListener(new View.OnTouchListener() {

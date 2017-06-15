@@ -2,6 +2,8 @@ package com.olmatix.ui.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -40,7 +42,10 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
@@ -188,7 +193,6 @@ public class SettingsActivity extends SettingsFragment {
             installedNodeModel = new InstalledNodeModel();
             detailNodeModel = new DetailNodeModel();
 
-
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
@@ -198,20 +202,41 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("server_port"));
             bindPreferenceSummaryToValue(findPreference("user_name"));
             bindPreferenceSummaryToValue(findPreference("password"));
+            bindPreferenceSummaryToValue(findPreference("appID"));
+            bindPreferenceSummaryToValue(findPreference("IPaddress"));
+
+
+            final Preference AppID = findPreference("appID");
+            AppID.setOnPreferenceClickListener(AppIDcopy());
 
             CheckBoxPreference mSLoc = (CheckBoxPreference) findPreference("switch_conn");
             final Preference setConnection = findPreference("switch_conn");
             setConnection.setOnPreferenceClickListener(NetworkClickListener());
         }
 
-        private Preference.OnPreferenceClickListener NetworkClickListener() {
 
+
+        private Preference.OnPreferenceClickListener NetworkClickListener() {
             return new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-
                     doSubAll();
+                    return true;
+                }
+            };
+        }
+        private Preference.OnPreferenceClickListener AppIDcopy(){
+            return new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    SharedPreferences sharedPref;
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    String appid = sharedPref.getString("appID", "123456");
+                    Log.d("DEBUG", "onPreferenceClick: "+appid);
 
+                    ClipboardManager clipboard = (ClipboardManager) getActivity().getApplication().getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", appid);
+                    clipboard.setPrimaryClip(clip);
                     return true;
                 }
 
@@ -228,7 +253,7 @@ public class SettingsActivity extends SettingsFragment {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID = data.get(i).getNodesID();
                     //Log.d("DEBUG", "Count list: " + mNodeID);
-                    for (int a = 0; a < 5; a++) {
+                    for (int a = 0; a < 6; a++) {
                         if (a == 0) {
                             topic = "devices/" + mNodeID + "/$online";
                         }
@@ -243,6 +268,9 @@ public class SettingsActivity extends SettingsFragment {
                         }
                         if (a == 4) {
                             topic = "devices/" + mNodeID + "/$localip";
+                        }
+                        if (a == 5) {
+                            topic = "devices/" + mNodeID + "/$calling";
                         }
                         int qos = 2;
                         try {

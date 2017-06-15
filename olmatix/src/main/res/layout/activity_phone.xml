@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/fwname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SmartPhone"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:padding="5sp"/>
+
+        <ImageButton
+            android:id="@+id/camButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/fwname"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="12dp"
+            android:background="@mipmap/smartcam" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:layout_marginLeft="6dp"
+            android:text="Start View Camera"
+            android:layout_alignBottom="@+id/camButton"
+            android:layout_toEndOf="@+id/camButton" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

@@ -100,7 +100,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/uptime"
                 android:paddingTop="0sp"
-                android:text="nodeID" />
+                android:text="nodeID"
+                android:maxLength="10"/>
 
             <ImageButton
                 android:id="@+id/opt"

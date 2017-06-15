@@ -26,6 +26,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
@@ -126,6 +127,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
         adapter = new NodeDetailAdapter(data,node_name, detail_node,this);
         mRecycleView.setAdapter(adapter);
 
+
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -143,9 +145,9 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
         mItemTouchHelper.attachToRecyclerView(mRecycleView);
 
         if (nicename!=null) {
-            label_node.setText(nicename);
+            label_node.setText(Html.fromHtml("<font color='#000000'>"+nicename+" </font>"));
         }else{
-            label_node.setText(node_name);
+            label_node.setText(Html.fromHtml("<font color='#000000'>"+node_name+" </font>"));
         }
     }
 
@@ -379,6 +381,8 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
     private void setupToolbar(){
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#ffffff'>OLMATIX </font>"));
+
     }
 
     @Override

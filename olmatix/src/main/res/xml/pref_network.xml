@@ -58,4 +58,21 @@
         android:enabled="false">
     </CheckBoxPreference>
 
+    <EditTextPreference
+        android:title="AppID"
+        android:key="appID"
+        android:summary="@string/appID"
+        android:editable="false"
+        android:enabled="true">
+    </EditTextPreference>
+
+    <EditTextPreference
+        android:title="IPaddress"
+        android:key="IPaddress"
+        android:summary="@string/ipaddrs"
+        android:editable="false"
+        android:enabled="true">
+    </EditTextPreference>
+
+
 </PreferenceScreen>

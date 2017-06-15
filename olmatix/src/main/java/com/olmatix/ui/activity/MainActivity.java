@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
@@ -20,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,13 +52,16 @@ import com.olmatix.utils.Connection;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.videolan.libvlc.LibVLC;
-import org.videolan.libvlc.MediaPlayer;
 
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -88,8 +93,8 @@ public class MainActivity extends AppCompatActivity {
     private Animation rotate_forward,rotate_backward;
     ArrayAdapter listAdap;
     ArrayList<String> recentChange;
-    LibVLC mLibVLC = null;
-    MediaPlayer mMediaPlayer = null;
+    //LibVLC mLibVLC = null;
+    //MediaPlayer mMediaPlayer = null;
 
 
     public static int[] tabIcons = {
@@ -177,14 +182,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        try {
+       /* try {
             mLibVLC = new LibVLC();
         } catch(IllegalStateException e) {
             Toast.makeText(MainActivity.this,
                     "Error initializing the libVLC multimedia framework!",
                     Toast.LENGTH_LONG).show();
             finish();
-        }
+        }*/
         dbNodeRepo = new dbNodeRepo(this);
         dbnode = new dbNode();
 
@@ -208,26 +213,21 @@ public class MainActivity extends AppCompatActivity {
         Intent iA = new Intent(getApplicationContext(), RingtonePlayingService.class);
         stopService(iA);
 
+        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        if (!ip.equals("0.0.0.0")) {
+            editor.putString("IPaddress", ip);
+            editor.apply();
+        } else {
+            ip = getLocalIpAddress();
+            editor.putString("IPaddress", ip);
+            editor.apply();
+        }
+
 
     }
-
-    /*private void askForPermission(String permission, Integer requestCode) {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
-
-                //This is called if user has denied the permission before
-                //In this case I am just asking the permission again
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
-
-            } else {
-
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
-            }
-        } else {
-        }
-    }*/
 
     @Override
     protected void onStop() {
@@ -358,8 +358,28 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public String getLocalIpAddress(){
+            try {
+                for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+                     en.hasMoreElements(); ) {
+                    NetworkInterface intf = en.nextElement();
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if (!inetAddress.isLoopbackAddress()) {
+                           String ip = Formatter.formatIpAddress(inetAddress.hashCode());
+                            return ip;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                Log.e("IP Address", ex.toString());
+            }
+            return null;
+    }
+
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("OLMATIX");
     }
 
     private void setupTabs(){

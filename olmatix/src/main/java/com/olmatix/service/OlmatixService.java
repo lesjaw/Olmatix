@@ -40,6 +40,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -61,10 +62,13 @@ import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.DurationModel;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.MainActivity;
+import com.olmatix.ui.activity.PhoneActivity;
 import com.olmatix.ui.activity.SplashActivity;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
+import org.appspot.apprtc.CallActivity;
+import org.appspot.apprtc.ConnectActivity;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -80,11 +84,15 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -174,7 +182,6 @@ public class OlmatixService extends Service {
             add_NodeID = intent.getStringExtra("NodeID");
             String alarmService = intent.getStringExtra("Conn");
 
-
             NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
             if (nInfo != null) {
                 if (nInfo.getType() == ConnectivityManager.TYPE_WIFI) {
@@ -238,15 +245,29 @@ public class OlmatixService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+            String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = sharedPref.edit();
 
             NetworkInfo nInfo = mConnMan.getActiveNetworkInfo();
             if (nInfo != null) {
                 if (nInfo.getType() == ConnectivityManager.TYPE_WIFI) {
                     hasChanged = true;
                     hasWifi = nInfo.isConnected();
+                    if (hasWifi) {
+                        editor.putString("IPaddress", ip);
+                        editor.apply();
+                    }
+
                 } else if (nInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
                     hasChanged = true;
                     hasMmobile = nInfo.isConnected();
+                    if (hasMmobile) {
+                        ip = getLocalIpAddress();
+                        editor.putString("IPaddress", ip);
+                        editor.apply();
+                    }
                 }
             } else {
                 //Not Connected info
@@ -267,8 +288,6 @@ public class OlmatixService extends Service {
                 doCon = false;
                 hasMmobile = false;
                 hasWifi = false;
-                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("conStatus", false);
                 editor.apply();
                 sendMessage();
@@ -289,6 +308,25 @@ public class OlmatixService extends Service {
                 }
             }
         }
+    }
+
+    public String getLocalIpAddress(){
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+                 en.hasMoreElements(); ) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress()) {
+                        String ip = Formatter.formatIpAddress(inetAddress.hashCode());
+                        return ip;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            Log.e("IP Address", ex.toString());
+        }
+        return null;
     }
 
     /*private void stopService (){
@@ -330,7 +368,7 @@ public class OlmatixService extends Service {
             mDbNodeRepo.insertDbMqtt(dbnode);
             sendMessageDetail();
 
-            String topic = "status/" + deviceId + "/$online";
+            String topic = "devices/" + deviceId + "/$online";
             byte[] payload = "false".getBytes();
             options.setWill(topic, payload, 1, true);
             options.setKeepAliveInterval(300);
@@ -359,7 +397,6 @@ public class OlmatixService extends Service {
                         if (!mSwitch_conn) {
                             Log.d(TAG, "Doing subscribe nodes");
                             doSubAll();
-                            //new OlmatixService.load().execute();
                         }
 
                         dbnode.setTopic("Connected to server");
@@ -367,22 +404,123 @@ public class OlmatixService extends Service {
                         mDbNodeRepo.insertDbMqtt(dbnode);
                         sendMessageDetail();
                         try {
-                            String topic = "status/" + deviceId + "/$online";
-                            String payload = "true";
-                            byte[] encodedPayload = new byte[0];
-                            try {
-                                if (mqttClient != null) {
-                                    encodedPayload = payload.getBytes("UTF-8");
-                                    MqttMessage message = new MqttMessage(encodedPayload);
-                                    message.setQos(1);
-                                    message.setRetained(true);
-                                    Connection.getClient().publish(topic, message);
+                            for (int a = 0; a < 6; a++) {
+                                String topic = "";
+                                if (a == 0) {
+                                    topic = "devices/" + deviceId + "/$online";
+                                    String payload = "true";
+                                    byte[] encodedPayload = new byte[0];
+                                    try {
+                                        if (mqttClient != null) {
+                                            encodedPayload = payload.getBytes("UTF-8");
+                                            MqttMessage message = new MqttMessage(encodedPayload);
+                                            message.setQos(1);
+                                            message.setRetained(true);
+                                            Connection.getClient().publish(topic, message);
+                                        }
+                                    } catch (UnsupportedEncodingException | MqttException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            } catch (UnsupportedEncodingException | MqttException e) {
-                                e.printStackTrace();
+                                if (a == 1) {
+                                    topic = "devices/" + deviceId + "/$fwname";
+                                    String payload = "olmatixapp";
+                                    byte[] encodedPayload = new byte[0];
+                                    try {
+                                        if (mqttClient != null) {
+                                            encodedPayload = payload.getBytes("UTF-8");
+                                            MqttMessage message = new MqttMessage(encodedPayload);
+                                            message.setQos(1);
+                                            message.setRetained(true);
+                                            Connection.getClient().publish(topic, message);
+                                        }
+                                    } catch (UnsupportedEncodingException | MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (a == 2) {
+                                    topic = "devices/" + deviceId + "/$localip";
+                                    String ip = sharedPref.getString("IPaddress", "127.0.0.1");
+                                    String payload = ip;
+                                    byte[] encodedPayload = new byte[0];
+                                    try {
+                                        if (mqttClient != null) {
+                                            encodedPayload = payload.getBytes("UTF-8");
+                                            MqttMessage message = new MqttMessage(encodedPayload);
+                                            message.setQos(1);
+                                            message.setRetained(true);
+                                            Connection.getClient().publish(topic, message);
+                                        }
+                                    } catch (UnsupportedEncodingException | MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (a == 3) {
+                                    topic = "devices/" + deviceId + "/$signal";
+                                    WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+                                    int strengthInPercentage = 0;
+                                    if(wm.isWifiEnabled()) {
+                                        WifiInfo wifiInfo = wm.getConnectionInfo();
+                                        if(wifiInfo != null) {
+                                            int dbm = wifiInfo.getRssi();
+                                            strengthInPercentage = WifiManager.calculateSignalLevel(wifiInfo.getRssi(), 100);
+                                        }
+                                    }
+
+                                    String payload = String.valueOf(strengthInPercentage);
+                                    byte[] encodedPayload = new byte[0];
+                                    try {
+                                        if (mqttClient != null) {
+                                            encodedPayload = payload.getBytes("UTF-8");
+                                            MqttMessage message = new MqttMessage(encodedPayload);
+                                            message.setQos(1);
+                                            message.setRetained(true);
+                                            Connection.getClient().publish(topic, message);
+                                        }
+                                    } catch (UnsupportedEncodingException | MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                if (a == 4) {
+                                    topic = "devices/" + deviceId + "/$uptime";
+                                    String payload = "0";
+                                    byte[] encodedPayload = new byte[0];
+                                    try {
+                                        if (mqttClient != null) {
+                                            encodedPayload = payload.getBytes("UTF-8");
+                                            MqttMessage message = new MqttMessage(encodedPayload);
+                                            message.setQos(1);
+                                            message.setRetained(true);
+                                            Connection.getClient().publish(topic, message);
+                                        }
+                                    } catch (UnsupportedEncodingException | MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                if (a == 5) {
+                                    topic = "devices/" + deviceId + "/$calling";
+                                    String payload = "false";
+                                    byte[] encodedPayload = new byte[0];
+                                    try {
+                                        if (mqttClient != null) {
+                                            encodedPayload = payload.getBytes("UTF-8");
+                                            MqttMessage message = new MqttMessage(encodedPayload);
+                                            message.setQos(1);
+                                            message.setRetained(true);
+                                            Connection.getClient().publish(topic, message);
+                                        }
+                                    } catch (UnsupportedEncodingException | MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
 
-                            Connection.getClient().subscribe("test", 0, getApplicationContext(), new IMqttActionListener() {
+
+                            Connection.getClient().subscribe("devices/" + deviceId + "/$calling", 2, getApplicationContext(), new IMqttActionListener() {
+
+
                                 @Override
                                 public void onSuccess(IMqttToken asyncActionToken) {
                                     text = "Connected";
@@ -392,6 +530,7 @@ public class OlmatixService extends Service {
                                     editor.apply();
                                     flagConn = true;
                                     sendMessage();
+
                                 }
 
                                 @Override
@@ -450,6 +589,17 @@ public class OlmatixService extends Service {
 
     }
 
+    public String uptime (Calendar ref){
+        Calendar now = Calendar.getInstance();
+        long milliseconds1 = ref.getTimeInMillis();
+        long milliseconds2 = now.getTimeInMillis();
+        long diff = milliseconds2 - milliseconds1;
+
+        long diffSeconds = diff / 1000;
+        //Log.d("DEBUG", "getTimeAgo: " + diffSeconds);
+        return String.valueOf(diffSeconds);
+    }
+
     private void doDisconnect() {
         Log.d(TAG, "doDisconnect, flagConn = " + flagConn);
         if (flagConn) {
@@ -490,6 +640,36 @@ public class OlmatixService extends Service {
 
     @Override
     public void onCreate() {
+
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        now.getTimeInMillis();
+
+        Handler h = new Handler();
+        int delay = 30000; //milliseconds
+
+        h.postDelayed(new Runnable(){
+            public void run(){
+                String upme = uptime(now);
+                Log.d(TAG, "run: "+upme);
+                topic = "devices/" + deviceId + "/$uptime";
+                String payload = upme;
+                byte[] encodedPayload = new byte[0];
+                try {
+                    if (mqttClient != null) {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+                    }
+                } catch (UnsupportedEncodingException | MqttException e) {
+                    e.printStackTrace();
+                }
+
+                h.postDelayed(this, delay);
+            }
+        }, delay);
 
         IntentFilter intent = new IntentFilter();
         setClientID();
@@ -538,22 +718,11 @@ public class OlmatixService extends Service {
             Log.d(TAG, "onStartCommand status connection: " + mStatusServer);
             doConnect();
 
-            /*OlmatixAlarmReceiver alarmCheckConn = new OlmatixAlarmReceiver();
-
-            alarmCheckConn.setAlarm(this);
-            if (alarmCheckConn == null) {
-                alarmCheckConn.setAlarm(this);
-                Log.d("DEBUG", "Alarm set " + alarmCheckConn);
-            }*/
         }
 
         sendMessage();
 
         listener = new MyLocationListener();
-      /*  if ((ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) && (ActivityCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {*/
-
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -601,9 +770,11 @@ public class OlmatixService extends Service {
 
     private void unSubIfnotForeground() {
 
-        if (!flagOnForeground||!noNotif) {
+        if (!flagOnForeground&&!noNotif) {
             int countDB = mDbNodeRepo.getNodeList().size();
+            data.clear();
             data.addAll(mDbNodeRepo.getNodeList());
+            Log.d(TAG, "doing unsub Signal & Uptime: ");
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID1 = data.get(i).getNodesID();
@@ -628,7 +799,6 @@ public class OlmatixService extends Service {
                     //Log.d("Unsubscribe", " device = " + mNodeID1);
                 }
             }
-            data.clear();
         }
     }
 
@@ -721,14 +891,16 @@ public class OlmatixService extends Service {
                     editor.commit();
                 }
              }
-       /* WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wInfo = wifiManager.getConnectionInfo();
-        deviceId = "OlmatixApp-" + wInfo.getMacAddress();*/
+
         deviceId = "OlmatixApp-" +uniqueID;
 
         if (deviceId == null) {
             deviceId = MqttAsyncClient.generateClientId();
         }
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("appID", deviceId);
+        editor.apply();
     }
 
     private void sTopService() {
@@ -863,6 +1035,71 @@ public class OlmatixService extends Service {
             }
 
             lastValue="";
+        } else if (online.equals("$localip")){
+            installedNodeModel.setLocalip(mMessage);
+            installedNodeModel.setNodesID(NodeID);
+            mDbNodeRepo.updateIP(installedNodeModel);
+            mChange = "2";
+            sendMessageDetail();
+        } else if (online.equals("$fwname")) {
+            data2.clear();
+            data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
+            int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    String fwnamecheck = data2.get(i).getFwName();
+                    if (fwnamecheck == null) {
+                        installedNodeModel.setFwName(mMessage);
+                        installedNodeModel.setNodesID(NodeID);
+                        mDbNodeRepo.updateFwname(installedNodeModel);
+                        mChange = "2";
+                        sendMessageDetail();
+                    }
+                }
+            }
+        } else if (online.equals("$signal")){
+            installedNodeModel.setSignal(mMessage);
+            installedNodeModel.setNodesID(NodeID);
+            mDbNodeRepo.updateSignal(installedNodeModel);
+            mChange = "2";
+            sendMessageDetail();
+        } else if (online.equals("$uptime")){
+            installedNodeModel.setUptime(mMessage);
+            installedNodeModel.setNodesID(NodeID);
+            mDbNodeRepo.updateUptime(installedNodeModel);
+            mChange = "2";
+            sendMessageDetail();
+        } else if (online.equals("$calling")){
+            String input =mMessage;
+            String[] rdm = input.split("-");
+            if (rdm[0].equals("true")){
+                Log.d(TAG, "Calling triggered ");
+                Intent i = new Intent(getBaseContext(), ConnectActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra("node_id", NodeID+rdm[1]);
+                getApplication().startActivity(i);
+                if (mStatusServer) {
+                    String topic = "devices/" + deviceId + "/$calling";
+                    String payload = "false";
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent("addNode");
+                    intent.putExtra("Connect", "con");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                }
+            }
+
         }
         checkValidation();
     }
@@ -1730,7 +1967,8 @@ public class OlmatixService extends Service {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         final Boolean mSwitch_NotifStatus = sharedPref.getBoolean("switch_notif", true);
 
-                if (!mNodeID.contains("door/close")||!mNodeID.contains("motion/motion")||
+                if (!mNodeID.contains("door/close")||
+                        !mNodeID.contains("motion/motion")||
                         !mNodeID.contains("prox/status")) {
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel(Channel);

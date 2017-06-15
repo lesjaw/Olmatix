@@ -91,26 +91,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    /*private void askForPermission(String permission, Integer requestCode) {
-        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-
-                //This is called if user has denied the permission before
-                //In this case I am just asking the permission again
-                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
-
-            } else {
-
-                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
-            }
-        } else {
-            Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
-        }
-    }*/
-
-
     public void login() {
         Log.d(TAG, "Login");
 

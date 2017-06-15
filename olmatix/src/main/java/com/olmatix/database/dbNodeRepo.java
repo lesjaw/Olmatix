@@ -478,6 +478,66 @@ public class dbNodeRepo {
 
     }
 
+    public void updateIP(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        if (installedNodeModel.getLocalip() != null) {
+            values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close();
+
+    }
+
+    public void updateFwname(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        if (installedNodeModel.getFwName() != null) {
+            values.put(KEY_FWNAME, installedNodeModel.getFwName());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close();
+
+    }
+
+    public void updateSignal(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        if (installedNodeModel.getSignal() != null) {
+            values.put(KEY_SIGNAL, installedNodeModel.getSignal());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close();
+
+    }
+
+    public void updateUptime(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        if (installedNodeModel.getUptime() != null) {
+            values.put(KEY_UPTIME, installedNodeModel.getUptime());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close();
+
+    }
+
     public void updateNameNice(InstalledNodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();

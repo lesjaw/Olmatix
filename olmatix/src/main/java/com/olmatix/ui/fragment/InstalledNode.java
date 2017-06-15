@@ -49,8 +49,11 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.CameraActivity;
+import com.olmatix.ui.activity.PhoneActivity;
 import com.olmatix.utils.Connection;
 
+import org.appspot.apprtc.CallActivity;
+import org.appspot.apprtc.ConnectActivity;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -131,7 +134,13 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
                             Intent i = new Intent(getActivity(), CameraActivity.class);
                             i.putExtra("nodeid", data.get(position).getLocalip());
-                            i.putExtra("nice_name", fwName);
+                            i.putExtra("nice_name", nice_name);
+                            startActivity(i);
+
+                        } else if (camid.equals("olmatixapp")) {
+                            Intent i = new Intent(getActivity(), PhoneActivity.class);
+                            i.putExtra("nodeid", data.get(position).getNodesID());
+                            i.putExtra("nice_name", nice_name);
                             startActivity(i);
 
                         } else {
@@ -178,11 +187,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     class load extends AsyncTask<Void, Integer, String> {
 
         protected void onPreExecute (){
-           /* nDialog = new ProgressDialog(getActivity());
-            nDialog.setMessage("Loading Nodes, Please wait..");
-            nDialog.setIndeterminate(true);
-            nDialog.setCancelable(false);
-            nDialog.show();  */
+
         }
 
         protected String doInBackground(Void...arg0) {
@@ -217,11 +222,9 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             int qos = 2;
                             try {
                                 IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                                int finalA = a;
                                 subToken.setActionCallback(new IMqttActionListener() {
                                     @Override
                                     public void onSuccess(IMqttToken asyncActionToken) {
-                                        Log.d(TAG, "onSuccess: " + finalA);
                                     }
 
                                     @Override
@@ -245,7 +248,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         }
 
         protected void onPostExecute(String result) {
-            //nDialog.dismiss();
             setAdapter();
             mFab.show();
             mSwipeRefreshLayout.setRefreshing(false);
@@ -497,27 +499,51 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             public void onClick(DialogInterface dialog, int which) {
 
                                 String input = mEditText.getText().toString();
-                                String[] outputDevices = input.split("/");
+                                String[] outputDevices = input.split("-");
                                 if (outputDevices[0].equals("cam")){
                                     addCameNode(outputDevices[1]);
 
-                                } else {
-
+                                } else if (outputDevices[0].equals("OlmatixApp")) {
+                                    dosubOlmatixApp(input);
                                     inputResult = input;
                                     sendMessage();
-                                }
+                                } else {
+
+                                        inputResult = input;
+                                        sendMessage();
+                                    }
+
 
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                     }
                 }).show();
-
             }
-
-
         };
     }
+
+    private void dosubOlmatixApp(String input){
+
+        String topic = "devices/" + input + "/$calling";
+        int qos = 1;
+        try {
+            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+            subToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.d(TAG, "onSuccess: " +input);
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void addCameNode(String mCamid){
         installedNodeModel.setNodesID(mCamid);
         installedNodeModel.setOnline("true");
@@ -617,8 +643,12 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     private void setRefresh() {
         onTouchListener(0);
-        new load().execute();
+        //new load().execute();
         //refreshnode();
+        setAdapter();
+        mFab.show();
+        mSwipeRefreshLayout.setRefreshing(false);
+
     }
 
     private void initSwipe(){

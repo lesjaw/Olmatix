@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+
 
     <supports-screens
         android:anyDensity="true"
@@ -84,6 +86,10 @@
 
         <activity
             android:name="com.olmatix.ui.activity.CameraActivity">
+        </activity>
+
+        <activity
+            android:name="com.olmatix.ui.activity.PhoneActivity">
         </activity>
 
         <activity

@@ -64,7 +64,10 @@ public class SplashActivity extends Activity {
         new TedPermission(this)
                 .setPermissionListener(permissionlistener)
                 .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
-                .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.WAKE_LOCK)
+                .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.WAKE_LOCK,
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.CAMERA)
                 .check();
 
         ImageView imgSplash = (ImageView) findViewById(R.id.splash);
@@ -105,7 +108,7 @@ public class SplashActivity extends Activity {
                     finish();
                     System.exit(0);
                 }
-            }, 5000);
+            }, 3000);
         }
 
             OlmatixUtils.calculateNoOfColumns(this);

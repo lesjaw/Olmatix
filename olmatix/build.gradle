@@ -5,13 +5,13 @@ android {
     buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "com.olmatix.lesjaw.olmatix"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 25
-        versionName '1.27'
+        versionName '1.28'
         jackOptions {
             enabled true
         }
-        versionCode 27
+        versionCode 28
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -52,5 +52,7 @@ dependencies {
     compile 'com.androidadvance:topsnackbar:1.1.1'
     compile 'net.cachapa.expandablelayout:expandablelayout:[2.6]'
     compile 'gun0912.ted:tedpermission:1.0.3'
-    compile 'de.mrmaffen:vlc-android-sdk:1.9.8'
+    //compile project(":libs:webRTCCall")
+    //compile 'de.mrmaffen:vlc-android-sdk:1.9.8'
+    compile project(':webRTCCall')
 }

@@ -13,7 +13,8 @@
             android:id="@+id/fwname"
             android:textSize="20sp"
             android:text="Smart Camera"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:padding="5sp"/>
 
 
     <FrameLayout

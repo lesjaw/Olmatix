@@ -7,11 +7,11 @@ android {
         applicationId "com.olmatix.lesjaw.olmatix"
         minSdkVersion 21
         targetSdkVersion 25
-        versionName '1.28'
+        versionName '1.29'
         jackOptions {
             enabled true
         }
-        versionCode 28
+        versionCode 29
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -32,8 +32,12 @@ android {
     }
 }
 
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile files('libs/merlin-core-v0.4.1.jar')
+    compile 'de.mrmaffen:vlc-android-sdk:1.9.8'
+    compile project(':olmatixRTC')
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:design:25.3.1'
@@ -44,7 +48,6 @@ dependencies {
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
     compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.0'
-    compile files('libs/merlin-core-v0.4.1.jar')
     compile 'com.afollestad.material-dialogs:commons:0.9.2.3'
     compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'com.android.volley:volley:1.0.0'
@@ -52,7 +55,5 @@ dependencies {
     compile 'com.androidadvance:topsnackbar:1.1.1'
     compile 'net.cachapa.expandablelayout:expandablelayout:[2.6]'
     compile 'gun0912.ted:tedpermission:1.0.3'
-    //compile project(":libs:webRTCCall")
-    //compile 'de.mrmaffen:vlc-android-sdk:1.9.8'
-    compile project(':webRTCCall')
+    compile 'com.google.android.gms:play-services-maps:10.2.6'
 }

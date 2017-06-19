@@ -1,28 +1,39 @@
 package com.olmatix.ui.activity;
 
-import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.olmatix.helper.PreferenceHelper;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.utils.Connection;
 
-import org.appspot.apprtc.ConnectActivity;
+import org.achartengine.tools.Zoom;
+import org.appspot.olmatixrtc.ConnectActivity;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
@@ -33,15 +44,15 @@ import java.util.Random;
  * Created by USER on 02/06/2017.
  */
 
-public class PhoneActivity extends AppCompatActivity {
+public class PhoneActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     ImageButton imgCamBut;
     TextView textNiceName;
+    CardView cv1;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
     private String node_id, nicename;
-    private Toolbar mToolbar;
-
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,9 +60,14 @@ public class PhoneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone);
 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+
+        mapFragment.getMapAsync(this);
+
         imgCamBut = (ImageButton) findViewById(R.id.camButton);
         textNiceName = (TextView)findViewById(R.id.fwname);
-
+        cv1 = (CardView)findViewById(R.id.cv2);
         setupToolbar();
 
         Intent i = getIntent();
@@ -61,10 +77,9 @@ public class PhoneActivity extends AppCompatActivity {
 
         textNiceName.setText(nicename);
 
-        imgCamBut.setOnClickListener(new View.OnClickListener() {
+        cv1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("DEBUG", "Camera onClick: "+node_id);
                 sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 Random r = new Random();
@@ -121,12 +136,17 @@ public class PhoneActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("Location"));
         super.onResume();
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+
     }
 
     @Override
@@ -134,5 +154,43 @@ public class PhoneActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String mChange = intent.getStringExtra("latlng");
+            //Log.d(TAG, "onReceive: ");
+            if (mChange!=null){
+
+
+            }
+        }
+    };
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        final PreferenceHelper mPrefHelper = new PreferenceHelper(getApplicationContext());
+        double latphone = mPrefHelper.getPhoneLatitude();
+        double lngphone = mPrefHelper.getPhoneLongitude();
+
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(latphone, lngphone);
+        CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(sydney, 5);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Olmatix App"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+    }
 
 }

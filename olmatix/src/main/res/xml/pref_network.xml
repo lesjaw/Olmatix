@@ -38,7 +38,7 @@
             android:title="@string/user_title"
             android:icon="@drawable/ic_user_black"
             android:dialogMessage="@string/info_user"
-            android:defaultValue="" />
+            android:defaultValue="@string/user" />
 
         <EditTextPreference
             android:key="password"
@@ -46,7 +46,7 @@
             android:icon="@drawable/ic_pass_black"
             android:password="true"
             android:dialogMessage="@string/info_pass"
-            android:defaultValue="olmatix" />
+            android:defaultValue="@string/pass" />
 
     </PreferenceCategory>
 
@@ -58,21 +58,21 @@
         android:enabled="false">
     </CheckBoxPreference>
 
-    <EditTextPreference
-        android:title="AppID"
+    <Preference
+        android:title="AppID - Click to send this via email"
         android:key="appID"
         android:summary="@string/appID"
         android:editable="false"
         android:enabled="true">
-    </EditTextPreference>
+    </Preference>
 
-    <EditTextPreference
-        android:title="IPaddress"
+    <Preference
+        android:title="IP Address"
         android:key="IPaddress"
         android:summary="@string/ipaddrs"
         android:editable="false"
         android:enabled="true">
-    </EditTextPreference>
+    </Preference>
 
 
 </PreferenceScreen>

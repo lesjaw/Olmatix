@@ -237,6 +237,13 @@ public class SettingsActivity extends SettingsFragment {
                     ClipboardManager clipboard = (ClipboardManager) getActivity().getApplication().getSystemService(CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText("label", appid);
                     clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, appid);
+                    sendIntent.setType("text/plain");
+                    startActivity(sendIntent);
+
                     return true;
                 }
 
@@ -253,7 +260,7 @@ public class SettingsActivity extends SettingsFragment {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID = data.get(i).getNodesID();
                     //Log.d("DEBUG", "Count list: " + mNodeID);
-                    for (int a = 0; a < 6; a++) {
+                    for (int a = 0; a < 7; a++) {
                         if (a == 0) {
                             topic = "devices/" + mNodeID + "/$online";
                         }
@@ -271,6 +278,9 @@ public class SettingsActivity extends SettingsFragment {
                         }
                         if (a == 5) {
                             topic = "devices/" + mNodeID + "/$calling";
+                        }
+                        if (a == 6) {
+                            topic = "devices/" + mNodeID + "/$location";
                         }
                         int qos = 2;
                         try {

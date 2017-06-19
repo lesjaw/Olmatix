@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Olmatix-Github.iml" filepath="$PROJECT_DIR$/Olmatix-Github.iml" />
       <module fileurl="file://$PROJECT_DIR$/olmatix/olmatix.iml" filepath="$PROJECT_DIR$/olmatix/olmatix.iml" />
-      <module fileurl="file://$PROJECT_DIR$/webRTCCall/webRTCCall.iml" filepath="$PROJECT_DIR$/webRTCCall/webRTCCall.iml" />
+      <module fileurl="file://$PROJECT_DIR$/olmatixRTC/OlmatixRTC.iml" filepath="$PROJECT_DIR$/olmatixRTC/OlmatixRTC.iml" />
     </modules>
   </component>
 </project>

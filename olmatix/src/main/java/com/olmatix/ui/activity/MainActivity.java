@@ -1,5 +1,6 @@
 package com.olmatix.ui.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -38,6 +39,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidadvance.topsnackbar.TSnackbar;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
@@ -56,6 +59,8 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.media.MediaPlayer;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -93,14 +98,28 @@ public class MainActivity extends AppCompatActivity {
     private Animation rotate_forward,rotate_backward;
     ArrayAdapter listAdap;
     ArrayList<String> recentChange;
-    //LibVLC mLibVLC = null;
-    //MediaPlayer mMediaPlayer = null;
+    LibVLC mLibVLC = null;
+    MediaPlayer mMediaPlayer = null;
 
 
     public static int[] tabIcons = {
             R.drawable.ic_dashboard,
             R.drawable.ic_scene,
             R.drawable.ic_node,
+    };
+
+    PermissionListener permissionlistener = new PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            // Toast.makeText(SplashActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+            Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+        }
+
+
     };
 
     private ViewPager mViewPager;
@@ -182,21 +201,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       /* try {
+        try {
             mLibVLC = new LibVLC();
         } catch(IllegalStateException e) {
             Toast.makeText(MainActivity.this,
                     "Error initializing the libVLC multimedia framework!",
                     Toast.LENGTH_LONG).show();
             finish();
-        }*/
+        }
+
+        new TedPermission(this)
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.WAKE_LOCK,
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.CAMERA)
+                .check();
+
         dbNodeRepo = new dbNodeRepo(this);
         dbnode = new dbNode();
 
         recentChange = new ArrayList<>();
-
-        //askForPermission(Manifest.permission.ACCESS_FINE_LOCATION,0x1);
-        //askForPermission(Manifest.permission.ACCESS_COARSE_LOCATION,0x2);
 
         Intent i = new Intent(this, OlmatixService.class);
         startService(i);

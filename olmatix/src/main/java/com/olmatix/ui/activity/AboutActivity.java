@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -34,6 +36,7 @@ public class AboutActivity extends AppCompatActivity {
         mDbNodeRepo = new dbNodeRepo(getApplicationContext());
         dbnode = new dbNode();
 
+        setupToolbar();
 
         View aboutPage = new AboutPage(this)
                 .isRTL(false)
@@ -172,7 +175,7 @@ public class AboutActivity extends AppCompatActivity {
         final String copyrights = String.format(getString(R.string.copy_right), Calendar.getInstance().get(Calendar.YEAR));
         copyRightsElement.setTitle(copyrights);
         copyRightsElement.setIcon(R.drawable.ic_copyright_black_24dp);
-        copyRightsElement.setColor(ContextCompat.getColor(this, mehdi.sakout.aboutpage.R.color.about_item_icon_color));
+        copyRightsElement.setColor(R.color.black);
         copyRightsElement.setGravity(Gravity.CENTER);
         copyRightsElement.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,5 +184,23 @@ public class AboutActivity extends AppCompatActivity {
             }
         });
         return copyRightsElement;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // app icon action bar is clicked; go to parent activity
+                this.finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    private void setupToolbar(){
+        //setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#ffffff'>About </font>"));
+
     }
 }

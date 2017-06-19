@@ -29,6 +29,7 @@ import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.fragment.InstalledNode;
 import com.olmatix.utils.ClickListener;
@@ -41,6 +42,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -134,7 +136,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         if (mInstalledNodeModel.getFwName() != null) {
             if (mInstalledNodeModel.getFwName().equals("smartfitting")||mInstalledNodeModel.getFwName().equals("smartadapter1ch")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_light);
-            } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")) {
+            } else if (mInstalledNodeModel.getFwName().equals("smartadapter4ch")||mInstalledNodeModel.getFwName().equals("smartadapter8ch")) {
                 holder.imgNode.setImageResource(R.mipmap.ic_adapter);
             } else if (mInstalledNodeModel.getFwName().equals("smartsensordoor")) {
                 holder.imgNode.setImageResource(R.mipmap.door);
@@ -183,7 +185,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             holder.lastAdd.setText("Updated : " + OlmatixUtils.getTimeAgo(cal));
         }
 
-
         holder.imgBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -231,6 +232,37 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                                     snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                         snackbar.show();
                         notifyDataSetChanged();
+
+                        String fwApp = mInstalledNodeModel.getFwName();
+                        ArrayList<DetailNodeModel> data1;
+                        dbNodeRepo mDbNodeRepo;
+                        mDbNodeRepo = new dbNodeRepo(context);
+                        DetailNodeModel detailNodeModel;
+                        detailNodeModel = new DetailNodeModel();
+
+
+                        data1 = new ArrayList<>();
+
+                        if (fwApp.equals("olmatixapp")){
+                            String nid = mInstalledNodeModel.getNodesID();
+                            data1.clear();
+                            int countDB = mDbNodeRepo.getNodeDetail(nid,"0").size();
+                            Log.d("DEBUG", "Count list Detail: " + countDB);
+                            data1.addAll(mDbNodeRepo.getNodeDetail(nid,"0"));
+                            if (countDB != 0) {
+                                for (int i = 0; i < countDB; i++) {
+                                    final String mNodeID1 = data1.get(i).getNode_id();
+                                    final String mNiceNameD = data1.get(i).getNice_name_d();
+                                    Log.d("DEBUG", "onClick: "+mNodeID1+" : "+mNiceNameD);
+
+                                    detailNodeModel.setNode_id(mNodeID1);
+                                    detailNodeModel.setChannel("0");
+                                    detailNodeModel.setNice_name_d(nice_name);
+                                    mDbNodeRepo.update_detail_NiceName(detailNodeModel);
+                                }
+
+                            }
+                        }
 
                     }
                 });
@@ -364,7 +396,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     public void removeItem(int position) {
 
         String mNodeID = nodeList.get(position).getNodesID();
-        for (int a=0; a < 20 ;a++) {
+        for (int a=0; a < 22 ;a++) {
             if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
             if (a == 1) {topic = "devices/" + mNodeID + "/$fwname";}
             if (a == 2) {topic = "devices/" + mNodeID + "/$signal";}
@@ -385,6 +417,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             if (a == 17) {topic = "devices/" + mNodeID + "/prox/theft";}
             if (a == 18) {topic = "devices/" + mNodeID + "/prox/jarak";}
             if (a == 19) {topic = "devices/" + mNodeID + "/dist/range";}
+            if (a == 20) {topic = "devices/" + mNodeID + "/$calling";}
+            if (a == 21) {topic = "devices/" + mNodeID + "/$location";}
 
             try {
                 Connection.getClient().unsubscribe(topic);

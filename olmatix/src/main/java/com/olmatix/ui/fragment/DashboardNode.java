@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.olmatix.adapter.NodeDashboardAdapter;
 import com.olmatix.adapter.groupAdapter;
@@ -50,6 +51,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
     private groupModel groupmodel;
     public  static dbNodeRepo mDbNodeRepo;
     private FloatingActionButton mFab,mFab1;
+    private TextView createGroup;
     private static ArrayList<groupModel> data;
     private static ArrayList<DashboardNodeModel> data1;
     private Context context;
@@ -121,7 +123,7 @@ public class DashboardNode extends android.support.v4.app.Fragment {
 
         mFab            = (FloatingActionButton) mView.findViewById(R.id.fab);
         mFab1            = (FloatingActionButton) mView.findViewById(R.id.fab1);
-
+        createGroup = (TextView)mView.findViewById(R.id.creategroup);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
 
         mRecycleView.setHasFixedSize(true);
@@ -132,11 +134,18 @@ public class DashboardNode extends android.support.v4.app.Fragment {
         if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             float colom = mPrefHelper.getLength();
             mNoOfColumns = Math.round(colom);
+            mFab.hide();
+            mFab1.hide();
+            createGroup.setVisibility(View.GONE);
+
 
         }
         else {
             float colomw = mPrefHelper.getWidht();
             mNoOfColumns = Math.round(colomw);
+            mFab.show();
+            mFab1.show();
+            createGroup.setVisibility(View.VISIBLE);
         }
 
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(),mNoOfColumns);

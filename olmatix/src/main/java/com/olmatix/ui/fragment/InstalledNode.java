@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -52,8 +53,6 @@ import com.olmatix.ui.activity.CameraActivity;
 import com.olmatix.ui.activity.PhoneActivity;
 import com.olmatix.utils.Connection;
 
-import org.appspot.apprtc.CallActivity;
-import org.appspot.apprtc.ConnectActivity;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -525,22 +524,31 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     private void dosubOlmatixApp(String input){
 
-        String topic = "devices/" + input + "/$calling";
-        int qos = 1;
-        try {
-            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-            subToken.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d(TAG, "onSuccess: " +input);
-                }
+        for (int a = 0; a < 2; a++) {
+            String topic = "";
+            if (a==0) {
+                topic = "devices/" + input + "/$calling";
+            }
+            if (a==1) {
+                topic = "devices/" + input + "/$location";
+            }
+            int qos = 2;
+            try {
+                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                int finalA = a;
+                subToken.setActionCallback(new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d(TAG, "onSuccess: "+ finalA +" "+input);
+                    }
 
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    }
+                });
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -567,6 +575,14 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
 
         mRecycleView.setHasFixedSize(true);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            mFab.hide();
+        }
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mFab.show();
+        }
 
         layoutManager = new LinearLayoutManager(getActivity());
         mRecycleView.setLayoutManager(layoutManager);
@@ -643,9 +659,9 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     private void setRefresh() {
         onTouchListener(0);
-        //new load().execute();
+        new load().execute();
         //refreshnode();
-        setAdapter();
+        //setAdapter();
         mFab.show();
         mSwipeRefreshLayout.setRefreshing(false);
 

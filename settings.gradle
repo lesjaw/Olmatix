@@ -1,1 +1,1 @@
-include ':olmatix', ':webRTCCall'
+include ':olmatix', ':olmatixRTC'

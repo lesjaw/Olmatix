@@ -1,7 +1,6 @@
 package com.olmatix.service;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -19,8 +18,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
@@ -35,7 +32,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
@@ -62,13 +58,11 @@ import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.DurationModel;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.MainActivity;
-import com.olmatix.ui.activity.PhoneActivity;
 import com.olmatix.ui.activity.SplashActivity;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
-import org.appspot.apprtc.CallActivity;
-import org.appspot.apprtc.ConnectActivity;
+import org.appspot.olmatixrtc.ConnectActivity;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -81,17 +75,18 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.DoubleSummaryStatistics;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -371,7 +366,7 @@ public class OlmatixService extends Service {
             String topic = "devices/" + deviceId + "/$online";
             byte[] payload = "false".getBytes();
             options.setWill(topic, payload, 1, true);
-            options.setKeepAliveInterval(300);
+            options.setKeepAliveInterval(120);
             Connection.setClient(mqttClient);
 
             text = "Connecting to server..";
@@ -876,6 +871,17 @@ public class OlmatixService extends Service {
 
     private void setClientID() {
 
+        String m_szDevIDShort = "35" + //we make this look like a valid IMEI
+                Build.BOARD.length()%10+ Build.BRAND.length()%10 +
+                Build.CPU_ABI.length()%10 + Build.DEVICE.length()%10 +
+                Build.DISPLAY.length()%10 + Build.HOST.length()%10 +
+                Build.ID.length()%10 + Build.MANUFACTURER.length()%10 +
+                Build.MODEL.length()%10 + Build.PRODUCT.length()%10 +
+                Build.TAGS.length()%10 + Build.TYPE.length()%10 +
+                Build.USER.length()%10 ; //13 digits
+
+        Log.d(TAG, "setClientID: "+m_szDevIDShort);
+
         String uniqueID = null;
         final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 
@@ -885,7 +891,7 @@ public class OlmatixService extends Service {
                         PREF_UNIQUE_ID, Context.MODE_PRIVATE);
                 uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
                 if (uniqueID == null) {
-                    uniqueID = UUID.randomUUID().toString();
+                    uniqueID = m_szDevIDShort;
                     SharedPreferences.Editor editor = sharedPrefs.edit();
                     editor.putString(PREF_UNIQUE_ID, uniqueID);
                     editor.commit();
@@ -915,6 +921,14 @@ public class OlmatixService extends Service {
     private void sendMessage() {
         Intent intent = new Intent("MQTTStatus");
         intent.putExtra("MqttStatus", flagConn);
+        //intent.putExtra("ConnectionStatus", connectionResult);
+        //Log.d(TAG, "sendMessage: "+connectionResult);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendMessageLoc(String latlng) {
+        Intent intent = new Intent("Location");
+        intent.putExtra("latlng", latlng);
         //intent.putExtra("ConnectionStatus", connectionResult);
         //Log.d(TAG, "sendMessage: "+connectionResult);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -963,12 +977,12 @@ public class OlmatixService extends Service {
         String online = outputDevices[2];
 
         if (online.equals("$online")){
-            //Log.d(TAG, "Online : "+online +"="+mMessage);
-            checkActivityForeground();
-            installedNodeModel.setNodesID(NodeID);
-            data2.clear();
+            Log.d("DEBUG", "online: "+ NodeID);
+            //checkValidation(NodeID);
+            //installedNodeModel.setNodesID(NodeID);
             data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
+            Log.d("DEBUG", "Online Count DB "+countDB +" "+NodeID);
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     if (data2.get(i).getNice_name_n() != null) {
@@ -978,21 +992,19 @@ public class OlmatixService extends Service {
                     }
 
                     lastValue = data2.get(i).getOnline();
+                    Log.d(TAG, "lastValue : "+lastValue);
 
                     if (TextUtils.isEmpty(lastValue)){
                         lastValue = "false";
                     }
 
                     if (mMessage.equals("true")) {
-                        Log.d(TAG, "addNode: "+lastValue);
                         if (lastValue.equals("false")) {
                             titleNode = mNiceNameN;
                             textNode = "ONLINE";
                             installedNodeModel.setOnline("true");
-                            //installedNodeModel.setOnline(messageReceive.get("online"));
                             installedNodeModel.setNodesID(NodeID);
                             mDbNodeRepo.updateOnline(installedNodeModel);
-
                             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                             dbnode.setTopic(mNiceNameN + " is " + textNode);
                             dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
@@ -1012,10 +1024,8 @@ public class OlmatixService extends Service {
                             titleNode = mNiceNameN;
                             textNode = "OFFLINE";
                             installedNodeModel.setOnline("false");
-                            //installedNodeModel.setOnline(messageReceive.get("online"));
                             installedNodeModel.setNodesID(NodeID);
                             mDbNodeRepo.updateOnline(installedNodeModel);
-
                             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                             dbnode.setTopic(mNiceNameN + " is " + textNode);
                             dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
@@ -1031,10 +1041,15 @@ public class OlmatixService extends Service {
                         }
 
                     }
+                    updated(NodeID);
                 }
+            } else if (countDB==0){
+                //checkValidation(NodeID);
+                saveFirst();
             }
 
             lastValue="";
+            data2.clear();
         } else if (online.equals("$localip")){
             installedNodeModel.setLocalip(mMessage);
             installedNodeModel.setNodesID(NodeID);
@@ -1042,33 +1057,41 @@ public class OlmatixService extends Service {
             mChange = "2";
             sendMessageDetail();
         } else if (online.equals("$fwname")) {
-            data2.clear();
             data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
+            Log.d(TAG, "NodeFW: "+NodeID);
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     String fwnamecheck = data2.get(i).getFwName();
+                    String fwnamecheck1 = data2.get(i).getNodesID();
+
+                    Log.d(TAG, "fwNameCheck: "+fwnamecheck +" "+fwnamecheck1 +" "+mMessage);
                     if (fwnamecheck == null) {
                         installedNodeModel.setFwName(mMessage);
                         installedNodeModel.setNodesID(NodeID);
                         mDbNodeRepo.updateFwname(installedNodeModel);
                         mChange = "2";
                         sendMessageDetail();
+                        addNodeDetail();
                     }
                 }
             }
+            data2.clear();
         } else if (online.equals("$signal")){
             installedNodeModel.setSignal(mMessage);
             installedNodeModel.setNodesID(NodeID);
             mDbNodeRepo.updateSignal(installedNodeModel);
             mChange = "2";
             sendMessageDetail();
+            updated(NodeID);
         } else if (online.equals("$uptime")){
+            //Log.d(TAG, "Uptime: "+NodeID+" "+mMessage);
             installedNodeModel.setUptime(mMessage);
             installedNodeModel.setNodesID(NodeID);
             mDbNodeRepo.updateUptime(installedNodeModel);
             mChange = "2";
             sendMessageDetail();
+            updated(NodeID);
         } else if (online.equals("$calling")){
             String input =mMessage;
             String[] rdm = input.split("-");
@@ -1100,21 +1123,33 @@ public class OlmatixService extends Service {
                 }
             }
 
+        }else if (online.equals("$location")){
+            sendMessageLoc(mMessage);
         }
-        checkValidation();
     }
 
-    private void checkValidation() {
+    private void updated(String nodeid){
+        installedNodeModel.setNodesID(nodeid);
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        now.getTimeInMillis();
+        installedNodeModel.setAdding(now.getTimeInMillis());
+        mDbNodeRepo.updateAdding(installedNodeModel);
+        mChange = "2";
+        sendMessageDetail();
+        //Log.d(TAG, "updated: ");
+    }
+
+    private void checkValidation(String nodeid) {
         if (flagNode) {
             if (messageReceive.containsKey("online")) {
-                Log.d("CheckValid online", "Passed");
+                Log.d("CheckValid online", "Passed " +nodeid);
                 if (mMessage.equals("true")) {
-                    Log.d("CheckValid online", " true Passed");
+                    Log.d("CheckValid online", " true Passed "+nodeid);
                     saveFirst();
                 } else {
-
                     final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                            "Your device Offline",TSnackbar.LENGTH_LONG);
+                            "Your device Offline " +nodeid,TSnackbar.LENGTH_LONG);
                     snackbarWrapper.setAction("Olmatix",
                             new View.OnClickListener() {
                                 @Override
@@ -1236,7 +1271,8 @@ public class OlmatixService extends Service {
                 e.printStackTrace();
             }
         }
-        messageReceive.clear();
+        //messageReceive.clear();
+        //doSubOnline();
     }
 
     private void toastAndNotif1() {
@@ -1609,7 +1645,7 @@ public class OlmatixService extends Service {
     private void addNodeDetail() {
 
         if (installedNodeModel.getFwName() != null) {
-
+            //Log.d(TAG, "addNodeDetail: ");
             if (installedNodeModel.getFwName().equals("smartfitting")||installedNodeModel.getFwName().equals("smartadapter1ch")) {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
@@ -1661,6 +1697,53 @@ public class OlmatixService extends Service {
                     saveDatabase_Detail();
                 } else {
                     for (int i = 0; i < 4; i++) {
+                        String a = String.valueOf(i);
+
+                        detailNodeModel.setNode_id(NodeID);
+                        detailNodeModel.setChannel(String.valueOf(i));
+                        detailNodeModel.setStatus("false");
+                        detailNodeModel.setNice_name_d(NodeID + " Ch " + String.valueOf(i + 1));
+                        detailNodeModel.setSensor("light");
+
+                        mDbNodeRepo.insertInstalledNode(detailNodeModel);
+
+                        durationModel.setNodeId(NodeID);
+                        durationModel.setChannel(String.valueOf(i));
+                        durationModel.setStatus("false");
+                        durationModel.setTimeStampOn((long) 0);
+                        //durationModel.setTimeStampOff((long) 0);
+                        durationModel.setDuration((long) 0);
+
+                        mDbNodeRepo.insertDurationNode(durationModel);
+
+
+                        topic1 = "devices/" + NodeID + "/light/" + i;
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeButton", " device = " + NodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            } else if (installedNodeModel.getFwName().equals("smartadapter8ch")) {
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel("0");
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
+                    saveDatabase_Detail();
+                } else {
+                    for (int i = 0; i < 8; i++) {
                         String a = String.valueOf(i);
 
                         detailNodeModel.setNode_id(NodeID);
@@ -1858,7 +1941,7 @@ public class OlmatixService extends Service {
                         }
                     }
                 }
-            }else if (installedNodeModel.getFwName().equals("smartsensorprox")) {
+            } else if (installedNodeModel.getFwName().equals("smartsensorprox")) {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
                 if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
@@ -1915,6 +1998,52 @@ public class OlmatixService extends Service {
                         }
                     }
                 }
+            } else if (installedNodeModel.getFwName().equals("olmatixapp")) {
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel("0");
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
+                } else {
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel("0");
+                    detailNodeModel.setSensor("0");
+                    detailNodeModel.setStatus("false");
+                    detailNodeModel.setStatus_sensor("false");
+                    detailNodeModel.setStatus_theft("false");
+                    detailNodeModel.setNice_name_d(NodeID);
+
+                    mDbNodeRepo.insertInstalledNode(detailNodeModel);
+
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel("0");
+                    durationModel.setTimeStampOn((long) 0);
+                    durationModel.setDuration((long) 0);
+
+                    mDbNodeRepo.insertDurationNode(durationModel);
+
+                    for (int a = 0; a < 1; a++) {
+                        if (a == 0) {
+                            topic1 = "";
+                        }
+
+
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeSensor", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
         }
     }
@@ -1932,8 +2061,6 @@ public class OlmatixService extends Service {
         //installedNodeModel.setOnline(messageReceive.get("online"));
         if (messageReceive.containsKey("online")) {
             //Log.d(TAG, "ONLINE : "+messageReceive);
-
-
         }
 
         installedNodeModel.setSignal(messageReceive.get("signal"));
@@ -2123,6 +2250,7 @@ public class OlmatixService extends Service {
                 subToken.setActionCallback(new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d(TAG, "doAddNodeSub: "+add_NodeID);
                     }
 
                     @Override
@@ -2134,6 +2262,7 @@ public class OlmatixService extends Service {
             e.printStackTrace();
         }
         flagNode = true;
+
     }
 
     private void doSubAll() {
@@ -2181,6 +2310,7 @@ public class OlmatixService extends Service {
                         }
                     }
                     doSubAllDetail();
+
                 }
     }
 
@@ -2520,9 +2650,31 @@ public class OlmatixService extends Service {
                             sendMessageDetail();
                             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                             final Boolean mSwitch_Notif = sharedPref.getBoolean("switch_loc", true);
-                            if (mSwitch_Notif){
+                            if (mSwitch_Notif) {
                                 showNotificationLoc();
+
+                                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplication());
+                                mStatusServer = sharedPref.getBoolean("conStatus", false);
+                                if (mStatusServer) {
+                                    Log.d(TAG, "Publich Location ");
+                                    topic = "devices/" + deviceId + "/$location";
+                                    String payload = String.valueOf(lat) + ", " + String.valueOf(lng);
+                                    byte[] encodedPayload = new byte[0];
+                                    try {
+                                        if (mqttClient != null) {
+                                            encodedPayload = payload.getBytes("UTF-8");
+                                            MqttMessage message = new MqttMessage(encodedPayload);
+                                            message.setQos(1);
+                                            message.setRetained(true);
+                                            Connection.getClient().publish(topic, message);
+                                        }
+                                    } catch (UnsupportedEncodingException | MqttException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
+                            mPrefHelper.setPhoneLatitude(lat);
+                            mPrefHelper.setPhoneLongitude(lng);
 
                         }
                     }

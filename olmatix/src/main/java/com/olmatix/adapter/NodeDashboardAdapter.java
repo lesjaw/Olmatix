@@ -18,6 +18,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.helper.ItemTouchHelperAdapter;
@@ -26,6 +27,7 @@ import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.utils.Connection;
 
+import org.appspot.olmatixrtc.ConnectActivity;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
@@ -33,6 +35,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Lesjaw on 17/12/2016.
@@ -65,8 +68,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 ||(nodeList.get(position).getSensor().trim()).equals("prox")) {
             viewType = 1;
 
-        }else if ((nodeList.get(position).getSensor().trim()).equals("temp")) {
+        } else if ((nodeList.get(position).getSensor().trim()).equals("temp")) {
             viewType = 2;
+        } else if ((nodeList.get(position).getSensor().trim()).equals("olmatixapp")) {
+            viewType = 3;
         }
 
         return viewType;
@@ -115,7 +120,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         .inflate(R.layout.frag_dash_temp, viewGroup, false);
 
                 return new TempHolder(v);
+            case 3:
+                v = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.frag_dash_phone, viewGroup, false);
+
+                return new PhoneHolder(v);
             default:
+
         }
 
         return null;
@@ -466,6 +477,92 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     return false;
                 }
             });
+        } else if ((mFavoriteModel.getSensor().trim()).equals("0")) {
+
+            final ButtonHolder holder = (ButtonHolder) viewHolder;
+
+            holder.node_name.setText(mFavoriteModel.getNice_name_d());
+
+            String lastval=mFavoriteModel.getStatus();
+
+            if (lastval!=null && !lastval.equals("")) {
+                    holder.imgNode.setImageResource(R.drawable.videcall);
+                    holder.imgSending.setVisibility(View.GONE);
+
+
+            }
+            if (mFavoriteModel.getOnline().trim().equals("true")) {
+                holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                holder.imgNode.setBackgroundColor(Color.WHITE);
+                holder.iconstat.setVisibility(View.GONE);
+
+            } /*else {
+                holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+                holder.imgNode.setBackgroundColor(Color.parseColor("#A9A9A9"));
+                holder.iconstat.setVisibility(View.VISIBLE);
+            }*/
+
+            holder.imgNode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Random r = new Random();
+                    int i1 = r.nextInt(80 - 65) + 65;
+                    if (mStatusServer) {
+
+                        String topic = "devices/" + mFavoriteModel.getNodeid() + "/$calling";
+                        String payload = "true-"+i1;
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                    }
+                    Intent i = new Intent(context, ConnectActivity.class);
+                    i.putExtra("node_id", mFavoriteModel.getNodeid()+i1);
+                    context.startActivity(i);
+                }
+            });
+
+            holder.imgNode.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Delete this Node?");
+                    builder.setMessage(mFavoriteModel.getNice_name_d());
+                    String nice_name = mFavoriteModel.getNice_name_d();
+
+                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            removeItem(position);
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+                    return false;
+                }
+            });
+
         }
 
 
@@ -535,6 +632,22 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             imgSending = (ImageView) view.findViewById(R.id.icon_sending);
             temp = (TextView) view.findViewById(R.id.temp);
             hum = (TextView) view.findViewById(R.id.hum);
+            iconstat = (ImageView) view.findViewById(R.id.icon_stat);
+
+        }
+    }
+
+    public class PhoneHolder extends ViewHolder {
+        public TextView node_name, status;
+        public ImageView imgOnline, imgSending,iconstat;
+        public ImageButton imgNode;
+
+        public PhoneHolder(View view) {
+            super(view);
+            imgNode = (ImageButton) view.findViewById(R.id.icon_node);
+            node_name = (TextView) view.findViewById(R.id.node_name);
+            imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
+            imgSending = (ImageView) view.findViewById(R.id.icon_sending);
             iconstat = (ImageView) view.findViewById(R.id.icon_stat);
 
         }

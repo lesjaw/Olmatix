@@ -462,9 +462,35 @@ public class dbNodeRepo {
 
     }
 
+    public void updateAdding(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        if (installedNodeModel.getNodes() != null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
+
+        if (installedNodeModel.getAdding() != null) {
+            values.put(KEY_ADDING, installedNodeModel.getAdding());
+            Log.d("DEBUG", "UpdateAdding: "+installedNodeModel.getAdding());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close();
+
+    }
+
     public void updateOnline(InstalledNodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        if (installedNodeModel.getNodes() != null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
 
         if (installedNodeModel.getOnline() != null) {
             values.put(KEY_ONLINE, installedNodeModel.getOnline());
@@ -482,6 +508,11 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        if (installedNodeModel.getNodes() != null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
+
         if (installedNodeModel.getLocalip() != null) {
             values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
         }
@@ -496,6 +527,11 @@ public class dbNodeRepo {
     public void updateFwname(InstalledNodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        if (installedNodeModel.getNodes() != null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
 
         if (installedNodeModel.getFwName() != null) {
             values.put(KEY_FWNAME, installedNodeModel.getFwName());
@@ -512,6 +548,11 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        if (installedNodeModel.getNodes() != null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
+
         if (installedNodeModel.getSignal() != null) {
             values.put(KEY_SIGNAL, installedNodeModel.getSignal());
         }
@@ -526,6 +567,11 @@ public class dbNodeRepo {
     public void updateUptime(InstalledNodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        if (installedNodeModel.getNodes() != null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
 
         if (installedNodeModel.getUptime() != null) {
             values.put(KEY_UPTIME, installedNodeModel.getUptime());
@@ -586,6 +632,7 @@ public class dbNodeRepo {
 
         if (detailNodeModel.getNice_name_d() != null) {
             values.put(KEY_NICE_NAME_D, detailNodeModel.getNice_name_d());
+            Log.d("DEBUG", "update_detail_NiceName: "+detailNodeModel.getNice_name_d());
         }
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
                 String.valueOf(detailNodeModel.getNode_id()),
@@ -936,7 +983,6 @@ public class dbNodeRepo {
         if (cursor.moveToFirst()) {
             do {
                 InstalledNodeModel node = new InstalledNodeModel();
-                //ArrayList<String> node = new ArrayList<>();
                 node.setNodesID(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
                 node.setNodes(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODES)));
                 node.setName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));

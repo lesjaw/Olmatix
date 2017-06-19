@@ -27,7 +27,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -115,6 +117,25 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
     };
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // app icon action bar is clicked; go to parent activity
+                this.finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    private void setupToolbar(){
+        //setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#ffffff'>Setup Product </font>"));
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +162,8 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             showSettingsAlert();
 
         }
+        setupToolbar();
+
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);

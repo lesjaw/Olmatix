@@ -1,0 +1,34 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
+    sourceSets.main {
+        jniLibs.srcDir 'libs'
+        jni.srcDirs = [] //disable automatic ndk-build call
+    }
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 25
+
+        versionCode 29
+        versionName '1.29'
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile files('libs/autobanh.jar')
+    compile files('libs/base_java.jar')
+    compile files('libs/libjingle_peerconnection.jar')
+}

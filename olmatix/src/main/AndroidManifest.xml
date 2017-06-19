@@ -1,19 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.olmatix.lesjaw.olmatix">
 
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <supports-screens
         android:anyDensity="true"
@@ -29,99 +29,81 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- Google MAP API key -->
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
         <activity
             android:name="com.olmatix.ui.activity.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.olmatix.ui.activity.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name="com.olmatix.ui.fragment.DetailNode"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name="com.olmatix.ui.activity.SettingsActivity"
             android:label="@string/action_settings">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.olmatix.ui.activity.MainActivity" />
         </activity>
-
         <activity
             android:name="com.olmatix.ui.activity.AboutActivity"
-            android:label="@string/pref_about">
-        </activity>
-
+            android:label="@string/pref_about"></activity>
         <activity
             android:name="com.olmatix.ui.activity.LoginActivity"
-            android:theme="@style/AppTheme.Dark">
-        </activity>
-
+            android:theme="@style/AppTheme.Dark"></activity>
         <activity
             android:name="com.olmatix.ui.activity.SignupActivity"
-            android:theme="@style/AppTheme.Dark">
-        </activity>
-
-        <activity
-            android:name="com.olmatix.ui.activity.SetupProduct">
-        </activity>
-
-        <activity
-            android:name="com.olmatix.ui.activity.SceneActivity">
-        </activity>
-
-        <activity
-            android:name="com.olmatix.ui.activity.CameraActivity">
-        </activity>
-
-        <activity
-            android:name="com.olmatix.ui.activity.PhoneActivity">
-        </activity>
-
+            android:theme="@style/AppTheme.Dark"></activity>
+        <activity android:name="com.olmatix.ui.activity.SetupProduct"></activity>
+        <activity android:name="com.olmatix.ui.activity.SceneActivity"></activity>
+        <activity android:name="com.olmatix.ui.activity.CameraActivity"></activity>
+        <activity android:name="com.olmatix.ui.activity.PhoneActivity"></activity>
         <activity
             android:name="com.olmatix.ui.activity.scene.ScheduleActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.olmatix.ui.activity.scene.ScheduleDetailActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name="com.olmatix.service.OlmatixService"/>
-        <service android:name="com.olmatix.service.OlmatixAlarmService"/>
+        <service android:name="com.olmatix.service.OlmatixService" />
+        <service android:name="com.olmatix.service.OlmatixAlarmService" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
         <receiver android:name="com.olmatix.service.OlmatixReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.olmatix.lesjaw.olmatix.ProximityAlert" />
             </intent-filter>
         </receiver>
+        <receiver android:name="com.olmatix.service.OlmatixAlarmReceiver" />
+        <receiver android:name="com.olmatix.service.OlmatixAlarmReceiver" />
 
-        <receiver android:name="com.olmatix.service.OlmatixAlarmReceiver"></receiver>
+        <service
+            android:name="com.novoda.merlin.service.MerlinService"
+            android:exported="false" />
 
-        <receiver android:name="com.olmatix.service.OlmatixAlarmReceiver"></receiver>
-        <service android:exported="false" android:name="com.novoda.merlin.service.MerlinService" />
         <receiver android:name="com.novoda.merlin.receiver.ConnectivityReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+
         <service
             android:name="com.olmatix.service.AlarmService"
             android:enabled="true" />

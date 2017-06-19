@@ -52,6 +52,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/creategroup"
             android:text="  Create New Group  "
             android:layout_marginBottom="70sp"
             android:layout_alignParentBottom="true"

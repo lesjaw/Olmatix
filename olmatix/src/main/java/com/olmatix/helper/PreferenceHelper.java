@@ -89,6 +89,26 @@ public class PreferenceHelper {
 
     }
 
+    public double getPhoneLatitude() {
+        return Double.parseDouble(customCachedPrefs.getString("phonelatitude", "0"));
+    }
+
+    public void setPhoneLatitude(double lat) {
+        SharedPreferences.Editor mEditor = customCachedPrefs.edit();
+        mEditor.putString("phonelatitude", String.valueOf(lat));
+        mEditor.apply();
+    }
+
+    public double getPhoneLongitude() {
+        return Double.parseDouble(customCachedPrefs.getString("phonelongitude", "0"));
+    }
+
+    public void setPhoneLongitude(double lat) {
+        SharedPreferences.Editor mEditor = customCachedPrefs.edit();
+        mEditor.putString("phonelongitude", String.valueOf(lat));
+        mEditor.apply();
+    }
+
     public void initializePrefs() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         homeThold = prefs.getInt("distanceThold", 150);

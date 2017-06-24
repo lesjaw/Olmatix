@@ -74,6 +74,7 @@ public class RoomParametersFetcher {
             Log.e(TAG, "Room connection error: " + errorMessage);
             events.onSignalingParametersError(errorMessage);
 
+
           }
 
           @Override
@@ -94,6 +95,7 @@ public class RoomParametersFetcher {
       String result = roomJson.getString("result");
       if (!result.equals("SUCCESS")) {
         events.onSignalingParametersError("Room response error: " + result);
+
         return;
       }
       response = roomJson.getString("params");

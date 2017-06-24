@@ -49,6 +49,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
@@ -120,6 +121,7 @@ public class OlmatixService extends Service {
     ArrayList<DetailNodeModel> data1;
     ArrayList<InstalledNodeModel> data2;
     ArrayList<DurationModel> data3;
+
     String add_NodeID;
     boolean flagSub = true;
     boolean flagNode = false;
@@ -143,8 +145,6 @@ public class OlmatixService extends Service {
     private String Distance;
     String adString = "";
     String loc = null;
-    double lat;
-    double lng;
     IntentFilter filter;
     int numMessages = 0;
     int count = 0;
@@ -160,7 +160,7 @@ public class OlmatixService extends Service {
     PermissionListener permissionlistener = new PermissionListener() {
         @Override
         public void onPermissionGranted() {
-            Toast.makeText(getApplicationContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -358,9 +358,9 @@ public class OlmatixService extends Service {
             }
 
             Log.d(TAG, "doConnect: " + count);
-            dbnode.setTopic("Connecting to server");
+            /*dbnode.setTopic("Connecting to server");
             dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-            mDbNodeRepo.insertDbMqtt(dbnode);
+            mDbNodeRepo.insertDbMqtt(dbnode);*/
             sendMessageDetail();
 
             String topic = "devices/" + deviceId + "/$online";
@@ -394,9 +394,9 @@ public class OlmatixService extends Service {
                             doSubAll();
                         }
 
-                        dbnode.setTopic("Connected to server");
+                        /*dbnode.setTopic("Connected to server");
                         dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                        mDbNodeRepo.insertDbMqtt(dbnode);
+                        mDbNodeRepo.insertDbMqtt(dbnode);*/
                         sendMessageDetail();
                         try {
                             for (int a = 0; a < 6; a++) {
@@ -542,9 +542,9 @@ public class OlmatixService extends Service {
                             editor.apply();
                             flagConn = false;
                             sendMessage();
-                            dbnode.setTopic("Failed to subscribe");
+                            /*dbnode.setTopic("Failed to subscribe");
                             dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
-                            mDbNodeRepo.insertDbMqtt(dbnode);
+                            mDbNodeRepo.insertDbMqtt(dbnode);*/
                             sendMessageDetail();
 
                         }
@@ -676,6 +676,7 @@ public class OlmatixService extends Service {
         data1 = new ArrayList<>();
         data2 = new ArrayList<>();
         data3 = new ArrayList<>();
+
         notifications = new ArrayList<>();
         dbnode = new dbNode();
 
@@ -697,6 +698,17 @@ public class OlmatixService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        new TedPermission(this)
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.WAKE_LOCK,
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.CAMERA)
+                .check();
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         String mProvider = locationManager.getBestProvider(OlmatixUtils.getGeoCriteria(), true);
 
@@ -718,7 +730,7 @@ public class OlmatixService extends Service {
         sendMessage();
 
         listener = new MyLocationListener();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
@@ -740,9 +752,9 @@ public class OlmatixService extends Service {
                 mLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
             }
             if (mLocation != null) {
-                lat = mLocation.getLatitude();
-                lng = mLocation.getLongitude();
-                locationDistance();
+                Double lat = mLocation.getLatitude();
+                Double lng = mLocation.getLongitude();
+                locationDistance(lat, lng);
                 PreferenceHelper mPrefHelper = new PreferenceHelper(this.getApplicationContext());
                 double homeLat = mPrefHelper.getHomeLatitude();
                 double homelng = mPrefHelper.getHomeLongitude();
@@ -883,20 +895,24 @@ public class OlmatixService extends Service {
         Log.d(TAG, "setClientID: "+m_szDevIDShort);
 
         String uniqueID = null;
+        int lengUniqID = 0;
         final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 
 
-            if (uniqueID == null) {
                 SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences(
                         PREF_UNIQUE_ID, Context.MODE_PRIVATE);
                 uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
-                if (uniqueID == null) {
+                if (uniqueID!=null) {
+                    lengUniqID = uniqueID.length();
+                }
+                Log.d(TAG, "check App ID length " +lengUniqID);
+                if (uniqueID == null || lengUniqID>15) {
                     uniqueID = m_szDevIDShort;
                     SharedPreferences.Editor editor = sharedPrefs.edit();
                     editor.putString(PREF_UNIQUE_ID, uniqueID);
                     editor.commit();
                 }
-             }
+
 
         deviceId = "OlmatixApp-" +uniqueID;
 
@@ -975,6 +991,8 @@ public class OlmatixService extends Service {
         mNodeIdSplit = mNodeIdSplit.substring(mNodeIdSplit.indexOf("$") + 1, mNodeIdSplit.length());
         messageReceive.put(mNodeIdSplit, mMessage);
         String online = outputDevices[2];
+
+        data2.clear();
 
         if (online.equals("$online")){
             Log.d("DEBUG", "online: "+ NodeID);
@@ -1057,16 +1075,17 @@ public class OlmatixService extends Service {
             mChange = "2";
             sendMessageDetail();
         } else if (online.equals("$fwname")) {
+            data2.clear();
             data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
-            Log.d(TAG, "NodeFW: "+NodeID);
+            Log.d(TAG, "NodeFW: "+NodeID +" fwname "+mMessage);
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
+            Log.d(TAG, "CountDB FWname "+countDB);
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     String fwnamecheck = data2.get(i).getFwName();
-                    String fwnamecheck1 = data2.get(i).getNodesID();
 
-                    Log.d(TAG, "fwNameCheck: "+fwnamecheck +" "+fwnamecheck1 +" "+mMessage);
                     if (fwnamecheck == null) {
+                    Log.d(TAG, "FWName: "+mMessage);
                         installedNodeModel.setFwName(mMessage);
                         installedNodeModel.setNodesID(NodeID);
                         mDbNodeRepo.updateFwname(installedNodeModel);
@@ -1076,7 +1095,6 @@ public class OlmatixService extends Service {
                     }
                 }
             }
-            data2.clear();
         } else if (online.equals("$signal")){
             installedNodeModel.setSignal(mMessage);
             installedNodeModel.setNodesID(NodeID);
@@ -1124,8 +1142,17 @@ public class OlmatixService extends Service {
             }
 
         }else if (online.equals("$location")){
+
+            installedNodeModel.setNodesID(NodeID);
+            installedNodeModel.setOta(mMessage);
+            mDbNodeRepo.updateLoc(installedNodeModel);
+            mChange = "2";
+            sendMessageDetail();
+            updated(NodeID);
             sendMessageLoc(mMessage);
         }
+
+
     }
 
     private void updated(String nodeid){
@@ -1173,6 +1200,7 @@ public class OlmatixService extends Service {
         if (mDbNodeRepo.getNodeList().isEmpty()) {
             installedNodeModel.setNodesID(NodeID);
             installedNodeModel.setNodes(messageReceive.get("online"));
+            installedNodeModel.setOnline(mMessage);
             Calendar now = Calendar.getInstance();
             now.setTime(new Date());
             now.getTimeInMillis();
@@ -1213,6 +1241,7 @@ public class OlmatixService extends Service {
             } else {
                 installedNodeModel.setNodesID(NodeID);
                 installedNodeModel.setNodes(messageReceive.get("online"));
+                installedNodeModel.setOnline(mMessage);
                 Calendar now = Calendar.getInstance();
                 now.setTime(new Date());
                 now.getTimeInMillis();
@@ -2032,7 +2061,51 @@ public class OlmatixService extends Service {
                             subToken.setActionCallback(new IMqttActionListener() {
                                 @Override
                                 public void onSuccess(IMqttToken asyncActionToken) {
-                                    Log.d("SubscribeSensor", " device = " + mNodeID);
+                                    Log.d("SubscribeOlmatixApp", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }  else if (installedNodeModel.getFwName().equals("smartcam")) {
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel("0");
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
+                } else {
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel("0");
+                    detailNodeModel.setSensor("0");
+                    detailNodeModel.setStatus("false");
+                    detailNodeModel.setStatus_sensor("false");
+                    detailNodeModel.setStatus_theft("false");
+                    detailNodeModel.setNice_name_d(NodeID);
+
+                    mDbNodeRepo.insertInstalledNode(detailNodeModel);
+
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel("0");
+                    durationModel.setTimeStampOn((long) 0);
+                    durationModel.setDuration((long) 0);
+
+                    mDbNodeRepo.insertDurationNode(durationModel);
+
+                    for (int a = 0; a < 1; a++) {
+                        if (a == 0) {
+                            topic1 = "";
+                        }
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubcriberCamera", " device = " + mNodeID);
                                 }
 
                                 @Override
@@ -2498,9 +2571,9 @@ public class OlmatixService extends Service {
             doCon=false;
             sendMessage();
             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-            dbnode.setTopic("Connection lost");
+            /*dbnode.setTopic("Connection lost");
             dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
-            mDbNodeRepo.insertDbMqtt(dbnode);
+            mDbNodeRepo.insertDbMqtt(dbnode);*/
             sendMessageDetail();
             connLose();
 
@@ -2556,9 +2629,9 @@ public class OlmatixService extends Service {
             Log.i("*****************", "Location changed");
             if(isBetterLocation(mLocation, previousBestLocation)) {
 
-                lat = (mLocation.getLatitude());
-                lng = (mLocation.getLongitude());
-                locationDistance();
+                Double lat = (mLocation.getLatitude());
+                Double lng = (mLocation.getLongitude());
+                locationDistance(lat,lng);
             }
         }
 
@@ -2598,7 +2671,7 @@ public class OlmatixService extends Service {
         }
     }
 
-    public void locationDistance(){
+    public void locationDistance(Double lat, Double lng){
 
             if (lat!=0 && lng!=0) {
 
@@ -2652,29 +2725,30 @@ public class OlmatixService extends Service {
                             final Boolean mSwitch_Notif = sharedPref.getBoolean("switch_loc", true);
                             if (mSwitch_Notif) {
                                 showNotificationLoc();
+                            }
 
-                                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplication());
-                                mStatusServer = sharedPref.getBoolean("conStatus", false);
-                                if (mStatusServer) {
-                                    Log.d(TAG, "Publich Location ");
-                                    topic = "devices/" + deviceId + "/$location";
-                                    String payload = String.valueOf(lat) + ", " + String.valueOf(lng);
-                                    byte[] encodedPayload = new byte[0];
-                                    try {
-                                        if (mqttClient != null) {
-                                            encodedPayload = payload.getBytes("UTF-8");
-                                            MqttMessage message = new MqttMessage(encodedPayload);
-                                            message.setQos(1);
-                                            message.setRetained(true);
-                                            Connection.getClient().publish(topic, message);
-                                        }
-                                    } catch (UnsupportedEncodingException | MqttException e) {
-                                        e.printStackTrace();
+                            sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplication());
+                            mStatusServer = sharedPref.getBoolean("conStatus", false);
+                            if (mStatusServer) {
+                                topic = "devices/" + deviceId + "/$location";
+                                String payload = String.valueOf(lat) + "," + String.valueOf(lng);
+                                byte[] encodedPayload = new byte[0];
+                                try {
+                                    if (mqttClient != null) {
+                                        encodedPayload = payload.getBytes("UTF-8");
+                                        MqttMessage message = new MqttMessage(encodedPayload);
+                                        message.setQos(1);
+                                        message.setRetained(true);
+                                        Connection.getClient().publish(topic, message);
+                                        Log.d(TAG, "Publich Location " +message);
                                     }
+                                } catch (UnsupportedEncodingException | MqttException e) {
+                                    e.printStackTrace();
                                 }
                             }
                             mPrefHelper.setPhoneLatitude(lat);
                             mPrefHelper.setPhoneLongitude(lng);
+
 
                         }
                     }

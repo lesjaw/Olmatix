@@ -157,6 +157,8 @@ public class CallActivity extends Activity implements AppRTCClient.SignalingEven
   private boolean callControlFragmentVisible = true;
   private long callStartedTimeMs = 0;
   private boolean micEnabled = true;
+  private boolean vidEnabled = true;
+
   private boolean screencaptureEnabled = false;
   private static Intent mediaProjectionPermissionResultData;
   private static int mediaProjectionPermissionResultCode;
@@ -477,6 +479,26 @@ public class CallActivity extends Activity implements AppRTCClient.SignalingEven
     return micEnabled;
   }
 
+  @Override
+  public boolean onToggleVideo() {
+    if (peerConnectionClient != null) {
+      vidEnabled = !vidEnabled;
+      //peerConnectionClient.setVideoEnabled(vidEnabled);
+      if (!vidEnabled) {
+        peerConnectionClient.stopVideoSource();
+        Log.d(TAG, "video false: ");
+          localRender.setVisibility(View.GONE);
+
+      } else {
+        peerConnectionClient.startVideoSource();
+          Log.d(TAG, "video true: ");
+          localRender.setVisibility(View.VISIBLE);
+
+      }
+    }
+    return vidEnabled;
+  }
+
   // Helper functions.
   private void toggleCallControlFragmentVisibility() {
     if (!iceConnected || !callFragment.isAdded()) {
@@ -607,7 +629,9 @@ public class CallActivity extends Activity implements AppRTCClient.SignalingEven
       Log.e(TAG, "Critical error: " + errorMessage);
       disconnect();
     } else {
-      new AlertDialog.Builder(this)
+        disconnect();
+
+      /*new AlertDialog.Builder(this)
           .setTitle(getText(R.string.channel_error_title))
           .setMessage(errorMessage)
           .setCancelable(false)
@@ -620,7 +644,7 @@ public class CallActivity extends Activity implements AppRTCClient.SignalingEven
                 }
               })
           .create()
-          .show();
+          .show();*/
     }
   }
 

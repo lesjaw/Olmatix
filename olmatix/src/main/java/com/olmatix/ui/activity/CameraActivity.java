@@ -1,11 +1,19 @@
 package com.olmatix.ui.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
@@ -17,18 +25,25 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.lesjaw.olmatix.R;
+import com.olmatix.utils.Connection;
 
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
 import org.w3c.dom.Node;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -39,7 +54,7 @@ import java.util.ArrayList;
 public class CameraActivity extends AppCompatActivity implements IVLCVout.Callback  {
 
 
-    private String mFilePath, uri;
+    private String mFilePath;
 
     // display surface
     private SurfaceView mSurface;
@@ -51,8 +66,12 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     private int mVideoWidth;
     private int mVideoHeight;
     private final static int VideoSizeChanged = -1;
-
-
+    TextView mNicename, mMode;
+    static ProgressDialog progressDialog;
+    Button hd, sd, ld;
+    SharedPreferences sharedPref;
+    Boolean mStatusServer;
+    String olmatixgtwID;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,11 +81,166 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
 
         mSurface = (SurfaceView) findViewById(R.id.surface);
         holder = mSurface.getHolder();
+        mNicename = (TextView) findViewById(R.id.fwname);
+        hd = (Button) findViewById(R.id.hd);
+        sd = (Button) findViewById(R.id.sd);
+        ld = (Button) findViewById(R.id.ld);
+        mMode = (TextView) findViewById(R.id.mode);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        olmatixgtwID = "OlmatixGtw-"+sharedPref.getString("CamGateway", "xxxx");
 
         Intent i = getIntent();
         String path = i.getStringExtra("nodeid");
-        mFilePath = "rtsp://"+path+"/live/ch00_1";
+        String nicename = i.getStringExtra("nice_name");
+        mNicename.setText(nicename);
+        mFilePath = "rtmp://103.43.47.61/live/"+path;
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(true);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage("Loading your CCTV view, please wait..");
+        progressDialog.show();
         setupToolbar();
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+        if (mStatusServer) {
+            String topic = "devices/" + olmatixgtwID + "/value";
+            String payload = "true";
+            byte[] encodedPayload = new byte[0];
+            try {
+                encodedPayload = payload.getBytes("UTF-8");
+                MqttMessage message = new MqttMessage(encodedPayload);
+                message.setQos(1);
+                message.setRetained(true);
+                Connection.getClient().publish(topic, message);
+
+            } catch (UnsupportedEncodingException | MqttException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent("addNode");
+            intent.putExtra("Connect", "con");
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        }
+
+        //mMode.setText("HD");
+
+        hd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFilePath = "rtmp://103.43.47.61/live/"+path;
+                Toast.makeText(getApplicationContext(), "Switching to HD", Toast.LENGTH_LONG).show();
+
+                mMode.setText("HD");
+
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                mStatusServer = sharedPref.getBoolean("conStatus", false);
+                if (mStatusServer) {
+                    String topic = "devices/" + olmatixgtwID + "/value";
+                    String payload = "true";
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent("addNode");
+                    intent.putExtra("Connect", "con");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                }
+                createPlayer(mFilePath);
+                hd.setEnabled(false);
+                sd.setEnabled(true);
+                ld.setEnabled(true);
+                progressDialog.setMessage("Loading High Definition view, please wait..");
+            }
+        });
+
+        sd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFilePath = "rtmp://103.43.47.61/live/"+path+480;
+                Toast.makeText(getApplicationContext(), "Switching to SD", Toast.LENGTH_LONG).show();
+
+                mMode.setText("480p");
+
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                mStatusServer = sharedPref.getBoolean("conStatus", false);
+                if (mStatusServer) {
+                    String topic = "devices/" + olmatixgtwID + "/value";
+                    String payload = "480";
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent("addNode");
+                    intent.putExtra("Connect", "con");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                }
+
+                createPlayer(mFilePath);
+                hd.setEnabled(true);
+                sd.setEnabled(false);
+                ld.setEnabled(true);
+                progressDialog.setMessage("Loading Standar Definition (480p) view, please wait..");
+            }
+        });
+
+        ld.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFilePath = "rtmp://103.43.47.61/live/"+path+360;
+                Toast.makeText(getApplicationContext(), "Switching to LD", Toast.LENGTH_LONG).show();
+
+                mMode.setText("360p");
+
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                mStatusServer = sharedPref.getBoolean("conStatus", false);
+                if (mStatusServer) {
+                    String topic = "devices/" + olmatixgtwID + "/value";
+                    String payload = "360";
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent("addNode");
+                    intent.putExtra("Connect", "con");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                }
+                createPlayer(mFilePath);
+                hd.setEnabled(true);
+                sd.setEnabled(true);
+                ld.setEnabled(false);
+                progressDialog.setMessage("Loading Low Definition (360p) view, please wait..");
+            }
+        });
+
 
 
     }
@@ -136,6 +310,28 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     @Override
     protected void onResume() {
         super.onResume();
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+        if (mStatusServer) {
+            String topic = "devices/" + olmatixgtwID + "/value";
+            String payload = "true";
+            byte[] encodedPayload = new byte[0];
+            try {
+                encodedPayload = payload.getBytes("UTF-8");
+                MqttMessage message = new MqttMessage(encodedPayload);
+                message.setQos(1);
+                message.setRetained(true);
+                Connection.getClient().publish(topic, message);
+
+            } catch (UnsupportedEncodingException | MqttException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent("addNode");
+            intent.putExtra("Connect", "con");
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        }
         createPlayer(mFilePath);
     }
 
@@ -143,6 +339,28 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     protected void onPause() {
         super.onPause();
         releasePlayer();
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+        if (mStatusServer) {
+            String topic = "devices/" + olmatixgtwID + "/value";
+            String payload = "false";
+            byte[] encodedPayload = new byte[0];
+            try {
+                encodedPayload = payload.getBytes("UTF-8");
+                MqttMessage message = new MqttMessage(encodedPayload);
+                message.setQos(1);
+                message.setRetained(true);
+                Connection.getClient().publish(topic, message);
+
+            } catch (UnsupportedEncodingException | MqttException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent("addNode");
+            intent.putExtra("Connect", "con");
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        }
 
     }
 
@@ -150,6 +368,28 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     protected void onDestroy() {
         super.onDestroy();
         releasePlayer();
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+        if (mStatusServer) {
+            String topic = "devices/" + olmatixgtwID + "/value";
+            String payload = "false";
+            byte[] encodedPayload = new byte[0];
+            try {
+                encodedPayload = payload.getBytes("UTF-8");
+                MqttMessage message = new MqttMessage(encodedPayload);
+                message.setQos(1);
+                message.setRetained(true);
+                Connection.getClient().publish(topic, message);
+
+            } catch (UnsupportedEncodingException | MqttException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent("addNode");
+            intent.putExtra("Connect", "con");
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        }
 
     }
     private void releasePlayer() {
@@ -169,12 +409,13 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
 
     private void createPlayer(String media) {
         releasePlayer();
+
         try {
             if (media.length() > 0) {
-                Toast toast = Toast.makeText(this, media, Toast.LENGTH_LONG);
+                /*Toast toast = Toast.makeText(this, media, Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0,
                         0);
-                toast.show();
+                toast.show();*/
             }
 
             // Create LibVLC
@@ -187,8 +428,9 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             options.add("--http-reconnect");
             options.add("--network-caching="+6*1000);
             libvlc = new LibVLC(options);
+
             //libvlc.setOnHardwareAccelerationError(this);
-            holder.setKeepScreenOn(true);
+            //holder.setKeepScreenOn(true);
 
             // Create media player
             mMediaPlayer = new MediaPlayer(libvlc);
@@ -204,11 +446,14 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             Media m = new Media(libvlc, Uri.parse(media));
             mMediaPlayer.setMedia(m);
             mMediaPlayer.play();
+
+
         } catch (Exception e) {
             Toast.makeText(this, "Error creating player!", Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "createPlayer: "+e);
         }
 
-        mSurface.getRootView().setOnTouchListener(new View.OnTouchListener() {
+        /*mSurface.getRootView().setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
                 if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
@@ -229,7 +474,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
 
                 return true;
             }
-        });
+        });*/
     }
 
     private MediaPlayer.EventListener mPlayerListener = new MyPlayerListener(this);
@@ -255,8 +500,12 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                     //player.releasePlayer();
                     break;
                 case MediaPlayer.Event.Playing:
+                    progressDialog.hide();
+                    break;
                 case MediaPlayer.Event.Paused:
                 case MediaPlayer.Event.Stopped:
+                    progressDialog.show();
+                    break;
                 default:
                     break;
             }
@@ -297,4 +546,6 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#ffffff'>OLMATIX </font>"));
 
     }
+
+
 }

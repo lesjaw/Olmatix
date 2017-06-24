@@ -47,6 +47,30 @@ public class dbNodeRepo {
         values.put(KEY_NAME, installedNodeModel.getFwName());
         values.put(KEY_NICE_NAME_N, installedNodeModel.getFwName());
         values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
+        //values.put(KEY_FWNAME, installedNodeModel.getFwName());
+        values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
+        values.put(KEY_ONLINE, installedNodeModel.getOnline());
+        values.put(KEY_ICON, installedNodeModel.getIcon());
+        values.put(KEY_ADDING, String.valueOf(installedNodeModel.getAdding()));
+        values.put(KEY_SIGNAL, installedNodeModel.getSignal());
+        values.put(KEY_UPTIME, installedNodeModel.getUptime());
+        values.put(KEY_RESET, installedNodeModel.getReset());
+        values.put(KEY_OTA, installedNodeModel.getOta());
+
+        long Id = db.insert(TABLE, null, values);
+        db.close(); // Closing database connection
+        //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        return (int) Id;
+    }
+
+    public int insertDbCam(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        values.put(KEY_NODES, installedNodeModel.getNodes());
+        values.put(KEY_NAME, installedNodeModel.getFwName());
+        values.put(KEY_NICE_NAME_N, installedNodeModel.getFwName());
+        values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
         values.put(KEY_FWNAME, installedNodeModel.getFwName());
         values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
         values.put(KEY_ONLINE, installedNodeModel.getOnline());
@@ -129,7 +153,6 @@ public class dbNodeRepo {
     }
 
     public void insertDbScene(SceneDetailModel sceneModel) {
-
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -428,9 +451,9 @@ public class dbNodeRepo {
         if (installedNodeModel.getLocalip() != null || installedNodeModel.getLocalip().equals("localip")) {
             values.put(KEY_LOCALIP, installedNodeModel.getLocalip());
         }
-        if (installedNodeModel.getFwName() != null || installedNodeModel.getFwName().equals("Waiting data")) {
+        /*if (installedNodeModel.getFwName() != null || installedNodeModel.getFwName().equals("Waiting data")) {
             values.put(KEY_FWNAME, installedNodeModel.getFwName());
-        }
+        }*/
         if (installedNodeModel.getFwVersion() != null) {
             values.put(KEY_FWVERSION, installedNodeModel.getFwVersion());
         }
@@ -528,13 +551,14 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
-        if (installedNodeModel.getNodes() != null) {
-            values.put(KEY_NODES, installedNodeModel.getNodes());
+        if (installedNodeModel.getFwName() != null) {
+            values.put(KEY_FWNAME, installedNodeModel.getFwName());
+            Log.d("DEBUG", "updateFwname: "+installedNodeModel.getFwName());
         }
 
         if (installedNodeModel.getFwName() != null) {
-            values.put(KEY_FWNAME, installedNodeModel.getFwName());
+            values.put(KEY_NICE_NAME_N, installedNodeModel.getFwName());
+            Log.d("DEBUG", "updateFwname: "+installedNodeModel.getFwName());
         }
 
         db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
@@ -555,6 +579,26 @@ public class dbNodeRepo {
 
         if (installedNodeModel.getSignal() != null) {
             values.put(KEY_SIGNAL, installedNodeModel.getSignal());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close();
+
+    }
+
+    public void updateLoc(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        if (installedNodeModel.getNodes() != null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
+
+        if (installedNodeModel.getSignal() != null) {
+            values.put(KEY_OTA, installedNodeModel.getOta());
         }
 
         db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{

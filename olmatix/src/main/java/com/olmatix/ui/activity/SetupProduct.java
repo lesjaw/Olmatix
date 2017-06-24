@@ -791,6 +791,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         if (what==0) {
             progressDialog = new ProgressDialog(this);
             progressDialog.setCancelable(true);
+            progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.setMessage(textProgres);
             progressDialog.show();
 

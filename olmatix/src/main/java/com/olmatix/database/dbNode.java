@@ -17,6 +17,8 @@ public class dbNode {
     public static final String  TABLE_INFO          = "info_data";
     public static final String  TABLE_LOG          = "log_alarm";
     public static final String  TABLE_GROUP          = "group_dash";
+    public static final String  TABLE_LOC          = "location";
+
 
 
 
@@ -49,6 +51,8 @@ public class dbNode {
     public static final String KEY_STATUS_RANGE  = "status_range" ;
     public static final String KEY_GROUP_NAME  = "group_name" ;
     public static final String KEY_GROUP_ID  = "group_id" ;
+    public static final String KEY_LOC  = "latlong" ;
+
 
 
     public static final String KEY_TOPIC  = "topic" ;

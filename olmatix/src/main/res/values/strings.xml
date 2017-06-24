@@ -152,7 +152,7 @@
     <string name="switch_sensor_prox">Notify Sensor Proximity</string>
     <string name="switch_sensorProxDisable">Disable notify sensor Proximity status</string>
     <string name="button_ok">OK</string>
-    <string name="app_ver">1.29</string>
+    <string name="app_ver">1.33</string>
     <string name="pref_ver">Version</string>
     <string name="network_setting">Configure network manually</string>
     <string name="misc">GPS Location, Notification etc</string>
@@ -161,5 +161,8 @@
     <string name="title_activity_maps">Map</string>
     <string name="pass">olmatix</string>
     <string name="user" />
+    <string name="camgtw_title">Gateway Camera</string>
+    <string name="info_cam">Input you Olmatix Camera Gateway</string>
+    <string name="camgtw">None</string>
 
 </resources>

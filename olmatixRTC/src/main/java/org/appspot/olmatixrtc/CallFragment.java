@@ -47,6 +47,7 @@ public class CallFragment extends Fragment {
     void onVideoScalingSwitch(ScalingType scalingType);
     void onCaptureFormatChange(int width, int height, int framerate);
     boolean onToggleMic();
+    boolean onToggleVideo();
   }
 
   @Override
@@ -78,7 +79,7 @@ public class CallFragment extends Fragment {
       }
     });
 
-    videoScalingButton.setOnClickListener(new View.OnClickListener() {
+    /*videoScalingButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         if (scalingType == ScalingType.SCALE_ASPECT_FILL) {
@@ -91,15 +92,25 @@ public class CallFragment extends Fragment {
         callEvents.onVideoScalingSwitch(scalingType);
       }
     });
-    scalingType = ScalingType.SCALE_ASPECT_FILL;
+    scalingType = ScalingType.SCALE_ASPECT_FILL;*/
 
     toggleMuteButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         boolean enabled = callEvents.onToggleMic();
-        toggleMuteButton.setAlpha(enabled ? 1.0f : 0.3f);
+        //boolean enabled = callEvents.onToggleVideo();
+          toggleMuteButton.setAlpha(enabled ? 1.0f : 0.3f);
       }
     });
+
+      videoScalingButton.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+              //boolean enabled = callEvents.onToggleMic();
+              boolean enabled = callEvents.onToggleVideo();
+              videoScalingButton.setAlpha(enabled ? 1.0f : 0.3f);
+          }
+      });
 
     return controlView;
   }

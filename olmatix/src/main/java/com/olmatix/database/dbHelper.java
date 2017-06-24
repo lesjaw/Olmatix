@@ -133,6 +133,10 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
                 + dbNode.KEY_GROUP_NAME + " TEXT)";
 
+        String CREATE_TABLE_LOC = "CREATE TABLE " + dbNode.TABLE_LOC  + "("
+                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_NODE_ID + " TEXT,"
+                + dbNode.KEY_LOC + " TEXT)";
 
         db.execSQL(CREATE_TABLE_NODE);
         db.execSQL(CREATE_TABLE_NODE_INSTALLED);
@@ -144,6 +148,8 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_INFO);
         db.execSQL(CREATE_TABLE_LOG);
         db.execSQL(CREATE_TABLE_GROUP);
+        db.execSQL(CREATE_TABLE_LOC);
+
 
     }
 
@@ -161,6 +167,8 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_INFO);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_LOG);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_GROUP);
+        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_LOC);
+
 
         // Create tables again
         onCreate(db);

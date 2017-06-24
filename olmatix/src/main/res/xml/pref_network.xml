@@ -59,7 +59,7 @@
     </CheckBoxPreference>
 
     <Preference
-        android:title="AppID - Click to send this via email"
+        android:title="AppID - Click to send this via email or WA"
         android:key="appID"
         android:summary="@string/appID"
         android:editable="false"
@@ -74,5 +74,10 @@
         android:enabled="true">
     </Preference>
 
+    <EditTextPreference
+        android:key="CamGateway"
+        android:title="@string/camgtw_title"
+        android:dialogMessage="@string/info_cam"
+        android:defaultValue="@string/camgtw" />
 
-</PreferenceScreen>
+    </PreferenceScreen>

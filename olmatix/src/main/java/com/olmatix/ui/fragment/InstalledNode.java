@@ -132,7 +132,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         if (camid.equals("smartcam")) {
 
                             Intent i = new Intent(getActivity(), CameraActivity.class);
-                            i.putExtra("nodeid", data.get(position).getLocalip());
+                            i.putExtra("nodeid", data.get(position).getNodesID());
                             i.putExtra("nice_name", nice_name);
                             startActivity(i);
 
@@ -550,6 +550,31 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                 e.printStackTrace();
             }
         }
+        dosubOlmatixAppLoc(input);
+    }
+
+    private void dosubOlmatixAppLoc(String input){
+
+
+        String topic = "devices/" + input + "/$location";
+
+            int qos = 2;
+            try {
+                IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                subToken.setActionCallback(new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d(TAG, "Subscribe location of: "+input);
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    }
+                });
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+
     }
 
     private void addCameNode(String mCamid){
@@ -557,23 +582,20 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         installedNodeModel.setOnline("true");
         installedNodeModel.setFwName("smartcam");
         installedNodeModel.setSignal("0");
-        installedNodeModel.setLocalip(mCamid);
+        installedNodeModel.setLocalip("103.43.47.61");
         installedNodeModel.setUptime("0");
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
         now.getTimeInMillis();
         installedNodeModel.setAdding(now.getTimeInMillis());
 
-        dbNodeRepo.insertDb(installedNodeModel);
+        dbNodeRepo.insertDbCam(installedNodeModel);
     }
 
     private void setupView() {
         mRecycleView    = (RecyclerView) mView.findViewById(R.id.rv);
         mSwipeRefreshLayout = (SwipeRefreshLayout)mView. findViewById(R.id.swipeRefreshLayout);
-
         mFab            = (FloatingActionButton) mView.findViewById(fab);
-
-
         mRecycleView.setHasFixedSize(true);
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -597,8 +619,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                 data.addAll(dbNodeRepo.getNodeList());
             }
         });
-
-
+        
         adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
 

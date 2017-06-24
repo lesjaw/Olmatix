@@ -61,14 +61,15 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.splash_screen);
 
 
-        new TedPermission(this)
+        /*new TedPermission(this)
                 .setPermissionListener(permissionlistener)
                 .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
                 .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.WAKE_LOCK,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.WAKE_LOCK,
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.CAMERA)
-                .check();
+                .check();*/
 
         ImageView imgSplash = (ImageView) findViewById(R.id.splash);
         Animation animConn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink);

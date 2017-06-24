@@ -203,11 +203,12 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             mLibVLC = new LibVLC();
+
         } catch(IllegalStateException e) {
             Toast.makeText(MainActivity.this,
                     "Error initializing the libVLC multimedia framework!",
                     Toast.LENGTH_LONG).show();
-            finish();
+            //finish();
         }
 
         new TedPermission(this)

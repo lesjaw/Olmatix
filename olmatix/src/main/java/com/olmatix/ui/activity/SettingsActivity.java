@@ -204,6 +204,8 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("password"));
             bindPreferenceSummaryToValue(findPreference("appID"));
             bindPreferenceSummaryToValue(findPreference("IPaddress"));
+            bindPreferenceSummaryToValue(findPreference("CamGateway"));
+
 
 
             final Preference AppID = findPreference("appID");

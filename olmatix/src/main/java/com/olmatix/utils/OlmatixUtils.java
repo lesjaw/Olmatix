@@ -27,7 +27,7 @@ public class OlmatixUtils {
 
     public static final int OLMATIX_PERMISSIONS_ACCESS_COARSE_LOCATION = 18;
     public static final long POSITION_UPDATE_INTERVAL = 10 * 1000;//5 seconds
-    public static final long POSITION_UPDATE_MIN_DIST = 25;
+    public static final long POSITION_UPDATE_MIN_DIST = 100;
     public static DecimalFormat gpsDecimalFormat = new DecimalFormat("#.######");
 
     public static String getTimeAgo(Calendar ref) {

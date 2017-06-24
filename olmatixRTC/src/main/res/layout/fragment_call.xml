@@ -12,7 +12,9 @@
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/buttons_call_container"
         android:textSize="24sp"
-        android:layout_margin="8dp"/>
+        android:layout_margin="8dp"
+        android:maxLines="1"/>
+
 
     <LinearLayout
            android:id="@+id/buttons_call_container"
@@ -22,12 +24,15 @@
            android:layout_marginBottom="32dp"
            android:layout_centerHorizontal="true"
            android:layout_width="wrap_content"
-           android:layout_height="wrap_content">
+           android:layout_height="wrap_content"
+            android:background="@android:color/background_dark"
+        android:padding="5sp">
 
        <ImageButton
            android:id="@+id/button_call_disconnect"
            android:background="@drawable/disconnect"
            android:contentDescription="@string/disconnect_call"
+           android:layout_marginStart="10dp"
            android:layout_marginEnd="16dp"
            android:layout_width="48dp"
            android:layout_height="48dp"/>
@@ -38,18 +43,21 @@
            android:contentDescription="@string/switch_camera"
            android:layout_marginEnd="8dp"
            android:layout_width="48dp"
-           android:layout_height="48dp"/>
+           android:layout_height="48dp"
+           />
 
         <ImageButton
            android:id="@+id/button_call_scaling_mode"
-           android:background="@drawable/ic_action_return_from_full_screen"
-           android:contentDescription="@string/disconnect_call"
-           android:layout_width="48dp"
+           android:background="@drawable/ic_video_disable"
+           android:contentDescription="@string/toggle_video"
+            android:backgroundTint="@android:color/white"
+            android:layout_width="48dp"
            android:layout_height="48dp"/>
 
        <ImageButton
            android:id="@+id/button_call_toggle_mic"
-           android:background="@android:drawable/ic_btn_speak_now"
+           android:background="@drawable/ic_mic_disable"
+           android:backgroundTint="@android:color/white"
            android:contentDescription="@string/toggle_mic"
            android:layout_marginEnd="8dp"
            android:layout_width="48dp"

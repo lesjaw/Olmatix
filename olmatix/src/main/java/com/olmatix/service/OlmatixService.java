@@ -76,7 +76,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -87,12 +86,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.DoubleSummaryStatistics;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 import static com.olmatix.lesjaw.olmatix.R.drawable;
 import static com.olmatix.lesjaw.olmatix.R.string;
@@ -708,6 +705,9 @@ public class OlmatixService extends Service {
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.CAMERA)
                 .check();
+
+        OlmatixAlarmReceiver alarmCheckConn = new OlmatixAlarmReceiver();
+        alarmCheckConn.setAlarm(this);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         String mProvider = locationManager.getBestProvider(OlmatixUtils.getGeoCriteria(), true);

@@ -55,7 +55,7 @@
     <string name="sendButton">Send Config</string>
     <string name="connect_product">Connect to product WiFi</string>
     <string name="action_exit">Exit</string>
-    <string name="backbutton">Press the back button once again to close the application, otherwise just press home button</string>
+    <string name="backbutton">Olmatix will go to background, dont kill/Force stop Olmatix or you wont receive any notification!</string>
     <string name="fav_label">Favorite</string>
     <string name="installed_label">Installed Node</string>
     <string name="signal">100</string>

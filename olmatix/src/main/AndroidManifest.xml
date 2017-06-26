@@ -44,6 +44,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.olmatix.ui.activity.MainActivity"
             android:label="@string/app_name"
@@ -91,18 +92,8 @@
                 <action android:name="com.olmatix.lesjaw.olmatix.ProximityAlert" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.olmatix.service.OlmatixAlarmReceiver" />
-        <receiver android:name="com.olmatix.service.OlmatixAlarmReceiver" />
 
-        <service
-            android:name="com.novoda.merlin.service.MerlinService"
-            android:exported="false" />
-
-        <receiver android:name="com.novoda.merlin.receiver.ConnectivityReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
+        <receiver android:name="com.olmatix.service.OlmatixAlarmReceiver" />
 
         <service
             android:name="com.olmatix.service.AlarmService"

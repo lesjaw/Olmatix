@@ -51,17 +51,17 @@ public class RingtonePlayingService extends Service
             ringtoneSound.play();
         }
         // Get instance of Vibrator from current Context
-        v = (Vibrator) getSystemService(getApplicationContext().VIBRATOR_SERVICE);
+        //v = (Vibrator) getSystemService(getApplicationContext().VIBRATOR_SERVICE);
 
         // Start without a delay
         // Vibrate for 100 milliseconds
         // Sleep for 1000 milliseconds
-        long[] pattern = {0, 100, 1000};
+        //long[] pattern = {0, 100, 1000};
 
         // The '0' here means to repeat indefinitely
         // '0' is actually the index at which the pattern keeps repeating from (the start)
         // To repeat the pattern from any other point, you could increase the index, e.g. '1'
-        v.vibrate(pattern, 0);
+        //v.vibrate(pattern, 0);
 
         return START_NOT_STICKY;
     }

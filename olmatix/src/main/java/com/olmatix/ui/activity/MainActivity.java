@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         try {
-            mLibVLC = new LibVLC();
+            mLibVLC = new LibVLC(this);
 
         } catch(IllegalStateException e) {
             Toast.makeText(MainActivity.this,
@@ -236,9 +236,6 @@ public class MainActivity extends AppCompatActivity {
         initView();
         setupToolbar();
         setupTabs();
-
-        Intent iA = new Intent(getApplicationContext(), RingtonePlayingService.class);
-        stopService(iA);
 
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
@@ -302,28 +299,7 @@ public class MainActivity extends AppCompatActivity {
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        /*NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        assert navigationView != null;
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_preferences) {
-                    Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
-                    startActivity(i);
 
-                } else if (id == R.id.nav_about) {
-                    Intent i = new Intent(getApplicationContext(), AboutActivity.class);
-                    startActivity(i);
-                }
-
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });
-
-*/
         imgStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -438,7 +414,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
+        Log.d("DEBUG", "MainActivity onStart status connection: "+mStatusServer);
     }
 
     @Override
@@ -456,7 +432,17 @@ public class MainActivity extends AppCompatActivity {
                 mMessageReceiver, new IntentFilter("MQTTStatus"));
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver1, new IntentFilter("MQTTStatusDetail"));
-        Log.d("Receiver ", "MainActivity = Starting..");
+        mStatusServer = sharedPref.getBoolean("conStatus", false);
+        Log.d("DEBUG", "MainActivity onResume status connection: "+mStatusServer);
+
+        if (mStatusServer) {
+            imgStatus.setImageResource(R.drawable.ic_conn_green);
+        } else {
+            imgStatus.setImageResource(R.drawable.ic_conn_red);
+            imgStatus.startAnimation(animConn);
+        }
+        Intent iA = new Intent(getApplicationContext(), RingtonePlayingService.class);
+        stopService(iA);
     }
 
     // Override this method to do what you want when the menu is recreated
@@ -622,6 +608,8 @@ public class MainActivity extends AppCompatActivity {
         int tabpos = tabLayout.getSelectedTabPosition();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+        Log.d("DEBUG", "onBackPressed: "+backButtonCount);
+
     if (tabpos==2){
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -643,8 +631,8 @@ public class MainActivity extends AppCompatActivity {
                 intent.addCategory(Intent.CATEGORY_HOME);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                finish();
-                System.exit(0);
+                //finish();
+                //System.exit(0);
             } else {
                 TSnackbar snackbar = TSnackbar.make((coordinatorLayout), R.string.backbutton
                         , TSnackbar.LENGTH_LONG);

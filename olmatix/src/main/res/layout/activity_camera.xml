@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relative">
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -18,6 +20,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top" />
+
+        <ImageView
+            android:id="@+id/camera_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/app_name" />
+
     </FrameLayout>
 
 
@@ -46,34 +55,141 @@
             android:background="@drawable/bg_rounded"
             android:layout_alignParentRight="true"/>
 
-        <Button
+        <android.support.v7.widget.CardView
+            android:id="@+id/cv1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="2dp"
+            card_view:cardElevation="2dp"
+            card_view:cardUseCompatPadding="true"
+            android:clickable="true"
+            android:background="?android:selectableItemBackground"
+            android:layout_margin="5sp"
+            android:layout_below="@+id/framesurface">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/hd"
-            android:layout_below="@+id/framesurface"
             android:text="HD"
             android:padding="5sp"
             android:theme="@style/AppTheme.Button1"/>
 
-        <Button
+            <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/sd"
-            android:layout_below="@+id/framesurface"
             android:text="SD"
             android:padding="5sp"
             android:layout_toRightOf="@+id/hd"
             android:theme="@style/AppTheme.Button1"/>
 
-        <Button
+            <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ld"
-            android:layout_below="@+id/framesurface"
             android:text="LD"
             android:padding="5sp"
             android:layout_toRightOf="@+id/sd"
             android:theme="@style/AppTheme.Button1"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/sc"
+                    android:text="SC"
+                    android:padding="5sp"
+                    android:layout_toRightOf="@+id/ld"
+                    android:theme="@style/AppTheme.Button1"/>
+
+            </RelativeLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cv2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="2dp"
+            card_view:cardElevation="2dp"
+            card_view:cardUseCompatPadding="true"
+            android:clickable="true"
+            android:background="?android:selectableItemBackground"
+            android:layout_margin="5sp"
+            android:layout_below="@+id/cv1">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/labelrecord"
+            android:text="Enable recording"
+            android:layout_marginLeft="10sp"
+            android:layout_marginTop="10sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="2sp"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/localrecord"
+            android:layout_below="@+id/labelrecord"
+            android:text="Local"
+            android:layout_marginLeft="10sp"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cloudrecord"
+            android:layout_below="@+id/labelrecord"
+            android:layout_toRightOf="@id/localrecord"
+            android:text="Cloud"
+            android:layout_marginLeft="20sp"/>
+
+            </RelativeLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cv3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true"
+        android:clickable="true"
+        android:background="?android:selectableItemBackground"
+        android:layout_margin="5sp"
+        android:layout_below="@+id/cv2">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/labelrecording"
+            android:text="Recorded File"
+            android:layout_marginLeft="10sp"
+            android:layout_marginTop="10sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="2sp"/>
+
+
+    </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
 
     </RelativeLayout>
 

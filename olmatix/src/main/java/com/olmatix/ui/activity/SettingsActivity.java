@@ -30,6 +30,7 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.PreferenceHelper;
+import com.olmatix.lesjaw.olmatix.BuildConfig;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.InstalledNodeModel;
@@ -56,8 +57,18 @@ import java.util.Locale;
 
 public class SettingsActivity extends SettingsFragment {
 
+    public static dbNodeRepo mDbNodeRepo;
+    static ArrayList<InstalledNodeModel> data;
+    static ArrayList<DetailNodeModel> data1;
+
+    public static String topic;
+    InstalledNodeModel installedNodeModel;
+    DetailNodeModel detailNodeModel;
+
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener
             = new Preference.OnPreferenceChangeListener() {
+
+
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
@@ -97,10 +108,19 @@ public class SettingsActivity extends SettingsFragment {
 
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+
+        data = new ArrayList<>();
+        data1 = new ArrayList<>();
+
+        mDbNodeRepo = new dbNodeRepo(this);
+        installedNodeModel = new InstalledNodeModel();
+        detailNodeModel = new DetailNodeModel();
     }
 
     @Override
@@ -115,6 +135,8 @@ public class SettingsActivity extends SettingsFragment {
             startActivity(i);        }
 
     }
+
+
 
     @Override
     protected void onDestroy() {
@@ -157,6 +179,16 @@ public class SettingsActivity extends SettingsFragment {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void onBuildHeaders(List<PreferenceActivity.Header> target) {
         loadHeadersFromResource(R.xml.pref_headers, target);
+
+        String versionName = BuildConfig.VERSION_NAME;
+
+
+        Header header = new Header();
+        header.title = "Version";
+        header.summary = versionName;
+        header.iconRes = (R.drawable.ic_copyright_black_24dp);
+        target.add(header);
+
     }
 
 
@@ -171,27 +203,12 @@ public class SettingsActivity extends SettingsFragment {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class NetworkPreferenceFragment extends PreferenceFragment {
-        public static dbNodeRepo mDbNodeRepo;
-        private static ArrayList<InstalledNodeModel> data;
-        ArrayList<DetailNodeModel> data1;
-
-        String topic;
-        private InstalledNodeModel installedNodeModel;
-        private DetailNodeModel detailNodeModel;
-
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_network);
             setHasOptionsMenu(true);
-
-            data = new ArrayList<>();
-            data1 = new ArrayList<>();
-
-            mDbNodeRepo = new dbNodeRepo(getActivity());
-            installedNodeModel = new InstalledNodeModel();
-            detailNodeModel = new DetailNodeModel();
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
@@ -589,12 +606,94 @@ public class SettingsActivity extends SettingsFragment {
                 pref2.setTitle(R.string.switch_sensor_door);
             } else if (mswitch_sensor_door){
                 pref2.setTitle(R.string.switch_sensorDoorDisable);
+
+                int countDB = mDbNodeRepo.getNodeDetailList().size();
+                Log.d("DEBUG", "Count list Sensor: " + countDB);
+                data1.clear();
+                data1.addAll(mDbNodeRepo.getNodeDetailList());
+                countDB = mDbNodeRepo.getNodeDetailList().size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        final String mNodeID1 = data1.get(i).getNode_id();
+                        final String mSensorT = data1.get(i).getSensor();
+                        //Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                        if (mSensorT != null && mSensorT.equals("close")) {
+                            for (int a = 0; a < 2; a++) {
+                                if (a == 0) {
+                                    topic = "devices/" + mNodeID1 + "/door/close";
+                                }
+                                if (a == 1) {
+                                    topic = "devices/" + mNodeID1 + "/door/theft";
+                                }
+
+                                int qos = 2;
+                                try {
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                    subToken.setActionCallback(new IMqttActionListener() {
+                                        @Override
+                                        public void onSuccess(IMqttToken asyncActionToken) {
+                                            //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                        }
+
+                                        @Override
+                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        }
+                                    });
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
+                    }
             }
 
             if (!mswitch_sensor_motion) {
                 pref3.setTitle(R.string.switch_sensor_motion);
             } else if (mswitch_sensor_motion){
                 pref3.setTitle(R.string.switch_sensorMotionDisable);
+
+                countDB = mDbNodeRepo.getNodeDetailList().size();
+                Log.d("DEBUG", "Count list Sensor: " + countDB);
+                data1.clear();
+                data1.addAll(mDbNodeRepo.getNodeDetailList());
+                countDB = mDbNodeRepo.getNodeDetailList().size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        final String mNodeID1 = data1.get(i).getNode_id();
+                        final String mSensorT = data1.get(i).getSensor();
+                        //Log.d("DEBUG", "Count list Sensor: " + mSensorT);
+                        if (mSensorT != null && mSensorT.equals("motion")) {
+                            for (int a = 0; a < 2; a++) {
+                                if (a == 0) {
+                                    topic = "devices/" + mNodeID1 + "/motion/motion";
+                                }
+                                if (a == 1) {
+                                    topic = "devices/" + mNodeID1 + "/motion/theft";
+                                }
+
+                                int qos = 2;
+                                try {
+                                    IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
+                                    subToken.setActionCallback(new IMqttActionListener() {
+                                        @Override
+                                        public void onSuccess(IMqttToken asyncActionToken) {
+                                            //Log.d("SubscribeSensor", " device = " + mNodeID);
+                                        }
+
+                                        @Override
+                                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                        }
+                                    });
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
+                    }
+                }
+
             }
 
             if (!mswitch_sensor_prox) {
@@ -636,6 +735,7 @@ public class SettingsActivity extends SettingsFragment {
                 }
             };
             sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
+        }
         }
 
 

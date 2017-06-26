@@ -243,7 +243,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
 
                         data1 = new ArrayList<>();
 
-                        if (fwApp.equals("olmatixapp")){
+                        if (fwApp.equals("olmatixapp")||fwApp.equals("smartcam")){
                             String nid = mInstalledNodeModel.getNodesID();
                             data1.clear();
                             int countDB = mDbNodeRepo.getNodeDetail(nid,"0").size();

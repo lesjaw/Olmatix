@@ -23,38 +23,17 @@ public class OlmatixAlarmReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // BEGIN_INCLUDE(alarm_onreceive)
-        /*
-         * If your receiver intent includes extras that need to be passed along to the
-         * service, use setComponent() to indicate that the service should handle the
-         * receiver's intent. For example:
-         *
-         * ComponentName comp = new ComponentName(context.getPackageName(),
-         *      MyService.class.getName());
-         *
-         * // This intent passed in this call will include the wake lock extra as well as
-         * // the receiver intent contents.
-         * startWakefulService(context, (intent.setComponent(comp)));
-         *
-         * In this example, we simply create a new intent to deliver to the service.
-         * This intent holds an extra identifying the wake lock.
-         */
+
         Intent service = new Intent(context, OlmatixAlarmService.class);
         // Start the service, keeping the device awake while it is launching.
         startWakefulService(context, service);
         Log.d("DEBUG", "Alarm Receive: ");
     }
 
-
-    // BEGIN_INCLUDE(set_alarm)
-    /**
-     * Sets a repeating alarm that runs once a day at approximately 8:30 a.m. When the
-     * alarm fires, the app broadcasts an Intent to this WakefulBroadcastReceiver.
-     * @param context
-     */
     public void setAlarm(Context context) {
         alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, OlmatixAlarmReceiver.class);
+        //intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
@@ -98,11 +77,9 @@ public class OlmatixAlarmReceiver extends WakefulBroadcastReceiver {
         // clock, and to repeat once a day.
         /*alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);*/
-        long executeRepeat = 20*60*1000;
+        long executeRepeat = 30*60*1000;
 
         alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), executeRepeat, alarmIntent);
-
-
         // Enable {@code SampleBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
         ComponentName receiver = new ComponentName(context, OlmatixReceiver.class);

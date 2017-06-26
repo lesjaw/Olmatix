@@ -40,6 +40,7 @@ public class OlmatixReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         mPrefHelper = new PreferenceHelper(context);
 
+        Log.d("DEBUG", "onReceive: "+intent);
 
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Intent serviceIntent = new Intent(context, OlmatixService.class);

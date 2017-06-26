@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
+import com.olmatix.lesjaw.olmatix.BuildConfig;
 import com.olmatix.lesjaw.olmatix.R;
 
 import java.util.Calendar;
@@ -115,8 +116,9 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     Element versionOlmatixElement(){
+        String versionName = BuildConfig.VERSION_NAME;
         Element olmatixElement = new Element();
-        final String descriptionText = ("Olmatix 2.0");
+        final String descriptionText = ("Olmatix 2.0" +" version "+versionName);
         olmatixElement.setTitle(descriptionText);
         olmatixElement.setOnClickListener(new View.OnClickListener() {
             @Override

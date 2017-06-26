@@ -619,7 +619,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                 data.addAll(dbNodeRepo.getNodeList());
             }
         });
-        
+
         adapter = new NodeAdapter(data,installed_node,this);
         mRecycleView.setAdapter(adapter);
 

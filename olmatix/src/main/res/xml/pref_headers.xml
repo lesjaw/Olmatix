@@ -26,11 +26,4 @@
         android:title="@string/pref_about"
         android:summary="@string/about_sum"/>
 
-    <header
-        android:id="@+id/version"
-        android:icon="@drawable/ic_copyright_black_24dp"
-        android:title="@string/pref_ver"
-        android:summary="@string/app_ver"/>
-
-
 </preference-headers>

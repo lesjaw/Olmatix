@@ -4,36 +4,35 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Point;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Debug;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ProgressBar;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.utils.Connection;
-
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -41,11 +40,16 @@ import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
-import org.w3c.dom.Node;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by USER on 02/06/2017.
@@ -68,24 +72,66 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     private final static int VideoSizeChanged = -1;
     TextView mNicename, mMode;
     static ProgressDialog progressDialog;
-    Button hd, sd, ld;
+    Button hd, sd, ld,sc;
     SharedPreferences sharedPref;
     Boolean mStatusServer;
     String olmatixgtwID;
+    File pathFile;
+    String pathThumb;
+    RelativeLayout camView;
+    ImageView camera_image;
+    CheckBox local, cloud;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                    | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            getSupportActionBar().hide();
+        }
+        else {
+
+            requestWindowFeature(Window.FEATURE_ACTION_BAR);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                    | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+            /*getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);*/
+            getSupportActionBar().show();
+
+        }
         setContentView(R.layout.activity_camera);
 
+        File pictureFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        File mediaDir = new File(pictureFolder, "Olmatix");
+        if (!mediaDir.exists()){
+            mediaDir.mkdir();
+        }
+
+        pathFile = pictureFolder;
+        pathThumb = pathFile+"/Olmatix/";
+
+        camView = (RelativeLayout) findViewById(R.id.relative);
         mSurface = (SurfaceView) findViewById(R.id.surface);
         holder = mSurface.getHolder();
+        camera_image = (ImageView) findViewById(R.id.camera_image);
         mNicename = (TextView) findViewById(R.id.fwname);
         hd = (Button) findViewById(R.id.hd);
         sd = (Button) findViewById(R.id.sd);
         ld = (Button) findViewById(R.id.ld);
+        sc = (Button) findViewById(R.id.sc);
+
         mMode = (TextView) findViewById(R.id.mode);
+        local = (CheckBox) findViewById(R.id.localrecord);
+        cloud = (CheckBox) findViewById(R.id.cloudrecord);
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         olmatixgtwID = "OlmatixGtw-"+sharedPref.getString("CamGateway", "xxxx");
 
@@ -241,7 +287,16 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             }
         });
 
+        sc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date now = new Date();
+                android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+                String mPath = pathThumb + "/" + now + ".jpg";
 
+                takeScreenshot(camView,mPath);
+            }
+        });
 
     }
 
@@ -310,6 +365,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     @Override
     protected void onResume() {
         super.onResume();
+
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
@@ -393,6 +449,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
 
     }
     private void releasePlayer() {
+
         if (libvlc == null)
             return;
         mMediaPlayer.stop();
@@ -427,10 +484,10 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             options.add("-vvv"); // verbosity
             options.add("--http-reconnect");
             options.add("--network-caching="+6*1000);
-            libvlc = new LibVLC(options);
 
-            //libvlc.setOnHardwareAccelerationError(this);
-            //holder.setKeepScreenOn(true);
+            //options.add("--sout=#transcode{vcodec=h264,venc=x264}:standard{mux=mp4,dst="+pathThumb+"/test.mp4}");
+
+            libvlc = new LibVLC(this,options);
 
             // Create media player
             mMediaPlayer = new MediaPlayer(libvlc);
@@ -453,33 +510,12 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             Log.d("DEBUG", "createPlayer: "+e);
         }
 
-        /*mSurface.getRootView().setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                    Display display = getWindowManager().getDefaultDisplay();
-                    Point size = new Point();
-                    display.getSize(size);
 
-                    Float p = event.getX()/size.x;
-                    Long pos = (long) (mMediaPlayer.getLength() / p);
-                    Log.d("DEBUG", "seek to "+p+" / "+pos+" state is "+mMediaPlayer.getPlayerState());
-                    if (mMediaPlayer.isSeekable()) {
-                        //mLibVLC.setTime( pos );
-                        mMediaPlayer.setPosition(p);
-                    } else {
-                        Log.w("DEBUG", "Non-seekable input");
-                    }
-                }
-
-                return true;
-            }
-        });*/
     }
 
     private MediaPlayer.EventListener mPlayerListener = new MyPlayerListener(this);
 
-    private static class MyPlayerListener implements MediaPlayer.EventListener {
+    private class MyPlayerListener implements MediaPlayer.EventListener {
         private WeakReference<CameraActivity> mOwner;
 
         public MyPlayerListener(CameraActivity owner) {
@@ -501,10 +537,12 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                     break;
                 case MediaPlayer.Event.Playing:
                     progressDialog.hide();
+
                     break;
                 case MediaPlayer.Event.Paused:
                 case MediaPlayer.Event.Stopped:
                     progressDialog.show();
+
                     break;
                 default:
                     break;
@@ -546,6 +584,80 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#ffffff'>OLMATIX </font>"));
 
     }
+
+    private void createThumbnail () throws FileNotFoundException {
+        Date now = new Date();
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+        try {
+            // image naming and path  to include sd card  appending name you choose for file
+            String mPath = pathThumb + "/" + now + ".jpg";
+
+            // create bitmap screen capture
+            //View v1 = getWindow().getDecorView().getRootView();
+           /* mSurface.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(mSurface.getWidth(),mSurface.getHeight(), Bitmap.Config.ARGB_8888);
+            mSurface.setDrawingCacheEnabled(false);
+            mSurface.buildDrawingCache(true);*/
+
+
+
+            Bitmap.Config conf = Bitmap.Config.RGB_565;
+            Bitmap image = Bitmap.createBitmap(camView.getWidth(),camView.getHeight(), conf);
+            Canvas canvas = new Canvas(image);
+            canvas.setBitmap(image);
+            Paint backgroundPaint = new Paint();
+            backgroundPaint.setARGB(255, 40, 40, 40);
+            canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(),
+                    backgroundPaint);
+            mSurface.draw(canvas);
+            Bitmap screen = Bitmap.createBitmap(image, 0, 0, camView.getWidth(),camView.getHeight());
+            canvas.setBitmap(null);
+            //GameThread.surfaceHolder.unlockCanvasAndPost(canvas);
+
+
+            File imageFile = new File(mPath);
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            screen.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+        } catch (Throwable e) {
+            // Several error may come out with file handling or OOM
+            e.printStackTrace();
+        }
+    }
+
+    public static void takeScreenshot(View view, String filePath) {
+        Bitmap bitmap = getBitmapScreenshot(view);
+
+        File imageFile = new File(filePath);
+        imageFile.getParentFile().mkdirs();
+        try {
+            OutputStream fout = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fout);
+            fout.flush();
+            fout.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Bitmap getBitmapScreenshot(View view) {
+        view.measure(View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(view.getHeight(), View.MeasureSpec.EXACTLY));
+        view.layout((int)view.getX(), (int)view.getY(), (int)view.getX() + view.getMeasuredWidth(), (int)view.getY() + view.getMeasuredHeight());
+
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache(true);
+        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false);
+
+        return bitmap;
+    }
+
 
 
 }

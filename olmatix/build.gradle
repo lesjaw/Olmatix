@@ -56,4 +56,5 @@ dependencies {
     compile 'net.cachapa.expandablelayout:expandablelayout:[2.6]'
     compile 'gun0912.ted:tedpermission:1.0.3'
     compile 'com.google.android.gms:play-services-maps:10.2.6'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }

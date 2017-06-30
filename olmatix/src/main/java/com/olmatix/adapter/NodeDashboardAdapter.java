@@ -17,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -147,11 +148,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             if (lastval!=null && !lastval.equals("")) {
                 if (mFavoriteModel.getStatus().trim().equals("false")) {
                     holder.imgNode.setImageResource(R.drawable.offlamp1);
-                    holder.imgSending.setVisibility(View.GONE);
+                    holder.loading.setVisibility(View.GONE);
+
 
                 } else {
                     holder.imgNode.setImageResource(R.drawable.onlamp1);
-                    holder.imgSending.setVisibility(View.GONE);
+                    holder.loading.setVisibility(View.GONE);
 
                 }
             }
@@ -188,8 +190,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 message.setQos(1);
                                 message.setRetained(true);
                                 Connection.getClient().publish(topic, message);
-                                holder.imgSending.setVisibility(View.VISIBLE);
-                                holder.imgSending.startAnimation(animConn);
+                                holder.loading.setVisibility(View.VISIBLE);
+                                holder.loading.setScaleY(4f);
 
 
                             } catch (UnsupportedEncodingException | MqttException e) {
@@ -249,9 +251,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             if ((mFavoriteModel.getStatus().trim()).equals("true")) {
                 holder.imgNodesBut.setImageResource(R.drawable.onsec);
+                holder.loading.setVisibility(View.GONE);
+
 
             } else {
                 holder.imgNodesBut.setImageResource(R.drawable.offsec);
+                holder.loading.setVisibility(View.GONE);
+
             }
 
             String theft = mFavoriteModel.getStatus_theft();
@@ -316,6 +322,9 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 message.setQos(1);
                                 message.setRetained(true);
                                 Connection.getClient().publish(topic, message);
+                                holder.loading.setVisibility(View.VISIBLE);
+                                holder.loading.setScaleY(4f);
+
                             } catch (UnsupportedEncodingException | MqttException e) {
                                 e.printStackTrace();
                             }
@@ -386,11 +395,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             if (mFavoriteModel.getStatus().trim().equals("false")) {
                 holder.imgNode.setImageResource(R.drawable.offlamp1);
-                holder.imgSending.setVisibility(View.GONE);
+                holder.loading.setVisibility(View.GONE);
 
             } else {
                 holder.imgNode.setImageResource(R.drawable.onlamp1);
-                holder.imgSending.setVisibility(View.GONE);
+                holder.loading.setVisibility(View.GONE);
 
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
@@ -425,9 +434,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 message.setQos(1);
                                 message.setRetained(true);
                                 Connection.getClient().publish(topic, message);
-                                holder.imgSending.setVisibility(View.VISIBLE);
-                                holder.imgSending.startAnimation(animConn);
-
+                                holder.loading.setVisibility(View.VISIBLE);
+                                holder.loading.setScaleY(4f);
 
                             } catch (UnsupportedEncodingException | MqttException e) {
                                 e.printStackTrace();
@@ -487,7 +495,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             if (lastval!=null && !lastval.equals("")) {
                     holder.imgNode.setImageResource(R.drawable.videcall);
-                    holder.imgSending.setVisibility(View.GONE);
 
 
             }
@@ -495,6 +502,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 holder.imgOnline.setImageResource(R.drawable.ic_check_green);
                 holder.imgNode.setBackgroundColor(Color.WHITE);
                 holder.iconstat.setVisibility(View.GONE);
+                holder.loading.setVisibility(View.GONE);
 
             } /*else {
                 holder.imgOnline.setImageResource(R.drawable.ic_check_red);
@@ -588,17 +596,18 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     public class ButtonHolder extends ViewHolder {
         public TextView node_name, status;
-        public ImageView imgOnline, imgSending;
+        public ImageView imgOnline;
         public ImageButton imgNode;
         public ImageView iconstat;
+        public ProgressBar loading;
 
         public ButtonHolder(View view) {
             super(view);
             imgNode = (ImageButton) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
-            imgSending = (ImageView) view.findViewById(R.id.icon_sending);
             iconstat = (ImageView) view.findViewById(R.id.icon_stat);
+            loading = (ProgressBar)view.findViewById(R.id.pbProcessing);
         }
     }
 
@@ -606,6 +615,8 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         public TextView node_names, status;
         public ImageView imgNodes, imgOnline,iconstat;
         public ImageButton imgNodesBut;
+        public ProgressBar loading;
+
 
         public StatusHolder(View view) {
             super(view);
@@ -614,6 +625,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             node_names = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
             iconstat = (ImageView) view.findViewById(R.id.icon_stat);
+            loading = (ProgressBar)view.findViewById(R.id.pbProcessing);
 
 
         }
@@ -621,25 +633,27 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
     public class TempHolder extends ViewHolder {
         public TextView node_name, status, temp, hum;
-        public ImageView imgOnline, imgSending,iconstat;
+        public ImageView imgOnline,iconstat;
         public ImageButton imgNode;
+        public ProgressBar loading;
+
 
         public TempHolder(View view) {
             super(view);
             imgNode = (ImageButton) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
-            imgSending = (ImageView) view.findViewById(R.id.icon_sending);
             temp = (TextView) view.findViewById(R.id.temp);
             hum = (TextView) view.findViewById(R.id.hum);
             iconstat = (ImageView) view.findViewById(R.id.icon_stat);
+            loading = (ProgressBar)view.findViewById(R.id.pbProcessing);
 
         }
     }
 
     public class PhoneHolder extends ViewHolder {
         public TextView node_name, status;
-        public ImageView imgOnline, imgSending,iconstat;
+        public ImageView imgOnline,iconstat;
         public ImageButton imgNode;
 
         public PhoneHolder(View view) {
@@ -647,7 +661,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             imgNode = (ImageButton) view.findViewById(R.id.icon_node);
             node_name = (TextView) view.findViewById(R.id.node_name);
             imgOnline = (ImageView) view.findViewById(R.id.icon_conn);
-            imgSending = (ImageView) view.findViewById(R.id.icon_sending);
             iconstat = (ImageView) view.findViewById(R.id.icon_stat);
 
         }

@@ -188,7 +188,7 @@ public class OlmatixService extends Service {
             if (alarmService == null) {
                 if (!hasConnectivity) {
                     final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(getApplicationContext(),
-                            "Internet connection avalaible", TSnackbar.LENGTH_LONG);
+                            "Internet connection not avalaible", TSnackbar.LENGTH_LONG);
                     snackbarWrapper.setAction("Olmatix",
                             new View.OnClickListener() {
                                 @Override

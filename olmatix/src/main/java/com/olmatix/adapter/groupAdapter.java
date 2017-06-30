@@ -3,10 +3,12 @@ package com.olmatix.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,6 +18,7 @@ import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.groupModel;
 import com.olmatix.ui.fragment.DashboardNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +31,7 @@ public class groupAdapter extends RecyclerView.Adapter<groupAdapter.ViewHolder> 
     private Context context;
     public  static dbNodeRepo mDbNodeRepo;
     NodeDashboardAdapter adapter;
+    private final ArrayList<Integer> selected = new ArrayList<>();
 
     public groupAdapter(List<groupModel> nodeList, Context group, DashboardNode dashboardNode) {
         this.nodeList = nodeList;
@@ -69,14 +73,38 @@ public class groupAdapter extends RecyclerView.Adapter<groupAdapter.ViewHolder> 
         final groupModel mGroupModel = nodeList.get(position);
         final groupHolder holder = (groupHolder) viewHolder;
 
+        if (!selected.contains(position)){
+            // view not selected
+            holder.group_name.setEnabled(true);
+        }
+        else
+            // view is selected
+            holder.group_name.setEnabled(false);
+
         holder.group_name.setText(mGroupModel.getGroupName());
+
         holder.group_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent("groupid");
                 intent.putExtra("groupid", String.valueOf(mGroupModel.getGroupid()));
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+                holder.group_name.setEnabled(false);
+
+                if (selected.isEmpty()){
+                    selected.add(position);
+                }else {
+                    int oldSelected = selected.get(0);
+                    selected.clear();
+                    selected.add(position);
+                    // we do not notify that an item has been selected
+                    // because that work is done here.  we instead send
+                    // notifications for items to be deselected
+                    notifyItemChanged(oldSelected);
+                }
             }
+
         });
 
         holder.group_name.setOnLongClickListener(new View.OnLongClickListener() {

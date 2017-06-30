@@ -71,7 +71,8 @@
             android:theme="@style/AppTheme.Dark"></activity>
         <activity android:name="com.olmatix.ui.activity.SetupProduct"></activity>
         <activity android:name="com.olmatix.ui.activity.SceneActivity"></activity>
-        <activity android:name="com.olmatix.ui.activity.CameraActivity"></activity>
+        <activity android:name="com.olmatix.ui.activity.CameraActivity"
+            android:configChanges="orientation|screenSize"></activity>
         <activity android:name="com.olmatix.ui.activity.PhoneActivity"></activity>
         <activity
             android:name="com.olmatix.ui.activity.scene.ScheduleActivity"

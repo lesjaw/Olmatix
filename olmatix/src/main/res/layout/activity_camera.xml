@@ -186,6 +186,33 @@
             android:textStyle="bold"
             android:layout_marginBottom="2sp"/>
 
+        <ProgressBar
+            android:id="@+id/pbProcessing"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/icon_stat"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:indeterminateOnly="true"
+            android:padding="0sp" />
+
+        <GridView
+            android:id="@+id/grid"
+            android:numColumns="auto_fit"
+            android:layout_marginLeft="10sp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/labelrecording"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnWidth="90dp"
+            android:gravity="center"
+            android:horizontalSpacing="10dp"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dp">
+
+        </GridView>
+
 
     </RelativeLayout>
     </android.support.v7.widget.CardView>

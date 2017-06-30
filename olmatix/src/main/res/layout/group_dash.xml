@@ -6,12 +6,12 @@
     android:orientation="horizontal"
     android:padding="0sp">
 
-
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/group_name"
-                android:textAllCaps="true"/>
+                android:textAllCaps="true"
+                android:theme="@style/AppTheme.Button1" />
 
 
 </LinearLayout>

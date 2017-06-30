@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="75sp"
+        android:layout_height="75sp"
+        android:padding="10dp"
+        android:background="@drawable/selected_item"
+        />
+
+    <TextView
+        android:layout_width="75sp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textlabel"
+        android:text="Judul"
+        android:gravity="center"/>
+
+
+</LinearLayout>

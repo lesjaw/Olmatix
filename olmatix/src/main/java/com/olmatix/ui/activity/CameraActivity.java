@@ -1,10 +1,16 @@
 package com.olmatix.ui.activity;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -14,6 +20,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
@@ -27,6 +34,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -54,22 +63,26 @@ import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Created by USER on 02/06/2017.
  */
 
-public class CameraActivity extends AppCompatActivity implements IVLCVout.Callback  {
+public class CameraActivity extends AppCompatActivity implements IVLCVout.Callback   {
 
 
     private String mFilePath;
@@ -95,14 +108,82 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     RelativeLayout camView;
     ImageView camera_image;
     CheckBox local, cloud;
-    String path;
+    String path, date;
     ArrayList<String> images = new ArrayList<>();
     ArrayList<String> names = new ArrayList<>();
     public static final String TAG_IMAGE_URL = "image";
     public static final String TAG_NAME = "name";
     GridView gridView;
-    public ProgressBar loading;
+    ProgressBar loading;
+    TextView inputDate, empty;
+    String dd, mm, yy;
+    DatePickerDialog datepickerdialog;
+    Boolean recordplaying;
 
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String mChange = intent.getStringExtra("imagesUrl");
+            //Log.d(TAG, "onReceive: ");
+            if (mChange==null){
+                mChange ="0";
+            } else {
+                String substr = mChange.substring(mChange.length() - 3);
+                if (substr.equals("jpg")){
+                    mSurface.setVisibility(View.GONE);
+                    new DownloadImageTask((ImageView) findViewById(R.id.camera_image))
+                            .execute(mChange);
+                    recordplaying = false;
+                    hd.setEnabled(true);
+                    sd.setEnabled(true);
+                    ld.setEnabled(true);
+                } else {
+                    camera_image.setVisibility(View.GONE);
+                    mSurface.setVisibility(View.VISIBLE);
+                    mFilePath = mChange;
+                    createPlayer(mFilePath);
+                    progressDialog.setMessage("Loading recording, please wait..");
+                    progressDialog.show();
+                    recordplaying=true;
+                    hd.setEnabled(true);
+                    sd.setEnabled(true);
+                    ld.setEnabled(true);
+                }
+            }
+
+        }
+    };
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+            releasePlayer();
+            progressDialog.setMessage("Loading image, please wait..");
+            progressDialog.show();
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+            progressDialog.hide();
+            camera_image.setVisibility(View.VISIBLE);
+
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,7 +197,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                     | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-            getSupportActionBar().hide();
+            //getSupportActionBar().hide();
         }
         else {
 
@@ -126,7 +207,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                     | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
             /*getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);*/
-            getSupportActionBar().show();
+            //getSupportActionBar().show();
 
         }
         setContentView(R.layout.activity_camera);
@@ -137,6 +218,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         if (!mediaDir.exists()){
             mediaDir.mkdir();
         }
+        recordplaying = false;
 
         pathFile = pictureFolder;
         pathThumb = pathFile+"/Olmatix/";
@@ -152,7 +234,8 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         sc = (Button) findViewById(R.id.sc);
         gridView = (GridView) findViewById(R.id.grid);
         loading = (ProgressBar) findViewById(R.id.pbProcessing);
-        //listFile = (ListView)findViewById(R.id.listRecord);
+        inputDate = (TextView) findViewById(R.id.inputDate);
+        empty = (TextView) findViewById(R.id.empty);
 
         mMode = (TextView) findViewById(R.id.mode);
         local = (CheckBox) findViewById(R.id.localrecord);
@@ -170,6 +253,9 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage("Loading your CCTV view, please wait..");
         progressDialog.show();
+
+        populatedate();
+
         setupToolbar();
         initload();
         new GetRecord().execute();
@@ -177,9 +263,18 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         images = new ArrayList<>();
         names = new ArrayList<>();
 
+        Calendar now = Calendar.getInstance();
+        int mYear =  now.get(Calendar.YEAR);
+        int mMonth = now.get(Calendar.MONTH);
+        int mDay = now.get(Calendar.DAY_OF_MONTH);
+
+        setDatePicker(mYear,mMonth,mDay);
+
         hd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                camera_image.setVisibility(View.GONE);
+                mSurface.setVisibility(View.VISIBLE);
                 mFilePath = "rtmp://103.43.47.61/live/"+path;
                 Toast.makeText(getApplicationContext(), "Switching to HD", Toast.LENGTH_LONG).show();
 
@@ -212,12 +307,15 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 sd.setEnabled(true);
                 ld.setEnabled(true);
                 progressDialog.setMessage("Loading High Definition view, please wait..");
+                progressDialog.show();
+
             }
         });
-
         sd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                camera_image.setVisibility(View.GONE);
+                mSurface.setVisibility(View.VISIBLE);
                 mFilePath = "rtmp://103.43.47.61/live/"+path+480;
                 Toast.makeText(getApplicationContext(), "Switching to SD", Toast.LENGTH_LONG).show();
 
@@ -251,12 +349,14 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 sd.setEnabled(false);
                 ld.setEnabled(true);
                 progressDialog.setMessage("Loading Standar Definition (480p) view, please wait..");
+                progressDialog.show();
             }
         });
-
         ld.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                camera_image.setVisibility(View.GONE);
+                mSurface.setVisibility(View.VISIBLE);
                 mFilePath = "rtmp://103.43.47.61/live/"+path+360;
                 Toast.makeText(getApplicationContext(), "Switching to LD", Toast.LENGTH_LONG).show();
 
@@ -289,9 +389,10 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 sd.setEnabled(true);
                 ld.setEnabled(false);
                 progressDialog.setMessage("Loading Low Definition (360p) view, please wait..");
+                progressDialog.show();
+
             }
         });
-
         sc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -299,14 +400,93 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
                 String mPath = pathThumb + "/" + now + ".jpg";
 
-                takeScreenshot(camView,mPath);
+                //takeScreenshot(camView,mPath);
                 //new GetRecord().execute();
-                loading.setVisibility(View.VISIBLE);
-
-                //getData();
+                //loading.setVisibility(View.VISIBLE);
+                int currentOrientation = getResources().getConfiguration().orientation;
+                if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    setSize(mVideoWidth, mVideoHeight);
+                    //getSupportActionBar().hide();
+                }
+                else {
+                    //getSupportActionBar().show();
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    setSize(mVideoWidth, mVideoHeight);
+                    //getSupportActionBar().hide();
+                }
             }
         });
 
+        mMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loading.setVisibility(View.VISIBLE);
+                int currentOrientation = getResources().getConfiguration().orientation;
+                if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    setSize(mVideoWidth, mVideoHeight);
+                    //getSupportActionBar().hide();
+                }
+                else {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    getSupportActionBar().show();
+                    setSize(mVideoWidth, mVideoHeight);
+                    //getSupportActionBar().hide();
+                }
+            }
+        });
+
+        inputDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datepickerdialog.show();
+            }
+        });
+
+    }
+
+    private void setDatePicker(int year, int month, int dayOfMonth) {
+        datepickerdialog = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener(){
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        String daymonth = String.valueOf(dayOfMonth);
+                        String mMonth = String.valueOf(++month);
+
+                        if (daymonth.length()==1){
+                            daymonth = "0"+dayOfMonth;
+                        } else {
+                            daymonth = String.valueOf(dayOfMonth);
+                        }
+                        if (mMonth.length()==1){
+                            mMonth = "0"+month;
+                        } else {
+                            mMonth = String.valueOf(month);
+                        }
+
+                        date = year + "-" + mMonth + "-" + daymonth;
+                        inputDate.setText(date);
+                        gridView.setVisibility(View.GONE);
+                        new GetRecord().execute();
+                    }
+                }, year, month, dayOfMonth);
+    }
+
+    private void populatedate() {
+        Date tgl = new Date();
+        SimpleDateFormat fdd = new SimpleDateFormat("dd");
+        dd = String.valueOf(fdd.format(tgl));
+
+        SimpleDateFormat fmm = new SimpleDateFormat("MM");
+        mm = String.valueOf(fmm.format(tgl));
+
+        SimpleDateFormat fyy = new SimpleDateFormat("yyyy");
+        yy = String.valueOf(fyy.format(tgl));
+
+        date = yy + "-" + mm + "-" + dd;
+        inputDate.setText(date);
+        setDatePicker(Integer.parseInt(yy),Integer.parseInt(mm),Integer.parseInt(dd));
     }
 
     private void initload(){
@@ -394,7 +574,6 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //Toast.makeText(CameraActivity.this,"Downloading recording",Toast.LENGTH_LONG).show();
             loading.setVisibility(View.VISIBLE);
             //loading.setScaleY(4f);
         }
@@ -403,13 +582,17 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         protected Void doInBackground(Void... arg0) {
 
             RequestQueue requestQueue = Volley.newRequestQueue(getBaseContext());
-            String urlJsonArry = "http://103.43.47.61/rest/list_record.php?date=2017-06-28&stream="+path;
+            String urlJsonArry = "http://103.43.47.61/rest/list_record.php?date="+date+"&stream="+path;
+            Log.d("DEBUG", "doInBackground: "+urlJsonArry);
 
             JsonArrayRequest req = new JsonArrayRequest(urlJsonArry,
                     new Response.Listener<JSONArray>() {
                         @Override
                         public void onResponse(JSONArray jsonArray) {
                             Log.d("DEBUG", "jsonArray: "+jsonArray.length());
+
+                            images.clear();
+                            names.clear();
 
                             for(int i = 0; i<jsonArray.length(); i++){
                                 //Creating a json object of the current index
@@ -426,14 +609,20 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                                     e.printStackTrace();
                                 }
                             }
+
+                            loading.setVisibility(View.GONE);
+                            GridViewAdapter gridViewAdapter = new GridViewAdapter(getApplicationContext(),images,names);
+                            //Adding adapter to gridview
+                            gridView.setAdapter(gridViewAdapter);
+                            gridView.setVisibility(View.VISIBLE);
+                            empty.setVisibility(View.GONE);
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-                            Toast.makeText(CameraActivity.this, "Unable to fetch data: "
-                                    + volleyError.getMessage(), Toast.LENGTH_SHORT).show();
-                            Log.d("DEBUG", "Unable to fetch data: "+ volleyError.getMessage());
+                            loading.setVisibility(View.GONE);
+                            empty.setVisibility(View.VISIBLE);
                         }
                     });
 
@@ -450,14 +639,6 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            /*ListAdapter adapter = new SimpleAdapter(this, contactList,
-                    R.layout.list_item, new String[]{ "email","mobile"},
-                    new int[]{R.id.email, R.id.mobile});
-            lv.setAdapter(adapter);*/
-            loading.setVisibility(View.GONE);
-            GridViewAdapter gridViewAdapter = new GridViewAdapter(getApplicationContext(),images,names);
-            //Adding adapter to gridview
-            gridView.setAdapter(gridViewAdapter);
         }
     }
 
@@ -477,13 +658,16 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setSize(mVideoWidth, mVideoHeight);
+
         int currentOrientation = getResources().getConfiguration().orientation;
         if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             getSupportActionBar().hide();
+            setSize(mVideoWidth, mVideoHeight);
+
         }
         else {
             getSupportActionBar().show();
-
+            setSize(mVideoWidth, mVideoHeight);
         }
     }
 
@@ -522,6 +706,10 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
 
         // force surface buffer size
         holder.setFixedSize(mVideoWidth, mVideoHeight);
+        camera_image.getLayoutParams().height = mVideoHeight;
+        camera_image.getLayoutParams().width = mVideoWidth;
+        camera_image.requestLayout();
+
 
         // set display size
         ViewGroup.LayoutParams lp = mSurface.getLayoutParams();
@@ -529,6 +717,8 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         lp.height = h;
         mSurface.setLayoutParams(lp);
         mSurface.invalidate();
+
+        Log.d("DEBUG", "setSize: "+w +" H "+h);
     }
 
     @Override
@@ -558,12 +748,16 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
         createPlayer(mFilePath);
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("loadcontent"));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         releasePlayer();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
@@ -593,6 +787,8 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     protected void onDestroy() {
         super.onDestroy();
         releasePlayer();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
@@ -711,7 +907,9 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                     break;
                 case MediaPlayer.Event.Paused:
                 case MediaPlayer.Event.Stopped:
-                    progressDialog.show();
+                    if (!recordplaying) {
+                        progressDialog.show();
+                    }
 
                     break;
                 default:

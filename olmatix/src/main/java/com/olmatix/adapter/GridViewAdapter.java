@@ -2,6 +2,8 @@ package com.olmatix.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,15 +47,11 @@ public class GridViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        Log.d("DEBUG", "getCount: "+images.size());
-
         return images.size();
     }
 
     @Override
     public Object getItem(int position) {
-        Log.d("DEBUG", "Position: "+images.get(position));
-
         return images.get(position);
     }
 
@@ -90,6 +88,17 @@ public class GridViewAdapter extends BaseAdapter {
         //Adding views to the layout
         linearLayout.addView(textView);
         linearLayout.addView(networkImageView);
+
+        networkImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String imagesUrl = images.get(position);
+                Log.d("DEBUG", "onClick: "+images.get(position)+ " "+ names.get(position));
+                Intent intent = new Intent("loadcontent");
+                intent.putExtra("imagesUrl", imagesUrl);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            }
+        });
 
         //Returnint the layout
         return linearLayout;

@@ -39,6 +39,7 @@ public class SplashActivity extends Activity {
     SharedPreferences sharedPref;
     Boolean mStatusServer;
     int count;
+    boolean starting = false;
 
 
     PermissionListener permissionlistener = new PermissionListener() {
@@ -95,6 +96,7 @@ public class SplashActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        starting = true;
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             Intent i = new Intent(getApplication(), MainActivity.class);
@@ -132,10 +134,12 @@ public class SplashActivity extends Activity {
                         finish();
                     }
                     if (message.equals("AuthOK")) {
-                        Intent i = new Intent(getApplication(), MainActivity.class);
-                        startActivity(i);
-                        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
-                        finish();
+                        if (starting) {
+                            Intent i = new Intent(getApplication(), MainActivity.class);
+                            startActivity(i);
+                            LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+                            finish();
+                        }
                     }
 
 
@@ -173,6 +177,7 @@ public class SplashActivity extends Activity {
     protected void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+        starting = false;
 
     }
 
@@ -180,6 +185,15 @@ public class SplashActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+        starting = false;
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mMessageReceiver);
+        starting = false;
 
     }
 }

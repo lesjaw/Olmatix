@@ -2123,6 +2123,7 @@ public class OlmatixService extends Service {
         /*new Thread(new Runnable() {
             @Override
             public void run() {*/
+        checkActivityForeground();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         final Boolean mSwitch_NotifStatus = sharedPref.getBoolean("switch_notif", true);
 

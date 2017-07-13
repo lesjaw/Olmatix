@@ -1,14 +1,19 @@
 package com.olmatix.adapter;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +49,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import static android.content.Context.CLIPBOARD_SERVICE;
 
 /**
  * Created by android on 12/13/2016.
@@ -156,6 +163,46 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.lastaction.setText("Last log : "+dateString);
             holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.imgNode.setImageResource(R.drawable.olmatixmed);
+
+            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
+            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel();
+
+            holder.api2.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget2);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
+            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
+            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+"&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
+
+            holder.api1.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget1);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
             if(mInstalledNodeModel.getDuration()!=null) {
                 holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
             }
@@ -328,6 +375,44 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
+            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
+            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel();
+            holder.api2.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget2);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
+            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
+            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
+            holder.api1.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget1);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
                 holder.sensorStatus.setText("Door Close!");
                 holder.imgSensor.setImageResource(R.drawable.door_close);
@@ -491,6 +576,44 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.lastaction.setText("Last log : "+dateString);
             holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+
+            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
+            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel();
+            holder.api2.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget2);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
+            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
+            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
+            holder.api1.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget1);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
                 holder.sensorStatus.setText("Motion detected!");
@@ -663,6 +786,44 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             holder.status.setText(mInstalledNodeModel.getStatus());
 
+            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
+            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel();
+            holder.api2.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget2);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
+            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
+            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
+            holder.api1.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget1);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
             if (mInstalledNodeModel.getStatus().equals("true")) {
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
                 holder.statuslabel.setText("Status:");
@@ -828,6 +989,44 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             holder.lastaction.setText("Last log : "+dateString);
             holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+
+            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
+            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel();
+            holder.api2.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget2);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
+            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
+            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
+            holder.api1.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget1);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
                 holder.sensorStatus.setText("Block detected!");
@@ -1039,7 +1238,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
     public class OlmatixHolder extends ViewHolder {
-        public TextView node_name, upTime, status, fwName, statuslabel, duration, temp, hum, lastaction, seechart;
+        public TextView node_name, upTime, status, fwName, statuslabel, duration, temp, hum,
+                lastaction, seechart, api1, api2;
         public ImageView imgNode;
         Button btn_off, btn_on;
         ImageButton imgBut;
@@ -1063,6 +1263,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             expandableLayout.collapse(false);
             lastaction = (TextView) view.findViewById(R.id.lastdata);
             seechart = (TextView) view.findViewById(R.id.chartLabel);
+            api1 = (TextView) view.findViewById(R.id.API1);
+            api2 = (TextView) view.findViewById(R.id.API2);
 
             datalog = new ArrayList<>();
             mDbNodeRepo = new dbNodeRepo(context);
@@ -1072,7 +1274,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
     public class OlmatixSensorDoorHolder extends ViewHolder {
-        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, lastaction, seechart;
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, lastaction, seechart, api1, api2;
         public ImageView imgNode, imgSensor;
         Button btn_off, btn_on;
         ExpandableLayout expandableLayout;
@@ -1095,14 +1297,15 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             lastaction = (TextView) view.findViewById(R.id.lastdata);
             seechart = (TextView) view.findViewById(R.id.chartLabel);
             imgBut = (ImageButton) view.findViewById(R.id.opt);
-
+            api1 = (TextView) view.findViewById(R.id.API1);
+            api2 = (TextView) view.findViewById(R.id.API2);
             datalog = new ArrayList<>();
             mDbNodeRepo = new dbNodeRepo(context);
         }
     }
 
     public class OlmatixSensorMotionHolder extends ViewHolder {
-        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, lastaction, seechart;
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, lastaction, seechart, api1, api2;
         public ImageView imgNode, imgSensor;
         Button btn_off, btn_on;
         ExpandableLayout expandableLayout;
@@ -1125,7 +1328,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             lastaction = (TextView) view.findViewById(R.id.lastdata);
             seechart = (TextView) view.findViewById(R.id.chartLabel);
             imgBut = (ImageButton) view.findViewById(R.id.opt);
-
+            api1 = (TextView) view.findViewById(R.id.API1);
+            api2 = (TextView) view.findViewById(R.id.API2);
             datalog = new ArrayList<>();
             mDbNodeRepo = new dbNodeRepo(context);
 
@@ -1133,7 +1337,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     }
 
     public class OlmatixSensorProxHolder extends ViewHolder {
-        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, jarak, setrange, lastaction, seechart;
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, jarak, setrange, lastaction, seechart, api1, api2;
         public ImageView imgNode, imgSensor;
         public SeekBar seekRange;
         Button btn_off, btn_on;
@@ -1160,7 +1364,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             lastaction = (TextView) view.findViewById(R.id.lastdata);
             seechart = (TextView) view.findViewById(R.id.chartLabel);
             imgBut = (ImageButton) view.findViewById(R.id.opt);
-
+            api1 = (TextView) view.findViewById(R.id.API1);
+            api2 = (TextView) view.findViewById(R.id.API2);
             datalog = new ArrayList<>();
             mDbNodeRepo = new dbNodeRepo(context);
         }

@@ -108,8 +108,6 @@ public class SettingsActivity extends SettingsFragment {
 
     }
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,8 +133,6 @@ public class SettingsActivity extends SettingsFragment {
             startActivity(i);        }
 
     }
-
-
 
     @Override
     protected void onDestroy() {

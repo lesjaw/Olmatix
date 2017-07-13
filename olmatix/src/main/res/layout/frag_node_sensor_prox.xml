@@ -216,7 +216,39 @@
                         android:text="Last action"
                         android:textColor="@color/white" />
 
+                    <TextView
+                        android:id="@+id/API1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/chartLabel"
+                        android:elevation="4dp"
+                        android:gravity="left"
+                        android:padding="5dp"
+                        android:text="API ON/OFF"
+                        android:textColor="@color/white" />
 
+                    <TextView
+                        android:id="@+id/API2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/API1"
+                        android:elevation="4dp"
+                        android:gravity="left"
+                        android:padding="5dp"
+                        android:text="API Status"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/labelapi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/API2"
+                        android:elevation="4dp"
+                        android:gravity="left"
+                        android:layout_marginTop="10sp"
+                        android:padding="5dp"
+                        android:text="Click those API above to copy or share"
+                        android:textColor="@color/white" />
 
                 </RelativeLayout>
 

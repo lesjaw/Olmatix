@@ -38,7 +38,7 @@ public class ChartONOFF extends AppCompatActivity {
         String nicename = i.getStringExtra("nice_name");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#ffffff'>"+nicename+" </font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#ffffff'>"+mNicename+" </font>"));
     }
 
     private ArrayList<BarDataSet> getDataSet() {

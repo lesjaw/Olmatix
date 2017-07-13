@@ -299,8 +299,12 @@ public class PhoneActivity extends AppCompatActivity implements OnMapReadyCallba
             jarak = "it's "+ (int) res[0] + unit ;
             Log.d("DEBUG", "Distance SERVICE 1: " + Distance);
 
-            LatLng sydney = new LatLng(latphone, lngphone);
+            LatLng phone = new LatLng(latphone, lngphone);
             LatLng you = new LatLng(latyou, lngyou);
+
+            Log.d("DEBUG", "Phone Loc: "+latphone +", "+lngphone);
+            Log.d("DEBUG", "You Loc: "+latyou +", "+lngyou);
+
 
             Marker markerYou = mMap.addMarker(new MarkerOptions().position(you).title("This is you").snippet(
                     locYou+adStringYou+"\n"+loc1)
@@ -308,12 +312,12 @@ public class PhoneActivity extends AppCompatActivity implements OnMapReadyCallba
             //markerYou.remove();
             markerYou.showInfoWindow();
 
-            Marker marker = mMap.addMarker(new MarkerOptions().position(sydney).title(node_id).snippet(
+            Marker marker = mMap.addMarker(new MarkerOptions().position(phone).title(node_id).snippet(
                     Distance+"\n"+jarak+" from your location"+"\n"+loc1)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
             marker.showInfoWindow();
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(phone));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
             mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {

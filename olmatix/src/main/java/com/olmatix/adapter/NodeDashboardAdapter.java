@@ -639,7 +639,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                     installedNodeModel.setOnline("true");
                                     installedNodeModel.setNodesID(idnode);
                                     mDbNodeRepo.updateOnline(installedNodeModel);
-                                    notifyDataSetChanged();
+                                    notifyChange();
                                 }
                             }
                         }, new Response.ErrorListener() {
@@ -658,7 +658,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         }
 
         protected void onPostExecute(String result) {
-
+            notifyChange();
         }
     }
 

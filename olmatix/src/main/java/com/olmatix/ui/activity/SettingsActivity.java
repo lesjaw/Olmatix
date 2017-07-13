@@ -588,7 +588,9 @@ public class SettingsActivity extends SettingsFragment {
             pref3 = (CheckBoxPreference) findPreference("switch_sensor_motion");
             pref4 = (CheckBoxPreference) findPreference("switch_sensor_prox");
 
-
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                permis = 1;
+            }
 
             if (!mswitch_loc) {
                 pref.setTitle(R.string.switch_loc);
@@ -755,9 +757,10 @@ public class SettingsActivity extends SettingsFragment {
                     final PreferenceHelper mPrefHelper;
                     try {
 
-                        /*if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                       /* if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                                 != PackageManager.PERMISSION_GRANTED ) {
-                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0x1);*/
+                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0x1);
+                        }*/
                         if (permis ==2){
                             Toast.makeText(getActivity(), "Permission Denied\n", Toast.LENGTH_SHORT).show();
 

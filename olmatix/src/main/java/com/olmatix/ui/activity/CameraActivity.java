@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,7 +26,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -37,6 +41,7 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -65,6 +70,7 @@ import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
 import org.w3c.dom.Text;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -73,6 +79,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -119,6 +127,9 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     String dd, mm, yy;
     DatePickerDialog datepickerdialog;
     Boolean recordplaying;
+    Media m;
+    ImageButton download;
+    String currentUrlView ="";
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -137,6 +148,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                     hd.setEnabled(true);
                     sd.setEnabled(true);
                     ld.setEnabled(true);
+                    currentUrlView = mChange;
                 } else {
                     camera_image.setVisibility(View.GONE);
                     mSurface.setVisibility(View.VISIBLE);
@@ -148,6 +160,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                     hd.setEnabled(true);
                     sd.setEnabled(true);
                     ld.setEnabled(true);
+                    currentUrlView = mChange;
                 }
             }
 
@@ -236,6 +249,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         loading = (ProgressBar) findViewById(R.id.pbProcessing);
         inputDate = (TextView) findViewById(R.id.inputDate);
         empty = (TextView) findViewById(R.id.empty);
+        download = (ImageButton) findViewById(R.id.download);
 
         mMode = (TextView) findViewById(R.id.mode);
         local = (CheckBox) findViewById(R.id.localrecord);
@@ -444,6 +458,19 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             }
         });
 
+        download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!currentUrlView.equals("")) {
+                    Toast.makeText(getApplicationContext(), "Download recording to Phone", Toast.LENGTH_SHORT).show();
+                    new DownloadFileFromURL().execute(currentUrlView);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Please select recording file first!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     private void setDatePicker(int year, int month, int dayOfMonth) {
@@ -575,6 +602,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         protected void onPreExecute() {
             super.onPreExecute();
             loading.setVisibility(View.VISIBLE);
+            empty.setVisibility(View.GONE);
             //loading.setScaleY(4f);
         }
 
@@ -640,6 +668,90 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
         }
+    }
+
+    class DownloadFileFromURL extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            System.out.println("Starting download");
+
+            progressDialog = new ProgressDialog(CameraActivity.this);
+            progressDialog.setMessage("Loading... Please wait...");
+            progressDialog.setIndeterminate(false);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        /**
+         * Downloading file in background thread
+         * */
+        @Override
+        protected String doInBackground(String... f_url) {
+            int count;
+            try {
+                File pictureFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+                File mediaDir = new File(pictureFolder, "Olmatix");
+                if (!mediaDir.exists()){
+                    mediaDir.mkdir();
+                }
+
+                pathFile = pictureFolder;
+                pathThumb = pathFile+"/Olmatix/";
+
+                System.out.println("Downloading");
+                URL url = new URL(f_url[0]);
+                String substr = String.valueOf(url).substring(String.valueOf(url).length() - 12);
+                URLConnection conection = url.openConnection();
+                conection.connect();
+                // getting file length
+                int lenghtOfFile = conection.getContentLength();
+
+                // input stream to read file - with 8k buffer
+                InputStream input = new BufferedInputStream(url.openStream(), 8192);
+
+                // Output stream to write file
+
+                OutputStream output = new FileOutputStream(pathThumb+substr);
+                byte data[] = new byte[1024];
+
+                long total = 0;
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+
+                    // writing data to file
+                    output.write(data, 0, count);
+
+                }
+
+                // flushing output
+                output.flush();
+
+                // closing streams
+                output.close();
+                input.close();
+
+            } catch (Exception e) {
+                Log.e("Error: ", e.getMessage());
+            }
+
+            return null;
+        }
+
+
+
+        /**
+         * After completing background task
+         * **/
+        @Override
+        protected void onPostExecute(String file_url) {
+            System.out.println("Downloaded");
+
+            progressDialog.dismiss();
+        }
+
     }
 
     @Override
@@ -849,7 +961,10 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             options.add("--audio-time-stretch"); // time stretching
             //options.add("-vvv"); // verbosity
             options.add("--http-reconnect");
-            //options.add("--network-caching="+6*1000);
+            if (recordplaying) {
+                options.add("--network-caching=" + 6 * 1000);
+                options.add("--loop");
+            }
 
             //options.add("--sout=#transcode{vcodec=h264,venc=x264}:standard{mux=mp4,dst="+pathThumb+"/test.mp4}");
 
@@ -866,8 +981,9 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             vout.addCallback(this);
             vout.attachViews();
 
-            Media m = new Media(libvlc, Uri.parse(media));
+            m = new Media(libvlc, Uri.parse(media));
             mMediaPlayer.setMedia(m);
+
             mMediaPlayer.play();
 
 
@@ -875,6 +991,41 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             Toast.makeText(this, "Error creating player!", Toast.LENGTH_LONG).show();
             Log.d("DEBUG", "createPlayer: "+e);
         }
+
+        mSurface.getRootView().setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                    if (recordplaying) {
+                        Display display = getWindowManager().getDefaultDisplay();
+                        Point size = new Point();
+                        display.getSize(size);
+
+                        Float p = event.getX() / size.x;
+                        Long pos = (long) (mMediaPlayer.getLength() / p);
+                        Log.d("DEBUG", "seek to " + p + " / " + pos + " state is " + mMediaPlayer.getPlayerState());
+                        int stateplayer = mMediaPlayer.getPlayerState();
+                        if (mMediaPlayer.isSeekable()) {
+                            //mLibVLC.setTime( pos );
+                            mMediaPlayer.setPosition(p);
+                            if (stateplayer==3) {
+                                mMediaPlayer.pause();
+                            } else if (stateplayer==4){
+                                mMediaPlayer.play();
+                            } else if (stateplayer==6){
+                                mMediaPlayer.stop();
+                                mMediaPlayer.play();
+                            }
+
+                        } else {
+                            Log.w("DEBUG", "Non-seekable input");
+                        }
+                    }
+                }
+
+                return true;
+            }
+        });
 
 
     }
@@ -895,7 +1046,8 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             switch(event.type) {
                 case MediaPlayer.Event.EndReached:
                     Log.d("DEBUG", "MediaPlayerEndReached");
-                    player.releasePlayer();
+                    mMediaPlayer.play();
+                    //player.releasePlayer();
                     break;
                 case MediaPlayer.Event.EncounteredError:
                     Log.d("DEBUG", "Media Player Error, re-try");
@@ -903,12 +1055,15 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                     break;
                 case MediaPlayer.Event.Playing:
                     progressDialog.hide();
-
                     break;
-                case MediaPlayer.Event.Paused:
+                case MediaPlayer.Event.Buffering:
+                    //progressDialog.show();
+                    break;
                 case MediaPlayer.Event.Stopped:
                     if (!recordplaying) {
                         progressDialog.show();
+                    } else {
+                        //mMediaPlayer.play();
                     }
 
                     break;

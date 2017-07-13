@@ -25,6 +25,7 @@ import com.olmatix.model.SceneModel;
 import com.olmatix.model.SpinnerObject;
 import com.olmatix.model.SpinnerObjectDash;
 import com.olmatix.model.groupModel;
+import com.olmatix.model.logModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,8 @@ public class dbNodeRepo {
         ContentValues values = new ContentValues();
         values.put(KEY_TOPIC, DbNode.getTopic());
         values.put(KEY_MESSAGE, DbNode.getMessage());
+        values.put(KEY_CHANNEL, DbNode.getMessage());
+        values.put(KEY_NODE_ID, DbNode.getMessage());
 
         long Id = db.insert(TABLE_MQTT, null, values);
         db.close(); // Closing database connection
@@ -496,7 +499,6 @@ public class dbNodeRepo {
 
         if (installedNodeModel.getAdding() != null) {
             values.put(KEY_ADDING, installedNodeModel.getAdding());
-            Log.d("DEBUG", "UpdateAdding: "+installedNodeModel.getAdding());
         }
 
         db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
@@ -556,11 +558,6 @@ public class dbNodeRepo {
             Log.d("DEBUG", "updateFwname: "+installedNodeModel.getFwName());
         }
 
-        if (installedNodeModel.getFwName() != null) {
-            values.put(KEY_NICE_NAME_N, installedNodeModel.getFwName());
-            Log.d("DEBUG", "updateFwname: "+installedNodeModel.getFwName());
-        }
-
         db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(installedNodeModel.getNodesID())
         });
@@ -597,7 +594,7 @@ public class dbNodeRepo {
             values.put(KEY_NODES, installedNodeModel.getNodes());
         }
 
-        if (installedNodeModel.getSignal() != null) {
+        if (installedNodeModel.getOta() != null) {
             values.put(KEY_OTA, installedNodeModel.getOta());
         }
 
@@ -948,17 +945,12 @@ public class dbNodeRepo {
     public ArrayList<DetailNodeModel> getNodeDetail(String node_id, String Channel) {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-
         String selectString = "SELECT * FROM " + dbNode.TABLE_NODE + " WHERE " + KEY_NODE_ID + " =? AND " + KEY_CHANNEL + " =?";
-
-        // Add the String you are searching by here.
-        // Put it in an array to avoid an unrecognized token error
         ArrayList<DetailNodeModel> nodeList = new ArrayList<DetailNodeModel>();
 
         Cursor cursor = db.rawQuery(selectString, new String[]{
                 String.valueOf(node_id),
                 String.valueOf(Channel)});
-
 
         if (cursor.moveToFirst()) {
             do {
@@ -1166,8 +1158,6 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selectString = "SELECT * FROM " + dbNode.TABLE + " WHERE " + KEY_NODE_ID + " =?";
 
-        // Add the String you are searching by here.
-        // Put it in an array to avoid an unrecognized token error
         Cursor cursor = db.rawQuery(selectString, new String[]{String.valueOf(installedNodeModel.getNodesID())});
 
         boolean hasObject = false;
@@ -1463,12 +1453,41 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_MQTT +" ORDER BY "+KEY_ID +" DESC limit "+100;
 
-
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                nodeList.add(cursor.getString(1)+ "\n "+ cursor.getString(2));
+                nodeList.add(cursor.getString(1)+ "\n"+ cursor.getString(2));
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
+    public ArrayList<logModel> getLogbyName(String node_id, String Channel) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectString = "SELECT * FROM " + dbNode.TABLE_NODE_DURATION + " WHERE " + KEY_NODE_ID +
+                " =? AND " + KEY_CHANNEL + " =? ORDER BY "+KEY_ID +" DESC limit "+1;
+        ArrayList<logModel> nodeList = new ArrayList<logModel>();
+
+        Cursor cursor = db.rawQuery(selectString, new String[]{
+                String.valueOf(node_id),
+                String.valueOf(Channel)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                logModel node = new logModel();
+
+                node.setNodeid(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setChannel(cursor.getString(cursor.getColumnIndex(dbNode.KEY_CHANNEL)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
+                node.setOn(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_ON)));
+                node.setOff(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_OFF)));
+
+                nodeList.add(node);
 
             } while (cursor.moveToNext());
         }

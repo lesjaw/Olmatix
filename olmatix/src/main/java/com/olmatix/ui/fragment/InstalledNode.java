@@ -41,7 +41,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.androidadvance.topsnackbar.TSnackbar;
 import com.olmatix.adapter.NodeAdapter;
 import com.olmatix.database.dbNodeRepo;
@@ -56,11 +64,13 @@ import com.olmatix.utils.Connection;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -237,6 +247,75 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     }
                     data.clear();
                 }
+            }
+
+            return "You are at PostExecute";
+        }
+
+        protected void onProgressUpdate(Integer...a){
+//            Log.d(TAG + " onProgressUpdate", "You are in progress update ... " + a[0]);
+        }
+
+        protected void onPostExecute(String result) {
+            setAdapter();
+            mFab.show();
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    private class getOnline extends AsyncTask<Void, Integer, String> {
+
+        protected void onPreExecute (){
+
+        }
+
+        protected String doInBackground(Void...arg0) {
+            Log.d(TAG, "doing http GET: ");
+            int countDB = dbNodeRepo.getNodeList().size();
+            data.addAll(dbNodeRepo.getNodeList());
+            for (int i = 0; i < countDB; i++) {
+
+                try {
+                    Thread.currentThread();
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                String id_device = data.get(i).getNodesID();
+
+                // Instantiate the RequestQueue.
+                RequestQueue queue = Volley.newRequestQueue(getActivity());
+                final String urlGet = "http://cloud.olmatix.com:1880/API/GET/DEVICE?id=" + id_device;
+                Log.d(TAG, "doInBackground: "+urlGet);
+
+                // Request a string response from the provided URL.
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, urlGet,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                // Display the first 500 characters of the response string.
+                                Log.d(TAG, "onResponse: " + id_device + " response "+  response);
+
+                                String result = response.trim();
+                                if (result.equals("false")|| Objects.equals(result, "false")){
+                                    Log.d("DEBUG", "FALSE: "+response);
+
+                                } else {
+                                    installedNodeModel.setOnline("true");
+                                    installedNodeModel.setNodesID(id_device);
+                                    dbNodeRepo.updateOnline(installedNodeModel);
+                                    updatelist();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    }
+                });
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
             }
 
             return "You are at PostExecute";
@@ -680,7 +759,8 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     private void setRefresh() {
         onTouchListener(0);
-        new load().execute();
+        //new load().execute();
+        new getOnline().execute();
         //refreshnode();
         //setAdapter();
         mFab.show();

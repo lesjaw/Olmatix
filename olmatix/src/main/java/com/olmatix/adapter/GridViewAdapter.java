@@ -72,13 +72,16 @@ public class GridViewAdapter extends BaseAdapter {
         //Initializing ImageLoader
         imageLoader = CustomVolleyRequest.getInstance(context).getImageLoader();
         imageLoader.get(images.get(position), ImageLoader.getImageListener(networkImageView,
-                R.mipmap.olmatixlogo, android.R.drawable.ic_dialog_alert));
+                    R.mipmap.olmatixlogo, android.R.drawable.ic_dialog_alert));
+
 
         //Setting the image url to load
         networkImageView.setImageUrl(images.get(position),imageLoader);
 
+
         //Creating a textview to show the title
         TextView textView = new TextView(context);
+        textView.setMaxLines(1);
         textView.setText(names.get(position));
 
         //Scaling the imageview

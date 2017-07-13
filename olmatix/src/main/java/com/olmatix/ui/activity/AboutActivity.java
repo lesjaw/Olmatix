@@ -132,7 +132,7 @@ public class AboutActivity extends AppCompatActivity {
     private void showAlertDialogMqtt() {
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(AboutActivity.this);
         builderSingle.setIcon(R.drawable.olmatixsmall);
-        builderSingle.setTitle("Log MQTT Message");
+        builderSingle.setTitle("Log Status Change");
 
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(AboutActivity.this, R.layout.list_log_alarm);
         arrayAdapter.addAll(mDbNodeRepo.getLogMqtt());

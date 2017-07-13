@@ -7,7 +7,7 @@ package com.olmatix.model;
 public class DetailNodeModel {
 
     private  int id;
-    private String node_id,channel, status, nice_name_d,uptime, name, sensor, status_sensor, fwName, status_theft,  status_temp, status_hum,duration, status_jarak, status_range;
+    private String node_id,channel, status, nice_name_d,uptime, name, sensor, status_sensor, fwName, status_theft,  status_temp, status_hum, duration, status_jarak, status_range;
 
 
     public int getId() {

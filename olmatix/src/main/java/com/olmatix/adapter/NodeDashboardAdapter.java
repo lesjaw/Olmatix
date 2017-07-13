@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -21,10 +22,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.androidadvance.topsnackbar.TSnackbar;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DashboardNodeModel;
+import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.fragment.DashboardNode;
 import com.olmatix.utils.Connection;
 
@@ -36,6 +45,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -198,11 +208,14 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 e.printStackTrace();
                             }
                         } else{
-                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
-                            snackbar.setActionTextColor(Color.BLACK);
+                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline, we check this node now" +
+                                    " by sending a request", TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
-                                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
+
+                            new getOnline(mFavoriteModel.getNodeid(),v).execute();
+
                         }
                     } else {
                         TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
@@ -329,10 +342,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 e.printStackTrace();
                             }
                         } else {
-                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
+                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline, we check this node now" +
+                                    " by sending a request", TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
                             snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
+
+                            new getOnline(mFavoriteModel.getNodeid(),v).execute();
                         }
                     } else {
                         TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
@@ -441,11 +457,13 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 e.printStackTrace();
                             }
                         } else{
-                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline", TSnackbar.LENGTH_LONG);
-                            snackbar.setActionTextColor(Color.BLACK);
+                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline, we check this node now" +
+                                    " by sending a request", TSnackbar.LENGTH_LONG);
                             View snackbarView = snackbar.getView();
                             snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
                             snackbar.show();
+                            new getOnline(mFavoriteModel.getNodeid(),v).execute();
+
                         }
                     } else {
                         TSnackbar snackbar = TSnackbar.make(v, "You dont connect to server", TSnackbar.LENGTH_LONG);
@@ -574,6 +592,74 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         }
 
 
+    }
+
+    private class getOnline extends AsyncTask<Void, Integer, String> {
+        String idnode;
+        View rootView;
+        InstalledNodeModel installedNodeModel;
+        dbNodeRepo mDbNodeRepo;
+
+        public getOnline(String nodeid, View v) {
+            this.idnode = nodeid;
+            this.rootView = v;
+        }
+
+        protected void onPreExecute (){
+            mDbNodeRepo = new dbNodeRepo(context);
+            installedNodeModel = new InstalledNodeModel();
+        }
+
+        protected String doInBackground(Void...arg0) {
+            Log.d("DEBUG", "doing http GET: ");
+
+                // Instantiate the RequestQueue.
+                RequestQueue queue = Volley.newRequestQueue(context);
+                final String urlGet = "http://cloud.olmatix.com:1880/API/GET/DEVICE?id=" + idnode;
+                Log.d("DEBUG", "doInBackground: "+urlGet);
+
+                // Request a string response from the provided URL.
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, urlGet,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                // Display the first 500 characters of the response string.
+                                Log.d("DEBUG", "onResponse: " + idnode + " response "+  response);
+                                String result = response.trim();
+                                if (result.equals("false")|| Objects.equals(result, "false")){
+                                    Log.d("DEBUG", "FALSE: "+response);
+                                    Toast.makeText(context, idnode +" is definetly OFFLINE, please check it",Toast.LENGTH_SHORT).show();
+
+                                    TSnackbar snackbar = TSnackbar.make(rootView, idnode+" is definetly OFFLINE, please check it" +
+                                            " by looking at Blue Led indicator, does it blink?", TSnackbar.LENGTH_LONG);
+                                    View snackbarView = snackbar.getView();
+                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                                    snackbar.show();
+                                } else {
+                                    installedNodeModel.setOnline("true");
+                                    installedNodeModel.setNodesID(idnode);
+                                    mDbNodeRepo.updateOnline(installedNodeModel);
+                                    notifyDataSetChanged();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    }
+                });
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
+
+            return "You are at PostExecute";
+        }
+
+        protected void onProgressUpdate(Integer...a){
+//            Log.d(TAG + " onProgressUpdate", "You are in progress update ... " + a[0]);
+        }
+
+        protected void onPostExecute(String result) {
+
+        }
     }
 
     @Override

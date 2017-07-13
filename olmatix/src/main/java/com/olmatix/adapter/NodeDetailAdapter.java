@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -17,26 +16,33 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidadvance.topsnackbar.TSnackbar;
+import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.DetailNodeModel;
+import com.olmatix.model.logModel;
+import com.olmatix.ui.activity.ChartONOFF;
 import com.olmatix.utils.Connection;
 import com.olmatix.utils.OlmatixUtils;
 
+import net.cachapa.expandablelayout.ExpandableLayout;
+
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.util.Strings;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,22 +51,25 @@ import java.util.List;
 
 public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.ViewHolder> implements ItemTouchHelperAdapter {
 
-    private final OnStartDragListener mDragStartListener;
-    List<DetailNodeModel> nodeList;
+    private List<DetailNodeModel> nodeList;
     Context context;
-    String fw_name;
-    SharedPreferences sharedPref;
-    Boolean mStatusServer;
-    String jar;
-    int step = 50;
-    int max = 200;
-    int min = 50;
+    private String fw_name;
+    private SharedPreferences sharedPref;
+    private Boolean mStatusServer;
+    private int step = 50;
+    private int min = 50;
+    private int position1;
+    private int UNSELECTED = -1;
+    private int selectedItem = UNSELECTED;
+
+    private dbNodeRepo mDbNodeRepo;
+    private ArrayList<logModel> datalog;
 
     public NodeDetailAdapter(List<DetailNodeModel> nodeList, String fw_name, Context context, OnStartDragListener dragStartListener) {
 
         this.nodeList = nodeList;
         this.fw_name = fw_name;
-        mDragStartListener = dragStartListener;
+        //mDragStartListener = dragStartListener;
         this.context = context;
 
     }
@@ -105,18 +114,47 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         return null;
     }
 
+
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
 
         final DetailNodeModel mInstalledNodeModel = nodeList.get(position);
+        this.position1 = position;
 
         if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")
                 ||fw_name.equals("smartadapter1ch")||fw_name.equals("smartadapter8ch")) {
 
-            //Toast.makeText(context,"I m in",Toast.LENGTH_LONG).show();
             final OlmatixHolder holder = (OlmatixHolder) viewHolder;
 
-            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+            String ch = mInstalledNodeModel.getChannel();
+            String dateString = null;
+            datalog.clear();
+            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
+            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    String Nodeid = datalog.get(i).getNodeid();
+                    String chan = datalog.get(i).getChannel();
+                    String on = datalog.get(i).getOn();
+                    String off = datalog.get(i).getOff();
+                    String timestamps;
+                    if (off.equals("0")||off == null){
+                        timestamps = on;
+                    } else  {
+                        timestamps = off;
+                    }
+
+                    //String time = timestamps.getText().toString();
+
+                    long timestampsformat = Long.parseLong(timestamps);;
+
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dateString = timeformat.format(new Date(timestampsformat));
+                }
+            }
+
+            holder.lastaction.setText("Last log : "+dateString);
+            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.imgNode.setImageResource(R.drawable.olmatixmed);
             if(mInstalledNodeModel.getDuration()!=null) {
                 holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
@@ -125,9 +163,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
             } else
                 holder.node_name.setText(mInstalledNodeModel.getName());
-
-
-            //holder.upTime.setText("Uptime: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
 
             holder.status.setText(mInstalledNodeModel.getStatus());
 
@@ -150,8 +185,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     holder.status.setTextColor(Color.RED);
                     holder.btn_on.setEnabled(true);
                     holder.btn_off.setEnabled(false);
-
-
                 }
             }
             holder.imgNode.setOnClickListener(new View.OnClickListener() {
@@ -188,7 +221,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                         intent.putExtra("Connect", "con");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
-
                 }
             });
 
@@ -224,6 +256,36 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             });
 
+            holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+
+                    if (holder != null) {
+                        holder.imgBut.setSelected(false);
+                        holder.expandableLayout.collapse();
+                    }
+
+                    if (position1 == selectedItem) {
+                        selectedItem = UNSELECTED;
+                    } else {
+                        holder.imgBut.setSelected(true);
+                        holder.expandableLayout.expand();
+                        selectedItem = position1;
+                    }
+                }
+            });
+
+            holder.seechart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ChartONOFF.class);
+                    //i.putExtra("nodeid", data.get(position).getNodesID());
+                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                    context.startActivity(i);
+                }
+            });
+
+
 
         } else if (fw_name.equals("smartsensordoor")) {
             final OlmatixSensorDoorHolder holder = (OlmatixSensorDoorHolder) viewHolder;
@@ -234,7 +296,36 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             } else {
                 holder.node_name.setText(mInstalledNodeModel.getName());
             }
-            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+
+            String ch = mInstalledNodeModel.getChannel();
+            String dateString = null;
+            datalog.clear();
+            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
+            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    String Nodeid = datalog.get(i).getNodeid();
+                    String chan = datalog.get(i).getChannel();
+                    String on = datalog.get(i).getOn();
+                    String off = datalog.get(i).getOff();
+                    String timestamps;
+                    if (off.equals("0")||off == null){
+                        timestamps = on;
+                    } else  {
+                        timestamps = off;
+                    }
+
+                    //String time = timestamps.getText().toString();
+
+                    long timestampsformat = Long.parseLong(timestamps);;
+
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dateString = timeformat.format(new Date(timestampsformat));
+                }
+            }
+
+            holder.lastaction.setText("Last log : "+dateString);
+            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
@@ -331,6 +422,36 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 }
 
             });
+
+            holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+
+                    if (holder != null) {
+                        holder.imgBut.setSelected(false);
+                        holder.expandableLayout.collapse();
+                    }
+
+                    if (position1 == selectedItem) {
+                        selectedItem = UNSELECTED;
+                    } else {
+                        holder.imgBut.setSelected(true);
+                        holder.expandableLayout.expand();
+                        selectedItem = position1;
+                    }
+                }
+            });
+
+            holder.seechart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ChartONOFF.class);
+                    //i.putExtra("nodeid", data.get(position).getNodesID());
+                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                    context.startActivity(i);
+                }
+            });
+
         } else if (fw_name.equals("smartsensormotion")) {
             final OlmatixSensorMotionHolder holder = (OlmatixSensorMotionHolder) viewHolder;
 
@@ -340,7 +461,35 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             } else {
                 holder.node_name.setText(mInstalledNodeModel.getName());
             }
-            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+            String ch = mInstalledNodeModel.getChannel();
+            String dateString = null;
+            datalog.clear();
+            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
+            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    String Nodeid = datalog.get(i).getNodeid();
+                    String chan = datalog.get(i).getChannel();
+                    String on = datalog.get(i).getOn();
+                    String off = datalog.get(i).getOff();
+                    String timestamps;
+                    if (off.equals("0")||off == null){
+                        timestamps = on;
+                    } else  {
+                        timestamps = off;
+                    }
+
+                    //String time = timestamps.getText().toString();
+
+                    long timestampsformat = Long.parseLong(timestamps);;
+
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dateString = timeformat.format(new Date(timestampsformat));
+                }
+            }
+
+            holder.lastaction.setText("Last log : "+dateString);
+            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
@@ -439,10 +588,67 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             });
 
+            holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+
+                    if (holder != null) {
+                        holder.imgBut.setSelected(false);
+                        holder.expandableLayout.collapse();
+                    }
+
+                    if (position1 == selectedItem) {
+                        selectedItem = UNSELECTED;
+                    } else {
+                        holder.imgBut.setSelected(true);
+                        holder.expandableLayout.expand();
+                        selectedItem = position1;
+                    }
+                }
+            });
+
+            holder.seechart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ChartONOFF.class);
+                    //i.putExtra("nodeid", data.get(position).getNodesID());
+                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                    context.startActivity(i);
+                }
+            });
+
         } else if (fw_name.equals("smartsensortemp")) {
             final OlmatixHolder holder = (OlmatixHolder) viewHolder;
 
-            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+            String ch = mInstalledNodeModel.getChannel();
+            String dateString = null;
+            datalog.clear();
+            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
+            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    String Nodeid = datalog.get(i).getNodeid();
+                    String chan = datalog.get(i).getChannel();
+                    String on = datalog.get(i).getOn();
+                    String off = datalog.get(i).getOff();
+                    String timestamps;
+                    if (off.equals("0")||off == null){
+                        timestamps = on;
+                    } else  {
+                        timestamps = off;
+                    }
+
+                    //String time = timestamps.getText().toString();
+
+                    long timestampsformat = Long.parseLong(timestamps);;
+
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dateString = timeformat.format(new Date(timestampsformat));
+                }
+            }
+
+            holder.lastaction.setText("Last log : "+dateString);
+            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.imgNode.setImageResource(R.drawable.olmatixmed);
             if(mInstalledNodeModel.getDuration()!=null) {
                 holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
@@ -493,7 +699,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     showAlertDialog();
                 }
             });
-
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -524,7 +729,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
                 }
             });
-
             holder.btn_off.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -556,6 +760,35 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 }
 
             });
+            holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+
+                    if (holder != null) {
+                        holder.imgBut.setSelected(false);
+                        holder.expandableLayout.collapse();
+                    }
+
+                    if (position1 == selectedItem) {
+                        selectedItem = UNSELECTED;
+                    } else {
+                        holder.imgBut.setSelected(true);
+                        holder.expandableLayout.expand();
+                        selectedItem = position1;
+                    }
+                }
+            });
+
+            holder.seechart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ChartONOFF.class);
+                    //i.putExtra("nodeid", data.get(position).getNodesID());
+                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                    context.startActivity(i);
+                }
+            });
+
         } else if (fw_name.equals("smartsensorprox")) {
             final OlmatixSensorProxHolder holder = (OlmatixSensorProxHolder) viewHolder;
 
@@ -565,7 +798,35 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             } else {
                 holder.node_name.setText(mInstalledNodeModel.getName());
             }
-            holder.fwName.setText(mInstalledNodeModel.getNode_id());
+            String ch = mInstalledNodeModel.getChannel();
+            String dateString = null;
+            datalog.clear();
+            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
+            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    String Nodeid = datalog.get(i).getNodeid();
+                    String chan = datalog.get(i).getChannel();
+                    String on = datalog.get(i).getOn();
+                    String off = datalog.get(i).getOff();
+                    String timestamps;
+                    if (off.equals("0")||off == null){
+                        timestamps = on;
+                    } else  {
+                        timestamps = off;
+                    }
+
+                    //String time = timestamps.getText().toString();
+
+                    long timestampsformat = Long.parseLong(timestamps);;
+
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dateString = timeformat.format(new Date(timestampsformat));
+                }
+            }
+
+            holder.lastaction.setText("Last log : "+dateString);
+            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
             holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
 
             if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
@@ -598,6 +859,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             if (mInstalledNodeModel.getStatus_jarak()!=null) {
                 holder.jarak.setText(mInstalledNodeModel.getStatus_jarak());
                 float convert = Integer.parseInt(mInstalledNodeModel.getStatus_jarak());
+                String jar;
                 if (convert < 100) {
                     jar = convert + " cm";
                 } else {
@@ -677,6 +939,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             });
             holder.setrange.setText(mInstalledNodeModel.getStatus_range()+ " cm");
+            int max = 200;
             holder.seekRange.setMax( (max - min) / step );
            /* int steppos = Integer.parseInt(mInstalledNodeModel.getStatus_range());
 
@@ -721,6 +984,35 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
                 }
             });
+
+            holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+
+                    if (holder != null) {
+                        holder.imgBut.setSelected(false);
+                        holder.expandableLayout.collapse();
+                    }
+
+                    if (position1 == selectedItem) {
+                        selectedItem = UNSELECTED;
+                    } else {
+                        holder.imgBut.setSelected(true);
+                        holder.expandableLayout.expand();
+                        selectedItem = position1;
+                    }
+                }
+            });
+
+            holder.seechart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ChartONOFF.class);
+                    //i.putExtra("nodeid", data.get(position).getNodesID());
+                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                    context.startActivity(i);
+                }
+            });
         }
 
 
@@ -740,14 +1032,18 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View v) {
+
             super(v);
+
         }
     }
 
     public class OlmatixHolder extends ViewHolder {
-        public TextView node_name, upTime, status, fwName, statuslabel, duration, temp, hum;
+        public TextView node_name, upTime, status, fwName, statuslabel, duration, temp, hum, lastaction, seechart;
         public ImageView imgNode;
         Button btn_off, btn_on;
+        ImageButton imgBut;
+        ExpandableLayout expandableLayout;
 
         public OlmatixHolder(View view) {
             super(view);
@@ -762,15 +1058,25 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             btn_on = (Button) view.findViewById(R.id.btn_on);
             temp = (TextView) view.findViewById(R.id.temp);
             hum = (TextView) view.findViewById(R.id.hum);
+            imgBut = (ImageButton) view.findViewById(R.id.opt);
+            expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+            expandableLayout.collapse(false);
+            lastaction = (TextView) view.findViewById(R.id.lastdata);
+            seechart = (TextView) view.findViewById(R.id.chartLabel);
 
+            datalog = new ArrayList<>();
+            mDbNodeRepo = new dbNodeRepo(context);
 
         }
+
     }
 
     public class OlmatixSensorDoorHolder extends ViewHolder {
-        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel;
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, lastaction, seechart;
         public ImageView imgNode, imgSensor;
         Button btn_off, btn_on;
+        ExpandableLayout expandableLayout;
+        ImageButton imgBut;
 
         public OlmatixSensorDoorHolder(View view) {
             super(view);
@@ -784,13 +1090,23 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);
             imgSensor = (ImageView) view.findViewById(R.id.door);
+            expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+            expandableLayout.collapse(false);
+            lastaction = (TextView) view.findViewById(R.id.lastdata);
+            seechart = (TextView) view.findViewById(R.id.chartLabel);
+            imgBut = (ImageButton) view.findViewById(R.id.opt);
+
+            datalog = new ArrayList<>();
+            mDbNodeRepo = new dbNodeRepo(context);
         }
     }
 
     public class OlmatixSensorMotionHolder extends ViewHolder {
-        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel;
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, lastaction, seechart;
         public ImageView imgNode, imgSensor;
         Button btn_off, btn_on;
+        ExpandableLayout expandableLayout;
+        ImageButton imgBut;
 
         public OlmatixSensorMotionHolder(View view) {
             super(view);
@@ -804,14 +1120,25 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);
             imgSensor = (ImageView) view.findViewById(R.id.door);
+            expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+            expandableLayout.collapse(false);
+            lastaction = (TextView) view.findViewById(R.id.lastdata);
+            seechart = (TextView) view.findViewById(R.id.chartLabel);
+            imgBut = (ImageButton) view.findViewById(R.id.opt);
+
+            datalog = new ArrayList<>();
+            mDbNodeRepo = new dbNodeRepo(context);
+
         }
     }
 
     public class OlmatixSensorProxHolder extends ViewHolder {
-        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, jarak, setrange;
+        public TextView node_name, upTime, status, sensorStatus, fwName, statuslabel, jarak, setrange, lastaction, seechart;
         public ImageView imgNode, imgSensor;
         public SeekBar seekRange;
         Button btn_off, btn_on;
+        ExpandableLayout expandableLayout;
+        ImageButton imgBut;
 
         public OlmatixSensorProxHolder(View view) {
             super(view);
@@ -828,7 +1155,14 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             jarak =(TextView) view.findViewById(R.id.jarak);
             seekRange = (SeekBar)view.findViewById(R.id.seek_range);
             setrange = (TextView) view.findViewById(R.id.set_range_text);
+            expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+            expandableLayout.collapse(false);
+            lastaction = (TextView) view.findViewById(R.id.lastdata);
+            seechart = (TextView) view.findViewById(R.id.chartLabel);
+            imgBut = (ImageButton) view.findViewById(R.id.opt);
 
+            datalog = new ArrayList<>();
+            mDbNodeRepo = new dbNodeRepo(context);
         }
     }
 

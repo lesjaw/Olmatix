@@ -564,6 +564,8 @@ public class OlmatixService extends Service {
                         showNotification();
                         dbnode.setTopic((String) text);
                         dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                        dbnode.setChannel("0");
+                        dbnode.setNode_id("0");
                         mDbNodeRepo.insertDbMqtt(dbnode);
                         sendMessageDetail();
                     }
@@ -730,7 +732,7 @@ public class OlmatixService extends Service {
         sendMessage();
 
         listener = new MyLocationListener();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
@@ -995,12 +997,10 @@ public class OlmatixService extends Service {
         data2.clear();
 
         if (online.equals("$online")){
-            Log.d("DEBUG", "online: "+ NodeID);
             //checkValidation(NodeID);
             //installedNodeModel.setNodesID(NodeID);
             data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
-            Log.d("DEBUG", "Online Count DB "+countDB +" "+NodeID);
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     if (data2.get(i).getNice_name_n() != null) {
@@ -1010,7 +1010,6 @@ public class OlmatixService extends Service {
                     }
 
                     lastValue = data2.get(i).getOnline();
-                    Log.d(TAG, "lastValue : "+lastValue);
 
                     if (TextUtils.isEmpty(lastValue)){
                         lastValue = "false";
@@ -1026,6 +1025,8 @@ public class OlmatixService extends Service {
                             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                             dbnode.setTopic(mNiceNameN + " is " + textNode);
                             dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                            dbnode.setNode_id(NodeID);
+                            dbnode.setChannel("0");
                             mDbNodeRepo.insertDbMqtt(dbnode);
 
                             mChange = "2";
@@ -1047,6 +1048,8 @@ public class OlmatixService extends Service {
                             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                             dbnode.setTopic(mNiceNameN + " is " + textNode);
                             dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                            dbnode.setNode_id(NodeID);
+                            dbnode.setChannel("0");
                             mDbNodeRepo.insertDbMqtt(dbnode);
 
                             mChange = "2";
@@ -1077,9 +1080,7 @@ public class OlmatixService extends Service {
         } else if (online.equals("$fwname")) {
             data2.clear();
             data2.addAll(mDbNodeRepo.getNodeListbyNode(NodeID));
-            Log.d(TAG, "NodeFW: "+NodeID +" fwname "+mMessage);
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
-            Log.d(TAG, "CountDB FWname "+countDB);
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
                     String fwnamecheck = data2.get(i).getFwName();
@@ -1304,62 +1305,6 @@ public class OlmatixService extends Service {
         //doSubOnline();
     }
 
-    private void toastAndNotif1() {
-
-        checkActivityForeground();
-        String state = "";
-        detailNodeModel.setNode_id(NodeID);
-        detailNodeModel.setChannel(Channel);
-        data1.addAll(mDbNodeRepo.getNodeDetail(NodeID, Channel));
-        int countDB = mDbNodeRepo.getNodeDetail(NodeID, Channel).size();
-        if (countDB != 0) {
-            for (int i = 0; i < countDB; i++) {
-                if (data1.get(i).getNice_name_d() != null) {
-                    mNiceName = data1.get(i).getNice_name_d();
-                } else {
-                    mNiceName = data1.get(i).getName();
-                }
-                state = data1.get(i).getStatus();
-            }
-        }
-
-        if (state.equals("true") || state.equals("ON")) {
-
-            state = "ON";
-        }
-        if (state.equals("false") || state.equals("OFF")) {
-            state = "OFF";
-        }
-
-        if (mNiceName != null) {
-            if (!state.equals("")) {
-                titleNode = mNiceName;
-                textNode = state;
-                //notifyID = notid;
-                notifyID = 0;
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                final Boolean mSwitch_NotifStatus = sharedPref.getBoolean("switch_notif", true);
-                if (mSwitch_NotifStatus) {
-                    if (!flagOnForeground) {
-                        if (!noNotif) {
-                            showNotificationNode();
-                        }
-                    }
-                }
-            }
-        }
-
-        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-        dbnode.setTopic(mNiceName+" is "+textNode);
-        dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
-        mDbNodeRepo.insertDbMqtt(dbnode);
-        messageReceive.clear();
-        message_topic.clear();
-        data1.clear();
-        textNode="";
-        titleNode="";
-    }
-
     protected void checkActivityForeground() {
         //Log.d(TAG, "start checking for Activity in foreground");
         Intent intent = new Intent();
@@ -1426,6 +1371,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName + " is " + textNode);
                                     dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel("0");
                                     mDbNodeRepo.insertDbMqtt(dbnode);
 
                                     mChange = "2";
@@ -1442,6 +1389,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName + " is " + textNode);
                                     dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel("0");
                                     mDbNodeRepo.insertDbMqtt(dbnode);
 
                                     mChange = "2";
@@ -1465,6 +1414,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName + " is " + textNode);
                                     dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel("0");
                                     mDbNodeRepo.insertDbMqtt(dbnode);
 
                                     mChange = "2";
@@ -1480,6 +1431,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName + " is " + textNode);
                                     dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel("0");
                                     mDbNodeRepo.insertDbMqtt(dbnode);
 
                                     mChange = "2";
@@ -1502,6 +1455,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName + " is " + textNode);
                                     dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel("0");
                                     mDbNodeRepo.insertDbMqtt(dbnode);
 
                                     mChange = "2";
@@ -1517,6 +1472,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName + " is " + textNode);
                                     dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel("0");
                                     mDbNodeRepo.insertDbMqtt(dbnode);
 
                                     mChange = "2";
@@ -1618,6 +1575,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName + " is " + textNode);
                                     dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel("0");
                                     mDbNodeRepo.insertDbMqtt(dbnode);
                                     alarm = 1;
 
@@ -2204,6 +2163,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName+" is "+textNode);
                                     dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel(Channel);
                                     mDbNodeRepo.insertDbMqtt(dbnode);
                                     mDbNodeRepo.update_detail(detailNodeModel);
                                     mChange = "2";
@@ -2228,6 +2189,8 @@ public class OlmatixService extends Service {
                                     SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
                                     dbnode.setTopic(mNiceName+" is "+textNode);
                                     dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                                    dbnode.setNode_id(NodeID);
+                                    dbnode.setChannel(Channel);
                                     mDbNodeRepo.insertDbMqtt(dbnode);
                                     mDbNodeRepo.update_detail(detailNodeModel);
                                     mChange = "2";
@@ -2558,7 +2521,6 @@ public class OlmatixService extends Service {
         @Override
         public void connectionLost(Throwable cause) {
             Log.d(TAG, "connectionLost: "+cause);
-            sendMessage();
             if (cause!=null) {
                 doDisconnect();
             }
@@ -2571,9 +2533,9 @@ public class OlmatixService extends Service {
             doCon=false;
             sendMessage();
             SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-            /*dbnode.setTopic("Connection lost");
+            dbnode.setTopic("Connection lost");
             dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
-            mDbNodeRepo.insertDbMqtt(dbnode);*/
+            mDbNodeRepo.insertDbMqtt(dbnode);
             sendMessageDetail();
             connLose();
 

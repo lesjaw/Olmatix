@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class dbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 24;
 
     // Database Name
     private static final String DATABASE_NAME = "olmatix";
@@ -65,7 +65,9 @@ public class dbHelper extends SQLiteOpenHelper {
         String CREATE_TABLE_MQTT = "CREATE TABLE " + dbNode.TABLE_MQTT  + "("
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
                 + dbNode.KEY_TOPIC + " TEXT, "
-                + dbNode.KEY_MESSAGE + " TEXT)";
+                + dbNode.KEY_MESSAGE + " TEXT,"
+                + dbNode.KEY_NODE_ID + " TEXT, "
+                + dbNode.KEY_CHANNEL + " TEXT) ";
 
         String CREATE_TABLE_NODE_DURATION = "CREATE TABLE " + dbNode.TABLE_NODE_DURATION  + "("
                 + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"

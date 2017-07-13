@@ -14,14 +14,10 @@ public class dbNode {
     public static final String TABLE_NODE_DURATION = "Node_Duration";
     public static final String TABLE_SCENE = "scene";
     public static final String TABLE_SCENE_DETAIL = "scene_detail";
-    public static final String  TABLE_INFO          = "info_data";
-    public static final String  TABLE_LOG          = "log_alarm";
-    public static final String  TABLE_GROUP          = "group_dash";
-    public static final String  TABLE_LOC          = "location";
-
-
-
-
+    public static final String TABLE_INFO          = "info_data";
+    public static final String TABLE_LOG          = "log_alarm";
+    public static final String TABLE_GROUP          = "group_dash";
+    public static final String TABLE_LOC          = "location";
 
     // Labels Table Columns names
     public static final String KEY_ID           = "id";
@@ -53,8 +49,6 @@ public class dbNode {
     public static final String KEY_GROUP_ID  = "group_id" ;
     public static final String KEY_LOC  = "latlong" ;
 
-
-
     public static final String KEY_TOPIC  = "topic" ;
     public static final String KEY_MESSAGE  = "message" ;
     public static final String KEY_TIMESTAMPS_ON  = "timestamp_on" ;
@@ -83,7 +77,7 @@ public class dbNode {
     // property help us to keep data
     public int id;
     public String topic;
-    public String message, log;
+    public String message, log, node_id, channel;
 
     public String getTopic() {
         return topic;
@@ -107,5 +101,21 @@ public class dbNode {
 
     public void setLog(String log) {
         this.log = log;
+    }
+
+    public String getNode_id() {
+        return node_id;
+    }
+
+    public void setNode_id(String node_id) {
+        this.node_id = node_id;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 }

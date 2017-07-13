@@ -64,6 +64,9 @@
             android:name="com.olmatix.ui.activity.AboutActivity"
             android:label="@string/pref_about"></activity>
         <activity
+            android:name="com.olmatix.ui.activity.ChartONOFF"
+            android:label="Chart"></activity>
+        <activity
             android:name="com.olmatix.ui.activity.LoginActivity"
             android:theme="@style/AppTheme.Dark"></activity>
         <activity

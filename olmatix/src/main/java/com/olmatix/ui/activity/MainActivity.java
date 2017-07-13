@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("DEBUG", "MainActivity onStart status connection: "+mStatusServer);
+        //Log.d("DEBUG", "MainActivity onStart status connection: "+mStatusServer);
     }
 
     @Override
@@ -433,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver1, new IntentFilter("MQTTStatusDetail"));
         mStatusServer = sharedPref.getBoolean("conStatus", false);
-        Log.d("DEBUG", "MainActivity onResume status connection: "+mStatusServer);
+        //Log.d("DEBUG", "MainActivity onResume status connection: "+mStatusServer);
 
         if (mStatusServer) {
             imgStatus.setImageResource(R.drawable.ic_conn_green);

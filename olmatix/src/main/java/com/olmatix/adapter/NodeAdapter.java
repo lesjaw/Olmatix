@@ -122,8 +122,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         final InstalledNodeModel mInstalledNodeModel = nodeList.get(position);
         dbNodeRepo = new dbNodeRepo(context);
         this.position1 = position;
-        holder.expandableLayout.collapse(false);
-        holder.imgBut.setSelected(false);
+        //holder.expandableLayout.collapse(false);
+        //holder.imgBut.setSelected(false);
 
         if (mInstalledNodeModel.getOnline() != null) {
             if (mInstalledNodeModel.getOnline().equals("true")) {
@@ -190,7 +190,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             public void onClick(final View v) {
 
                 if (holder != null) {
-                    installedNode.cancelSchedule();
                     holder.imgBut.setSelected(false);
                     holder.expandableLayout.collapse();
                 }

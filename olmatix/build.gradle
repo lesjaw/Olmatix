@@ -7,11 +7,11 @@ android {
         applicationId "com.olmatix.lesjaw.olmatix"
         minSdkVersion 19
         targetSdkVersion 25
-        versionName '1.36'
+        versionName '1.38'
         jackOptions {
             enabled true
         }
-        versionCode 36
+        versionCode 38
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

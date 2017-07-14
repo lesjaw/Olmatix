@@ -127,9 +127,12 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
 
         if (mInstalledNodeModel.getOnline() != null) {
             if (mInstalledNodeModel.getOnline().equals("true")) {
-                holder.imgStatus.setImageResource(R.drawable.ic_check_green);
+                holder.imgStatus.setImageResource(R.drawable.on_indicator);
+                //holder.imgStatus.setColorFilter(Color.GREEN);
             } else {
-                holder.imgStatus.setImageResource(R.drawable.ic_check_red);
+                holder.imgStatus.setImageResource(R.drawable.off_indicator);
+                //holder.imgStatus.setColorFilter(Color.RED);
+
             }
         }
         holder.imgNode.setImageResource(R.drawable.olmatixmed);

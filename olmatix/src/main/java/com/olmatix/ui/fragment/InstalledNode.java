@@ -101,6 +101,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
     Boolean mStatusServer;
     private static String TAG = InstalledNode.class.getSimpleName();
     private CoordinatorLayout coordinatorLayout;
+    boolean onrefresh;
 
     @Nullable
     @Override
@@ -193,9 +194,16 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         }
     }
 
-    class load extends AsyncTask<Void, Integer, String> {
+    private class load extends AsyncTask<Void, Integer, String> {
+
+        View rootView;
+
+        public load(CoordinatorLayout coordinatorLayout) {
+            this.rootView = coordinatorLayout;
+        }
 
         protected void onPreExecute (){
+            onrefresh = true;
 
         }
 
@@ -211,7 +219,7 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     data.addAll(dbNodeRepo.getNodeList());
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data.get(i).getNodesID();
-                        for (int a = 0; a < 5; a++) {
+                        for (int a = 0; a < 7; a++) {
                             String topic = "";
                             if (a == 0) {
                                 topic = "devices/" + mNodeID + "/$online";
@@ -227,6 +235,12 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             }
                             if (a == 4) {
                                 topic = "devices/" + mNodeID + "/$localip";
+                            }
+                            if (a == 5) {
+                                topic = "devices/" + mNodeID + "/$location";
+                            }
+                            if (a == 6) {
+                                topic = "devices/" + mNodeID + "/$calling";
                             }
                             int qos = 2;
                             try {
@@ -259,25 +273,34 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         protected void onPostExecute(String result) {
             setAdapter();
             mFab.show();
-            mSwipeRefreshLayout.setRefreshing(false);
+            //mSwipeRefreshLayout.setRefreshing(false);
+            TSnackbar snackbar = TSnackbar.make(rootView, " Refreshing is half done, continue to each node check..", TSnackbar.LENGTH_LONG);
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+            snackbar.show();
         }
     }
 
     private class getOnline extends AsyncTask<Void, Integer, String> {
+        View rootView;
+        int i;
+        public getOnline(CoordinatorLayout coordinatorLayout) {
+            this.rootView = coordinatorLayout;
+        }
 
         protected void onPreExecute (){
-
+            onrefresh = true;
         }
 
         protected String doInBackground(Void...arg0) {
             Log.d(TAG, "doing http GET: ");
             int countDB = dbNodeRepo.getNodeList().size();
             data.addAll(dbNodeRepo.getNodeList());
-            for (int i = 0; i < countDB; i++) {
+            for (i = 0; i < countDB; i++) {
 
                 try {
                     Thread.currentThread();
-                    Thread.sleep(10000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -297,17 +320,28 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             public void onResponse(String response) {
                                 // Display the first 500 characters of the response string.
                                 Log.d(TAG, "onResponse: " + id_device + " response "+  response);
+                                String state;
 
                                 String result = response.trim();
-                                if (result.equals("false")|| Objects.equals(result, "false")){
-                                    Log.d("DEBUG", "FALSE: "+response);
+                                if (result.equals("false")|| Objects.equals(result, "")){
+                                    //Log.d("DEBUG", "FALSE: "+response);
+                                    state = "OFFLINE";
 
                                 } else {
+                                    state = "ONLINE";
                                     installedNodeModel.setOnline("true");
                                     installedNodeModel.setNodesID(id_device);
                                     dbNodeRepo.updateOnline(installedNodeModel);
                                     updatelist();
                                 }
+                                //Toast.makeText(getActivity(),"Refreshing Node "+id_device +" is done, and it's "+state +
+                                        //", checking next node..",Toast.LENGTH_LONG).show();
+
+                                TSnackbar snackbar = TSnackbar.make(rootView, id_device+" is "+state+", refreshing now & continue to " +
+                                        "node no "+i+" from "+countDB+", "+(countDB-i)+" node left", TSnackbar.LENGTH_LONG);
+                                View snackbarView = snackbar.getView();
+                                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                                snackbar.show();
                             }
                         }, new Response.ErrorListener() {
                     @Override
@@ -328,7 +362,12 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         protected void onPostExecute(String result) {
             setAdapter();
             mFab.show();
+            TSnackbar snackbar = TSnackbar.make(rootView, "We are almost done refreshing, one node left..", TSnackbar.LENGTH_LONG);
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+            snackbar.show();
             mSwipeRefreshLayout.setRefreshing(false);
+            onrefresh = false;
         }
     }
 
@@ -759,12 +798,21 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
     private void setRefresh() {
         onTouchListener(0);
-        //new load().execute();
-        new getOnline().execute();
+        if (!onrefresh) {
+            TSnackbar snackbar = TSnackbar.make(coordinatorLayout, " Refreshing Nodes now..", TSnackbar.LENGTH_LONG);
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+            snackbar.show();
+            new load(coordinatorLayout).execute();
+            new getOnline(coordinatorLayout).execute();
+        } else {
+            Toast.makeText(getActivity(),"Refresh already running in background, " +
+                    "it takes couple of minutes depending your installed nodes",Toast.LENGTH_SHORT).show();
+        }
         //refreshnode();
         //setAdapter();
         mFab.show();
-        mSwipeRefreshLayout.setRefreshing(false);
+        //mSwipeRefreshLayout.setRefreshing(false);
 
     }
 

@@ -168,12 +168,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 }
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
-                holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                holder.imgOnline.setImageResource(R.drawable.on_indicator);
                 holder.imgNode.setBackgroundColor(Color.WHITE);
                 holder.iconstat.setVisibility(View.GONE);
 
             } else {
-                holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+                holder.imgOnline.setImageResource(R.drawable.off_indicator);
                 holder.imgNode.setBackgroundColor(Color.parseColor("#A9A9A9"));
                 holder.iconstat.setVisibility(View.VISIBLE);
             }
@@ -281,11 +281,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             String lastval=mFavoriteModel.getOnline();
             if (lastval!=null && !lastval.equals("")) {
                 if (mFavoriteModel.getOnline().trim().equals("true")) {
-                    holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                    holder.imgOnline.setImageResource(R.drawable.on_indicator);
                     holder.imgNodesBut.setBackgroundColor(Color.WHITE);
                     holder.iconstat.setVisibility(View.GONE);
                 } else {
-                    holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+                    holder.imgOnline.setImageResource(R.drawable.off_indicator);
                     holder.imgNodesBut.setBackgroundColor(Color.parseColor("#A9A9A9"));
                     holder.iconstat.setVisibility(View.VISIBLE);
                 }
@@ -419,11 +419,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
-                holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                holder.imgOnline.setImageResource(R.drawable.on_indicator);
                 holder.imgNode.setBackgroundColor(Color.WHITE);
                 holder.iconstat.setVisibility(View.GONE);
             } else {
-                holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+                holder.imgOnline.setImageResource(R.drawable.off_indicator);
                 holder.imgNode.setBackgroundColor(Color.parseColor("#A9A9A9"));
                 holder.iconstat.setVisibility(View.VISIBLE);
             }
@@ -517,16 +517,16 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
-                holder.imgOnline.setImageResource(R.drawable.ic_check_green);
+                holder.imgOnline.setImageResource(R.drawable.on_indicator);
                 holder.imgNode.setBackgroundColor(Color.WHITE);
                 holder.iconstat.setVisibility(View.GONE);
                 holder.loading.setVisibility(View.GONE);
 
-            } /*else {
-                holder.imgOnline.setImageResource(R.drawable.ic_check_red);
+            } else {
+                holder.imgOnline.setImageResource(R.drawable.off_indicator);
                 holder.imgNode.setBackgroundColor(Color.parseColor("#A9A9A9"));
                 holder.iconstat.setVisibility(View.VISIBLE);
-            }*/
+            }
 
             holder.imgNode.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -536,19 +536,32 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                     Random r = new Random();
                     int i1 = r.nextInt(80 - 65) + 65;
                     if (mStatusServer) {
+                        if (mFavoriteModel.getOnline().trim().equals("true")) {
+                            String topic = "devices/" + mFavoriteModel.getNodeid() + "/$calling";
+                            String payload = "true-" + i1;
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
 
-                        String topic = "devices/" + mFavoriteModel.getNodeid() + "/$calling";
-                        String payload = "true-"+i1;
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
 
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                            Intent i = new Intent(context, ConnectActivity.class);
+                            i.putExtra("node_id", mFavoriteModel.getNodeid()+i1);
+                            context.startActivity(i);
+
+                        }else {
+                            TSnackbar snackbar = TSnackbar.make(v, mFavoriteModel.getNice_name_d()+" Offline, we check this node now" +
+                                    " by sending a request", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            new getOnline(mFavoriteModel.getNodeid(),v).execute();
                         }
                     } else {
                         Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
@@ -556,9 +569,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         intent.putExtra("Connect", "con");
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
-                    Intent i = new Intent(context, ConnectActivity.class);
-                    i.putExtra("node_id", mFavoriteModel.getNodeid()+i1);
-                    context.startActivity(i);
                 }
             });
 
@@ -628,7 +638,7 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 String result = response.trim();
                                 if (result.equals("false")|| Objects.equals(result, "false")){
                                     Log.d("DEBUG", "FALSE: "+response);
-                                    Toast.makeText(context, idnode +" is definetly OFFLINE, please check it",Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(context, idnode +" is definetly OFFLINE, please check it",Toast.LENGTH_SHORT).show();
 
                                     TSnackbar snackbar = TSnackbar.make(rootView, idnode+" is definetly OFFLINE, please check it" +
                                             " by looking at Blue Led indicator, does it blink?", TSnackbar.LENGTH_LONG);
@@ -639,7 +649,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                     installedNodeModel.setOnline("true");
                                     installedNodeModel.setNodesID(idnode);
                                     mDbNodeRepo.updateOnline(installedNodeModel);
-                                    notifyChange();
+                                    TSnackbar snackbar = TSnackbar.make(rootView, idnode+" is ONLINE, refreshing now", TSnackbar.LENGTH_LONG);
+                                    View snackbarView = snackbar.getView();
+                                    snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                                    snackbar.show();
                                 }
                             }
                         }, new Response.ErrorListener() {
@@ -658,7 +671,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         }
 
         protected void onPostExecute(String result) {
-            notifyChange();
+            //notifyChange();
+            Intent intent = new Intent("MQTTStatusDetail");
+            intent.putExtra("NotifyChangeDetail", "2");
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
     }
 

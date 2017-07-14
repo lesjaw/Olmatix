@@ -584,7 +584,7 @@ public class SettingsActivity extends SettingsFragment {
             pref3 = (CheckBoxPreference) findPreference("switch_sensor_motion");
             pref4 = (CheckBoxPreference) findPreference("switch_sensor_prox");
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
                 permis = 1;
             }
 

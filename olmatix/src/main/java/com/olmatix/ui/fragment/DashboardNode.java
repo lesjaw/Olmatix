@@ -177,6 +177,8 @@ public class DashboardNode extends android.support.v4.app.Fragment {
             public void onRefresh() {
                 mSwipeRefreshLayout.setRefreshing(true);
                 setRefresh();
+                setRefresh1(currentgroupid);
+
 
             }
         });

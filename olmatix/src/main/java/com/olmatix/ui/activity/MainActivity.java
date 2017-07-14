@@ -441,8 +441,8 @@ public class MainActivity extends AppCompatActivity {
             imgStatus.setImageResource(R.drawable.ic_conn_red);
             imgStatus.startAnimation(animConn);
         }
-        Intent iA = new Intent(getApplicationContext(), RingtonePlayingService.class);
-        stopService(iA);
+        /*Intent iA = new Intent(getApplicationContext(), RingtonePlayingService.class);
+        stopService(iA);*/
     }
 
     // Override this method to do what you want when the menu is recreated

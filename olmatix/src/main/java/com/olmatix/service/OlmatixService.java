@@ -18,6 +18,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
@@ -133,7 +134,12 @@ public class OlmatixService extends Service {
     private DetailNodeModel detailNodeModel;
     private DurationModel durationModel;
     private String NodeID, Channel, mMessage;
-    private String mNodeID, mNiceName, mNiceNameN, NodeIDSensor, TopicID, mChange = "", connectionResult;
+    private String mNodeID;
+    private String mNiceName;
+    private String NodeIDSensor;
+    private String TopicID;
+    private String mChange = "";
+    private String connectionResult;
     private ArrayList<String> notifications;
     private static final int TWO_MINUTES = 1000 * 60 * 5;
     public LocationManager locationManager;
@@ -152,7 +158,8 @@ public class OlmatixService extends Service {
     dbNode dbnode;
     int alarm;
     String lastValue;
-
+    Uri ringtoneUri;
+    Ringtone ringtoneSound;
 
     PermissionListener permissionlistener = new PermissionListener() {
         @Override
@@ -283,7 +290,7 @@ public class OlmatixService extends Service {
                 editor.putBoolean("conStatus", false);
                 editor.apply();
                 sendMessage();
-                showNotification();
+                showNotification(text);
             }
 
             hasConnectivity = hasMmobile || hasWifi;
@@ -367,7 +374,7 @@ public class OlmatixService extends Service {
             Connection.setClient(mqttClient);
 
             text = "Connecting to server..";
-            showNotification();
+            showNotification(text);
             Log.d(TAG, "doConnect: " + deviceId);
             try {
                 Log.d(TAG, "trying connect ");
@@ -377,7 +384,7 @@ public class OlmatixService extends Service {
                     public void onSuccess(IMqttToken asyncActionToken) {
                         mqttClient.setCallback(new MqttEventCallback());
                         text = "Connected";
-                        showNotification();
+                        showNotification(text);
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putBoolean("conStatus", true);
                         editor.apply();
@@ -516,7 +523,7 @@ public class OlmatixService extends Service {
                                 @Override
                                 public void onSuccess(IMqttToken asyncActionToken) {
                                     text = "Connected";
-                                    showNotification();
+                                    showNotification(text);
                                     SharedPreferences.Editor editor = sharedPref.edit();
                                     editor.putBoolean("conStatus", true);
                                     editor.apply();
@@ -534,7 +541,7 @@ public class OlmatixService extends Service {
                         } catch (MqttException e) {
                             e.printStackTrace();
                             text = "Failed to subscribe";
-                            showNotification();
+                            showNotification(text);
                             editor.putBoolean("conStatus", false);
                             editor.apply();
                             flagConn = false;
@@ -561,7 +568,7 @@ public class OlmatixService extends Service {
                         flagConn = false;
                         sendMessage();
                         sendMessageSplash();
-                        showNotification();
+                        showNotification(text);
                         dbnode.setTopic((String) text);
                         dbnode.setMessage("at " + timeformat.format(System.currentTimeMillis()));
                         dbnode.setChannel("0");
@@ -577,7 +584,7 @@ public class OlmatixService extends Service {
         }
         sendMessage();
         sendMessageSplash();
-        showNotification();
+        //showNotification();
         noNotif = true;
         setFlagSub();
 
@@ -686,7 +693,8 @@ public class OlmatixService extends Service {
         detailNodeModel = new DetailNodeModel();
         durationModel = new DurationModel();
         // Display a notification about us starting.  We put an icon in the status bar.
-        showNotification();
+        text = "Starting";
+        showNotification(text);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter("addNode"));
@@ -707,6 +715,9 @@ public class OlmatixService extends Service {
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.CAMERA)
                 .check();
+
+        ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        ringtoneSound = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
 
         OlmatixAlarmReceiver alarmCheckConn = new OlmatixAlarmReceiver();
         alarmCheckConn.setAlarm(this);
@@ -811,7 +822,7 @@ public class OlmatixService extends Service {
         }
     }
 
-    private void showNotification() {
+    private void showNotification(CharSequence txt) {
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, SplashActivity.class), 0);
@@ -822,7 +833,7 @@ public class OlmatixService extends Service {
                 .setTicker(text)  // the status text
                 .setWhen(System.currentTimeMillis())  // the time stamp
                 .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
-                .setContentText(text)  // the contents of the entry
+                .setContentText(txt)  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .setOngoing(true)
                 .setPriority(Notification.FLAG_FOREGROUND_SERVICE)
@@ -1003,6 +1014,7 @@ public class OlmatixService extends Service {
             int countDB = mDbNodeRepo.getNodeListbyNode(NodeID).size();
             if (countDB != 0) {
                 for (int i = 0; i < countDB; i++) {
+                    String mNiceNameN;
                     if (data2.get(i).getNice_name_n() != null) {
                         mNiceNameN = data2.get(i).getNice_name_n();
                     } else {
@@ -1142,7 +1154,7 @@ public class OlmatixService extends Service {
                 }
             }
 
-        }else if (online.equals("$location")){
+        } else if (online.equals("$location")){
 
             installedNodeModel.setNodesID(NodeID);
             installedNodeModel.setOta(mMessage);
@@ -1582,13 +1594,15 @@ public class OlmatixService extends Service {
 
                                     //playAlarm(1);
                                     checkActivityForeground();
-                                    if (!flagOnForeground){
+                                    /*if (!flagOnForeground){
                                         Intent iA = new Intent(getApplicationContext(), RingtonePlayingService.class);
                                         startService(iA);
-                                    }
-
+                                    }*/
+                                    playAlarm(1);
 
                                 }
+                            } else {
+
                             }
                         }
                     }
@@ -1600,21 +1614,28 @@ public class OlmatixService extends Service {
     }
 
     private void playAlarm (int code){
-        Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        Ringtone ringtoneSound = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
+
+        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int currentVolume = audio.getStreamVolume(AudioManager.STREAM_ALARM);
+        Log.d(TAG, "Current Vol: "+currentVolume);
+        int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+        float percent = 0.7f;
+        int seventyVolume = (int) (maxVolume*percent);
+        audio.setStreamVolume(AudioManager.STREAM_ALARM, seventyVolume, 0);
+        audio.setStreamVolume(AudioManager.STREAM_NOTIFICATION, seventyVolume, 0);
+        audio.setStreamVolume(AudioManager.STREAM_RING, seventyVolume, 0);
+
         if (code==1) {
             if (ringtoneSound != null) {
                 ringtoneSound.play();
                 Log.d(TAG, "playAlarm: ");
+
             }
-        } else {
-            if (ringtoneSound.isPlaying()){
-                ringtoneSound.stop();
-            }
+        }
+        if (code==2){
 
             if (ringtoneSound != null) {
                 ringtoneSound.stop();
-
                 Log.d(TAG, "stopAlarm: ");
 
             }
@@ -2202,7 +2223,7 @@ public class OlmatixService extends Service {
 
                                     alarm=0;
 
-                                    //playAlarm(0);
+                                    playAlarm(2);
                                 }
                             }
                         }
@@ -2310,7 +2331,7 @@ public class OlmatixService extends Service {
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data.get(i).getNodesID();
                         //Log.d("DEBUG", "Count list: " + mNodeID);
-                        for (int a = 0; a < 5; a++) {
+                        for (int a = 0; a < 7; a++) {
                             if (a == 0) {
                                 topic = "devices/" + mNodeID + "/$online";
                             }
@@ -2325,6 +2346,12 @@ public class OlmatixService extends Service {
                             }
                             if (a == 4) {
                                 topic = "devices/" + mNodeID + "/$localip";
+                            }
+                            if (a == 5) {
+                                topic = "devices/" + mNodeID + "/$location";
+                            }
+                            if (a == 6) {
+                                //topic = "devices/" + mNodeID + "/$calling";
                             }
                             int qos = 2;
                             try {

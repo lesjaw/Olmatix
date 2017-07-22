@@ -753,7 +753,7 @@ public class SettingsActivity extends SettingsFragment {
                     final PreferenceHelper mPrefHelper;
                     try {
 
-                       /* if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                        /*if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                                 != PackageManager.PERMISSION_GRANTED ) {
                             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0x1);
                         }*/
@@ -798,7 +798,6 @@ public class SettingsActivity extends SettingsFragment {
                     return true;
                 }
             };
-
         }
 
         private void resetMesg(Preference setLocation) {
@@ -828,9 +827,6 @@ public class SettingsActivity extends SettingsFragment {
             }
            // setLocation.setSummary(mPrefHelper.getHomeLatitude() + " : " + mPrefHelper.getHomeLongitude() );
         }
-
-
-
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

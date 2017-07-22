@@ -152,8 +152,6 @@ public class Scene extends Fragment implements OnStartDragListener {
 
     private void onClickListener() {
         mFab.setOnClickListener(mFabClickListener());
-
-
     }
 
 
@@ -200,8 +198,6 @@ public class Scene extends Fragment implements OnStartDragListener {
 
         };
     }
-
-
 
     private void setupView() {
         mRecycleView = (RecyclerView) mView.findViewById(R.id.rv);

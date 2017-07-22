@@ -617,11 +617,15 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
 
                                 String input = mEditText.getText().toString();
                                 String[] outputDevices = input.split("-");
-                                if (outputDevices[0].equals("cam")){
+                                if (outputDevices[0].equals("cam")|| (outputDevices[0].equals("Cam"))){
                                     addCameNode(outputDevices[1]);
 
                                 } else if (outputDevices[0].equals("OlmatixApp")) {
                                     dosubOlmatixApp(input);
+                                    inputResult = input;
+                                    sendMessage();
+                                } else if (outputDevices[0].equals("gtw")||(outputDevices[0].equals("Gtw"))) {
+
                                     inputResult = input;
                                     sendMessage();
                                 } else {

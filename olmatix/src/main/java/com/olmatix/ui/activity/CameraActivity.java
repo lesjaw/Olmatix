@@ -298,7 +298,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = "true";
+                    String payload = path+":true";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -339,7 +339,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = "480";
+                    String payload = path+":480";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -380,7 +380,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = "360";
+                    String payload = path+":360";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -521,7 +521,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = "true";
+            String payload = path+":true";
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -818,9 +818,12 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
 
         // force surface buffer size
         holder.setFixedSize(mVideoWidth, mVideoHeight);
-        camera_image.getLayoutParams().height = mVideoHeight;
-        camera_image.getLayoutParams().width = mVideoWidth;
-        camera_image.requestLayout();
+
+        ViewGroup.LayoutParams lp1 = camera_image.getLayoutParams();
+        lp1.width = w;
+        lp1.height = h;
+        camera_image.setLayoutParams(lp1);
+        camera_image.invalidate();
 
 
         // set display size
@@ -841,7 +844,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = "true";
+            String payload = path+":true";
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -868,13 +871,14 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     protected void onPause() {
         super.onPause();
         releasePlayer();
+        progressDialog.hide();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = "false";
+            String payload = path+":false";
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -899,13 +903,15 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     protected void onDestroy() {
         super.onDestroy();
         releasePlayer();
+        progressDialog.hide();
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = "false";
+            String payload = path+":false";
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");

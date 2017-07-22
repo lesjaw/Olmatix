@@ -150,7 +150,7 @@ public class OlmatixService extends Service {
     String loc = null;
     IntentFilter filter;
     int numMessages = 0;
-    int count = 0;
+    int count = 0, countloss= 0;
     boolean hasConnectivity = false;
     boolean hasChanged = false;
     SharedPreferences sharedPref;
@@ -642,6 +642,7 @@ public class OlmatixService extends Service {
     @Override
     public void onCreate() {
 
+        countloss = 0;
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
         now.getTimeInMillis();
@@ -2548,24 +2549,28 @@ public class OlmatixService extends Service {
 
         @Override
         public void connectionLost(Throwable cause) {
-            Log.d(TAG, "connectionLost: "+cause);
-            if (cause!=null) {
-                doDisconnect();
+            countloss++;
+            if (countloss==1){
+                Log.d(TAG, "connectionLost: "+cause);
+                if (cause!=null) {
+                    doDisconnect();
+                }
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                mStatusServer = sharedPref.getBoolean("conStatus", false);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("conStatus", false);
+                editor.apply();
+                flagConn = false;
+                doCon=false;
+                sendMessage();
+                SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                dbnode.setTopic("Connection lost");
+                dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                mDbNodeRepo.insertDbMqtt(dbnode);
+                sendMessageDetail();
+                connLose();
             }
-            sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            mStatusServer = sharedPref.getBoolean("conStatus", false);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putBoolean("conStatus", false);
-            editor.apply();
-            flagConn = false;
-            doCon=false;
-            sendMessage();
-            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-            dbnode.setTopic("Connection lost");
-            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
-            mDbNodeRepo.insertDbMqtt(dbnode);
-            sendMessageDetail();
-            connLose();
+
 
         }
 

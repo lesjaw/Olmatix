@@ -7,11 +7,11 @@ android {
         applicationId "com.olmatix.lesjaw.olmatix"
         minSdkVersion 19
         targetSdkVersion 25
-        versionName '1.38'
+        versionName '1.40'
         jackOptions {
             enabled true
         }
-        versionCode 38
+        versionCode 40
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -33,10 +33,11 @@ android {
 }
 
 
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'de.mrmaffen:vlc-android-sdk:2.0.6'
     compile project(':olmatixRTC')
+    compile 'de.mrmaffen:vlc-android-sdk:2.0.6'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:design:25.3.1'
@@ -56,4 +57,5 @@ dependencies {
     compile 'gun0912.ted:tedpermission:1.0.3'
     compile 'com.github.PhilJay:MPAndroidChart:v2.0.9'
     compile 'com.google.android.gms:play-services-maps:10.2.6'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

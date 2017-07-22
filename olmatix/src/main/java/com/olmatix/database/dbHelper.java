@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class dbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 24;
+    private static final int DATABASE_VERSION = 25;
 
     // Database Name
     private static final String DATABASE_NAME = "olmatix";
@@ -140,6 +140,13 @@ public class dbHelper extends SQLiteOpenHelper {
                 + dbNode.KEY_NODE_ID + " TEXT,"
                 + dbNode.KEY_LOC + " TEXT)";
 
+        String CREATE_TABLE_CCTV = "CREATE TABLE " + dbNode.TABLE_CCTV  + "("
+                + dbNode.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                + dbNode.KEY_NODE_ID + " TEXT,"
+                + dbNode.KEY_STATUS + " TEXT,"
+                + dbNode.KEY_NAME + " TEXT,"
+                + dbNode.KEY_IP + " TEXT)";
+
         db.execSQL(CREATE_TABLE_NODE);
         db.execSQL(CREATE_TABLE_NODE_INSTALLED);
         db.execSQL(CREATE_TABLE_FAVORITE);
@@ -151,6 +158,8 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_LOG);
         db.execSQL(CREATE_TABLE_GROUP);
         db.execSQL(CREATE_TABLE_LOC);
+        db.execSQL(CREATE_TABLE_CCTV);
+
 
 
     }
@@ -170,6 +179,8 @@ public class dbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_LOG);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_GROUP);
         db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_LOC);
+        db.execSQL("DROP TABLE IF EXISTS " + dbNode.TABLE_CCTV);
+
 
 
         // Create tables again

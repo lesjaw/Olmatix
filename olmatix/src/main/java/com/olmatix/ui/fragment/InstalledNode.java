@@ -58,6 +58,7 @@ import com.olmatix.helper.SimpleItemTouchHelperCallback;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.ui.activity.CameraActivity;
+import com.olmatix.ui.activity.GatewayActivity;
 import com.olmatix.ui.activity.PhoneActivity;
 import com.olmatix.utils.Connection;
 
@@ -141,7 +142,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                         Log.d(TAG, "onClick: "+camid+" " +fwName);
 
                         if (camid.equals("smartcam")) {
-
                             Intent i = new Intent(getActivity(), CameraActivity.class);
                             i.putExtra("nodeid", data.get(position).getNodesID());
                             i.putExtra("nice_name", nice_name);
@@ -153,8 +153,23 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             i.putExtra("nice_name", nice_name);
                             startActivity(i);
 
-                        } else {
+                        } else if (camid.equals("smartgateway")) {
+                            String state = data.get(position).getOnline();
+                            if (state.equals("true")) {
+                                Intent i = new Intent(getActivity(), GatewayActivity.class);
+                                i.putExtra("nodeid", data.get(position).getNodesID());
+                                i.putExtra("nice_name", nice_name);
+                                startActivity(i);
+                            } else {
+                                TSnackbar snackbar = TSnackbar.make((coordinatorLayout), nice_name + " is OFFLINE!, please check it, " +
+                                        "if led blink something is wrong, slow blink mean no WiFi, " +
+                                        "fast blink mean no Internet", TSnackbar.LENGTH_LONG);
+                                View snackbarView = snackbar.getView();
+                                snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                                snackbar.show();
+                            }
 
+                        } else {
                             String state = data.get(position).getOnline();
                             if (state.equals("true")) {
 

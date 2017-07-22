@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.olmatix.model.AllSceneModel;
+import com.olmatix.model.CCTVModel;
 import com.olmatix.model.DashboardNodeModel;
 import com.olmatix.model.DetailNodeModel;
 import com.olmatix.model.DurationModel;
@@ -99,6 +100,20 @@ public class dbNodeRepo {
         long Id = db.insert(TABLE_MQTT, null, values);
         db.close(); // Closing database connection
         //Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
+        return (int) Id;
+    }
+
+    public int insertCCTV(CCTVModel cctvModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NODE_ID, cctvModel.getNodeId());
+        values.put(KEY_IP, cctvModel.getIp());
+        values.put(KEY_STATUS, cctvModel.getStatus());
+        values.put(KEY_NAME, cctvModel.getName());
+
+        long Id = db.insert(TABLE_CCTV, null, values);
+        db.close(); // Closing database connection
+        Log.d("DEBUG", "insertNode: " + String.valueOf(KEY_NODE_ID));
         return (int) Id;
     }
 
@@ -417,6 +432,17 @@ public class dbNodeRepo {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
         db.delete(TABLE_FAV, dbNode.KEY_ID_NODE_DETAIL + "= ?", new String[]{
+                String.valueOf(node_Id)});
+
+
+        db.close(); // Closing database connection
+    }
+
+    public void deleteCCTV(String node_Id) {
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        // It's a good practice to use parameter ?, instead of concatenate string
+        db.delete(TABLE_CCTV, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
 
@@ -839,6 +865,38 @@ public class dbNodeRepo {
                 //ArrayList<String> node = new ArrayList<>();
                 node.setGroupid(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
                 node.setGroupName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_GROUP_NAME)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        //Log.d("getlist", "getNodeList: " +cursor.getCount());
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
+    public ArrayList<CCTVModel> getIPcamList(String nodesID) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        /*String selectQuery = "SELECT * FROM " + TABLE + " installed_node INNER JOIN " + TABLE_CCTV +
+                " cctv ON installed_node." +KEY_NODE_ID+ "= cctv."+KEY_NODE_ID +
+                " WHERE cctv." + KEY_NODE_ID + " =?";*/
+
+        String selectQuery = "SELECT * FROM Node Inner join cctv ON Node.node_id = cctv.node_id WHERE cctv.node_id =?";
+
+        //Log.d("DEBUG", "getIPcamList: "+selectQuery);
+
+        ArrayList<CCTVModel> nodeList = new ArrayList<CCTVModel>();
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(nodesID)});
+        if (cursor.moveToFirst()) {
+            do {
+                CCTVModel node = new CCTVModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setNodeId(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NODE_ID)));
+                node.setIp(cursor.getString(cursor.getColumnIndex(dbNode.KEY_IP)));
+                node.setName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_NAME)));
+                node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
 
                 nodeList.add(node);
 

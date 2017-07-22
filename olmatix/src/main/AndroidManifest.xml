@@ -77,6 +77,9 @@
         <activity
             android:name="com.olmatix.ui.activity.CameraActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name="com.olmatix.ui.activity.CCTVActivity"
+            android:configChanges="orientation|screenSize" />
         <activity android:name="com.olmatix.ui.activity.PhoneActivity" />
         <activity
             android:name="com.olmatix.ui.activity.scene.ScheduleActivity"

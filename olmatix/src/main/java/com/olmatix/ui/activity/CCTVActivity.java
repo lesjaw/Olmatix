@@ -21,13 +21,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -39,7 +37,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -68,7 +65,6 @@ import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
-import org.w3c.dom.Text;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -90,7 +86,7 @@ import java.util.Date;
  * Created by USER on 02/06/2017.
  */
 
-public class CameraActivity extends AppCompatActivity implements IVLCVout.Callback   {
+public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback   {
 
 
     private String mFilePath;
@@ -116,7 +112,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     RelativeLayout camView;
     ImageView camera_image;
     CheckBox local, cloud;
-    String path, date;
+    String path, date, nicename, ipaddres;
     ArrayList<String> images = new ArrayList<>();
     ArrayList<String> names = new ArrayList<>();
     public static final String TAG_IMAGE_URL = "image";
@@ -181,7 +177,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             String urldisplay = urls[0];
             Bitmap mIcon11 = null;
             try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
+                InputStream in = new URL(urldisplay).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
@@ -259,7 +255,8 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
 
         Intent i = getIntent();
         path = i.getStringExtra("nodeid");
-        String nicename = i.getStringExtra("nice_name");
+        nicename = i.getStringExtra("nice_name");
+        ipaddres = i.getStringExtra("ip");
         mNicename.setText(nicename);
         mFilePath = "rtmp://103.43.47.61/live/"+path;
         progressDialog = new ProgressDialog(this);
@@ -298,7 +295,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = path+":true";
+                    String payload = path+",1280,"+ipaddres;
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -330,7 +327,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             public void onClick(View v) {
                 camera_image.setVisibility(View.GONE);
                 mSurface.setVisibility(View.VISIBLE);
-                mFilePath = "rtmp://103.43.47.61/live/"+path+480;
+                mFilePath = "rtmp://103.43.47.61/live/"+path;
                 Toast.makeText(getApplicationContext(), "Switching to SD", Toast.LENGTH_LONG).show();
 
                 mMode.setText("480p");
@@ -339,7 +336,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = path+":480";
+                    String payload = path+",480,"+ipaddres;
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -371,7 +368,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             public void onClick(View v) {
                 camera_image.setVisibility(View.GONE);
                 mSurface.setVisibility(View.VISIBLE);
-                mFilePath = "rtmp://103.43.47.61/live/"+path+360;
+                mFilePath = "rtmp://103.43.47.61/live/"+path;
                 Toast.makeText(getApplicationContext(), "Switching to LD", Toast.LENGTH_LONG).show();
 
                 mMode.setText("360p");
@@ -380,7 +377,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = path+":360";
+                    String payload = path+",360,"+ipaddres;
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -471,6 +468,13 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             }
         });
 
+        cloud.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
     }
 
     private void setDatePicker(int year, int month, int dayOfMonth) {
@@ -519,9 +523,10 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     private void initload(){
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mStatusServer = sharedPref.getBoolean("conStatus", false);
+
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+":true";
+            String payload = path+",1280,"+ipaddres;
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -677,7 +682,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
             super.onPreExecute();
             System.out.println("Starting download");
 
-            progressDialog = new ProgressDialog(CameraActivity.this);
+            progressDialog = new ProgressDialog(CCTVActivity.this);
             progressDialog.setMessage("Loading... Please wait...");
             progressDialog.setIndeterminate(false);
             progressDialog.setCancelable(false);
@@ -841,7 +846,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+":true";
+            String payload = path+",1280,"+ipaddres;
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -875,7 +880,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+":false";
+            String payload = path+",false,"+ipaddres;
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -908,7 +913,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+":false";
+            String payload = path+",false,"+ipaddres;
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -1036,15 +1041,15 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
     private MediaPlayer.EventListener mPlayerListener = new MyPlayerListener(this);
 
     private class MyPlayerListener implements MediaPlayer.EventListener {
-        private WeakReference<CameraActivity> mOwner;
+        private WeakReference<CCTVActivity> mOwner;
 
-        public MyPlayerListener(CameraActivity owner) {
-            mOwner = new WeakReference<CameraActivity>(owner);
+        public MyPlayerListener(CCTVActivity owner) {
+            mOwner = new WeakReference<CCTVActivity>(owner);
         }
 
         @Override
         public void onEvent(MediaPlayer.Event event) {
-            CameraActivity player = mOwner.get();
+            CCTVActivity player = mOwner.get();
             //Log.d("DEBUG", "Player EVENT");
             switch(event.type) {
                 case MediaPlayer.Event.EndReached:

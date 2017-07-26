@@ -422,6 +422,9 @@ public class dbNodeRepo {
         db.delete(TABLE_NODE_DURATION, dbNode.KEY_NODE_ID + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
+        db.delete(TABLE_CCTV, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(node_Id)});
+
         Log.d("DEBUG", "deleteNode: " + String.valueOf(node_Id));
 
         db.close(); // Closing database connection
@@ -442,7 +445,7 @@ public class dbNodeRepo {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
-        db.delete(TABLE_CCTV, dbNode.KEY_NODE_ID + "= ?", new String[]{
+        db.delete(TABLE_CCTV, dbNode.KEY_NAME + "= ?", new String[]{
                 String.valueOf(node_Id)});
 
 

@@ -3,11 +3,13 @@ package com.olmatix.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +17,13 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.CCTVModel;
 import com.olmatix.ui.activity.CCTVActivity;
-import com.olmatix.ui.activity.CameraActivity;
 import com.olmatix.ui.activity.GatewayActivity;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class CCTVadapter extends BaseAdapter {
     private static LayoutInflater inflater=null;
     private Context context;
     public  static dbNodeRepo mDbNodeRepo;
+    int countdb;
 
     public CCTVadapter(ArrayList<CCTVModel> data, GatewayActivity gatewayActivity) {
         this.context = gatewayActivity;
@@ -44,6 +47,7 @@ public class CCTVadapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        countdb = cctvModel.size();
         return cctvModel.size();
     }
 
@@ -63,38 +67,92 @@ public class CCTVadapter extends BaseAdapter {
         mDbNodeRepo = new dbNodeRepo(context);
 
         //Creating a linear layout
-        LinearLayout linearLayout = new LinearLayout(context);
-        linearLayout.setPadding(20,20,20,20);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        RelativeLayout linearLayout = new RelativeLayout(context);
+        //linearLayout.setPadding(20,20,20,20);
+        //linearLayout.setOrientation(LinearLayout.VERTICAL);
         //Returnint the layout
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int setwd = (int) (dpWidth)+100;
-        Log.d("DEBUG", "dpWidth: "+setwd);
+        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
+        int mVideoWidth = (int) (dpWidth);
+        int mVideoHeight = (int) (dpHeight);
 
+        // get screen size
+        int w = mVideoWidth;
+        int h = mVideoHeight;
+
+        // getWindow().getDecorView() doesn't always take orientation into
+        // account, we have to correct the values
+        boolean isPortrait = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        if (w > h && isPortrait || w < h && !isPortrait) {
+            int i = w;
+            w = h;
+            h = i;
+        }
+
+        float videoAR = (float) mVideoWidth / (float) mVideoHeight;
+        float screenAR = (float) w / (float) h;
+
+        if (screenAR < videoAR)
+            h = (int) (w / videoAR);
+        else
+            w = (int) (h * videoAR);
 
         ImageView img = new ImageView(context);
+        ImageView icon = new ImageView(context);
+        LinearLayout.LayoutParams layoutParams = null;
+        if (countdb>1) {
+           layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    h/2);
+        } else {
+            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    h);
+        }
+        RelativeLayout.LayoutParams layoutParamsicon = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        img.setLayoutParams(new GridView.LayoutParams(setwd,setwd));
+        RelativeLayout.LayoutParams layoutParamsName = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+
+        layoutParams.gravity = Gravity.CENTER;
+        layoutParamsicon.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        layoutParamsicon.addRule(RelativeLayout.CENTER_VERTICAL);
+        layoutParamsName.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        layoutParamsName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        layoutParamsName.setMargins(10,0,0,10);
+        img.setLayoutParams(layoutParams);
         img.setBackgroundColor(Color.BLACK);
-        //img.setImageResource(R.mipmap.smartcctv);
+        icon.setLayoutParams(layoutParamsicon);
+        icon.setImageResource(R.mipmap.smartcctv);
+        icon.setBackgroundColor(Color.BLACK);
+
         //img.getLayoutParams().width = setwd;
-        //img.requestLayout();
+        icon.requestLayout();
+        img.requestLayout();
 
         TextView name = new TextView(context);
         name.setMaxLines(1);
         name.setTextSize(20);
         name.setText(cctvModel.get(position).getName());
+        name.setTextColor(Color.WHITE);
+        name.setPadding(10,5,5,10);
+        name.requestLayout();
 
         TextView IP = new TextView(context);
         IP.setMaxLines(1);
         IP.setTextSize(9);
         IP.setText(cctvModel.get(position).getIp());
+        IP.setTextColor(Color.WHITE);
+        IP.setPadding(10,5,5,10);
+        IP.setLayoutParams(layoutParamsName);
+        IP.requestLayout();
 
         linearLayout.addView(img);
         linearLayout.addView(name);
         linearLayout.addView(IP);
+        linearLayout.addView(icon);
 
         Log.d("DEBUG", "IP: "+cctvModel.get(position).getIp()+" name "+cctvModel.get(position).getName());
 
@@ -120,7 +178,7 @@ public class CCTVadapter extends BaseAdapter {
                 builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mDbNodeRepo.deleteCCTV(String.valueOf(cctvModel.get(position).getNodeId()));
+                        mDbNodeRepo.deleteCCTV(String.valueOf(cctvModel.get(position).getName()));
                         Intent intent = new Intent("cctvadapter");
                         intent.putExtra("NotifyChangeDetail", String.valueOf(2));
                         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

@@ -15,8 +15,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -81,6 +83,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by USER on 02/06/2017.
@@ -135,7 +138,31 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
             if (mChange==null){
                 mChange ="0";
             } else {
+                releasePlayer();
                 String substr = mChange.substring(mChange.length() - 3);
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                mStatusServer = sharedPref.getBoolean("conStatus", false);
+                if (mStatusServer) {
+                    String topic = "devices/" + olmatixgtwID + "/value";
+                    String payload = path+",false,"+ipaddres;
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                    Intent intent1 = new Intent("addNode");
+                    intent1.putExtra("Connect", "con");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
+                }
+
                 if (substr.equals("jpg")){
                     mSurface.setVisibility(View.GONE);
                     new DownloadImageTask((ImageView) findViewById(R.id.camera_image))
@@ -462,6 +489,11 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
                 if (!currentUrlView.equals("")) {
                     Toast.makeText(getApplicationContext(), "Download recording to Phone", Toast.LENGTH_SHORT).show();
                     new DownloadFileFromURL().execute(currentUrlView);
+                    /*try {
+                        takeImgVideo(currentUrlView);
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }*/
                 } else {
                     Toast.makeText(getApplicationContext(), "Please select recording file first!", Toast.LENGTH_SHORT).show();
                 }
@@ -615,7 +647,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
         protected Void doInBackground(Void... arg0) {
 
             RequestQueue requestQueue = Volley.newRequestQueue(getBaseContext());
-            String urlJsonArry = "http://103.43.47.61/rest/list_record.php?date="+date+"&stream="+path;
+            String urlJsonArry = "http://103.43.47.61/rest/list_record.php?date="+date+"&stream="+path+"/"+nicename;
             Log.d("DEBUG", "doInBackground: "+urlJsonArry);
 
             JsonArrayRequest req = new JsonArrayRequest(urlJsonArry,
@@ -1175,6 +1207,57 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void takeImgVideo(String filePath) throws Throwable {
+        Bitmap bitmap = retriveVideoFrameFromVideo(filePath);
+        String mPath = pathThumb + "/" + "Olmatix.jpg";
+        File imageFile = new File(mPath);
+        imageFile.getParentFile().mkdirs();
+        try {
+            OutputStream fout = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fout);
+            fout.flush();
+            fout.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Bitmap retriveVideoFrameFromVideo(String videoPath)
+            throws Throwable
+    {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever mediaMetadataRetriever = null;
+        try
+        {
+            mediaMetadataRetriever = new MediaMetadataRetriever();
+            if (Build.VERSION.SDK_INT >= 14)
+                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
+            else
+                mediaMetadataRetriever.setDataSource(videoPath);
+            //   mediaMetadataRetriever.setDataSource(videoPath);
+            Log.d("DEBUG", "retriveVideoFrameFromVideo: "+videoPath);
+            bitmap = mediaMetadataRetriever.getFrameAtTime();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            throw new Throwable(
+                    "Exception in retriveVideoFrameFromVideo(String videoPath)"
+                            + e.getMessage());
+
+        }
+        finally
+        {
+            if (mediaMetadataRetriever != null)
+            {
+                mediaMetadataRetriever.release();
+            }
+        }
+        return bitmap;
     }
 
     public static Bitmap getBitmapScreenshot(View view) {

@@ -17,10 +17,8 @@ import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import com.androidadvance.topsnackbar.TSnackbar;
@@ -83,8 +81,13 @@ public class GatewayActivity extends AppCompatActivity {
         data.addAll(dbNodeRepo.getIPcamList(node_id));
         int countDB = dbNodeRepo.getIPcamList(node_id).size();
         Log.d("DEBUG", "setupView: "+countDB);
-        adapter = new CCTVadapter(data,this);
+        adapter = new CCTVadapter(data, this);
         list_IPcam.setAdapter(adapter);
+        if (countDB>1) {
+            list_IPcam.setNumColumns(2);
+        } else {
+            list_IPcam.setNumColumns(1);
+        }
 
         btn_crv.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1557,6 +1557,85 @@ public class OlmatixService extends Service {
 
     }
 
+    private void UpdateRGB() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final Boolean mSwitch_NotifStatus = sharedPref.getBoolean("switch_notif", true);
+        if (!mNodeID.contains("light")) {
+            detailNodeModel.setNode_id(NodeID);
+            detailNodeModel.setChannel(Channel);
+
+            data1.addAll(mDbNodeRepo.getNodeDetail(NodeID, Channel));
+            int countDB = mDbNodeRepo.getNodeDetail(NodeID, Channel).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    if (data1.get(i).getNice_name_d() != null) {
+                        mNiceName = data1.get(i).getNice_name_d();
+                    } else {
+                        mNiceName = data1.get(i).getName();
+                    }
+                    lastValue = data1.get(i).getStatus();
+
+                    if (TextUtils.isEmpty(lastValue)){
+                        lastValue = "off";
+                    }
+
+                    if (!mMessage.equals("off")) {
+                        Log.d(TAG, "UpdateRGB: "+mMessage);
+                            detailNodeModel.setStatus(mMessage);
+                            saveOnTime();
+                            titleNode = mNiceName;
+                            textNode = "ON";
+                            if (mSwitch_NotifStatus) {
+                                if (!flagOnForeground) {
+                                    if (!noNotif) {
+                                        showNotificationNode();
+                                    }
+                                }
+                            }
+                            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                            dbnode.setTopic(mNiceName+" is "+textNode);
+                            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                            dbnode.setNode_id(NodeID);
+                            dbnode.setChannel(Channel);
+                            mDbNodeRepo.insertDbMqtt(dbnode);
+                            mDbNodeRepo.update_detail(detailNodeModel);
+                            mChange = "2";
+                            sendMessageDetail();
+                            lastValue="";
+
+
+                    } else if (mMessage.equals("off")) {
+                            detailNodeModel.setStatus(mMessage);
+                            titleNode = mNiceName;
+                            textNode = "OFF";
+                            saveOffTime();
+                            if (mSwitch_NotifStatus) {
+                                if (!flagOnForeground) {
+                                    if (!noNotif) {
+
+                                        showNotificationNode();
+                                    }
+                                }
+                            }
+                            SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                            dbnode.setTopic(mNiceName+" is "+textNode);
+                            dbnode.setMessage("at "+timeformat.format(System.currentTimeMillis()));
+                            dbnode.setNode_id(NodeID);
+                            dbnode.setChannel(Channel);
+                            mDbNodeRepo.insertDbMqtt(dbnode);
+                            mDbNodeRepo.update_detail(detailNodeModel);
+                            mChange = "2";
+                            sendMessageDetail();
+                            lastValue="";
+                    }
+                }
+            }
+
+            data1.clear();
+        }
+
+    }
+
     private void updateSensorTheft() {
         if (!mNodeID.contains("light")) {
             detailNodeModel.setNode_id(NodeIDSensor);
@@ -1721,7 +1800,8 @@ public class OlmatixService extends Service {
                         durationModel.setChannel(String.valueOf(i));
                         durationModel.setStatus("false");
                         durationModel.setTimeStampOn((long) 0);
-                        //durationModel.setTimeStampOff((long) 0);
+                        durationModel.setTimeStampOff((long) 0);
+
                         durationModel.setDuration((long) 0);
 
                         mDbNodeRepo.insertDurationNode(durationModel);
@@ -1768,7 +1848,7 @@ public class OlmatixService extends Service {
                         durationModel.setChannel(String.valueOf(i));
                         durationModel.setStatus("false");
                         durationModel.setTimeStampOn((long) 0);
-                        //durationModel.setTimeStampOff((long) 0);
+                        durationModel.setTimeStampOff((long) 0);
                         durationModel.setDuration((long) 0);
 
                         mDbNodeRepo.insertDurationNode(durationModel);
@@ -1917,6 +1997,7 @@ public class OlmatixService extends Service {
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel("0");
                     durationModel.setTimeStampOn((long) 0);
+                    durationModel.setTimeStampOff((long) 0);
                     durationModel.setDuration((long) 0);
 
                     mDbNodeRepo.insertDurationNode(durationModel);
@@ -1969,6 +2050,7 @@ public class OlmatixService extends Service {
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel("0");
                     durationModel.setTimeStampOn((long) 0);
+                    durationModel.setTimeStampOff((long) 0);
                     durationModel.setDuration((long) 0);
 
                     mDbNodeRepo.insertDurationNode(durationModel);
@@ -2026,6 +2108,7 @@ public class OlmatixService extends Service {
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel("0");
                     durationModel.setTimeStampOn((long) 0);
+                    durationModel.setTimeStampOff((long) 0);
                     durationModel.setDuration((long) 0);
 
                     mDbNodeRepo.insertDurationNode(durationModel);
@@ -2054,7 +2137,57 @@ public class OlmatixService extends Service {
                         }
                     }
                 }
-            }  else if (installedNodeModel.getFwName().equals("smartcam")) {
+            }  else if (installedNodeModel.getFwName().equals("smartrgb")) {
+                detailNodeModel.setNode_id(NodeID);
+                detailNodeModel.setChannel("0");
+                if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
+                } else {
+                    detailNodeModel.setNode_id(NodeID);
+                    detailNodeModel.setChannel("0");
+                    detailNodeModel.setStatus("false");
+                    detailNodeModel.setNice_name_d(NodeID);
+                    detailNodeModel.setSensor("rgb");
+
+                    mDbNodeRepo.insertInstalledNode(detailNodeModel);
+
+                    durationModel.setNodeId(NodeID);
+                    durationModel.setChannel("0");
+                    durationModel.setStatus("false");
+                    durationModel.setTimeStampOn((long) 0);
+                    durationModel.setTimeStampOff((long) 0);
+
+                    durationModel.setDuration((long) 0);
+
+                    mDbNodeRepo.insertDurationNode(durationModel);
+
+                    for (int a = 0; a < 2; a++) {
+                        if (a == 0) {
+                            topic1 = "devices/" + NodeID + "/led/color/set";
+                        }
+                        if (a == 1) {
+                            topic1 = "devices/" + NodeID + "/dim/dimmer/set";
+                        }
+
+                        int qos = 2;
+                        try {
+                            IMqttToken subToken = Connection.getClient().subscribe(topic1, qos);
+                            subToken.setActionCallback(new IMqttActionListener() {
+                                @Override
+                                public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.d("SubscribeSensor", " device = " + mNodeID);
+                                }
+
+                                @Override
+                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                }
+                            });
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            } else if (installedNodeModel.getFwName().equals("smartcam")) {
                 detailNodeModel.setNode_id(NodeID);
                 detailNodeModel.setChannel("0");
                 if (mDbNodeRepo.hasDetailObject(detailNodeModel)) {
@@ -2072,6 +2205,7 @@ public class OlmatixService extends Service {
                     durationModel.setNodeId(NodeID);
                     durationModel.setChannel("0");
                     durationModel.setTimeStampOn((long) 0);
+                    durationModel.setTimeStampOff((long) 0);
                     durationModel.setDuration((long) 0);
 
                     mDbNodeRepo.insertDurationNode(durationModel);
@@ -2151,7 +2285,8 @@ public class OlmatixService extends Service {
 
                 if (!mNodeID.contains("door/close")||
                         !mNodeID.contains("motion/motion")||
-                        !mNodeID.contains("prox/status")) {
+                        !mNodeID.contains("prox/status")||
+                        !mNodeID.contains("led/color")){
                     detailNodeModel.setNode_id(NodeID);
                     detailNodeModel.setChannel(Channel);
 
@@ -2606,6 +2741,9 @@ public class OlmatixService extends Service {
 
             } else if (mNodeID.contains("dist/range")) {
                 UpdateSensorRange();
+
+            }  else if (mNodeID.contains("led/color/set")) {
+                UpdateRGB();
 
             } else   {
                 updateDetail();

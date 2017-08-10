@@ -155,6 +155,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                 holder.imgNode.setImageResource(R.mipmap.phone);
             }else if (mInstalledNodeModel.getFwName().equals("smartgateway")) {
                 holder.imgNode.setImageResource(R.mipmap.gateway);
+            } else if (mInstalledNodeModel.getFwName().equals("smartrgb")) {
+                holder.imgNode.setImageResource(R.mipmap.smartrgb);
             }
         }
         holder.imgStatus.setOnTouchListener(new View.OnTouchListener() {
@@ -400,7 +402,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     public void removeItem(int position) {
 
         String mNodeID = nodeList.get(position).getNodesID();
-        for (int a=0; a < 22 ;a++) {
+        for (int a=0; a < 24 ;a++) {
             if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
             if (a == 1) {topic = "devices/" + mNodeID + "/$fwname";}
             if (a == 2) {topic = "devices/" + mNodeID + "/$signal";}
@@ -423,6 +425,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             if (a == 19) {topic = "devices/" + mNodeID + "/dist/range";}
             if (a == 20) {topic = "devices/" + mNodeID + "/$calling";}
             if (a == 21) {topic = "devices/" + mNodeID + "/$location";}
+            if (a == 22) {topic = "devices/" + mNodeID + "/led/color/set";}
+            if (a == 23) {topic = "devices/" + mNodeID + "/dim/dimmer/set";}
 
             try {
                 Connection.getClient().unsubscribe(topic);

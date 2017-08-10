@@ -271,7 +271,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         populatedate();
 
         setupToolbar();
-        initload();
+        //initload();
         new GetRecord().execute();
 
         images = new ArrayList<>();
@@ -841,7 +841,7 @@ public class CameraActivity extends AppCompatActivity implements IVLCVout.Callba
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+":true";
+            String payload = path+":1280:";
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");

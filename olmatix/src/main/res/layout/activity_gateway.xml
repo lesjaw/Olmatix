@@ -29,7 +29,7 @@
         android:layout_height="70sp"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="20sp"
-        android:src="@android:drawable/btn_plus"
+        android:src="@mipmap/cctv"
         android:layout_centerVertical="true"
         android:stateListAnimator="@null"
         android:theme="@style/AppTheme.Button" />

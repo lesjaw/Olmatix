@@ -1,5 +1,8 @@
 package com.olmatix.adapter;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -29,6 +33,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.androidadvance.topsnackbar.TSnackbar;
+import com.github.ybq.android.spinkit.style.ChasingDots;
+import com.github.ybq.android.spinkit.style.CubeGrid;
+import com.github.ybq.android.spinkit.style.DoubleBounce;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.lesjaw.olmatix.R;
@@ -143,9 +150,12 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
         return null;
     }
 
+
+
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         final DashboardNodeModel mFavoriteModel = nodeList.get(position);
+        //CubeGrid doubleBounce = new CubeGrid();
 
         if ((mFavoriteModel.getSensor().trim()).equals("light")) {
 
@@ -158,14 +168,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
             if (lastval!=null && !lastval.equals("")) {
                 if (mFavoriteModel.getStatus().trim().equals("false")) {
                     holder.imgNode.setImageResource(R.drawable.offlamp1);
-                    holder.loading.setVisibility(View.GONE);
-
-
                 } else {
                     holder.imgNode.setImageResource(R.drawable.onlamp1);
-                    holder.loading.setVisibility(View.GONE);
-
                 }
+                holder.loading.setVisibility(View.GONE);
             }
             if (mFavoriteModel.getOnline().trim().equals("true")) {
                 holder.imgOnline.setImageResource(R.drawable.on_indicator);
@@ -202,7 +208,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                 Connection.getClient().publish(topic, message);
                                 holder.loading.setVisibility(View.VISIBLE);
                                 holder.loading.setScaleY(4f);
-
 
                             } catch (UnsupportedEncodingException | MqttException e) {
                                 e.printStackTrace();

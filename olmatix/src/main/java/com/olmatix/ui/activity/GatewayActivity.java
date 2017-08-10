@@ -37,6 +37,7 @@ public class GatewayActivity extends AppCompatActivity {
     private static ArrayList<CCTVModel> data;
     private Activity mActivity;
     CCTVadapter adapter;
+    GridView list_IPcam;
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -74,13 +75,13 @@ public class GatewayActivity extends AppCompatActivity {
     private void setupView(){
         coordinatorLayout=(LinearLayout)findViewById(R.id.main_content);
         CardView btn_crv = (CardView) findViewById(R.id.cv1);
-        GridView list_IPcam = (GridView) findViewById(R.id.grid);
+        list_IPcam = (GridView) findViewById(R.id.grid);
         //ImageButton btn_config = (ImageButton) findViewById(R.id.btn_config);
 
         data.clear();
         data.addAll(dbNodeRepo.getIPcamList(node_id));
         int countDB = dbNodeRepo.getIPcamList(node_id).size();
-        Log.d("DEBUG", "setupView: "+countDB);
+        Log.d("DEBUG", "setupView: "+node_id);
         adapter = new CCTVadapter(data, this);
         list_IPcam.setAdapter(adapter);
         if (countDB>1) {
@@ -120,6 +121,7 @@ public class GatewayActivity extends AppCompatActivity {
                                 cctvModel.setIp(input);
                                 cctvModel.setName(labelcctv);
                                 dbNodeRepo.insertCCTV(cctvModel);
+                                refresh();
 
                             }
                         }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -129,6 +131,20 @@ public class GatewayActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void refresh(){
+        data.clear();
+        data.addAll(dbNodeRepo.getIPcamList(node_id));
+        int countDB = dbNodeRepo.getIPcamList(node_id).size();
+        Log.d("DEBUG", "setupView: "+countDB);
+        adapter = new CCTVadapter(data, this);
+        list_IPcam.setAdapter(adapter);
+        if (countDB>1) {
+            list_IPcam.setNumColumns(2);
+        } else {
+            list_IPcam.setNumColumns(1);
+        }
     }
 
     private void setupToolbar(){

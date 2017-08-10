@@ -115,7 +115,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
     RelativeLayout camView;
     ImageView camera_image;
     CheckBox local, cloud;
-    String path, date, nicename, ipaddres;
+    String path, date, nicename, ipaddres, nodeid;
     ArrayList<String> images = new ArrayList<>();
     ArrayList<String> names = new ArrayList<>();
     public static final String TAG_IMAGE_URL = "image";
@@ -144,7 +144,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = path+",false,"+ipaddres;
+                    String payload = path+";false;"+ipaddres;
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -278,11 +278,12 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
         local = (CheckBox) findViewById(R.id.localrecord);
         cloud = (CheckBox) findViewById(R.id.cloudrecord);
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        olmatixgtwID = "OlmatixGtw-"+sharedPref.getString("CamGateway", "xxxx");
+        //olmatixgtwID = "OlmatixGtw-"+sharedPref.getString("CamGateway", "xxxx");
 
         Intent i = getIntent();
-        path = i.getStringExtra("nodeid");
+        nodeid = i.getStringExtra("nodeid");
         nicename = i.getStringExtra("nice_name");
+        path = nodeid+"-"+nicename;
         ipaddres = i.getStringExtra("ip");
         mNicename.setText(nicename);
         mFilePath = "rtmp://103.43.47.61/live/"+path;
@@ -291,11 +292,11 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setMessage("Loading your CCTV view, please wait..");
         progressDialog.show();
-
+        olmatixgtwID = nodeid;
         populatedate();
 
         setupToolbar();
-        initload();
+        //initload();
         new GetRecord().execute();
 
         images = new ArrayList<>();
@@ -317,12 +318,12 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
                 Toast.makeText(getApplicationContext(), "Switching to HD", Toast.LENGTH_LONG).show();
 
                 mMode.setText("HD");
-
+                Log.d("DEBUG", "Start Streaming Click: ");
                 sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = path+",1280,"+ipaddres;
+                    String payload = path+";1280;"+ipaddres;
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -363,7 +364,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = path+",480,"+ipaddres;
+                    String payload = path+";480;"+ipaddres;
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -404,7 +405,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
                 mStatusServer = sharedPref.getBoolean("conStatus", false);
                 if (mStatusServer) {
                     String topic = "devices/" + olmatixgtwID + "/value";
-                    String payload = path+",360,"+ipaddres;
+                    String payload = path+";360;"+ipaddres;
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -503,7 +504,68 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
         cloud.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                mStatusServer = sharedPref.getBoolean("conStatus", false);
 
+                if (mStatusServer) {
+                    String payload = null;
+                    String topic = "devices/" + olmatixgtwID + "/value";
+                    if (cloud.isChecked()) {
+                        payload = path + ";cloudsr;" + ipaddres;
+                    } else {
+                        payload = path + ";cloudsp;" + ipaddres;
+                    }
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent("addNode");
+                    intent.putExtra("Connect", "con");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                }
+            }
+        });
+
+        local.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                mStatusServer = sharedPref.getBoolean("conStatus", false);
+
+                if (mStatusServer) {
+                    String topic = "devices/" + olmatixgtwID + "/value";
+                    String payload = null;
+                    if (local.isChecked()) {
+                        payload = path + ";localsr;" + ipaddres;
+                    } else {
+                        payload = path + ";localsp;" + ipaddres;
+                    }
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent("addNode");
+                    intent.putExtra("Connect", "con");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                }
             }
         });
 
@@ -558,7 +620,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
 
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+",1280,"+ipaddres;
+            String payload = path+";1280;"+ipaddres;
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -566,6 +628,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
                 message.setQos(1);
                 message.setRetained(true);
                 Connection.getClient().publish(topic, message);
+                Log.d("DEBUG", "Start Streaming: "+topic);
 
             } catch (UnsupportedEncodingException | MqttException e) {
                 e.printStackTrace();
@@ -647,7 +710,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
         protected Void doInBackground(Void... arg0) {
 
             RequestQueue requestQueue = Volley.newRequestQueue(getBaseContext());
-            String urlJsonArry = "http://103.43.47.61/rest/list_record.php?date="+date+"&stream="+path+"/"+nicename;
+            String urlJsonArry = "http://103.43.47.61/rest/list_record_new.php?date="+date+"&stream="+path;
             Log.d("DEBUG", "doInBackground: "+urlJsonArry);
 
             JsonArrayRequest req = new JsonArrayRequest(urlJsonArry,
@@ -873,12 +936,12 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
     @Override
     protected void onResume() {
         super.onResume();
-
+        Log.d("DEBUG", "Start Streaming Resume: ");
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+",1280,"+ipaddres;
+            String payload = path+";1280;"+ipaddres;
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -912,7 +975,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+",false,"+ipaddres;
+            String payload = path+";false;"+ipaddres;
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");
@@ -945,7 +1008,7 @@ public class CCTVActivity extends AppCompatActivity implements IVLCVout.Callback
         mStatusServer = sharedPref.getBoolean("conStatus", false);
         if (mStatusServer) {
             String topic = "devices/" + olmatixgtwID + "/value";
-            String payload = path+",false,"+ipaddres;
+            String payload = path+";false;"+ipaddres;
             byte[] encodedPayload = new byte[0];
             try {
                 encodedPayload = payload.getBytes("UTF-8");

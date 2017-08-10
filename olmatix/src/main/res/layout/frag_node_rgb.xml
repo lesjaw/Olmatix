@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="0dp"
+    android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/cv"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+                        android:padding="10dp">
+
+                        <ImageView
+                            android:layout_width="70sp"
+                            android:layout_height="70sp"
+                            android:id="@+id/icon_node"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginRight="16dp"
+                            android:fitsSystemWindows="true"
+                            />
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/node_name"
+                            android:layout_toRightOf="@+id/icon_node"
+                            android:layout_alignParentTop="true"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:text="Node Name"
+                            />
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/status"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginLeft="0sp"
+                            android:paddingLeft="5sp"
+                            android:layout_toRightOf="@+id/icon_node"
+                            android:layout_below="@+id/node_name"
+                            android:text="NOT ARMED"
+                            android:background="@drawable/border"
+                            />
+
+                        <Button
+                            android:id="@+id/btn_off"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="15sp"
+                            android:text="OFF"
+                            android:layout_alignParentRight="true"
+                            android:layout_below="@+id/status"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:theme="@style/AppTheme.Button_off" />
+
+                        <Button
+                            android:id="@+id/btn_on"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="15sp"
+                            android:layout_below="@id/status"
+                            android:layout_toLeftOf="@id/btn_off"
+                            android:text="ON"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:theme="@style/AppTheme.Button_on"/>
+
+                        <com.flask.colorpicker.ColorPickerView
+                            android:id="@+id/color_picker_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:alphaSlider="true"
+                            app:density="12"
+                            app:lightnessSlider="true"
+                            app:wheelType="FLOWER"
+                            app:lightnessSliderView="@+id/v_lightness_slider"
+                            app:alphaSliderView="@+id/v_alpha_slider"
+                            android:layout_below="@+id/btn_on"
+                            />
+
+                        <com.flask.colorpicker.slider.LightnessSlider
+                            android:id="@+id/v_lightness_slider"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_below="@+id/color_picker_view"
+                            />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/fw_name"
+                            android:textSize="10sp"
+                            android:text="fw Name"
+                            android:paddingTop="5sp"
+                            android:layout_marginLeft="20sp"
+                            android:layout_below="@+id/v_lightness_slider"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/mode"
+                            android:layout_width="40sp"
+                            android:layout_height="40sp"
+                            android:layout_below="@+id/icon_node"
+                            android:src="@android:drawable/ic_menu_view"
+                            android:stateListAnimator="@null"
+                            android:theme="@style/AppTheme.Button"
+                            android:scaleType="fitXY"
+                            />
+
+
+
+                        <ImageButton
+                            android:id="@+id/opt"
+                            android:layout_width="40sp"
+                            android:layout_height="40sp"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_below="@+id/v_lightness_slider"
+                            android:src="@android:drawable/ic_menu_view"
+                            android:stateListAnimator="@null"
+                            android:theme="@style/AppTheme.Button"
+                            android:scaleType="fitXY"
+                            />
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/red"
+                android:layout_below="@+id/opt"
+                android:layout_marginTop="10sp"
+                android:max="100"/>
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/green"
+                android:layout_below="@+id/red"
+                android:layout_marginTop="10sp"
+                android:max="100"/>
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/blue"
+                android:layout_below="@+id/green"
+                android:layout_marginTop="10sp"
+                android:max="100"/>
+
+                        <net.cachapa.expandablelayout.ExpandableLayout
+                            android:id="@+id/expandable_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/colorPrimaryDark"
+                            app:el_duration="300"
+                            app:el_expanded="true"
+                            android:layout_below="@id/opt">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/chartLabel"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:elevation="4dp"
+                                    android:gravity="center"
+                                    android:padding="16dp"
+                                    android:text="See Chart"
+                                    android:textColor="@color/white"
+                                    android:theme="@style/AppTheme.Button"/>
+
+                                <TextView
+                                    android:id="@+id/lastdata"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_toRightOf="@+id/chartLabel"
+                                    android:elevation="4dp"
+                                    android:gravity="center"
+                                    android:padding="16dp"
+                                    android:text="Last action"
+                                    android:textColor="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/API1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/chartLabel"
+                                    android:elevation="4dp"
+                                    android:gravity="left"
+                                    android:padding="5dp"
+                                    android:text="API ON/OFF"
+                                    android:textColor="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/API2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/API1"
+                                    android:elevation="4dp"
+                                    android:gravity="left"
+                                    android:padding="5dp"
+                                    android:text="API Status"
+                                    android:textColor="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/labelapi"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/API2"
+                                    android:elevation="4dp"
+                                    android:gravity="left"
+                                    android:layout_marginTop="10sp"
+                                    android:padding="5dp"
+                                    android:text="Click those API above to copy or share"
+                                    android:textColor="@color/white" />
+
+                            </RelativeLayout>
+
+                        </net.cachapa.expandablelayout.ExpandableLayout>
+
+
+                    </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

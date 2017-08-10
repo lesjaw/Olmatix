@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,6 +30,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidadvance.topsnackbar.TSnackbar;
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorChangedListener;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.slider.LightnessSlider;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -116,6 +122,11 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     .inflate(R.layout.frag_node_sensor_prox, parent, false);
 
             return new OlmatixSensorProxHolder(itemView);
+        } else if (fw_name.equals("smartrgb")) {
+            itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.frag_node_rgb, parent, false);
+
+            return new OlmatixRGBHolder(itemView);
         }
 
         return null;
@@ -1212,6 +1223,368 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     context.startActivity(i);
                 }
             });
+        } else if (fw_name.equals("smartrgb")) {
+            final OlmatixRGBHolder holder = (OlmatixRGBHolder) viewHolder;
+
+            holder.colorPickerView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    holder.colclick=0;
+
+                    return false;
+                }
+            });
+
+            holder.redSl.setVisibility(View.GONE);
+            holder.greenSl.setVisibility(View.GONE);
+            holder.blueSl.setVisibility(View.GONE);
+            final int[] tog = {0};
+            holder.mode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    if (tog[0] ==0) {
+                        holder.redSl.setVisibility(View.VISIBLE);
+                        holder.greenSl.setVisibility(View.VISIBLE);
+                        holder.blueSl.setVisibility(View.VISIBLE);
+                        holder.colorPickerView.setVisibility(View.GONE);
+                        holder.v_lightness_slider.setVisibility(View.GONE);
+
+                        tog[0] =1;
+                    } else {
+                        holder.redSl.setVisibility(View.GONE);
+                        holder.greenSl.setVisibility(View.GONE);
+                        holder.blueSl.setVisibility(View.GONE);
+                        holder.colorPickerView.setVisibility(View.VISIBLE);
+                        holder.v_lightness_slider.setVisibility(View.VISIBLE);
+
+                        tog[0] =0;
+                    }
+
+                }
+            });
+
+            holder.redSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int value = (progress);
+                    Log.d("DEBUG", "onProgressChanged: "+value);
+                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dim/dimmer/set";
+                    String payload = "0,"+String.valueOf(value);
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            holder.greenSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int value =(progress);
+                    Log.d("DEBUG", "onProgressChanged: "+value);
+                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dim/dimmer/set";
+                    String payload = "1,"+String.valueOf(value);
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            holder.blueSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int value = (progress);
+                    Log.d("DEBUG", "onProgressChanged: "+value);
+                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dim/dimmer/set";
+                    String payload = "2,"+String.valueOf(value);
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            holder.colorPickerView.addOnColorChangedListener(new OnColorChangedListener() {
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                @Override public void onColorChanged(int selectedColor) {
+                    // Handle on color change
+                    //holder.colclick=0;
+
+                    if (holder.colclick==0) {
+                        holder.colclick=1;
+                        int red = Color.red(selectedColor);
+                        int green = Color.green(selectedColor);
+                        int blue = Color.blue(selectedColor);
+                        Log.d("ColorPicker", "onColorChanged: red" + red + " green " + green + " blue " + blue);
+                        holder.status.setText("RGB(" + red + "," + green + "," + blue + ")");
+                        holder.imgNode.setImageResource(R.mipmap.smartrgb);
+                        holder.imgNode.setImageTintList(ColorStateList.valueOf(selectedColor));
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                            String payload = "rgb(" + red + "," + green + "," + blue + ")";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                        /*TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();*/
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+                    }
+                }
+            });
+            holder.colorPickerView.addOnColorSelectedListener(new OnColorSelectedListener() {
+                @Override
+                public void onColorSelected(int selectedColor) {
+
+                }
+            });
+
+
+            //holder.imgNode.setImageResource(R.drawable.olmatixmed);
+            if (mInstalledNodeModel.getNice_name_d() != null) {
+                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+            } else {
+                holder.node_name.setText(mInstalledNodeModel.getName());
+            }
+            String ch = mInstalledNodeModel.getChannel();
+            String dateString = null;
+            datalog.clear();
+            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
+            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
+            if (countDB != 0) {
+                for (int i = 0; i < countDB; i++) {
+                    String Nodeid = datalog.get(i).getNodeid();
+                    String chan = datalog.get(i).getChannel();
+                    String on = datalog.get(i).getOn();
+                    String off = datalog.get(i).getOff();
+                    String timestamps;
+                    if (off.equals("0")||off == null){
+                        timestamps = on;
+                    } else  {
+                        timestamps = off;
+                    }
+
+                    //String time = timestamps.getText().toString();
+
+                    long timestampsformat = Long.parseLong(timestamps);;
+
+                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                    dateString = timeformat.format(new Date(timestampsformat));
+                }
+            }
+
+            holder.lastaction.setText("Last log : "+dateString);
+            holder.fwName.setText(mInstalledNodeModel.getNode_id()+" Channel : "+ch);
+            holder.status.setText(mInstalledNodeModel.getStatus());
+
+            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
+            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel();
+            holder.api2.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget2);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
+            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
+            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
+                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
+            holder.api1.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", apiget1);
+                    clipboard.setPrimaryClip(clip);
+
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                    sendIntent.setType("text/plain");
+                    context.startActivity(sendIntent);
+                }
+            });
+
+
+            holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    if (mStatusServer) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                        String payload = "rgb(255,255,255)";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.status.setText(" ON");
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                    }
+
+                }
+            });
+
+            holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                    mStatusServer = sharedPref.getBoolean("conStatus", false);
+                    Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                    if (mStatusServer) {
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                        String payload = "rgb(0,0,0)";
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+                            holder.status.setText(" OFF");
+                            holder.colclick=0;
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();
+                        Intent intent = new Intent("addNode");
+                        intent.putExtra("Connect", "con");
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                    }
+
+                }
+
+            });
+
+            holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+
+                    if (holder != null) {
+                        holder.imgBut.setSelected(false);
+                        holder.expandableLayout.collapse();
+                    }
+
+                    if (position1 == selectedItem) {
+                        selectedItem = UNSELECTED;
+                    } else {
+                        holder.imgBut.setSelected(true);
+                        holder.expandableLayout.expand();
+                        selectedItem = position1;
+                    }
+                }
+            });
+
+            holder.seechart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, ChartONOFF.class);
+                    //i.putExtra("nodeid", data.get(position).getNodesID());
+                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                    context.startActivity(i);
+                }
+            });
         }
 
 
@@ -1344,6 +1717,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         ExpandableLayout expandableLayout;
         ImageButton imgBut;
 
+
         public OlmatixSensorProxHolder(View view) {
             super(view);
             imgNode = (ImageView) view.findViewById(R.id.icon_node);
@@ -1366,6 +1740,45 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             imgBut = (ImageButton) view.findViewById(R.id.opt);
             api1 = (TextView) view.findViewById(R.id.API1);
             api2 = (TextView) view.findViewById(R.id.API2);
+            datalog = new ArrayList<>();
+            mDbNodeRepo = new dbNodeRepo(context);
+        }
+    }
+
+    public class OlmatixRGBHolder extends ViewHolder {
+        public TextView node_name, upTime, status, fwName, lastaction, seechart, api1, api2;
+        public ImageView imgNode;
+        Button btn_off, btn_on;
+        ExpandableLayout expandableLayout;
+        ImageButton imgBut, mode;
+        ColorPickerView colorPickerView;
+        int colclick;
+        SeekBar redSl, greenSl, blueSl;
+        LightnessSlider v_lightness_slider;
+
+        public OlmatixRGBHolder(View view) {
+            super(view);
+            colorPickerView = (ColorPickerView) view.findViewById(R.id.color_picker_view);
+            imgNode = (ImageView) view.findViewById(R.id.icon_node);
+            node_name = (TextView) view.findViewById(R.id.node_name);
+            fwName = (TextView) view.findViewById(R.id.fw_name);
+            status = (TextView) view.findViewById(R.id.status);
+            upTime = (TextView) view.findViewById(R.id.uptime);
+            btn_off = (Button) view.findViewById(R.id.btn_off);
+            btn_on = (Button) view.findViewById(R.id.btn_on);
+            expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+            expandableLayout.collapse(false);
+            lastaction = (TextView) view.findViewById(R.id.lastdata);
+            seechart = (TextView) view.findViewById(R.id.chartLabel);
+            imgBut = (ImageButton) view.findViewById(R.id.opt);
+            mode = (ImageButton) view.findViewById(R.id.mode);
+            api1 = (TextView) view.findViewById(R.id.API1);
+            api2 = (TextView) view.findViewById(R.id.API2);
+            redSl = (SeekBar) view.findViewById(R.id.red);
+            greenSl = (SeekBar) view.findViewById(R.id.green);
+            blueSl = (SeekBar) view.findViewById(R.id.blue);
+            v_lightness_slider = (LightnessSlider) view.findViewById(R.id.v_lightness_slider);
+
             datalog = new ArrayList<>();
             mDbNodeRepo = new dbNodeRepo(context);
         }

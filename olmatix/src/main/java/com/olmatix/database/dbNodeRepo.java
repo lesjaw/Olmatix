@@ -634,6 +634,26 @@ public class dbNodeRepo {
 
     }
 
+    public void updateSSID(InstalledNodeModel installedNodeModel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NODE_ID, installedNodeModel.getNodesID());
+        if (installedNodeModel.getNodes() != null) {
+            values.put(KEY_NODES, installedNodeModel.getNodes());
+        }
+
+        if (installedNodeModel.getIcon() != null) {
+            values.put(KEY_ICON, installedNodeModel.getIcon());
+        }
+
+        db.update(TABLE, values, dbNode.KEY_NODE_ID + "= ?", new String[]{
+                String.valueOf(installedNodeModel.getNodesID())
+        });
+        db.close();
+
+    }
+
     public void updateUptime(InstalledNodeModel installedNodeModel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -682,7 +702,7 @@ public class dbNodeRepo {
         }
         if (detailNodeModel.getStatus() != null || detailNodeModel.getStatus() != "ON" || detailNodeModel.getStatus() != "OFF") {
             values.put(KEY_STATUS, detailNodeModel.getStatus());
-            //Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getStatus());
+            Log.d("DEBUG", "updateDetail Status: " +detailNodeModel.getChannel() +" nodeid "+detailNodeModel.getNode_id());
         }
 
         db.update(TABLE_NODE, values, dbNode.KEY_NODE_ID + "=? AND " + dbNode.KEY_CHANNEL + "=?", new String[]{
@@ -1319,20 +1339,27 @@ public class dbNodeRepo {
     }
 
     public void updateOff(DurationModel durationModel) {
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NODE_ID, durationModel.getNodeId());
         values.put(KEY_CHANNEL, durationModel.getChannel());
         values.put(KEY_STATUS, durationModel.getStatus());
         values.put(KEY_TIMESTAMPS_OFF, durationModel.getTimeStampOff());
+        //Log.d("DEBUG", "insertDurationNode: "+durationModel.getTimeStampOff());
+
         values.put(KEY_DURATION, durationModel.getDuration());
+        //Log.d("DEBUG", "KEY_DURATION: "+durationModel.getDuration());
+
         db.update(TABLE_NODE_DURATION, values, dbNode.KEY_NODE_ID + "=? AND "
                 + dbNode.KEY_CHANNEL + "=? AND "
                 + dbNode.KEY_STATUS + "=?", new String[]{
                 String.valueOf(durationModel.getNodeId()),
                 String.valueOf(durationModel.getChannel()),
-                String.valueOf("true")
+                String.valueOf("on")
         });
+
+
         db.close(); // Closing database connection
 
     }
@@ -1550,6 +1577,8 @@ public class dbNodeRepo {
 
     public ArrayList<logModel> getLogbyName(String node_id, String Channel) {
 
+       // Log.d("DEBUG", "getLogbyName: "+node_id +" "+Channel);
+
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String selectString = "SELECT * FROM " + dbNode.TABLE_NODE_DURATION + " WHERE " + KEY_NODE_ID +
                 " =? AND " + KEY_CHANNEL + " =? ORDER BY "+KEY_ID +" DESC limit "+1;
@@ -1568,6 +1597,7 @@ public class dbNodeRepo {
                 node.setStatus(cursor.getString(cursor.getColumnIndex(dbNode.KEY_STATUS)));
                 node.setOn(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_ON)));
                 node.setOff(cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_OFF)));
+                //Log.d("DEBUG", "insertDurationNode: "+cursor.getString(cursor.getColumnIndex(dbNode.KEY_TIMESTAMPS_ON)));
 
                 nodeList.add(node);
 

@@ -33,6 +33,12 @@
     <PreferenceCategory
         android:title="@string/pref_user">
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:enabled="false"
+            android:key="conStatus"
+            android:summary="@string/check_status"
+            android:title="@string/conStatus"></CheckBoxPreference>
         <EditTextPreference
             android:key="user_name"
             android:title="@string/user_title"
@@ -49,14 +55,6 @@
             android:defaultValue="@string/pass" />
 
     </PreferenceCategory>
-
-    <CheckBoxPreference
-        android:title="@string/conStatus"
-        android:key="conStatus"
-        android:defaultValue="false"
-        android:summary="@string/check_status"
-        android:enabled="false">
-    </CheckBoxPreference>
 
     <Preference
         android:title="AppID - Click to send this via email or WA"
@@ -75,9 +73,9 @@
     </Preference>
 
     <EditTextPreference
-        android:key="CamGateway"
-        android:title="@string/camgtw_title"
-        android:dialogMessage="@string/info_cam"
-        android:defaultValue="@string/camgtw" />
+        android:key="WiFi_SSID"
+        android:title="Current WiFi"
+        android:editable="false"
+        android:enabled="true" />
 
     </PreferenceScreen>

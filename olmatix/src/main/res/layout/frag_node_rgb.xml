@@ -111,7 +111,7 @@
                             android:textSize="10sp"
                             android:text="fw Name"
                             android:paddingTop="5sp"
-                            android:layout_marginLeft="20sp"
+                            android:layout_marginLeft="10sp"
                             android:layout_below="@+id/v_lightness_slider"
                             />
 
@@ -147,7 +147,8 @@
                 android:id="@+id/red"
                 android:layout_below="@+id/opt"
                 android:layout_marginTop="10sp"
-                android:max="100"/>
+                android:max="255"
+                />
 
             <SeekBar
                 android:layout_width="match_parent"
@@ -155,7 +156,7 @@
                 android:id="@+id/green"
                 android:layout_below="@+id/red"
                 android:layout_marginTop="10sp"
-                android:max="100"/>
+                android:max="255"/>
 
             <SeekBar
                 android:layout_width="match_parent"
@@ -163,7 +164,15 @@
                 android:id="@+id/blue"
                 android:layout_below="@+id/green"
                 android:layout_marginTop="10sp"
-                android:max="100"/>
+                android:max="255"/>
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/white"
+                android:layout_below="@+id/blue"
+                android:layout_marginTop="10sp"
+                android:max="255"/>
 
                         <net.cachapa.expandablelayout.ExpandableLayout
                             android:id="@+id/expandable_layout"

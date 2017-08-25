@@ -20,6 +20,7 @@ public class DashboardNodeModel {
     private String temp;
     private String hum;
     private String groupid;
+    private String node_ip;
 
     public int getId() {
         return id;
@@ -131,5 +132,13 @@ public class DashboardNodeModel {
 
     public void setGroupid(String groupid) {
         this.groupid = groupid;
+    }
+
+    public String getNode_ip() {
+        return node_ip;
+    }
+
+    public void setNode_ip(String node_ip) {
+        this.node_ip = node_ip;
     }
 }

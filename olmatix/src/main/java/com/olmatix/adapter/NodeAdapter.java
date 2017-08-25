@@ -65,7 +65,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     private InstalledNode installedNode;
 
     class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView fwName, ipAddrs, upTime, siGnal, nodeid, lastAdd;
+        TextView fwName, ipAddrs, upTime, siGnal, nodeid, lastAdd, ssid;
         ImageView imgNode, imgStatus;
         ImageButton imgBut;
         TextView reset, rename, delete;
@@ -77,6 +77,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             imgNode = (ImageView) view.findViewById(R.id.icon_node);
             imgStatus = (ImageView) view.findViewById(R.id.icon_status);
             fwName = (TextView) view.findViewById(R.id.fw_name);
+            ssid = (TextView) view.findViewById(R.id.ssid);
             ipAddrs = (TextView) view.findViewById(R.id.ipaddrs);
             siGnal = (TextView) view.findViewById(R.id.signal);
             upTime = (TextView) view.findViewById(R.id.uptime);
@@ -157,6 +158,8 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                 holder.imgNode.setImageResource(R.mipmap.gateway);
             } else if (mInstalledNodeModel.getFwName().equals("smartrgb")) {
                 holder.imgNode.setImageResource(R.mipmap.smartrgb);
+            }else if (mInstalledNodeModel.getFwName().equals("smartrgbw")) {
+                holder.imgNode.setImageResource(R.mipmap.smartrgb);
             }
         }
         holder.imgStatus.setOnTouchListener(new View.OnTouchListener() {
@@ -175,6 +178,12 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             titleNode = mInstalledNodeModel.getNice_name_n();
         } else
             holder.fwName.setText(mInstalledNodeModel.getFwName());
+
+        if (mInstalledNodeModel.getIcon() != null) {
+            holder.ssid.setText("WiFi : "+mInstalledNodeModel.getIcon());
+        } else
+            holder.ssid.setText("SSID");
+
 
         holder.ipAddrs.setText("IP : " + mInstalledNodeModel.getLocalip());
         holder.siGnal.setText("Signal : " + mInstalledNodeModel.getSignal() + "%");
@@ -332,7 +341,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
                         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                         mStatusServer = sharedPref.getBoolean("conStatus", false);
                         if (mStatusServer) {
-                            String topic = "devices/" + mInstalledNodeModel.getNodesID() + "/$reset";
+                            String topic = "devices/" + mInstalledNodeModel.getNodesID() + "/$implementation/reset";
                             String payload = "true";
                             byte[] encodedPayload = new byte[0];
                             try {
@@ -404,15 +413,15 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
         String mNodeID = nodeList.get(position).getNodesID();
         for (int a=0; a < 24 ;a++) {
             if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
-            if (a == 1) {topic = "devices/" + mNodeID + "/$fwname";}
-            if (a == 2) {topic = "devices/" + mNodeID + "/$signal";}
-            if (a == 3) {topic = "devices/" + mNodeID + "/$uptime";}
+            if (a == 1) {topic = "devices/" + mNodeID + "/$fw/name";}
+            if (a == 2) {topic = "devices/" + mNodeID + "/$stats/signal";}
+            if (a == 3) {topic = "devices/" + mNodeID + "/$stats/uptime";}
             if (a == 4) {topic = "devices/" + mNodeID + "/$name";}
             if (a == 5) {topic = "devices/" + mNodeID + "/$localip";}
-            if (a == 6) {topic = "devices/" + mNodeID + "/light/0";}
-            if (a == 7) {topic = "devices/" + mNodeID + "/light/1";}
-            if (a == 8) {topic = "devices/" + mNodeID + "/light/2";}
-            if (a == 9) {topic = "devices/" + mNodeID + "/light/3";}
+            if (a == 6) {topic = "devices/" + mNodeID + "/light/on_1";}
+            if (a == 7) {topic = "devices/" + mNodeID + "/light/on_2";}
+            if (a == 8) {topic = "devices/" + mNodeID + "/light/on_3";}
+            if (a == 9) {topic = "devices/" + mNodeID + "/light/on_4";}
             if (a == 10) {topic = "devices/" + mNodeID + "/door/close";}
             if (a == 11) {topic = "devices/" + mNodeID + "/door/theft";}
             if (a == 12) {topic = "devices/" + mNodeID + "/motion/motion";}

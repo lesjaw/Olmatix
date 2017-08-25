@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -74,7 +76,11 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     private int position1;
     private int UNSELECTED = -1;
     private int selectedItem = UNSELECTED;
-
+    private int tog =1;
+    String cur_red="0";
+    String cur_green="0";
+    String cur_blue="0";
+    String cur_white="0";
     private dbNodeRepo mDbNodeRepo;
     private ArrayList<logModel> datalog;
 
@@ -122,7 +128,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     .inflate(R.layout.frag_node_sensor_prox, parent, false);
 
             return new OlmatixSensorProxHolder(itemView);
-        } else if (fw_name.equals("smartrgb")) {
+        } else if (fw_name.equals("smartrgb")||fw_name.equals("smartrgbw")) {
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.frag_node_rgb, parent, false);
 
@@ -154,7 +160,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     String Nodeid = datalog.get(i).getNodeid();
                     String chan = datalog.get(i).getChannel();
                     String on = datalog.get(i).getOn();
+                    //Log.d("DEBUG", "onBindViewHolder ON: "+on);
                     String off = datalog.get(i).getOff();
+                    //Log.d("DEBUG", "onBindViewHolder OFF: "+on);
+
                     String timestamps;
                     if (off.equals("0")||off == null){
                         timestamps = on;
@@ -227,7 +236,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             String lastval=mInstalledNodeModel.getStatus();
 
             if (lastval!=null && !lastval.equals("")) {
-                if (mInstalledNodeModel.getStatus().equals("true")) {
+                if (mInstalledNodeModel.getStatus().equals("on")) {
                     holder.imgNode.setImageResource(R.mipmap.onlamp);
                     holder.statuslabel.setText("Status:");
                     holder.status.setText("ON");
@@ -258,8 +267,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
-                        String payload = "ON";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
+                        String payload = "on";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -288,8 +297,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
-                        String payload = "OFF";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
+                        String payload = "off";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -431,11 +440,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.sensorStatus.setText("Door Open!");
                 holder.imgSensor.setImageResource(R.drawable.door_open);
             }
-            if (mInstalledNodeModel.getStatus().equals("true")) {
+            if (mInstalledNodeModel.getStatus().equals("on")) {
                 holder.imgNode.setImageResource(R.mipmap.armed);
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("ARMED");
-
 
             } else {
                 holder.imgNode.setImageResource(R.mipmap.not_armed);
@@ -455,8 +463,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
-                        String payload = "ON";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                        String payload = "on";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -490,8 +498,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
-                        String payload = "OFF";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                        String payload = "off";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -633,7 +641,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.sensorStatus.setText("No Motion detected!");
                 holder.imgSensor.setImageResource(R.drawable.no_motion);
             }
-            if (mInstalledNodeModel.getStatus().equals("true")) {
+            if (mInstalledNodeModel.getStatus().equals("on")) {
                 holder.imgNode.setImageResource(R.mipmap.armed);
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("ARMED");
@@ -658,8 +666,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
-                        String payload = "ON";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                        String payload = "on";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -693,8 +701,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
-                        String payload = "OFF";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                        String payload = "off";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -835,7 +843,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 }
             });
 
-            if (mInstalledNodeModel.getStatus().equals("true")) {
+            if (mInstalledNodeModel.getStatus().equals("on")) {
                 holder.imgNode.setImageResource(R.mipmap.onlamp);
                 holder.statuslabel.setText("Status:");
                 holder.status.setText("ON");
@@ -854,14 +862,19 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             }
             String t=mInstalledNodeModel.getStatus_temp();
+            Log.d("DEBUG", "tempe: "+t);
             if (t !=null) {
-                String t1 = t.substring(0, 2);
-                int t2 = Integer.parseInt(t1.replaceAll("[\\D]", ""));
-                holder.temp.setText(t2 - 7 + "°C");
-                String h = mInstalledNodeModel.getStatus_hum();
-                String h1 = h.substring(0, 2);
-                int h2 = Integer.parseInt(h1.replaceAll("[\\D]", ""));
-                holder.hum.setText(h2 + "%");
+                if (!t.equals("0")) {
+                    if (!t.equals("nan")) {
+                        String t1 = t.substring(0, 2);
+                        int t2 = Integer.parseInt(t1.replaceAll("[\\D]", ""));
+                        holder.temp.setText(t2 - 7 + "°C");
+                        String h = mInstalledNodeModel.getStatus_hum();
+                        String h1 = h.substring(0, 2);
+                        int h2 = Integer.parseInt(h1.replaceAll("[\\D]", ""));
+                        holder.hum.setText(h2 + "%");
+                    }
+                }
             }
 
 
@@ -877,8 +890,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
-                        String payload = "ON";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
+                        String payload = "on";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -907,8 +920,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/" + mInstalledNodeModel.getChannel() + "/set";
-                        String payload = "OFF";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
+                        String payload = "off";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -1085,8 +1098,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
-                        String payload = "ON";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                        String payload = "on";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -1120,8 +1133,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
                     if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/0/set";
-                        String payload = "OFF";
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                        String payload = "off";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -1167,7 +1180,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     int value = min + (progress * step);
-                    Log.d("DEBUG", "onProgressChanged: "+value);
+                    //Log.d("DEBUG", "onProgressChanged: "+value);
                     String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dist/range/set";
                     String payload = String.valueOf(value);
                     byte[] encodedPayload = new byte[0];
@@ -1223,35 +1236,45 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     context.startActivity(i);
                 }
             });
-        } else if (fw_name.equals("smartrgb")) {
+        } else if (fw_name.equals("smartrgb")||fw_name.equals("smartrgbw")) {
             final OlmatixRGBHolder holder = (OlmatixRGBHolder) viewHolder;
 
             holder.colorPickerView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     holder.colclick=0;
-
                     return false;
                 }
             });
 
-            holder.redSl.setVisibility(View.GONE);
-            holder.greenSl.setVisibility(View.GONE);
-            holder.blueSl.setVisibility(View.GONE);
-            final int[] tog = {0};
+            Log.d("DEBUG", "Current Tog: "+tog);
+
+            if (tog==0){
+                holder.redSl.setVisibility(View.VISIBLE);
+                holder.greenSl.setVisibility(View.VISIBLE);
+                holder.blueSl.setVisibility(View.VISIBLE);
+                holder.colorPickerView.setVisibility(View.GONE);
+                holder.v_lightness_slider.setVisibility(View.GONE);
+            } else {
+                holder.redSl.setVisibility(View.GONE);
+                holder.greenSl.setVisibility(View.GONE);
+                holder.blueSl.setVisibility(View.GONE);
+                holder.colorPickerView.setVisibility(View.VISIBLE);
+                holder.v_lightness_slider.setVisibility(View.VISIBLE);
+            }
+            holder.imgNode.setImageResource(R.mipmap.smartrgb);
             holder.mode.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-
-                    if (tog[0] ==0) {
+                    Log.d("DEBUG", "Current Tog: "+tog);
+                    if (tog == 1) {
                         holder.redSl.setVisibility(View.VISIBLE);
                         holder.greenSl.setVisibility(View.VISIBLE);
                         holder.blueSl.setVisibility(View.VISIBLE);
                         holder.colorPickerView.setVisibility(View.GONE);
                         holder.v_lightness_slider.setVisibility(View.GONE);
 
-                        tog[0] =1;
+                        tog = 0;
                     } else {
                         holder.redSl.setVisibility(View.GONE);
                         holder.greenSl.setVisibility(View.GONE);
@@ -1259,19 +1282,28 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                         holder.colorPickerView.setVisibility(View.VISIBLE);
                         holder.v_lightness_slider.setVisibility(View.VISIBLE);
 
-                        tog[0] =0;
+                        tog = 1;
                     }
-
                 }
             });
+
+            holder.redSl.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+            holder.redSl.getThumb().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+
+            holder.greenSl.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+            holder.greenSl.getThumb().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+
+            holder.blueSl.getProgressDrawable().setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
+            holder.blueSl.getThumb().setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
 
             holder.redSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     int value = (progress);
                     Log.d("DEBUG", "onProgressChanged: "+value);
-                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dim/dimmer/set";
-                    String payload = "0,"+String.valueOf(value);
+                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                    String payload = "rgb("+String.valueOf(value)+","+cur_green+","+cur_blue+","+cur_white+")";
+                    cur_red = String.valueOf(value);
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -1302,8 +1334,9 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     int value =(progress);
                     Log.d("DEBUG", "onProgressChanged: "+value);
-                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dim/dimmer/set";
-                    String payload = "1,"+String.valueOf(value);
+                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                    String payload = "rgb("+cur_red+","+String.valueOf(value)+","+cur_blue+","+cur_white+")";
+                    cur_green = String.valueOf(value);
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -1334,8 +1367,42 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     int value = (progress);
                     Log.d("DEBUG", "onProgressChanged: "+value);
-                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dim/dimmer/set";
-                    String payload = "2,"+String.valueOf(value);
+                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                    String payload = "rgb("+cur_red+","+cur_green+","+String.valueOf(value)+","+cur_white+")";
+                    cur_blue = String.valueOf(value);
+                    byte[] encodedPayload = new byte[0];
+                    try {
+                        encodedPayload = payload.getBytes("UTF-8");
+                        MqttMessage message = new MqttMessage(encodedPayload);
+                        message.setQos(1);
+                        message.setRetained(true);
+                        Connection.getClient().publish(topic, message);
+
+
+                    } catch (UnsupportedEncodingException | MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            holder.whiteSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int value = (progress);
+                    Log.d("DEBUG", "onProgressChanged: "+value);
+                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                    String payload = "rgb("+cur_red+","+cur_green+","+cur_blue+","+String.valueOf(value)+")";
+                    cur_white = String.valueOf(value);
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -1362,7 +1429,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             });
 
             holder.colorPickerView.addOnColorChangedListener(new OnColorChangedListener() {
-                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override public void onColorChanged(int selectedColor) {
                     // Handle on color change
                     //holder.colclick=0;
@@ -1372,15 +1438,16 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                         int red = Color.red(selectedColor);
                         int green = Color.green(selectedColor);
                         int blue = Color.blue(selectedColor);
-                        Log.d("ColorPicker", "onColorChanged: red" + red + " green " + green + " blue " + blue);
+                        //Log.d("ColorPicker", "onColorChanged: red" + red + " green " + green + " blue " + blue);
                         holder.status.setText("RGB(" + red + "," + green + "," + blue + ")");
-                        holder.imgNode.setImageResource(R.mipmap.smartrgb);
-                        holder.imgNode.setImageTintList(ColorStateList.valueOf(selectedColor));
+
+                        //holder.imgNode.setImageTintList(ColorStateList.valueOf(selectedColor));
+                        //Log.d("DEBUG", "onColorChanged: "+selectedColor);
                         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                         mStatusServer = sharedPref.getBoolean("conStatus", false);
                         if (mStatusServer) {
                             String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                            String payload = "rgb(" + red + "," + green + "," + blue + ")";
+                            String payload = "rgb(" + red + "," + green + "," + blue+ ",0" + ")";
                             byte[] encodedPayload = new byte[0];
                             try {
                                 encodedPayload = payload.getBytes("UTF-8");
@@ -1410,7 +1477,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
                 }
             });
-
 
             //holder.imgNode.setImageResource(R.drawable.olmatixmed);
             if (mInstalledNodeModel.getNice_name_d() != null) {
@@ -1447,13 +1513,28 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
 
             holder.lastaction.setText("Last log : "+dateString);
             holder.fwName.setText(mInstalledNodeModel.getNode_id()+" Channel : "+ch);
-            holder.status.setText(mInstalledNodeModel.getStatus());
+            String lastval=mInstalledNodeModel.getStatus();
+            //Log.d("DEBUG", "RGB: " + lastval+ " nodeid "+mInstalledNodeModel.getNode_id()+" Channel : "+ch);
 
+            holder.status.setText(mInstalledNodeModel.getStatus());
+            String convRGB = mInstalledNodeModel.getStatus();
+            Log.d("DEBUG", "onBindViewHolder RGB: "+convRGB.length());
+            int colorVal = 0;
+            if (convRGB.length()>10) {
+                String[] a = convRGB.split(",");
+                int redval = Integer.parseInt(a[0].substring(4));
+                int greenVal = Integer.parseInt(a[1]);
+                int blueVal = Integer.parseInt(a[2]);
+
+                //int blueVal = Integer.parseInt(a[2].substring(0, a[2].length()-1));
+                colorVal = Color.rgb(redval, greenVal, blueVal);
+            }
+            //Log.d("DEBUG", "onBindViewHolder: "+colorVal);
+            holder.imgNode.setColorFilter(colorVal, PorterDuff.Mode.SRC_IN);
             holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
             String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
                     "&ch="+mInstalledNodeModel.getChannel();
             holder.api2.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
                 public void onClick(View v) {
                     ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
@@ -1487,7 +1568,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 }
             });
 
-
             holder.btn_on.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -1495,7 +1575,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     mStatusServer = sharedPref.getBoolean("conStatus", false);
                     if (mStatusServer) {
                         String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                        String payload = "rgb(255,255,255)";
+                        String payload = "rgb(255,255,255,255)";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -1529,7 +1609,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
                     if (mStatusServer) {
                         String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                        String payload = "rgb(0,0,0)";
+                        String payload = "rgb(0,0,0,0)";
                         byte[] encodedPayload = new byte[0];
                         try {
                             encodedPayload = payload.getBytes("UTF-8");
@@ -1565,7 +1645,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                         holder.imgBut.setSelected(false);
                         holder.expandableLayout.collapse();
                     }
-
                     if (position1 == selectedItem) {
                         selectedItem = UNSELECTED;
                     } else {
@@ -1753,7 +1832,7 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         ImageButton imgBut, mode;
         ColorPickerView colorPickerView;
         int colclick;
-        SeekBar redSl, greenSl, blueSl;
+        SeekBar redSl, greenSl, blueSl, whiteSl;
         LightnessSlider v_lightness_slider;
 
         public OlmatixRGBHolder(View view) {
@@ -1777,6 +1856,8 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             redSl = (SeekBar) view.findViewById(R.id.red);
             greenSl = (SeekBar) view.findViewById(R.id.green);
             blueSl = (SeekBar) view.findViewById(R.id.blue);
+            whiteSl = (SeekBar) view.findViewById(R.id.white);
+
             v_lightness_slider = (LightnessSlider) view.findViewById(R.id.v_lightness_slider);
 
             datalog = new ArrayList<>();

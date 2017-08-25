@@ -8,11 +8,11 @@ android {
         jni.srcDirs = [] //disable automatic ndk-build call
     }
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 17
         targetSdkVersion 25
 
-        versionCode 43
-        versionName '1.43'
+        versionCode 45
+        versionName '1.45'
     }
     buildTypes {
         release {

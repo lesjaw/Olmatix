@@ -234,19 +234,19 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                     data.addAll(dbNodeRepo.getNodeList());
                     for (int i = 0; i < countDB; i++) {
                         final String mNodeID = data.get(i).getNodesID();
-                        for (int a = 0; a < 7; a++) {
+                        for (int a = 0; a < 8; a++) {
                             String topic = "";
                             if (a == 0) {
                                 topic = "devices/" + mNodeID + "/$online";
                             }
                             if (a == 1) {
-                                topic = "devices/" + mNodeID + "/$signal";
+                                topic = "devices/" + mNodeID + "/$stats/signal";
                             }
                             if (a == 2) {
-                                topic = "devices/" + mNodeID + "/$uptime";
+                                topic = "devices/" + mNodeID + "/$stats/uptime";
                             }
                             if (a == 3) {
-                                topic = "devices/" + mNodeID + "/$fwname";
+                                topic = "devices/" + mNodeID + "/$fw/name";
                             }
                             if (a == 4) {
                                 topic = "devices/" + mNodeID + "/$localip";
@@ -256,6 +256,9 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                             }
                             if (a == 6) {
                                 topic = "devices/" + mNodeID + "/$calling";
+                            }
+                            if (a == 7) {
+                                topic = "devices/" + mNodeID + "/$ssid";
                             }
                             int qos = 2;
                             try {
@@ -386,62 +389,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
         }
     }
 
-    private void refreshnode(){
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mStatusServer = sharedPref.getBoolean("conStatus", false);
-        Log.d(TAG, "doInBackground: "+mStatusServer);
-        if (mStatusServer) {
-            final Boolean mSwitch_conn = sharedPref.getBoolean("switch_conn", true);
-            if (!mSwitch_conn) {
-                Log.d(TAG, "doInBackground: "+mSwitch_conn);
-                int countDB = dbNodeRepo.getNodeList().size();
-                data.addAll(dbNodeRepo.getNodeList());
-                for (int i = 0; i < countDB; i++) {
-                    final String mNodeID = data.get(i).getNodesID();
-                    for (int a = 0; a < 5; a++) {
-                        String topic = "";
-                        if (a == 0) {
-                            topic = "devices/" + mNodeID + "/$online";
-                        }
-                        if (a == 1) {
-                            topic = "devices/" + mNodeID + "/$signal";
-                        }
-                        if (a == 2) {
-                            topic = "devices/" + mNodeID + "/$uptime";
-                        }
-                        if (a == 3) {
-                            topic = "devices/" + mNodeID + "/$fwname";
-                        }
-                        if (a == 4) {
-                            topic = "devices/" + mNodeID + "/$localip";
-                        }
-                        int qos = 2;
-                        try {
-                            IMqttToken subToken = Connection.getClient().subscribe(topic, qos);
-                            int finalA = a;
-                            subToken.setActionCallback(new IMqttActionListener() {
-                                @Override
-                                public void onSuccess(IMqttToken asyncActionToken) {
-                                    Log.d(TAG, "onSuccess: " + finalA +" "+mNodeID);
-                                }
-
-                                @Override
-                                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                                }
-                            });
-                        } catch (MqttException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                data.clear();
-            }
-        }
-        setAdapter();
-        mFab.show();
-        mSwipeRefreshLayout.setRefreshing(false);
-    }
-
     private void setAdapter(){
         data.clear();
         data.addAll(dbNodeRepo.getNodeList());
@@ -463,14 +410,6 @@ public class InstalledNode extends Fragment implements  OnStartDragListener {
                 });
             }
         }, 100, 10000); // updates GUI each 40 secs
-    }
-
-    public void cancelSchedule(){
-        Log.d(TAG, "cancelSchedule: "+autoUpdate);
-        if (autoUpdate != null){
-            autoUpdate.cancel();
-        }
-
     }
 
     private void onClickListener() {

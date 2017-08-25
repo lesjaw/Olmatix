@@ -430,8 +430,7 @@ public class DetailNode extends AppCompatActivity implements OnStartDragListener
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
 
-                if (direction == ItemTouchHelper.LEFT)
-                {
+                if (direction == ItemTouchHelper.LEFT) {
                     adapter.notifyDataSetChanged();
                     ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
                     mItemTouchHelper = new ItemTouchHelper(callback);

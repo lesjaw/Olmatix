@@ -77,10 +77,18 @@
                 android:text="@string/signal" />
 
             <TextView
-                android:id="@+id/latestAdd"
+                android:id="@+id/ssid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/signal"
+                android:layout_toRightOf="@+id/icon_node"
+                android:text="@string/ssid" />
+
+            <TextView
+                android:id="@+id/latestAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ssid"
                 android:layout_toRightOf="@+id/icon_node"
                 android:text="@string/latestAdding" />
 
@@ -101,7 +109,7 @@
                 android:layout_below="@+id/uptime"
                 android:paddingTop="0sp"
                 android:text="nodeID"
-                android:maxLength="10"/>
+                android:maxLength="12"/>
 
             <ImageButton
                 android:id="@+id/opt"

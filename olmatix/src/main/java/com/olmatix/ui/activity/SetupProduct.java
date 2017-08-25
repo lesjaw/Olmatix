@@ -93,7 +93,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     ListView listWifiDetails;
     List<ScanResult> wifiList;
     ListView listProduct, listHome;
-    String[] statesList;
+    String[] statesList, listwifiall;
     String Wifi = "", Wificut = "",Password, textProgres, deviceID, firmware, version,textHomeWifi;
     private ProgressDialog progressDialog;
     private IntentFilter mIntentFilter;
@@ -281,12 +281,19 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         wifiList = mainWifi.getScanResults();
 
         listProduct = new ListView(this);
-        statesList = new String[wifiList.size()];
+        listwifiall = new String[wifiList.size()];
+        ArrayList<String> arrayList = new ArrayList<String>();
+
         for (int i = 0; i < wifiList.size(); i++) {
-            statesList[i] = String.valueOf(wifiList.get(i).SSID + getString(R.string.label_setup_signal) + wifiList.get(i).level);
-            System.out.println(statesList[i]);
+            listwifiall[i] = String.valueOf(wifiList.get(i).SSID);
+            String[] a = listwifiall[i].split("-");
+            if (a[0].equals("Olmatix")){
+                arrayList.add(String.valueOf(wifiList.get(i).SSID + getString(R.string.label_setup_signal) + wifiList.get(i).level));
+                System.out.println(String.valueOf(wifiList.get(i).SSID));
+            }
+
         }
-        ArrayAdapter<String> testadap = new ArrayAdapter<>(this, layout.list_item_wifi, statesList);
+        ArrayAdapter<String> testadap = new ArrayAdapter<>(this, layout.list_item_wifi, arrayList);
 
         listProduct.setAdapter(testadap);
 
@@ -362,7 +369,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
         statesList = new String[wifiList.size()];
         for (int i = 0; i < wifiList.size(); i++) {
             statesList[i] = String.valueOf(wifiList.get(i).SSID);
-            System.out.println(statesList[i]);
+            //System.out.println(statesList[i]);
         }
         ArrayAdapter<String> testadap = (new ArrayAdapter<>(this, layout.list_item_wifi, statesList));
 
@@ -426,7 +433,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     public void requestInfo() {
         Log.d("DEBUG", "requestInfo: ");
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = "http://192.168.1.1/device-info";
+        String URL = "http://192.168.123.1/device-info";
 
         // prepare the Request
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
@@ -457,7 +464,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
 
     public void requestInfo1() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = "http://192.168.244.1/device-info";
+        String URL = "http://192.168.1.1/device-info";
 
         // prepare the Request
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
@@ -488,7 +495,7 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
     public void parsingJson(String json) {
         try {
             JSONObject jObject = new JSONObject(json);
-            deviceID = jObject.getString("device_id");
+            deviceID = jObject.getString("hardware_device_id");
             String firmwareAll = jObject.getString("firmware");
             JSONObject jObject1 = new JSONObject(firmwareAll);
             firmware = jObject1.getString("name");
@@ -544,10 +551,10 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             if (ssidHome!=null) {
 
                 RequestQueue requestQueue = Volley.newRequestQueue(this);
-                String URL = "http://192.168.1.1/config";
+                String URL = "http://192.168.123.1/config";
                 JSONObject jsonBody = new JSONObject("{\"name\":\"Olmatix\",\"wifi\": {\"ssid\": \"" + ssidHome + "\",\"password\": " +
                         "\"" + passwordHome + "\"},\"mqtt\": {\"host\": \"cloud.olmatix.com\",\"port\": 1883,\"base_topic\": \"devices/\"," +
-                        "\"auth\": true, \"username\": \"" + mUserName + "\",\"password\": \"" + mPassword + "\"},\"ota\": {\"enabled\": false}}");
+                        "\"auth\": true, \"username\": \"" + mUserName + "\",\"password\": \"" + mPassword + "\"},\"ota\": {\"enabled\": true}}");
 
                 final String requestBody = jsonBody.toString();
 
@@ -679,10 +686,11 @@ public class SetupProduct extends AppCompatActivity implements VerticalStepperFo
             if (ssidHome!=null) {
 
                 RequestQueue requestQueue = Volley.newRequestQueue(this);
-                String URL = "http://192.168.244.1/config";
+                String URL = "http://192.168.1.1/config";
                 JSONObject jsonBody = new JSONObject("{\"name\":\"Olmatix\",\"wifi\": {\"ssid\": \"" + ssidHome + "\",\"password\": " +
                         "\"" + passwordHome + "\"},\"mqtt\": {\"host\": \"cloud.olmatix.com\",\"port\": 1883,\"base_topic\": \"devices/\"," +
-                        "\"auth\": true, \"username\": \"" + mUserName + "\",\"password\": \"" + mPassword + "\"},\"ota\": {\"enabled\": false}}");
+                        "\"auth\": true, \"username\": \"" + mUserName + "\",\"password\": \"" + mPassword + "\"},\"ota\": {\"enabled\": true" +
+                        ",\"host\": 103.43.47.61,\"port\": 9080,\"path\": \"/ota}");
 
                 final String requestBody = jsonBody.toString();
 

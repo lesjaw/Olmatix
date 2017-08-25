@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="0sp">
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="100sp"
+            android:layout_height="100sp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/icon_stat"
+                android:background="@color/grey"
+                android:visibility="gone"
+                />
+
+            <ImageButton
+                android:layout_marginTop="10sp"
+                android:id="@+id/icon_node"
+                android:layout_width="50sp"
+                android:layout_height="50sp"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:src="@mipmap/smartrgb"
+                android:stateListAnimator="@null"
+                android:theme="@style/AppTheme.Button"
+                android:scaleType="centerCrop"
+                android:elevation="5dp"
+                />
+
+            <ImageView
+                android:id="@+id/icon_conn"
+                android:layout_width="10sp"
+                android:layout_height="10sp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="30sp"
+                android:foregroundGravity="top"
+                android:scaleType="fitXY"
+                android:padding="2sp"
+                android:src="@drawable/off_indicator"/>
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/node_name"
+                android:text="Name Sensor"
+                android:textSize="15dp"
+                android:layout_marginTop="5sp"
+                android:maxLines="1"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:textAlignment="center"
+                android:layout_alignParentBottom="true"
+                android:gravity="center" />
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

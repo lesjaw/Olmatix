@@ -217,7 +217,7 @@ public class SettingsActivity extends SettingsFragment {
             bindPreferenceSummaryToValue(findPreference("password"));
             bindPreferenceSummaryToValue(findPreference("appID"));
             bindPreferenceSummaryToValue(findPreference("IPaddress"));
-            bindPreferenceSummaryToValue(findPreference("CamGateway"));
+            bindPreferenceSummaryToValue(findPreference("WiFi_SSID"));
 
 
 
@@ -275,18 +275,18 @@ public class SettingsActivity extends SettingsFragment {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID = data.get(i).getNodesID();
                     //Log.d("DEBUG", "Count list: " + mNodeID);
-                    for (int a = 0; a < 7; a++) {
+                    for (int a = 0; a < 8; a++) {
                         if (a == 0) {
                             topic = "devices/" + mNodeID + "/$online";
                         }
                         if (a == 1) {
-                            topic = "devices/" + mNodeID + "/$fwname";
+                            topic = "devices/" + mNodeID + "/$fw/name";
                         }
                         if (a == 2) {
-                            topic = "devices/" + mNodeID + "/$signal";
+                            topic = "devices/" + mNodeID + "/$stats/signal";
                         }
                         if (a == 3) {
-                            topic = "devices/" + mNodeID + "/$uptime";
+                            topic = "devices/" + mNodeID + "/$stats/uptime";
                         }
                         if (a == 4) {
                             topic = "devices/" + mNodeID + "/$localip";
@@ -296,6 +296,9 @@ public class SettingsActivity extends SettingsFragment {
                         }
                         if (a == 6) {
                             topic = "devices/" + mNodeID + "/$location";
+                        }
+                        if (a == 7) {
+                            topic = "devices/" + mNodeID + "/$ssid";
                         }
                         int qos = 2;
                         try {
@@ -331,7 +334,7 @@ public class SettingsActivity extends SettingsFragment {
                 for (int i = 0; i < countDB; i++) {
                     final String mNodeID = data1.get(i).getNode_id();
                     final String mChannel = data1.get(i).getChannel();
-                    topic = "devices/" + mNodeID + "/light/" + mChannel;
+                    topic = "devices/" + mNodeID + "/light/on_" + mChannel;
                     int qos = 2;
                     try {
                         IMqttToken subToken = Connection.getClient().subscribe(topic, qos);

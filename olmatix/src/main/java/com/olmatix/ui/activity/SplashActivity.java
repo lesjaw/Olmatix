@@ -87,7 +87,6 @@ public class SplashActivity extends Activity {
             startActivity(i);
             finish();
         } else {
-
             Intent i = new Intent(this, OlmatixService.class);
             startService(i);
         }
@@ -104,12 +103,13 @@ public class SplashActivity extends Activity {
             finish();
 
         } else {
-            Toast.makeText(SplashActivity.this, "  No reply from server, exiting now..  ", Toast.LENGTH_LONG).show();
+            Toast.makeText(SplashActivity.this, "  No reply from server, Offline mode starting..  ", Toast.LENGTH_LONG).show();
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    Intent i = new Intent(getApplication(), MainActivity.class);
+                    startActivity(i);
                     finish();
-                    System.exit(0);
                 }
             }, 3000);
         }
@@ -153,14 +153,15 @@ public class SplashActivity extends Activity {
                 }
                 if (count==3){
 
-                    Toast.makeText(SplashActivity.this, "  No reply from server, exiting now..  ", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SplashActivity.this, "  No reply from server, Offline mode starting..  ", Toast.LENGTH_LONG).show();
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            Intent i = new Intent(getApplication(), MainActivity.class);
+                            startActivity(i);
                             finish();
                         }
-                    }, 5000);
-
+                    }, 3000);
                 }
             }
         }

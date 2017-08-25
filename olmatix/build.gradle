@@ -5,13 +5,13 @@ android {
     buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "com.olmatix.lesjaw.olmatix"
-        minSdkVersion 19
+        minSdkVersion 17
         targetSdkVersion 25
-        versionName '1.43'
+        versionName '1.45'
         jackOptions {
             enabled true
         }
-        versionCode 43
+        versionCode 45
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -60,5 +60,4 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.github.ybq:Android-SpinKit:1.1.0'
     compile 'com.github.QuadFlask:colorpicker:0.0.13'
-
 }

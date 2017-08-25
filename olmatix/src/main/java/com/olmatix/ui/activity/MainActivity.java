@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
@@ -44,6 +46,7 @@ import com.gun0912.tedpermission.TedPermission;
 import com.olmatix.adapter.OlmatixPagerAdapter;
 import com.olmatix.database.dbNode;
 import com.olmatix.database.dbNodeRepo;
+import com.olmatix.helper.UdpClientThread;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.model.InstalledNodeModel;
 import com.olmatix.service.OlmatixService;
@@ -90,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
     Boolean mStatusServer;
     public static dbNodeRepo dbNodeRepo;
-    private InstalledNodeModel installedNodeModel;
     CoordinatorLayout coordinatorLayout;
     ListView listViewRecent;
     dbNode dbnode;
@@ -99,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter listAdap;
     ArrayList<String> recentChange;
     LibVLC mLibVLC = null;
-    MediaPlayer mMediaPlayer = null;
 
 
     public static int[] tabIcons = {
@@ -121,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     };
+
+
 
     private ViewPager mViewPager;
     private OlmatixPagerAdapter mOlmatixAdapter;
@@ -200,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         try {
             mLibVLC = new LibVLC(this);
 
@@ -210,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
             //finish();
         }
+
 
         new TedPermission(this)
                 .setPermissionListener(permissionlistener)
@@ -506,7 +509,6 @@ public class MainActivity extends AppCompatActivity {
         List<InstalledNodeModel> NodeID;
 
         dbNodeRepo = new dbNodeRepo(this);
-        installedNodeModel = new InstalledNodeModel();
         final ListView listView = new ListView(this);
 
         NodeID = dbNodeRepo.getNodeList();

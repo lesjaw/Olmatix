@@ -63,7 +63,6 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerInParent="true"
                 android:layout_alignParentBottom="true"
-
                 android:textAlignment="center"
                 android:gravity="center" />
         </RelativeLayout>

@@ -109,15 +109,23 @@ public class OlmatixUtils {
 
     public static int calculateNoOfColumns(Context context) {
         int noOfColumns;
+        float dpWidthf = 0;
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        float dpLength = displayMetrics.heightPixels / displayMetrics.density;
+        int currentOrientation = context.getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            dpWidthf = displayMetrics.heightPixels / displayMetrics.density;
+        } else {
+            dpWidthf = displayMetrics.widthPixels / displayMetrics.density;
+        }
+        int dpWidth = Math.round(dpWidthf);
+        Log.d("DEBUG", "calculateNoOfColumns: "+dpWidth +", wdPixel: "+displayMetrics.widthPixels+", density: "+displayMetrics.density);
+        //Log.d("DEBUG", "calculateNoOfColumns: "+dpLength +", wdPixel: "+displayMetrics.heightPixels+", density: "+displayMetrics.density);
 
 
-        if (dpWidth==600) {
-            noOfColumns = (int) (dpWidth / 100) - 2;
-        } else if (dpWidth==1024) {
-            noOfColumns = (int) (dpWidth / 100) - 2;
+        if (Math.round(dpWidth)>=400 && Math.round(dpWidth)<=1024) {
+            noOfColumns = (int) (dpWidth / 100) - 1;
+        } else if (Math.round(dpWidth)>=1024 && Math.round(dpWidth)<=1024) {
+            noOfColumns = (int) (dpWidth / 100) - 1;
         }else {
             noOfColumns = (int) (dpWidth / 100);
         }
@@ -125,8 +133,12 @@ public class OlmatixUtils {
         final PreferenceHelper mPrefHelper = new PreferenceHelper(context.getApplicationContext());
             mPrefHelper.setWidht(Math.round(noOfColumns));
         Log.d("DEBUD", "calculateNoOfColumns: "+mPrefHelper.getWidht());
-            int l = Math.round(noOfColumns);
-            mPrefHelper.setLength(l+l);
+        int l = Math.round(noOfColumns);
+        if (Math.round(dpWidth)>=500 && Math.round(dpWidth)<=1024) {
+            mPrefHelper.setLength(l + l-1);
+        } else {
+            mPrefHelper.setLength(l + l);
+        }
         Log.d("DEBUD", "calculateNoOfColumns: "+mPrefHelper.getLength());
 
         return noOfColumns;

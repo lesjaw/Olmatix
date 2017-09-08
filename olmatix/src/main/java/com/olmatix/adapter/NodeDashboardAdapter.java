@@ -250,8 +250,11 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         }
                     }
 
-                    String ipDev = ip_devices.substring(0, 10);
-                    String ipNod = ip_nodes.substring(0, 10);
+                    String [] splitipDev = ip_devices.split("\\.");
+                    String [] splitipnod = ip_nodes.split("\\.");
+                    String ipDev = splitipDev[0]+splitipDev[1]+splitipDev[2];
+                    String ipNod = splitipnod[0]+splitipnod[1]+splitipnod[2];
+
                     Log.d("DEBUG", "WiFi Compare : " + ssid_devices + " : " + wifi_name);
 
                     if (!mFavoriteModel.getOnline().trim().equals("true")) {
@@ -403,8 +406,16 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         }
                     }
 
-                    String ipDev = ip_devices.substring(0, 10);
-                    String ipNod = ip_nodes.substring(0, 10);
+                    //String ipDev = ip_devices.substring(0, 10);
+                    //String ipNod = ip_nodes.substring(0, 10);
+
+                    String [] splitipDev = ip_devices.split("\\.");
+                    String [] splitipnod = ip_nodes.split("\\.");
+                    String ipDev = splitipDev[0]+splitipDev[1]+splitipDev[2];
+                    String ipNod = splitipnod[0]+splitipnod[1]+splitipnod[2];
+
+                    Log.d("DEBUG", "IP Compare: "+ipDev+" ipNode "+ipNod);
+
                     Log.d("DEBUG", "WiFi Compare : " + ssid_devices + " : " + wifi_name);
 
                     if (!mFavoriteModel.getOnline().trim().equals("true")) {
@@ -485,18 +496,25 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
 
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
 
-            String t = mFavoriteModel.getTemp();
-            if (t !=null) {
-                String t1 = t.substring(0, 2);
-                int t2 = Integer.parseInt(t1.replaceAll("[\\D]", ""));
+            String t = (mFavoriteModel.getTemp());
+            if (t != null) {
+                /*int t2 = 0;
+                if (t.length()>=2) {
+                    String t1 = t.substring(0, 2);
+                    t2 = Integer.parseInt(t1.replaceAll("[\\D]", ""));
+                }*/
+                int t2 = Integer.parseInt(t);
                 holder.temp.setText(t2 - 7 + "°C");
             }
 
             String h = mFavoriteModel.getHum();
             if (h !=null) {
-                String h1 = h.substring(0, 2);
-                int h2 = Integer.parseInt(h1.replaceAll("[\\D]", ""));
-                holder.hum.setText(h2 + "%");
+              /*  int h2 = 0;
+                if (h.length()>=2) {
+                    String h1 = h.substring(0, 2);
+                    h2 = Integer.parseInt(h1.replaceAll("[\\D]", ""));
+                }*/
+                holder.hum.setText(h + "%");
             }
 
             if (mFavoriteModel.getStatus().trim().equals("off")) {
@@ -541,8 +559,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                         }
                     }
 
-                    String ipDev = ip_devices.substring(0, 10);
-                    String ipNod = ip_nodes.substring(0, 10);
+                    String [] splitipDev = ip_devices.split("\\.");
+                    String [] splitipnod = ip_nodes.split("\\.");
+                    String ipDev = splitipDev[0]+splitipDev[1]+splitipDev[2];
+                    String ipNod = splitipnod[0]+splitipnod[1]+splitipnod[2];
                     Log.d("DEBUG", "WiFi Compare : " + ssid_devices + " : " + wifi_name);
 
                     if (!mFavoriteModel.getOnline().trim().equals("true")) {
@@ -724,11 +744,6 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                 }
             }
 
-
-            String ipDev = ip_devices.substring(0,10);
-            String ipNod = ip_nodes.substring(0,10);
-            //Log.d("DEBUG", "onBindViewHolder: "+ipDev+" ipNode "+ipNod);
-
             holder.node_name.setText(mFavoriteModel.getNice_name_d());
 
             holder.imgNode.setImageResource(R.mipmap.smartrgb);
@@ -807,8 +822,10 @@ public class NodeDashboardAdapter extends RecyclerView.Adapter<NodeDashboardAdap
                                                 }
                                             }
 
-                                            String ipDev = ip_devices.substring(0, 10);
-                                            String ipNod = ip_nodes.substring(0, 10);
+                                            String [] splitipDev = ip_devices.split("\\.");
+                                            String [] splitipnod = ip_nodes.split("\\.");
+                                            String ipDev = splitipDev[0]+splitipDev[1]+splitipDev[2];
+                                            String ipNod = splitipnod[0]+splitipnod[1]+splitipnod[2];
                                             Log.d("DEBUG", "WiFi Compare : " + ssid_devices + " : " + wifi_name);
 
                                             if (!mFavoriteModel.getOnline().trim().equals("true")) {

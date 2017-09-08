@@ -62,13 +62,13 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     private int position1;
     private SharedPreferences sharedPref;
     private Boolean mStatusServer;
-    private InstalledNode installedNode;
+    int current_togle = 0;
 
     class OlmatixHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView fwName, ipAddrs, upTime, siGnal, nodeid, lastAdd, ssid;
         ImageView imgNode, imgStatus;
         ImageButton imgBut;
-        TextView reset, rename, delete;
+        TextView reset, rename, delete, reconfig;
         ExpandableLayout expandableLayout;
 
 
@@ -87,8 +87,10 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             reset = (TextView) view.findViewById(R.id.reset);
             rename = (TextView) view.findViewById(R.id.rename);
             delete = (TextView) view.findViewById(R.id.delete);
+            reconfig = (TextView) view.findViewById(R.id.reconfig);
 
-            installedNode = new InstalledNode();
+
+            //installedNode = new InstalledNode();
             expandableLayout = (ExpandableLayout) itemView.findViewById(R.id.expandable_layout);
             expandableLayout.setInterpolator(new OvershootInterpolator());
             view.setOnClickListener(this);
@@ -328,6 +330,14 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             }
         });
 
+        holder.reconfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                holder.reconfig.setSelected(true);
+
+            }
+        });
+
         holder.reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -411,7 +421,7 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
     public void removeItem(int position) {
 
         String mNodeID = nodeList.get(position).getNodesID();
-        for (int a=0; a < 24 ;a++) {
+        for (int a=0; a < 23 ;a++) {
             if (a == 0) {topic = "devices/" + mNodeID + "/$online";}
             if (a == 1) {topic = "devices/" + mNodeID + "/$fw/name";}
             if (a == 2) {topic = "devices/" + mNodeID + "/$stats/signal";}
@@ -435,7 +445,6 @@ public class NodeAdapter extends RecyclerView.Adapter<NodeAdapter.OlmatixHolder>
             if (a == 20) {topic = "devices/" + mNodeID + "/$calling";}
             if (a == 21) {topic = "devices/" + mNodeID + "/$location";}
             if (a == 22) {topic = "devices/" + mNodeID + "/led/color/set";}
-            if (a == 23) {topic = "devices/" + mNodeID + "/dim/dimmer/set";}
 
             try {
                 Connection.getClient().unsubscribe(topic);

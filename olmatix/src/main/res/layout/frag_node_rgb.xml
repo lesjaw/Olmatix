@@ -97,13 +97,6 @@
                             android:layout_below="@+id/btn_on"
                             />
 
-                        <com.flask.colorpicker.slider.LightnessSlider
-                            android:id="@+id/v_lightness_slider"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:layout_below="@+id/color_picker_view"
-                            />
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -112,14 +105,14 @@
                             android:text="fw Name"
                             android:paddingTop="5sp"
                             android:layout_marginLeft="10sp"
-                            android:layout_below="@+id/v_lightness_slider"
+                            android:layout_below="@+id/color_picker_view"
                             />
 
                         <ImageButton
                             android:id="@+id/mode"
                             android:layout_width="40sp"
                             android:layout_height="40sp"
-                            android:layout_below="@+id/icon_node"
+                            android:layout_below="@id/icon_node"
                             android:src="@android:drawable/ic_menu_view"
                             android:stateListAnimator="@null"
                             android:theme="@style/AppTheme.Button"
@@ -134,12 +127,60 @@
                             android:layout_height="40sp"
                             android:layout_alignParentRight="true"
                             android:layout_alignParentEnd="true"
-                            android:layout_below="@+id/v_lightness_slider"
+                            android:layout_marginTop="-20sp"
+                            android:layout_below="@+id/color_picker_view"
                             android:src="@android:drawable/ic_menu_view"
                             android:stateListAnimator="@null"
                             android:theme="@style/AppTheme.Button"
                             android:scaleType="fitXY"
                             />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/opt">
+                <Button
+                    android:id="@+id/ten"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10sp"
+                    android:text="10%"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    />
+
+                <Button
+                    android:id="@+id/twentyfive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10sp"
+                    android:text="25%"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    />
+                <Button
+                    android:id="@+id/fifty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10sp"
+                    android:text="50%"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    />
+
+                <Button
+                    android:id="@+id/seventyfive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10sp"
+                    android:text="75%"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    />
+
+            </LinearLayout>
+
+
 
             <SeekBar
                 android:layout_width="match_parent"
@@ -180,7 +221,7 @@
                             android:layout_height="wrap_content"
                             android:background="@color/colorPrimaryDark"
                             app:el_duration="300"
-                            app:el_expanded="true"
+                            app:el_expanded="false"
                             android:layout_below="@id/opt">
 
                             <RelativeLayout

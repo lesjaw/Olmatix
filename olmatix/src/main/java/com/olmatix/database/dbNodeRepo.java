@@ -1556,6 +1556,31 @@ public class dbNodeRepo {
         db.close(); // Closing database connection
     }
 
+    public ArrayList<groupModel> getGroupID() {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_GROUP+" ORDER BY "+KEY_ID +" ASC limit "+1;
+
+        ArrayList<groupModel> nodeList = new ArrayList<groupModel>();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                groupModel node = new groupModel();
+                //ArrayList<String> node = new ArrayList<>();
+                node.setGroupid(cursor.getInt(cursor.getColumnIndex(dbNode.KEY_ID)));
+                node.setGroupName(cursor.getString(cursor.getColumnIndex(dbNode.KEY_GROUP_NAME)));
+
+                nodeList.add(node);
+
+            } while (cursor.moveToNext());
+        }
+        //Log.d("getlist", "getNodeList: " +cursor.getCount());
+        cursor.close();
+        db.close();
+        return nodeList;
+    }
+
     public List<String> getLogMqtt() {
         List<String> nodeList = new ArrayList<>();
 

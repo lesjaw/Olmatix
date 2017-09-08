@@ -17,6 +17,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -160,7 +161,17 @@ public class DashboardNode extends android.support.v4.app.Fragment {
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         mRecycleView1.setItemAnimator(new DefaultItemAnimator());
 
-        currentgroupid="1";
+        //currentgroupid="1";
+        int countDB = mDbNodeRepo.getGroupID().size();
+        data.clear();
+        data.addAll(mDbNodeRepo.getGroupID());
+        Log.d("DEBUG", "setupView: "+countDB);
+        if (countDB != 0) {
+            for (int i = 0; i < countDB; i++) {
+                currentgroupid = String.valueOf(data.get(i).getGroupid());
+            }
+        }
+        Log.d("DEBUG", "setupView: "+currentgroupid);
 
         data1.clear();
         data1.addAll(mDbNodeRepo.getNodeDetailDashNew(currentgroupid));

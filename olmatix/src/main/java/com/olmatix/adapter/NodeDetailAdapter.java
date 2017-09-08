@@ -5,14 +5,10 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +23,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +32,6 @@ import com.androidadvance.topsnackbar.TSnackbar;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorChangedListener;
 import com.flask.colorpicker.OnColorSelectedListener;
-import com.flask.colorpicker.slider.LightnessSlider;
 import com.olmatix.database.dbNodeRepo;
 import com.olmatix.helper.ItemTouchHelperAdapter;
 import com.olmatix.helper.OnStartDragListener;
@@ -61,7 +57,7 @@ import java.util.List;
 import static android.content.Context.CLIPBOARD_SERVICE;
 
 /**
- * Created by android on 12/13/2016.
+ * Created by lesjaw@gmail.com on 12/13/2016.
  */
 
 public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.ViewHolder> implements ItemTouchHelperAdapter {
@@ -77,10 +73,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     private int UNSELECTED = -1;
     private int selectedItem = UNSELECTED;
     private int tog =1;
-    String cur_red="0";
-    String cur_green="0";
-    String cur_blue="0";
-    String cur_white="0";
+    private String cur_red="0";
+    private String cur_green="0";
+    private String cur_blue="0";
+    private String cur_white="0";
     private dbNodeRepo mDbNodeRepo;
     private ArrayList<logModel> datalog;
 
@@ -145,97 +141,716 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         final DetailNodeModel mInstalledNodeModel = nodeList.get(position);
         this.position1 = position;
 
-        if (fw_name.equals("smartfitting") || fw_name.equals("smartadapter4ch")
-                ||fw_name.equals("smartadapter1ch")||fw_name.equals("smartadapter8ch")) {
+        switch (fw_name) {
+            case "smartfitting":
+            case "smartadapter4ch":
+            case "smartadapter1ch":
+            case "smartadapter8ch": {
 
-            final OlmatixHolder holder = (OlmatixHolder) viewHolder;
+                final OlmatixHolder holder = (OlmatixHolder) viewHolder;
 
-            String ch = mInstalledNodeModel.getChannel();
-            String dateString = null;
-            datalog.clear();
-            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
-            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
-            if (countDB != 0) {
-                for (int i = 0; i < countDB; i++) {
-                    String Nodeid = datalog.get(i).getNodeid();
-                    String chan = datalog.get(i).getChannel();
-                    String on = datalog.get(i).getOn();
-                    //Log.d("DEBUG", "onBindViewHolder ON: "+on);
-                    String off = datalog.get(i).getOff();
-                    //Log.d("DEBUG", "onBindViewHolder OFF: "+on);
+                String ch = mInstalledNodeModel.getChannel();
+                String dateString = null;
+                datalog.clear();
+                datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()));
+                int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()).size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        String Nodeid = datalog.get(i).getNodeid();
+                        String chan = datalog.get(i).getChannel();
+                        String on = datalog.get(i).getOn();
+                        //Log.d("DEBUG", "onBindViewHolder ON: "+on);
+                        String off = datalog.get(i).getOff();
+                        //Log.d("DEBUG", "onBindViewHolder OFF: "+on);
 
-                    String timestamps;
-                    if (off.equals("0")||off == null){
-                        timestamps = on;
-                    } else  {
-                        timestamps = off;
+                        String timestamps;
+                        if (off.equals("0") || off == null) {
+                            timestamps = on;
+                        } else {
+                            timestamps = off;
+                        }
+
+                        //String time = timestamps.getText().toString();
+
+                        long timestampsformat = Long.parseLong(timestamps);
+                        ;
+
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dateString = timeformat.format(new Date(timestampsformat));
+                    }
+                }
+
+                holder.lastaction.setText("Last log : " + dateString);
+                holder.fwName.setText(mInstalledNodeModel.getNode_id() + "\nChannel : " + ch);
+                holder.imgNode.setImageResource(R.drawable.olmatixmed);
+
+                holder.api2.setText(Html.fromHtml("<font color='#ffffff'>" + "API for <b>getting ON/OFF</b> status this Node </font>"));
+                String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id=o" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel();
+
+                holder.api2.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget2);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                holder.api1.setText(Html.fromHtml("<font color='#ffffff'>" + "API for sending <b>command ON/OFF</b> to this Node </font>"));
+                String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id=" + mInstalledNodeModel.getNode_id() + "&ch=on_" + mInstalledNodeModel.getChannel() + "&msg=on";
+
+                holder.api1.setOnClickListener(new View.OnClickListener() {
+                    // @RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget1);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                if (mInstalledNodeModel.getDuration() != null) {
+                    holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
+                }
+                if (mInstalledNodeModel.getNice_name_d() != null) {
+                    holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+                } else
+                    holder.node_name.setText(mInstalledNodeModel.getName());
+
+                holder.status.setText(mInstalledNodeModel.getStatus());
+
+                String lastval = mInstalledNodeModel.getStatus();
+
+                if (lastval != null && !lastval.equals("")) {
+                    if (mInstalledNodeModel.getStatus().equals("on")) {
+                        holder.imgNode.setImageResource(R.mipmap.onlamp);
+                        holder.statuslabel.setText("Status:");
+                        holder.status.setText("ON");
+                        holder.status.setTextColor(Color.GREEN);
+                        //holder.status.setTextColor(ContextCompat.getColor(context, R.color.green));
+                        holder.btn_on.setEnabled(false);
+                        holder.btn_off.setEnabled(true);
+
+                    } else {
+                        holder.imgNode.setImageResource(R.mipmap.offlamp);
+                        holder.statuslabel.setText("Status:");
+                        holder.status.setText("OFF");
+                        holder.status.setTextColor(Color.RED);
+                        holder.btn_on.setEnabled(true);
+                        holder.btn_off.setEnabled(false);
+                    }
+                }
+                holder.imgNode.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showAlertDialog();
+                    }
+                });
+
+                holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
+                            String payload = "on";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" ON");
+                                holder.status.setSingleLine();
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(context, "No response from server, trying to connect now..", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+                    }
+                });
+
+                holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
+                            String payload = "off";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" OFF");
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(context, "No response from server, trying to connect now..", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
                     }
 
-                    //String time = timestamps.getText().toString();
+                });
 
-                    long timestampsformat = Long.parseLong(timestamps);;
+                holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
 
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dateString = timeformat.format(new Date(timestampsformat));
-                }
+                        if (holder != null) {
+                            holder.imgBut.setSelected(false);
+                            holder.expandableLayout.collapse();
+                        }
+
+                        if (position1 == selectedItem) {
+                            selectedItem = UNSELECTED;
+                        } else {
+                            holder.imgBut.setSelected(true);
+                            holder.expandableLayout.expand();
+                            selectedItem = position1;
+                        }
+                    }
+                });
+
+                holder.seechart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(context, ChartONOFF.class);
+                        //i.putExtra("nodeid", data.get(position).getNodesID());
+                        i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                        context.startActivity(i);
+                    }
+                });
+
+
+                break;
             }
+            case "smartsensordoor": {
+                final OlmatixSensorDoorHolder holder = (OlmatixSensorDoorHolder) viewHolder;
 
-            holder.lastaction.setText("Last log : "+dateString);
-            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
-            holder.imgNode.setImageResource(R.drawable.olmatixmed);
-
-            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
-            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel();
-
-            holder.api2.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget2);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
+                holder.imgNode.setImageResource(R.drawable.olmatixmed);
+                if (mInstalledNodeModel.getNice_name_d() != null) {
+                    holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+                } else {
+                    holder.node_name.setText(mInstalledNodeModel.getName());
                 }
-            });
 
-            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
-            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+"&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
+                String ch = mInstalledNodeModel.getChannel();
+                String dateString = null;
+                datalog.clear();
+                datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()));
+                int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()).size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        //String Nodeid = datalog.get(i).getNodeid();
+                        String chan = datalog.get(i).getChannel();
+                        String on = datalog.get(i).getOn();
+                        String off = datalog.get(i).getOff();
+                        String timestamps;
+                        if (off.equals("0") || off == null) {
+                            timestamps = on;
+                        } else {
+                            timestamps = off;
+                        }
 
-            holder.api1.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget1);
-                    clipboard.setPrimaryClip(clip);
+                        //String time = timestamps.getText().toString();
 
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
+                        long timestampsformat = Long.parseLong(timestamps);
+                        ;
+
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dateString = timeformat.format(new Date(timestampsformat));
+                    }
                 }
-            });
 
-            if(mInstalledNodeModel.getDuration()!=null) {
-                holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
+                holder.lastaction.setText("Last log : " + dateString);
+                holder.fwName.setText(mInstalledNodeModel.getNode_id() + "\nChannel : " + ch);
+                holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+
+                holder.api2.setText(Html.fromHtml("<font color='#ffffff'>" + "API for <b>getting ON/OFF</b> status this Node </font>"));
+                String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id=" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel();
+                holder.api2.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget2);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                holder.api1.setText(Html.fromHtml("<font color='#ffffff'>" + "API for sending <b>command ON/OFF</b> to this Node </font>"));
+                String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id=" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel() + "&msg=on";
+                holder.api1.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget1);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
+                    holder.sensorStatus.setText("Door Close!");
+                    holder.imgSensor.setImageResource(R.drawable.door_close);
+                } else {
+                    holder.sensorStatus.setText("Door Open!");
+                    holder.imgSensor.setImageResource(R.drawable.door_open);
+                }
+                if (mInstalledNodeModel.getStatus().equals("on")) {
+                    holder.imgNode.setImageResource(R.mipmap.armed);
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("ARMED");
+
+                } else {
+                    holder.imgNode.setImageResource(R.mipmap.not_armed);
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("NOT ARMED");
+                }
+                if (mInstalledNodeModel.getStatus_theft().equals("true")) {
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("ALARM!!");
+                    holder.status.setTextColor(Color.MAGENTA);
+                    holder.status.setTypeface(null, Typeface.BOLD);
+                    holder.imgNode.setImageResource(R.drawable.theft);
+                }
+                holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                            String payload = "on";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" ARMED");
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
+                    }
+                });
+
+                holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                            String payload = "off";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" NOT ARMED");
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
+                    }
+
+                });
+
+                holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+
+                        if (holder != null) {
+                            holder.imgBut.setSelected(false);
+                            holder.expandableLayout.collapse();
+                        }
+
+                        if (position1 == selectedItem) {
+                            selectedItem = UNSELECTED;
+                        } else {
+                            holder.imgBut.setSelected(true);
+                            holder.expandableLayout.expand();
+                            selectedItem = position1;
+                        }
+                    }
+                });
+
+                holder.seechart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(context, ChartONOFF.class);
+                        //i.putExtra("nodeid", data.get(position).getNodesID());
+                        i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                        context.startActivity(i);
+                    }
+                });
+
+                break;
             }
-            if (mInstalledNodeModel.getNice_name_d() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            } else
-                holder.node_name.setText(mInstalledNodeModel.getName());
+            case "smartsensormotion": {
+                final OlmatixSensorMotionHolder holder = (OlmatixSensorMotionHolder) viewHolder;
 
-            holder.status.setText(mInstalledNodeModel.getStatus());
+                holder.imgNode.setImageResource(R.drawable.olmatixmed);
+                if (mInstalledNodeModel.getNice_name_d() != null) {
+                    holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+                } else {
+                    holder.node_name.setText(mInstalledNodeModel.getName());
+                }
+                String ch = mInstalledNodeModel.getChannel();
+                String dateString = null;
+                datalog.clear();
+                datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()));
+                int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()).size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        //String Nodeid = datalog.get(i).getNodeid();
+                        //String chan = datalog.get(i).getChannel();
+                        String on = datalog.get(i).getOn();
+                        String off = datalog.get(i).getOff();
+                        String timestamps;
+                        if (off.equals("0") || off == null) {
+                            timestamps = on;
+                        } else {
+                            timestamps = off;
+                        }
 
-            String lastval=mInstalledNodeModel.getStatus();
+                        //String time = timestamps.getText().toString();
 
-            if (lastval!=null && !lastval.equals("")) {
+                        long timestampsformat = Long.parseLong(timestamps);
+                        ;
+
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dateString = timeformat.format(new Date(timestampsformat));
+                    }
+                }
+
+                holder.lastaction.setText("Last log : " + dateString);
+                holder.fwName.setText(mInstalledNodeModel.getNode_id() + "\nChannel : " + ch);
+                holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+
+                holder.api2.setText(Html.fromHtml("<font color='#ffffff'>" + "API for <b>getting ON/OFF</b> status this Node </font>"));
+                String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id=" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel();
+                holder.api2.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget2);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                holder.api1.setText(Html.fromHtml("<font color='#ffffff'>" + "API for sending <b>command ON/OFF</b> to this Node </font>"));
+                String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id=" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel() + "&msg=on";
+                holder.api1.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget1);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
+                    holder.sensorStatus.setText("Motion detected!");
+                    holder.imgSensor.setImageResource(R.drawable.motion);
+                } else {
+                    holder.sensorStatus.setText("No Motion detected!");
+                    holder.imgSensor.setImageResource(R.drawable.no_motion);
+                }
+                if (mInstalledNodeModel.getStatus().equals("on")) {
+                    holder.imgNode.setImageResource(R.mipmap.armed);
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("ARMED");
+
+
+                } else {
+                    holder.imgNode.setImageResource(R.mipmap.not_armed);
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("NOT ARMED");
+                }
+                if (mInstalledNodeModel.getStatus_theft().equals("true")) {
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("ALARM!!");
+                    holder.status.setTextColor(Color.MAGENTA);
+                    holder.status.setTypeface(null, Typeface.BOLD);
+                    holder.imgNode.setImageResource(R.drawable.theft);
+
+                }
+                holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                            String payload = "on";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" ARMED");
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
+                    }
+                });
+
+                holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                            String payload = "off";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" NOT ARMED");
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
+                    }
+
+                });
+
+                holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+
+                        if (holder != null) {
+                            holder.imgBut.setSelected(false);
+                            holder.expandableLayout.collapse();
+                        }
+
+                        if (position1 == selectedItem) {
+                            selectedItem = UNSELECTED;
+                        } else {
+                            holder.imgBut.setSelected(true);
+                            holder.expandableLayout.expand();
+                            selectedItem = position1;
+                        }
+                    }
+                });
+
+                holder.seechart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(context, ChartONOFF.class);
+                        //i.putExtra("nodeid", data.get(position).getNodesID());
+                        i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                        context.startActivity(i);
+                    }
+                });
+
+                break;
+            }
+            case "smartsensortemp": {
+                final OlmatixHolder holder = (OlmatixHolder) viewHolder;
+
+                String ch = mInstalledNodeModel.getChannel();
+                String dateString = null;
+                datalog.clear();
+                datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()));
+                int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()).size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        String Nodeid = datalog.get(i).getNodeid();
+                        String chan = datalog.get(i).getChannel();
+                        String on = datalog.get(i).getOn();
+                        String off = datalog.get(i).getOff();
+                        String timestamps;
+                        if (off.equals("0") || off == null) {
+                            timestamps = on;
+                        } else {
+                            timestamps = off;
+                        }
+
+                        //String time = timestamps.getText().toString();
+
+                        long timestampsformat = Long.parseLong(timestamps);
+                        ;
+
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dateString = timeformat.format(new Date(timestampsformat));
+                    }
+                }
+
+                holder.lastaction.setText("Last log : " + dateString);
+                holder.fwName.setText(mInstalledNodeModel.getNode_id() + "\nChannel : " + ch);
+                holder.imgNode.setImageResource(R.drawable.olmatixmed);
+                if (mInstalledNodeModel.getDuration() != null) {
+                    holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
+                }
+                if (mInstalledNodeModel.getNice_name_d() != null) {
+                    holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+                } else
+                    holder.node_name.setText(mInstalledNodeModel.getName());
+
+
+                //holder.upTime.setText("Uptime: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
+
+                holder.status.setText(mInstalledNodeModel.getStatus());
+
+                holder.api2.setText(Html.fromHtml("<font color='#ffffff'>" + "API for <b>getting ON/OFF</b> status this Node </font>"));
+                String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id=" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel();
+                holder.api2.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget2);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                holder.api1.setText(Html.fromHtml("<font color='#ffffff'>" + "API for sending <b>command ON/OFF</b> to this Node </font>"));
+                String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id=" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel() + "&msg=ON";
+                holder.api1.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget1);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
                 if (mInstalledNodeModel.getStatus().equals("on")) {
                     holder.imgNode.setImageResource(R.mipmap.onlamp);
                     holder.statuslabel.setText("Status:");
@@ -252,918 +867,314 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                     holder.status.setTextColor(Color.RED);
                     holder.btn_on.setEnabled(true);
                     holder.btn_off.setEnabled(false);
-                }
-            }
-            holder.imgNode.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showAlertDialog();
-                }
-            });
 
-            holder.btn_on.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
-                        String payload = "on";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" ON");
-                            holder.status.setSingleLine();
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                }
+                String t = mInstalledNodeModel.getStatus_temp();
+                Log.d("DEBUG", "tempe: " + t);
+                if (t != null) {
+                    if (!t.equals("0")) {
+                        if (!t.equals("nan")) {
+                            //String t1 = t.substring(0, 2);
+                            int t2 = Integer.parseInt(t.replaceAll("[\\D]", ""));
+                            holder.temp.setText(t2 - 7 + "°C");
+                            String h = mInstalledNodeModel.getStatus_hum();
+                            //String h1 = h.substring(0, 2);
+                            int h2 = Integer.parseInt(h.replaceAll("[\\D]", ""));
+                            holder.hum.setText(h2 + "%");
                         }
-                    } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
                 }
-            });
 
-            holder.btn_off.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
-                        String payload = "off";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" OFF");
 
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                holder.imgNode.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showAlertDialog();
+                    }
+                });
+                holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
+                            String payload = "on";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" ON");
+                                holder.status.setSingleLine();
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(context, "No response from server, trying to connect now..", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                         }
-                    } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
                     }
+                });
+                holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
+                            String payload = "off";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" OFF");
 
-                }
-
-            });
-
-            holder.imgBut.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-
-                    if (holder != null) {
-                        holder.imgBut.setSelected(false);
-                        holder.expandableLayout.collapse();
-                    }
-
-                    if (position1 == selectedItem) {
-                        selectedItem = UNSELECTED;
-                    } else {
-                        holder.imgBut.setSelected(true);
-                        holder.expandableLayout.expand();
-                        selectedItem = position1;
-                    }
-                }
-            });
-
-            holder.seechart.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(context, ChartONOFF.class);
-                    //i.putExtra("nodeid", data.get(position).getNodesID());
-                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
-                    context.startActivity(i);
-                }
-            });
-
-
-
-        } else if (fw_name.equals("smartsensordoor")) {
-            final OlmatixSensorDoorHolder holder = (OlmatixSensorDoorHolder) viewHolder;
-
-            holder.imgNode.setImageResource(R.drawable.olmatixmed);
-            if (mInstalledNodeModel.getNice_name_d() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            } else {
-                holder.node_name.setText(mInstalledNodeModel.getName());
-            }
-
-            String ch = mInstalledNodeModel.getChannel();
-            String dateString = null;
-            datalog.clear();
-            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
-            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
-            if (countDB != 0) {
-                for (int i = 0; i < countDB; i++) {
-                    String Nodeid = datalog.get(i).getNodeid();
-                    String chan = datalog.get(i).getChannel();
-                    String on = datalog.get(i).getOn();
-                    String off = datalog.get(i).getOff();
-                    String timestamps;
-                    if (off.equals("0")||off == null){
-                        timestamps = on;
-                    } else  {
-                        timestamps = off;
-                    }
-
-                    //String time = timestamps.getText().toString();
-
-                    long timestampsformat = Long.parseLong(timestamps);;
-
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dateString = timeformat.format(new Date(timestampsformat));
-                }
-            }
-
-            holder.lastaction.setText("Last log : "+dateString);
-            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
-            holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
-
-            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
-            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel();
-            holder.api2.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget2);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
-            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
-            holder.api1.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget1);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
-                holder.sensorStatus.setText("Door Close!");
-                holder.imgSensor.setImageResource(R.drawable.door_close);
-            } else {
-                holder.sensorStatus.setText("Door Open!");
-                holder.imgSensor.setImageResource(R.drawable.door_open);
-            }
-            if (mInstalledNodeModel.getStatus().equals("on")) {
-                holder.imgNode.setImageResource(R.mipmap.armed);
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("ARMED");
-
-            } else {
-                holder.imgNode.setImageResource(R.mipmap.not_armed);
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("NOT ARMED");
-            }
-            if (mInstalledNodeModel.getStatus_theft().equals("true")) {
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("ALARM!!");
-                holder.status.setTextColor(Color.MAGENTA);
-                holder.status.setTypeface(null, Typeface.BOLD);
-                holder.imgNode.setImageResource(R.drawable.theft);
-            }
-            holder.btn_on.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
-                        String payload = "on";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" ARMED");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(context, "No response from server, trying to connect now..", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                         }
-                    } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
                     }
 
-                }
-            });
+                });
+                holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
 
-            holder.btn_off.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
-                        String payload = "off";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" NOT ARMED");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                        if (holder != null) {
+                            holder.imgBut.setSelected(false);
+                            holder.expandableLayout.collapse();
                         }
-                    } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                    }
 
-                }
-
-            });
-
-            holder.imgBut.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-
-                    if (holder != null) {
-                        holder.imgBut.setSelected(false);
-                        holder.expandableLayout.collapse();
-                    }
-
-                    if (position1 == selectedItem) {
-                        selectedItem = UNSELECTED;
-                    } else {
-                        holder.imgBut.setSelected(true);
-                        holder.expandableLayout.expand();
-                        selectedItem = position1;
-                    }
-                }
-            });
-
-            holder.seechart.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(context, ChartONOFF.class);
-                    //i.putExtra("nodeid", data.get(position).getNodesID());
-                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
-                    context.startActivity(i);
-                }
-            });
-
-        } else if (fw_name.equals("smartsensormotion")) {
-            final OlmatixSensorMotionHolder holder = (OlmatixSensorMotionHolder) viewHolder;
-
-            holder.imgNode.setImageResource(R.drawable.olmatixmed);
-            if (mInstalledNodeModel.getNice_name_d() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            } else {
-                holder.node_name.setText(mInstalledNodeModel.getName());
-            }
-            String ch = mInstalledNodeModel.getChannel();
-            String dateString = null;
-            datalog.clear();
-            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
-            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
-            if (countDB != 0) {
-                for (int i = 0; i < countDB; i++) {
-                    String Nodeid = datalog.get(i).getNodeid();
-                    String chan = datalog.get(i).getChannel();
-                    String on = datalog.get(i).getOn();
-                    String off = datalog.get(i).getOff();
-                    String timestamps;
-                    if (off.equals("0")||off == null){
-                        timestamps = on;
-                    } else  {
-                        timestamps = off;
-                    }
-
-                    //String time = timestamps.getText().toString();
-
-                    long timestampsformat = Long.parseLong(timestamps);;
-
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dateString = timeformat.format(new Date(timestampsformat));
-                }
-            }
-
-            holder.lastaction.setText("Last log : "+dateString);
-            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
-            holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
-
-            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
-            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel();
-            holder.api2.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget2);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
-            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
-            holder.api1.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget1);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
-                holder.sensorStatus.setText("Motion detected!");
-                holder.imgSensor.setImageResource(R.drawable.motion);
-            } else {
-                holder.sensorStatus.setText("No Motion detected!");
-                holder.imgSensor.setImageResource(R.drawable.no_motion);
-            }
-            if (mInstalledNodeModel.getStatus().equals("on")) {
-                holder.imgNode.setImageResource(R.mipmap.armed);
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("ARMED");
-
-
-            } else {
-                holder.imgNode.setImageResource(R.mipmap.not_armed);
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("NOT ARMED");
-            }
-            if (mInstalledNodeModel.getStatus_theft().equals("true")) {
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("ALARM!!");
-                holder.status.setTextColor(Color.MAGENTA);
-                holder.status.setTypeface(null, Typeface.BOLD);
-                holder.imgNode.setImageResource(R.drawable.theft);
-
-            }
-            holder.btn_on.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
-                        String payload = "on";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" ARMED");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                        if (position1 == selectedItem) {
+                            selectedItem = UNSELECTED;
+                        } else {
+                            holder.imgBut.setSelected(true);
+                            holder.expandableLayout.expand();
+                            selectedItem = position1;
                         }
-                    } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
+                });
 
-                }
-            });
-
-            holder.btn_off.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: "+mStatusServer);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
-                        String payload = "off";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" NOT ARMED");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                holder.seechart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(context, ChartONOFF.class);
+                        //i.putExtra("nodeid", data.get(position).getNodesID());
+                        i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                        context.startActivity(i);
                     }
+                });
 
-                }
-
-            });
-
-            holder.imgBut.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-
-                    if (holder != null) {
-                        holder.imgBut.setSelected(false);
-                        holder.expandableLayout.collapse();
-                    }
-
-                    if (position1 == selectedItem) {
-                        selectedItem = UNSELECTED;
-                    } else {
-                        holder.imgBut.setSelected(true);
-                        holder.expandableLayout.expand();
-                        selectedItem = position1;
-                    }
-                }
-            });
-
-            holder.seechart.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(context, ChartONOFF.class);
-                    //i.putExtra("nodeid", data.get(position).getNodesID());
-                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
-                    context.startActivity(i);
-                }
-            });
-
-        } else if (fw_name.equals("smartsensortemp")) {
-            final OlmatixHolder holder = (OlmatixHolder) viewHolder;
-
-            String ch = mInstalledNodeModel.getChannel();
-            String dateString = null;
-            datalog.clear();
-            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
-            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
-            if (countDB != 0) {
-                for (int i = 0; i < countDB; i++) {
-                    String Nodeid = datalog.get(i).getNodeid();
-                    String chan = datalog.get(i).getChannel();
-                    String on = datalog.get(i).getOn();
-                    String off = datalog.get(i).getOff();
-                    String timestamps;
-                    if (off.equals("0")||off == null){
-                        timestamps = on;
-                    } else  {
-                        timestamps = off;
-                    }
-
-                    //String time = timestamps.getText().toString();
-
-                    long timestampsformat = Long.parseLong(timestamps);;
-
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dateString = timeformat.format(new Date(timestampsformat));
-                }
+                break;
             }
+            case "smartsensorprox": {
+                final OlmatixSensorProxHolder holder = (OlmatixSensorProxHolder) viewHolder;
 
-            holder.lastaction.setText("Last log : "+dateString);
-            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
-            holder.imgNode.setImageResource(R.drawable.olmatixmed);
-            if(mInstalledNodeModel.getDuration()!=null) {
-                holder.duration.setText("ON time : " + OlmatixUtils.getDuration(Long.valueOf(mInstalledNodeModel.getDuration())));
-            }
-            if (mInstalledNodeModel.getNice_name_d() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            } else
-                holder.node_name.setText(mInstalledNodeModel.getName());
-
-
-            //holder.upTime.setText("Uptime: "+OlmatixUtils.getScaledTime(Long.valueOf(mInstalledNodeModel.getUptime())));
-
-            holder.status.setText(mInstalledNodeModel.getStatus());
-
-            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
-            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel();
-            holder.api2.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget2);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
-            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
-            holder.api1.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget1);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            if (mInstalledNodeModel.getStatus().equals("on")) {
-                holder.imgNode.setImageResource(R.mipmap.onlamp);
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("ON");
-                holder.status.setTextColor(Color.GREEN);
-                //holder.status.setTextColor(ContextCompat.getColor(context, R.color.green));
-                holder.btn_on.setEnabled(false);
-                holder.btn_off.setEnabled(true);
-
-            } else {
-                holder.imgNode.setImageResource(R.mipmap.offlamp);
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("OFF");
-                holder.status.setTextColor(Color.RED);
-                holder.btn_on.setEnabled(true);
-                holder.btn_off.setEnabled(false);
-
-            }
-            String t=mInstalledNodeModel.getStatus_temp();
-            Log.d("DEBUG", "tempe: "+t);
-            if (t !=null) {
-                if (!t.equals("0")) {
-                    if (!t.equals("nan")) {
-                        String t1 = t.substring(0, 2);
-                        int t2 = Integer.parseInt(t1.replaceAll("[\\D]", ""));
-                        holder.temp.setText(t2 - 7 + "°C");
-                        String h = mInstalledNodeModel.getStatus_hum();
-                        String h1 = h.substring(0, 2);
-                        int h2 = Integer.parseInt(h1.replaceAll("[\\D]", ""));
-                        holder.hum.setText(h2 + "%");
-                    }
-                }
-            }
-
-
-            holder.imgNode.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showAlertDialog();
-                }
-            });
-            holder.btn_on.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
-                        String payload = "on";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" ON");
-                            holder.status.setSingleLine();
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                    }
-
-                }
-            });
-            holder.btn_off.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_" + mInstalledNodeModel.getChannel() + "/set";
-                        String payload = "off";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" OFF");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        Toast.makeText(context,"No response from server, trying to connect now..",Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                    }
-
-                }
-
-            });
-            holder.imgBut.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-
-                    if (holder != null) {
-                        holder.imgBut.setSelected(false);
-                        holder.expandableLayout.collapse();
-                    }
-
-                    if (position1 == selectedItem) {
-                        selectedItem = UNSELECTED;
-                    } else {
-                        holder.imgBut.setSelected(true);
-                        holder.expandableLayout.expand();
-                        selectedItem = position1;
-                    }
-                }
-            });
-
-            holder.seechart.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(context, ChartONOFF.class);
-                    //i.putExtra("nodeid", data.get(position).getNodesID());
-                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
-                    context.startActivity(i);
-                }
-            });
-
-        } else if (fw_name.equals("smartsensorprox")) {
-            final OlmatixSensorProxHolder holder = (OlmatixSensorProxHolder) viewHolder;
-
-            holder.imgNode.setImageResource(R.drawable.olmatixmed);
-            if (mInstalledNodeModel.getNice_name_d() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            } else {
-                holder.node_name.setText(mInstalledNodeModel.getName());
-            }
-            String ch = mInstalledNodeModel.getChannel();
-            String dateString = null;
-            datalog.clear();
-            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
-            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
-            if (countDB != 0) {
-                for (int i = 0; i < countDB; i++) {
-                    String Nodeid = datalog.get(i).getNodeid();
-                    String chan = datalog.get(i).getChannel();
-                    String on = datalog.get(i).getOn();
-                    String off = datalog.get(i).getOff();
-                    String timestamps;
-                    if (off.equals("0")||off == null){
-                        timestamps = on;
-                    } else  {
-                        timestamps = off;
-                    }
-
-                    //String time = timestamps.getText().toString();
-
-                    long timestampsformat = Long.parseLong(timestamps);;
-
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dateString = timeformat.format(new Date(timestampsformat));
-                }
-            }
-
-            holder.lastaction.setText("Last log : "+dateString);
-            holder.fwName.setText(mInstalledNodeModel.getNode_id()+"\nChannel : "+ch);
-            holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
-
-            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
-            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel();
-            holder.api2.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget2);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
-            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
-            holder.api1.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget1);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
-                holder.sensorStatus.setText("Block detected!");
-                holder.imgSensor.setImageResource(R.drawable.proximityon);
-            } else {
-                holder.sensorStatus.setText("Empty");
-                holder.imgSensor.setImageResource(R.drawable.proximityoff);
-            }
-            if (mInstalledNodeModel.getStatus().equals("true")) {
-                holder.imgNode.setImageResource(R.mipmap.armed);
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("ARMED");
-
-
-            } else {
-                holder.imgNode.setImageResource(R.mipmap.not_armed);
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("NOT ARMED");
-            }
-            if (mInstalledNodeModel.getStatus_theft().equals("true")) {
-                holder.statuslabel.setText("Status:");
-                holder.status.setText("ALARM!!");
-                holder.status.setTextColor(Color.MAGENTA);
-                holder.status.setTypeface(null, Typeface.BOLD);
-                holder.imgNode.setImageResource(R.drawable.theft);
-
-            }
-
-            if (mInstalledNodeModel.getStatus_jarak()!=null) {
-                holder.jarak.setText(mInstalledNodeModel.getStatus_jarak());
-                float convert = Integer.parseInt(mInstalledNodeModel.getStatus_jarak());
-                String jar;
-                if (convert < 100) {
-                    jar = convert + " cm";
+                holder.imgNode.setImageResource(R.drawable.olmatixmed);
+                if (mInstalledNodeModel.getNice_name_d() != null) {
+                    holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
                 } else {
-                    convert = convert / 100;
-                    jar = convert + " m";
+                    holder.node_name.setText(mInstalledNodeModel.getName());
                 }
-                holder.jarak.setText(jar);
-            }
-
-            holder.btn_on.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
-                        String payload = "on";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" ARMED");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                String ch = mInstalledNodeModel.getChannel();
+                String dateString = null;
+                datalog.clear();
+                datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()));
+                int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()).size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        String Nodeid = datalog.get(i).getNodeid();
+                        String chan = datalog.get(i).getChannel();
+                        String on = datalog.get(i).getOn();
+                        String off = datalog.get(i).getOff();
+                        String timestamps;
+                        if (off.equals("0") || off == null) {
+                            timestamps = on;
+                        } else {
+                            timestamps = off;
                         }
+
+                        //String time = timestamps.getText().toString();
+
+                        long timestampsformat = Long.parseLong(timestamps);
+                        ;
+
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dateString = timeformat.format(new Date(timestampsformat));
+                    }
+                }
+
+                holder.lastaction.setText("Last log : " + dateString);
+                holder.fwName.setText(mInstalledNodeModel.getNode_id() + "\nChannel : " + ch);
+                holder.status.setText("Status : " + mInstalledNodeModel.getStatus());
+
+                holder.api2.setText(Html.fromHtml("<font color='#ffffff'>" + "API for <b>getting ON/OFF</b> status this Node </font>"));
+                String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id=" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel();
+                holder.api2.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget2);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                holder.api1.setText(Html.fromHtml("<font color='#ffffff'>" + "API for sending <b>command ON/OFF</b> to this Node </font>"));
+                String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id=" + mInstalledNodeModel.getNode_id() +
+                        "&ch=on_" + mInstalledNodeModel.getChannel() + "&msg=on";
+                holder.api1.setOnClickListener(new View.OnClickListener() {
+                    // @RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget1);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
+                    }
+                });
+
+                if (mInstalledNodeModel.getStatus_sensor().equals("true")) {
+                    holder.sensorStatus.setText("Block detected!");
+                    holder.imgSensor.setImageResource(R.drawable.proximityon);
+                } else {
+                    holder.sensorStatus.setText("Empty");
+                    holder.imgSensor.setImageResource(R.drawable.proximityoff);
+                }
+                if (mInstalledNodeModel.getStatus().equals("true")) {
+                    holder.imgNode.setImageResource(R.mipmap.armed);
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("ARMED");
+
+
+                } else {
+                    holder.imgNode.setImageResource(R.mipmap.not_armed);
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("NOT ARMED");
+                }
+                if (mInstalledNodeModel.getStatus_theft().equals("true")) {
+                    holder.statuslabel.setText("Status:");
+                    holder.status.setText("ALARM!!");
+                    holder.status.setTextColor(Color.MAGENTA);
+                    holder.status.setTypeface(null, Typeface.BOLD);
+                    holder.imgNode.setImageResource(R.drawable.theft);
+
+                }
+
+                if (mInstalledNodeModel.getStatus_jarak() != null) {
+                    holder.jarak.setText(mInstalledNodeModel.getStatus_jarak());
+                    float convert = Integer.parseInt(mInstalledNodeModel.getStatus_jarak());
+                    String jar;
+                    if (convert < 100) {
+                        jar = convert + " cm";
                     } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        convert = convert / 100;
+                        jar = convert + " m";
+                    }
+                    holder.jarak.setText(jar);
+                }
+
+                holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                            String payload = "on";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" ARMED");
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
+                    }
+                });
+
+                holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
+                            String payload = "off";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.statuslabel.setText("Sending");
+                                holder.status.setText(" NOT ARMED");
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
                     }
 
-                }
-            });
-
-            holder.btn_off.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/light/on_1/set";
-                        String payload = "off";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.statuslabel.setText("Sending");
-                            holder.status.setText(" NOT ARMED");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                    }
-
-                }
-
-            });
-            holder.setrange.setText(mInstalledNodeModel.getStatus_range()+ " cm");
-            int max = 200;
-            holder.seekRange.setMax( (max - min) / step );
+                });
+                holder.setrange.setText(mInstalledNodeModel.getStatus_range() + " cm");
+                int max = 200;
+                holder.seekRange.setMax((max - min) / step);
            /* int steppos = Integer.parseInt(mInstalledNodeModel.getStatus_range());
 
             if (steppos == 200) {
@@ -1176,278 +1187,449 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                 holder.seekRange.setProgress(1);
             }*/
 
-            holder.seekRange.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int value = min + (progress * step);
-                    //Log.d("DEBUG", "onProgressChanged: "+value);
-                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dist/range/set";
-                    String payload = String.valueOf(value);
-                    byte[] encodedPayload = new byte[0];
-                    try {
-                        encodedPayload = payload.getBytes("UTF-8");
-                        MqttMessage message = new MqttMessage(encodedPayload);
-                        message.setQos(1);
-                        message.setRetained(true);
-                        Connection.getClient().publish(topic, message);
+                holder.seekRange.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        int value = min + (progress * step);
+                        //Log.d("DEBUG", "onProgressChanged: "+value);
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/dist/range/set";
+                        String payload = String.valueOf(value);
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
 
 
-                    } catch (UnsupportedEncodingException | MqttException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-
-            holder.imgBut.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-
-                    if (holder != null) {
-                        holder.imgBut.setSelected(false);
-                        holder.expandableLayout.collapse();
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
                     }
 
-                    if (position1 == selectedItem) {
-                        selectedItem = UNSELECTED;
-                    } else {
-                        holder.imgBut.setSelected(true);
-                        holder.expandableLayout.expand();
-                        selectedItem = position1;
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
                     }
-                }
-            });
 
-            holder.seechart.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(context, ChartONOFF.class);
-                    //i.putExtra("nodeid", data.get(position).getNodesID());
-                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
-                    context.startActivity(i);
-                }
-            });
-        } else if (fw_name.equals("smartrgb")||fw_name.equals("smartrgbw")) {
-            final OlmatixRGBHolder holder = (OlmatixRGBHolder) viewHolder;
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
 
-            holder.colorPickerView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    holder.colclick=0;
-                    return false;
-                }
-            });
+                    }
+                });
 
-            Log.d("DEBUG", "Current Tog: "+tog);
+                holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
 
-            if (tog==0){
-                holder.redSl.setVisibility(View.VISIBLE);
-                holder.greenSl.setVisibility(View.VISIBLE);
-                holder.blueSl.setVisibility(View.VISIBLE);
-                holder.colorPickerView.setVisibility(View.GONE);
-                holder.v_lightness_slider.setVisibility(View.GONE);
-            } else {
-                holder.redSl.setVisibility(View.GONE);
-                holder.greenSl.setVisibility(View.GONE);
-                holder.blueSl.setVisibility(View.GONE);
-                holder.colorPickerView.setVisibility(View.VISIBLE);
-                holder.v_lightness_slider.setVisibility(View.VISIBLE);
+                        if (holder != null) {
+                            holder.imgBut.setSelected(false);
+                            holder.expandableLayout.collapse();
+                        }
+
+                        if (position1 == selectedItem) {
+                            selectedItem = UNSELECTED;
+                        } else {
+                            holder.imgBut.setSelected(true);
+                            holder.expandableLayout.expand();
+                            selectedItem = position1;
+                        }
+                    }
+                });
+
+                holder.seechart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(context, ChartONOFF.class);
+                        //i.putExtra("nodeid", data.get(position).getNodesID());
+                        i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                        context.startActivity(i);
+                    }
+                });
+                break;
             }
-            holder.imgNode.setImageResource(R.mipmap.smartrgb);
-            holder.mode.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("DEBUG", "Current Tog: "+tog);
-                    if (tog == 1) {
-                        holder.redSl.setVisibility(View.VISIBLE);
-                        holder.greenSl.setVisibility(View.VISIBLE);
-                        holder.blueSl.setVisibility(View.VISIBLE);
-                        holder.colorPickerView.setVisibility(View.GONE);
-                        holder.v_lightness_slider.setVisibility(View.GONE);
+            case "smartrgb":
+            case "smartrgbw": {
+                final OlmatixRGBHolder holder = (OlmatixRGBHolder) viewHolder;
 
-                        tog = 0;
-                    } else {
-                        holder.redSl.setVisibility(View.GONE);
-                        holder.greenSl.setVisibility(View.GONE);
-                        holder.blueSl.setVisibility(View.GONE);
-                        holder.colorPickerView.setVisibility(View.VISIBLE);
-                        holder.v_lightness_slider.setVisibility(View.VISIBLE);
+                holder.colorPickerView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        holder.colclick = 0;
+                        return false;
+                    }
+                });
 
-                        tog = 1;
+                Log.d("DEBUG", "Current Tog: " + tog);
+
+                if (tog == 0) {
+                    holder.redSl.setVisibility(View.VISIBLE);
+                    holder.greenSl.setVisibility(View.VISIBLE);
+                    holder.blueSl.setVisibility(View.VISIBLE);
+                    holder.whiteSl.setVisibility(View.VISIBLE);
+                    holder.colorPickerView.setVisibility(View.GONE);
+                    holder.ten.setVisibility(View.GONE);
+                    holder.twentyfive.setVisibility(View.GONE);
+                    holder.fifty.setVisibility(View.GONE);
+                    holder.seventyfive.setVisibility(View.GONE);
+                } else {
+                    holder.redSl.setVisibility(View.GONE);
+                    holder.greenSl.setVisibility(View.GONE);
+                    holder.blueSl.setVisibility(View.GONE);
+                    holder.whiteSl.setVisibility(View.GONE);
+                    holder.ten.setVisibility(View.VISIBLE);
+                    holder.twentyfive.setVisibility(View.VISIBLE);
+                    holder.fifty.setVisibility(View.VISIBLE);
+                    holder.seventyfive.setVisibility(View.VISIBLE);
+                    holder.colorPickerView.setVisibility(View.VISIBLE);
+                }
+                holder.imgNode.setImageResource(R.mipmap.smartrgb);
+                holder.mode.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("DEBUG", "Current Tog: " + tog);
+                        if (tog == 1) {
+                            holder.redSl.setVisibility(View.VISIBLE);
+                            holder.greenSl.setVisibility(View.VISIBLE);
+                            holder.blueSl.setVisibility(View.VISIBLE);
+                            holder.whiteSl.setVisibility(View.VISIBLE);
+                            holder.colorPickerView.setVisibility(View.GONE);
+                            holder.ten.setVisibility(View.GONE);
+                            holder.twentyfive.setVisibility(View.GONE);
+                            holder.fifty.setVisibility(View.GONE);
+                            holder.seventyfive.setVisibility(View.GONE);
+
+                            tog = 0;
+                        } else {
+                            holder.redSl.setVisibility(View.GONE);
+                            holder.greenSl.setVisibility(View.GONE);
+                            holder.blueSl.setVisibility(View.GONE);
+                            holder.whiteSl.setVisibility(View.GONE);
+                            holder.ten.setVisibility(View.VISIBLE);
+                            holder.twentyfive.setVisibility(View.VISIBLE);
+                            holder.fifty.setVisibility(View.VISIBLE);
+                            holder.seventyfive.setVisibility(View.VISIBLE);
+                            holder.colorPickerView.setVisibility(View.VISIBLE);
+                            //  p.addRule(RelativeLayout.BELOW, R.id.white);
+
+                            // holder.imgBut.setLayoutParams(p);
+
+                            tog = 1;
+                        }
+                    }
+                });
+
+
+
+                holder.redSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        int value = (progress);
+                        Log.d("DEBUG", "onProgressChanged: " + value);
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                        String payload = "rgb(" + String.valueOf(value) + "," + cur_green + "," + cur_blue + "," + cur_white + ")";
+                        cur_red = String.valueOf(value);
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                holder.greenSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        int value = (progress);
+                        Log.d("DEBUG", "onProgressChanged: " + value);
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                        String payload = "rgb(" + cur_red + "," + String.valueOf(value) + "," + cur_blue + "," + cur_white + ")";
+                        cur_green = String.valueOf(value);
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                holder.blueSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        int value = (progress);
+                        Log.d("DEBUG", "onProgressChanged: " + value);
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                        String payload = "rgb(" + cur_red + "," + cur_green + "," + String.valueOf(value) + "," + cur_white + ")";
+                        cur_blue = String.valueOf(value);
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                holder.whiteSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        int value = (progress);
+                        Log.d("DEBUG", "onProgressChanged: " + value);
+                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                        String payload = "rgb(" + cur_red + "," + cur_green + "," + cur_blue + "," + String.valueOf(value) + ")";
+                        cur_white = String.valueOf(value);
+                        byte[] encodedPayload = new byte[0];
+                        try {
+                            encodedPayload = payload.getBytes("UTF-8");
+                            MqttMessage message = new MqttMessage(encodedPayload);
+                            message.setQos(1);
+                            message.setRetained(true);
+                            Connection.getClient().publish(topic, message);
+
+
+                        } catch (UnsupportedEncodingException | MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                holder.colorPickerView.addOnColorChangedListener(new OnColorChangedListener() {
+                    @Override
+                    public void onColorChanged(int selectedColor) {
+                        // Handle on color change
+                        //holder.colclick=0;
+
+                        if (holder.colclick == 0) {
+                            holder.colclick = 1;
+                            int red = Color.red(selectedColor);
+                            int green = Color.green(selectedColor);
+                            int blue = Color.blue(selectedColor);
+                            //Log.d("ColorPicker", "onColorChanged: red" + red + " green " + green + " blue " + blue);
+                            holder.status.setText("RGB(" + red + "," + green + "," + blue + ")");
+                            cur_white = "0";
+                            cur_red = String.valueOf(red);
+                            cur_green = String.valueOf(green);
+                            cur_blue = String.valueOf(blue);
+
+                            //holder.imgNode.setImageTintList(ColorStateList.valueOf(selectedColor));
+                            //Log.d("DEBUG", "onColorChanged: "+selectedColor);
+                            sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                            mStatusServer = sharedPref.getBoolean("conStatus", false);
+                            if (mStatusServer) {
+                                String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                                String payload = "rgb(" + red + "," + green + "," + blue + ",0" + ")";
+                                byte[] encodedPayload = new byte[0];
+                                try {
+                                    encodedPayload = payload.getBytes("UTF-8");
+                                    MqttMessage message = new MqttMessage(encodedPayload);
+                                    message.setQos(1);
+                                    message.setRetained(true);
+                                    Connection.getClient().publish(topic, message);
+
+                                } catch (UnsupportedEncodingException | MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                        /*TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                        snackbar.show();*/
+                                Intent intent = new Intent("addNode");
+                                intent.putExtra("Connect", "con");
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                            }
+                        }
+                    }
+                });
+                holder.colorPickerView.addOnColorSelectedListener(new OnColorSelectedListener() {
+                    @Override
+                    public void onColorSelected(int selectedColor) {
+
+                    }
+                });
+
+                //holder.imgNode.setImageResource(R.drawable.olmatixmed);
+                if (mInstalledNodeModel.getNice_name_d() != null) {
+                    holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
+                } else {
+                    holder.node_name.setText(mInstalledNodeModel.getName());
+                }
+                String ch = mInstalledNodeModel.getChannel();
+                String dateString = null;
+                datalog.clear();
+                datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()));
+                int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(), mInstalledNodeModel.getChannel()).size();
+                if (countDB != 0) {
+                    for (int i = 0; i < countDB; i++) {
+                        String Nodeid = datalog.get(i).getNodeid();
+                        String chan = datalog.get(i).getChannel();
+                        String on = datalog.get(i).getOn();
+                        String off = datalog.get(i).getOff();
+                        String timestamps;
+                        if (off.equals("0") || off == null) {
+                            timestamps = on;
+                        } else {
+                            timestamps = off;
+                        }
+
+                        //String time = timestamps.getText().toString();
+
+                        long timestampsformat = Long.parseLong(timestamps);
+                        ;
+
+                        SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
+                        dateString = timeformat.format(new Date(timestampsformat));
                     }
                 }
-            });
 
-            holder.redSl.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
-            holder.redSl.getThumb().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                holder.lastaction.setText("Last log : " + dateString);
+                holder.fwName.setText(mInstalledNodeModel.getNode_id() + " Channel : " + ch);
+                String lastval = mInstalledNodeModel.getStatus();
+                //Log.d("DEBUG", "RGB: " + lastval+ " nodeid "+mInstalledNodeModel.getNode_id()+" Channel : "+ch);
 
-            holder.greenSl.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
-            holder.greenSl.getThumb().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+                holder.status.setText(mInstalledNodeModel.getStatus());
+                String convRGB = mInstalledNodeModel.getStatus();
+                Log.d("DEBUG", "onBindViewHolder RGB: " + convRGB.length());
+                int colorVal = 0;
+                if (convRGB.length() > 10) {
+                    String[] a = convRGB.split(",");
+                    int redval = Integer.parseInt(a[0].substring(4));
+                    int greenVal = Integer.parseInt(a[1]);
+                    int blueVal = Integer.parseInt(a[2]);
+                    int whiteVal = Integer.parseInt(a[3].replace(")", ""));
 
-            holder.blueSl.getProgressDrawable().setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
-            holder.blueSl.getThumb().setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
+                    //int blueVal = Integer.parseInt(a[2].substring(0, a[2].length()-1));
+                    colorVal = Color.rgb(redval, greenVal, blueVal);
+                    cur_red = String.valueOf(redval);
+                    cur_green = String.valueOf(greenVal);
+                    cur_blue = String.valueOf(blueVal);
+                    cur_white = String.valueOf(whiteVal);
 
-            holder.redSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int value = (progress);
-                    Log.d("DEBUG", "onProgressChanged: "+value);
-                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                    String payload = "rgb("+String.valueOf(value)+","+cur_green+","+cur_blue+","+cur_white+")";
-                    cur_red = String.valueOf(value);
-                    byte[] encodedPayload = new byte[0];
-                    try {
-                        encodedPayload = payload.getBytes("UTF-8");
-                        MqttMessage message = new MqttMessage(encodedPayload);
-                        message.setQos(1);
-                        message.setRetained(true);
-                        Connection.getClient().publish(topic, message);
+                }
 
 
-                    } catch (UnsupportedEncodingException | MqttException e) {
-                        e.printStackTrace();
+                //Log.d("DEBUG", "onBindViewHolder: "+colorVal);
+                holder.imgNode.setColorFilter(colorVal, PorterDuff.Mode.SRC_IN);
+                holder.redSl.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                holder.redSl.getThumb().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+                holder.redSl.setProgress(Integer.parseInt(cur_red));
+
+                holder.greenSl.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+                holder.greenSl.getThumb().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+                holder.greenSl.setProgress(Integer.parseInt(cur_green));
+
+                holder.blueSl.getProgressDrawable().setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
+                holder.blueSl.getThumb().setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
+                holder.blueSl.setProgress(Integer.parseInt(cur_blue));
+
+                holder.whiteSl.setProgress(Integer.parseInt(cur_white));
+
+                holder.api2.setText(Html.fromHtml("<font color='#ffffff'>" + "API for <b>getting ON/OFF/Color</b> status this Node </font>"));
+                String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id=" + mInstalledNodeModel.getNode_id() +
+                        "/led/color/";
+                holder.api2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget2);
+                        clipboard.setPrimaryClip(clip);
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
                     }
-                }
+                });
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+                holder.api1.setText(Html.fromHtml("<font color='#ffffff'>" + "API for sending <b>command ON/OFF</b> to this Node </font>"));
+                String apiget1 = "http://cloud.olmatix.com:1880/API/POST/RGB?id=" + mInstalledNodeModel.getNode_id() +
+                        "&msg=rgb(255,255,255,255)";
+                holder.api1.setOnClickListener(new View.OnClickListener() {
+                    //@RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", apiget1);
+                        clipboard.setPrimaryClip(clip);
 
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-
-            holder.greenSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int value =(progress);
-                    Log.d("DEBUG", "onProgressChanged: "+value);
-                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                    String payload = "rgb("+cur_red+","+String.valueOf(value)+","+cur_blue+","+cur_white+")";
-                    cur_green = String.valueOf(value);
-                    byte[] encodedPayload = new byte[0];
-                    try {
-                        encodedPayload = payload.getBytes("UTF-8");
-                        MqttMessage message = new MqttMessage(encodedPayload);
-                        message.setQos(1);
-                        message.setRetained(true);
-                        Connection.getClient().publish(topic, message);
-
-
-                    } catch (UnsupportedEncodingException | MqttException e) {
-                        e.printStackTrace();
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
+                        sendIntent.setType("text/plain");
+                        context.startActivity(sendIntent);
                     }
-                }
+                });
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-
-            holder.blueSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int value = (progress);
-                    Log.d("DEBUG", "onProgressChanged: "+value);
-                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                    String payload = "rgb("+cur_red+","+cur_green+","+String.valueOf(value)+","+cur_white+")";
-                    cur_blue = String.valueOf(value);
-                    byte[] encodedPayload = new byte[0];
-                    try {
-                        encodedPayload = payload.getBytes("UTF-8");
-                        MqttMessage message = new MqttMessage(encodedPayload);
-                        message.setQos(1);
-                        message.setRetained(true);
-                        Connection.getClient().publish(topic, message);
-
-
-                    } catch (UnsupportedEncodingException | MqttException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-
-            holder.whiteSl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int value = (progress);
-                    Log.d("DEBUG", "onProgressChanged: "+value);
-                    String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                    String payload = "rgb("+cur_red+","+cur_green+","+cur_blue+","+String.valueOf(value)+")";
-                    cur_white = String.valueOf(value);
-                    byte[] encodedPayload = new byte[0];
-                    try {
-                        encodedPayload = payload.getBytes("UTF-8");
-                        MqttMessage message = new MqttMessage(encodedPayload);
-                        message.setQos(1);
-                        message.setRetained(true);
-                        Connection.getClient().publish(topic, message);
-
-
-                    } catch (UnsupportedEncodingException | MqttException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-
-            holder.colorPickerView.addOnColorChangedListener(new OnColorChangedListener() {
-                @Override public void onColorChanged(int selectedColor) {
-                    // Handle on color change
-                    //holder.colclick=0;
-
-                    if (holder.colclick==0) {
-                        holder.colclick=1;
-                        int red = Color.red(selectedColor);
-                        int green = Color.green(selectedColor);
-                        int blue = Color.blue(selectedColor);
-                        //Log.d("ColorPicker", "onColorChanged: red" + red + " green " + green + " blue " + blue);
-                        holder.status.setText("RGB(" + red + "," + green + "," + blue + ")");
-
-                        //holder.imgNode.setImageTintList(ColorStateList.valueOf(selectedColor));
-                        //Log.d("DEBUG", "onColorChanged: "+selectedColor);
+                holder.btn_on.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
                         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                         mStatusServer = sharedPref.getBoolean("conStatus", false);
                         if (mStatusServer) {
                             String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                            String payload = "rgb(" + red + "," + green + "," + blue+ ",0" + ")";
+                            String payload = "rgb(255,255,255,255)";
                             byte[] encodedPayload = new byte[0];
                             try {
                                 encodedPayload = payload.getBytes("UTF-8");
@@ -1455,215 +1637,237 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
                                 message.setQos(1);
                                 message.setRetained(true);
                                 Connection.getClient().publish(topic, message);
+                                holder.status.setText(" ON");
 
                             } catch (UnsupportedEncodingException | MqttException e) {
                                 e.printStackTrace();
                             }
                         } else {
-                        /*TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();*/
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
+                    }
+                });
+
+                holder.btn_off.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                            String payload = "rgb(0,0,0,0)";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.status.setText(" OFF");
+                                holder.colclick = 0;
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
+
+                    }
+
+                });
+
+                holder.ten.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                            String payload = "rgb(" + Math.round(Integer.parseInt(cur_red)*0.1) + ","
+                                    + Math.round(Integer.parseInt(cur_green)*0.1) + ","
+                                    + Math.round(Integer.parseInt(cur_blue)*0.1) + ","
+                                    + Math.round(Integer.parseInt(cur_white)*0.1)+")";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.status.setText(" OFF");
+                                holder.colclick = 0;
+
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
                             Intent intent = new Intent("addNode");
                             intent.putExtra("Connect", "con");
                             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                         }
                     }
-                }
-            });
-            holder.colorPickerView.addOnColorSelectedListener(new OnColorSelectedListener() {
-                @Override
-                public void onColorSelected(int selectedColor) {
+                });
 
-                }
-            });
+                holder.twentyfive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                            String payload = "rgb(" + Math.round(Integer.parseInt(cur_red)*0.25) + ","
+                                    + Math.round(Integer.parseInt(cur_green)*0.25) + ","
+                                    + Math.round(Integer.parseInt(cur_blue)*0.25) + ","
+                                    + Math.round(Integer.parseInt(cur_white)*0.25)+")";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.status.setText(" OFF");
+                                holder.colclick = 0;
 
-            //holder.imgNode.setImageResource(R.drawable.olmatixmed);
-            if (mInstalledNodeModel.getNice_name_d() != null) {
-                holder.node_name.setText(mInstalledNodeModel.getNice_name_d());
-            } else {
-                holder.node_name.setText(mInstalledNodeModel.getName());
-            }
-            String ch = mInstalledNodeModel.getChannel();
-            String dateString = null;
-            datalog.clear();
-            datalog.addAll(mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()));
-            int countDB = mDbNodeRepo.getLogbyName(mInstalledNodeModel.getNode_id(),mInstalledNodeModel.getChannel()).size();
-            if (countDB != 0) {
-                for (int i = 0; i < countDB; i++) {
-                    String Nodeid = datalog.get(i).getNodeid();
-                    String chan = datalog.get(i).getChannel();
-                    String on = datalog.get(i).getOn();
-                    String off = datalog.get(i).getOff();
-                    String timestamps;
-                    if (off.equals("0")||off == null){
-                        timestamps = on;
-                    } else  {
-                        timestamps = off;
-                    }
-
-                    //String time = timestamps.getText().toString();
-
-                    long timestampsformat = Long.parseLong(timestamps);;
-
-                    SimpleDateFormat timeformat = new SimpleDateFormat("d MMM | hh:mm:ss");
-                    dateString = timeformat.format(new Date(timestampsformat));
-                }
-            }
-
-            holder.lastaction.setText("Last log : "+dateString);
-            holder.fwName.setText(mInstalledNodeModel.getNode_id()+" Channel : "+ch);
-            String lastval=mInstalledNodeModel.getStatus();
-            //Log.d("DEBUG", "RGB: " + lastval+ " nodeid "+mInstalledNodeModel.getNode_id()+" Channel : "+ch);
-
-            holder.status.setText(mInstalledNodeModel.getStatus());
-            String convRGB = mInstalledNodeModel.getStatus();
-            Log.d("DEBUG", "onBindViewHolder RGB: "+convRGB.length());
-            int colorVal = 0;
-            if (convRGB.length()>10) {
-                String[] a = convRGB.split(",");
-                int redval = Integer.parseInt(a[0].substring(4));
-                int greenVal = Integer.parseInt(a[1]);
-                int blueVal = Integer.parseInt(a[2]);
-
-                //int blueVal = Integer.parseInt(a[2].substring(0, a[2].length()-1));
-                colorVal = Color.rgb(redval, greenVal, blueVal);
-            }
-            //Log.d("DEBUG", "onBindViewHolder: "+colorVal);
-            holder.imgNode.setColorFilter(colorVal, PorterDuff.Mode.SRC_IN);
-            holder.api2.setText(Html.fromHtml("<font color='#ffffff'>"+"API for <b>getting ON/OFF</b> status this Node </font>"));
-            String apiget2 = "http://cloud.olmatix.com:1880/API/GET/SWITCH?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel();
-            holder.api2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget2);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget2);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            holder.api1.setText(Html.fromHtml("<font color='#ffffff'>"+"API for sending <b>command ON/OFF</b> to this Node </font>"));
-            String apiget1 = "http://cloud.olmatix.com:1880/API/POST?id="+mInstalledNodeModel.getNode_id()+
-                    "&ch="+mInstalledNodeModel.getChannel()+"&msg=ON";
-            holder.api1.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("label", apiget1);
-                    clipboard.setPrimaryClip(clip);
-
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, apiget1);
-                    sendIntent.setType("text/plain");
-                    context.startActivity(sendIntent);
-                }
-            });
-
-            holder.btn_on.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                        String payload = "rgb(255,255,255,255)";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.status.setText(" ON");
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                         }
-                    } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
+                });
 
-                }
-            });
+                holder.fifty.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                            String payload = "rgb(" + Math.round(Integer.parseInt(cur_red)*0.5) + ","
+                                    + Math.round(Integer.parseInt(cur_green)*0.5) + ","
+                                    + Math.round(Integer.parseInt(cur_blue)*0.5) + ","
+                                    + Math.round(Integer.parseInt(cur_white)*0.5)+")";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.status.setText(" OFF");
+                                holder.colclick = 0;
 
-            holder.btn_off.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                    mStatusServer = sharedPref.getBoolean("conStatus", false);
-                    Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
-                    if (mStatusServer) {
-                        String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
-                        String payload = "rgb(0,0,0,0)";
-                        byte[] encodedPayload = new byte[0];
-                        try {
-                            encodedPayload = payload.getBytes("UTF-8");
-                            MqttMessage message = new MqttMessage(encodedPayload);
-                            message.setQos(1);
-                            message.setRetained(true);
-                            Connection.getClient().publish(topic, message);
-                            holder.status.setText(" OFF");
-                            holder.colclick=0;
-
-                        } catch (UnsupportedEncodingException | MqttException e) {
-                            e.printStackTrace();
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                         }
-                    } else {
-                        TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
-                        snackbar.show();
-                        Intent intent = new Intent("addNode");
-                        intent.putExtra("Connect", "con");
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
+                });
 
-                }
+                holder.seventyfive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        mStatusServer = sharedPref.getBoolean("conStatus", false);
+                        Log.d("DEBUG", "oNcLICK status connection: " + mStatusServer);
+                        if (mStatusServer) {
+                            String topic = "devices/" + mInstalledNodeModel.getNode_id() + "/led/color/set";
+                            String payload = "rgb(" + Math.round(Integer.parseInt(cur_red)*0.75) + ","
+                                    + Math.round(Integer.parseInt(cur_green)*0.75) + ","
+                                    + Math.round(Integer.parseInt(cur_blue)*0.75) + ","
+                                    + Math.round(Integer.parseInt(cur_white)*0.75)+")";
+                            byte[] encodedPayload = new byte[0];
+                            try {
+                                encodedPayload = payload.getBytes("UTF-8");
+                                MqttMessage message = new MqttMessage(encodedPayload);
+                                message.setQos(1);
+                                message.setRetained(true);
+                                Connection.getClient().publish(topic, message);
+                                holder.status.setText(" OFF");
+                                holder.colclick = 0;
 
-            });
-
-            holder.imgBut.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-
-                    if (holder != null) {
-                        holder.imgBut.setSelected(false);
-                        holder.expandableLayout.collapse();
+                            } catch (UnsupportedEncodingException | MqttException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            TSnackbar snackbar = TSnackbar.make(view, "You dont connect to server", TSnackbar.LENGTH_LONG);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#FF4081"));
+                            snackbar.show();
+                            Intent intent = new Intent("addNode");
+                            intent.putExtra("Connect", "con");
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        }
                     }
-                    if (position1 == selectedItem) {
-                        selectedItem = UNSELECTED;
-                    } else {
-                        holder.imgBut.setSelected(true);
-                        holder.expandableLayout.expand();
-                        selectedItem = position1;
-                    }
-                }
-            });
+                });
 
-            holder.seechart.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(context, ChartONOFF.class);
-                    //i.putExtra("nodeid", data.get(position).getNodesID());
-                    i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
-                    context.startActivity(i);
-                }
-            });
+                holder.imgBut.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+
+                        if (holder != null) {
+                            holder.imgBut.setSelected(false);
+                            holder.expandableLayout.collapse();
+                        }
+                        if (position1 == selectedItem) {
+                            selectedItem = UNSELECTED;
+                        } else {
+                            holder.imgBut.setSelected(true);
+                            holder.expandableLayout.expand();
+                            selectedItem = position1;
+                        }
+                    }
+                });
+
+                holder.seechart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(context, ChartONOFF.class);
+                        //i.putExtra("nodeid", data.get(position).getNodesID());
+                        i.putExtra("nice_name", mInstalledNodeModel.getNice_name_d());
+                        context.startActivity(i);
+                    }
+                });
+                break;
+            }
         }
 
 
@@ -1827,13 +2031,12 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
     public class OlmatixRGBHolder extends ViewHolder {
         public TextView node_name, upTime, status, fwName, lastaction, seechart, api1, api2;
         public ImageView imgNode;
-        Button btn_off, btn_on;
+        Button btn_off, btn_on, ten, twentyfive, fifty, seventyfive;
         ExpandableLayout expandableLayout;
         ImageButton imgBut, mode;
         ColorPickerView colorPickerView;
         int colclick;
         SeekBar redSl, greenSl, blueSl, whiteSl;
-        LightnessSlider v_lightness_slider;
 
         public OlmatixRGBHolder(View view) {
             super(view);
@@ -1845,6 +2048,10 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             upTime = (TextView) view.findViewById(R.id.uptime);
             btn_off = (Button) view.findViewById(R.id.btn_off);
             btn_on = (Button) view.findViewById(R.id.btn_on);
+            ten = (Button) view.findViewById(R.id.ten);
+            twentyfive = (Button) view.findViewById(R.id.twentyfive);
+            fifty = (Button) view.findViewById(R.id.fifty);
+            seventyfive = (Button) view.findViewById(R.id.seventyfive);
             expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
             expandableLayout.collapse(false);
             lastaction = (TextView) view.findViewById(R.id.lastdata);
@@ -1858,7 +2065,6 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
             blueSl = (SeekBar) view.findViewById(R.id.blue);
             whiteSl = (SeekBar) view.findViewById(R.id.white);
 
-            v_lightness_slider = (LightnessSlider) view.findViewById(R.id.v_lightness_slider);
 
             datalog = new ArrayList<>();
             mDbNodeRepo = new dbNodeRepo(context);
@@ -1884,14 +2090,11 @@ public class NodeDetailAdapter extends RecyclerView.Adapter<NodeDetailAdapter.Vi
         gridView.setHorizontalSpacing(0);
 
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // do something here
-                view.setSelected(true);
-                Log.d("DEBUG", "onClick1: "+gridView.getSelectedItem().toString());
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
+            // do something here
+            view.setSelected(true);
+            Log.d("DEBUG", "onClick1: "+gridView.getSelectedItem().toString());
 
-            }
         });
 
         // Set grid view to alertDialog

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -89,6 +90,8 @@ public class groupAdapter extends RecyclerView.Adapter<groupAdapter.ViewHolder> 
                 Intent intent = new Intent("groupid");
                 intent.putExtra("groupid", String.valueOf(mGroupModel.getGroupid()));
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+                Log.d("DEBUG", "onClick: "+String.valueOf(mGroupModel.getGroupid()));
 
                 holder.group_name.setEnabled(false);
 

@@ -208,30 +208,4 @@ public class SignupActivity extends AppCompatActivity {
         }
     }
 
-    private void sendEmail() {
-        Intent intent = new Intent(Intent.ACTION_SENDTO)
-                .setData(new Uri.Builder().scheme("mailto").build())
-                .putExtra(Intent.EXTRA_EMAIL, new String[]{ "Olmatix <lesjaw@olmatix.com>" })
-                .putExtra(Intent.EXTRA_SUBJECT, "Request Auth for Login")
-                .putExtra(Intent.EXTRA_TEXT, "Your name : " + name +"\n" +" Your email : "+ email +"\n"+" Your password : "+password
-                +"\n\n"+" This is your Auth Login request, we will send you a confirmation email as soon as possible.."
-                +"\n\n"+ " Send this email now.."+"\n\n"+" Thank you..");
-
-        ComponentName emailApp = intent.resolveActivity(getPackageManager());
-        ComponentName unsupportedAction = ComponentName.unflattenFromString("com.android.fallback/.Fallback");
-        if (emailApp != null && !emailApp.equals(unsupportedAction))
-            try {
-                // Needed to customise the chooser dialog title since it might default to "Share with"
-                // Note that the chooser will still be skipped if only one app is matched
-                Intent chooser = Intent.createChooser(intent, "Send email with");
-                startActivity(chooser);
-                return;
-            }
-            catch (ActivityNotFoundException ignored) {
-            }
-
-        Toast
-                .makeText(this, "Couldn't find an email app and account", Toast.LENGTH_LONG)
-                .show();
-    }
 }

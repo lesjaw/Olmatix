@@ -21,6 +21,7 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.olmatix.lesjaw.olmatix.R;
 import com.olmatix.service.OlmatixService;
+import com.olmatix.utils.OlmatixUtils;
 
 import java.util.ArrayList;
 
@@ -81,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
         //_labelOlmatix.setSelected(true);
+        OlmatixUtils.calculateNoOfColumns(this);
 
         _loginButton.setOnClickListener(v -> login());
 

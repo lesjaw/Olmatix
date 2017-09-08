@@ -159,6 +159,16 @@
                     android:text="Delete"
                     android:textColor="@color/white" />
 
+                    <TextView
+                        android:id="@+id/reconfig"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:elevation="4dp"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:text="re-Config"
+                        android:textColor="@color/white" />
+
                 <TextView
                     android:id="@+id/rename"
                     android:layout_width="wrap_content"
